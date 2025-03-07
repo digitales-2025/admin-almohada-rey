@@ -140,6 +140,8 @@ function checkIsActive(pathname: string, item: NavItem, mainNav = false) {
     pathname === item.url || // /endpoint?search=param
     currentPath === item.url || // endpoint
     !!item?.items?.filter((i) => i.url === pathname).length || // if child nav is active
-    (mainNav && pathname.split("/")[1] !== "" && pathname.split("/")[1] === item?.url?.split("/")[1])
+    (mainNav &&
+      pathname.split("/")[1] !== "" &&
+      pathname.split("/")[1] === (typeof item.url === "string" ? item.url.split("/")[1] : ""))
   );
 }

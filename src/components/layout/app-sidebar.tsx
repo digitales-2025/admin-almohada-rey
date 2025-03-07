@@ -1,8 +1,12 @@
-import { NavGroup } from "@/components/layout/nav-group";
-import { NavUser } from "@/components/layout/nav-user";
-import { TeamSwitcher } from "@/components/layout/team-switcher";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from "@/components/ui/sidebar";
+"use client";
+
+import { Box } from "lucide-react";
+
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from "../ui/sidebar";
 import { sidebarData } from "./data/sidebar-data";
+import { NavGroup } from "./nav-group";
+import { NavUser } from "./nav-user";
+import { TeamSwitcher } from "./team-switcher";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (

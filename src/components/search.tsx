@@ -1,3 +1,5 @@
+"use client";
+
 import { Search as SearchButton } from "lucide-react";
 
 import { useSearch } from "@/context/search-context";

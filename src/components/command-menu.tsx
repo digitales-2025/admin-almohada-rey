@@ -1,9 +1,12 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation"; // Cambiado de next/router a next/navigation
-import { ArrowRightCircle, Laptop, Moon, Sun } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowBigRightDash, Laptop, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 
+import { useSearch } from "@/context/search-context";
+import { sidebarData } from "./layout/data/sidebar-data";
 import {
   CommandDialog,
   CommandEmpty,
@@ -12,14 +15,11 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@/components/ui/command";
-import { useSearch } from "@/context/search-context";
-import { useTheme } from "@/context/theme-context";
-import { sidebarData } from "./layout/data/sidebar-data";
+} from "./ui/command";
 import { ScrollArea } from "./ui/scroll-area";
 
 export function CommandMenu() {
-  const router = useRouter(); // Ahora usa el router del App Router
+  const navigate = useRouter();
   const { setTheme } = useTheme();
   const { open, setOpen } = useSearch();
 
@@ -33,10 +33,10 @@ export function CommandMenu() {
 
   return (
     <CommandDialog modal open={open} onOpenChange={setOpen}>
-      <CommandInput placeholder="Type a command or search..." />
+      <CommandInput placeholder="Busca un módulo ..." />
       <CommandList>
         <ScrollArea type="hover" className="h-72 pr-1">
-          <CommandEmpty>No results found.</CommandEmpty>
+          <CommandEmpty>No se encontraron resultados.</CommandEmpty>
           {sidebarData.navGroups.map((group) => (
             <CommandGroup key={group.title} heading={group.title}>
               {group.items.map((navItem, i) => {
@@ -46,11 +46,11 @@ export function CommandMenu() {
                       key={`${navItem.url}-${i}`}
                       value={navItem.title}
                       onSelect={() => {
-                        runCommand(() => router.push(navItem.url));
+                        runCommand(() => navigate.push(navItem.url as string));
                       }}
                     >
                       <div className="mr-2 flex h-4 w-4 items-center justify-center">
-                        <ArrowRightCircle className="size-2 text-muted-foreground/80" />
+                        <ArrowBigRightDash className="size-2 text-muted-foreground/80" />
                       </div>
                       {navItem.title}
                     </CommandItem>
@@ -61,11 +61,11 @@ export function CommandMenu() {
                     key={`${subItem.url}-${i}`}
                     value={subItem.title}
                     onSelect={() => {
-                      runCommand(() => router.push(subItem.url));
+                      runCommand(() => navigate.push(subItem.url as string));
                     }}
                   >
                     <div className="mr-2 flex h-4 w-4 items-center justify-center">
-                      <ArrowRightCircle className="size-2 text-muted-foreground/80" />
+                      <ArrowBigRightDash className="size-2 text-muted-foreground/80" />
                     </div>
                     {subItem.title}
                   </CommandItem>

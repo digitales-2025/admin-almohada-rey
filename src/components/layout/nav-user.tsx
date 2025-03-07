@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from "lucide-react";
 

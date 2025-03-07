@@ -1,22 +1,19 @@
-"use client";
-
-import { ReactNode } from "react";
 import Cookies from "js-cookie";
 
-import { AppSidebar } from "@/components/layout/app-sidebar";
-import SkipToMain from "@/components/skip-to-main";
-import { SidebarProvider } from "@/components/ui/sidebar";
 import { SearchProvider } from "@/context/search-context";
+import { ThemeProvider } from "@/context/theme-context";
 import { cn } from "@/lib/utils";
+import SkipToMain from "../skip-to-main";
+import { SidebarProvider } from "../ui/sidebar";
+import { AppSidebar } from "./app-sidebar";
 
-export default function AdminLayout({ children }: { children: ReactNode }) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const defaultOpen = Cookies.get("sidebar:state") !== "false";
-
   return (
-    <SearchProvider>
-      <SidebarProvider defaultOpen={defaultOpen}>
-        <SkipToMain />
-        <div className="flex h-svh">
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <SearchProvider>
+        <SidebarProvider defaultOpen={defaultOpen}>
+          <SkipToMain />
           <AppSidebar />
           <div
             id="content"
@@ -25,15 +22,15 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               "peer-data-[state=collapsed]:w-[calc(100%-var(--sidebar-width-icon)-1rem)]",
               "peer-data-[state=expanded]:w-[calc(100%-var(--sidebar-width))]",
               "transition-[width] duration-200 ease-linear",
-              "flex flex-col",
+              "flex h-svh flex-col",
               "group-data-[scroll-locked=1]/body:h-full",
               "group-data-[scroll-locked=1]/body:has-[main.fixed-main]:h-svh"
             )}
           >
             {children}
           </div>
-        </div>
-      </SidebarProvider>
-    </SearchProvider>
+        </SidebarProvider>
+      </SearchProvider>
+    </ThemeProvider>
   );
 }
