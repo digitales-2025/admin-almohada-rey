@@ -1,5 +1,7 @@
+"use client";
+
 import React from "react";
-import { useRouter } from "next/router"; // Cambiado de @tanstack/react-router
+import { useRouter } from "next/navigation"; // Cambiado de next/router a next/navigation
 import { ArrowRightCircle, Laptop, Moon, Sun } from "lucide-react";
 
 import {
@@ -17,7 +19,7 @@ import { sidebarData } from "./layout/data/sidebar-data";
 import { ScrollArea } from "./ui/scroll-area";
 
 export function CommandMenu() {
-  const router = useRouter(); // Cambiado de useNavigate
+  const router = useRouter(); // Ahora usa el router del App Router
   const { setTheme } = useTheme();
   const { open, setOpen } = useSearch();
 
@@ -44,7 +46,7 @@ export function CommandMenu() {
                       key={`${navItem.url}-${i}`}
                       value={navItem.title}
                       onSelect={() => {
-                        runCommand(() => router.push(navItem.url)); // Cambiado de navigate
+                        runCommand(() => router.push(navItem.url));
                       }}
                     >
                       <div className="mr-2 flex h-4 w-4 items-center justify-center">
@@ -59,7 +61,7 @@ export function CommandMenu() {
                     key={`${subItem.url}-${i}`}
                     value={subItem.title}
                     onSelect={() => {
-                      runCommand(() => router.push(subItem.url)); // Cambiado de navigate
+                      runCommand(() => router.push(subItem.url));
                     }}
                   >
                     <div className="mr-2 flex h-4 w-4 items-center justify-center">
