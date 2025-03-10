@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 
+import { useLogout } from "@/app/(auth)/log-in/_hooks/use-logout";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +17,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function ProfileDropdown() {
+  const { signOut, isLoading } = useLogout();
+
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
@@ -34,28 +39,15 @@ export function ProfileDropdown() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            <Link href="/settings" className="flex w-full justify-between">
-              Profile
+            <Link href="/profile" className="flex w-full justify-between">
+              Perfil
               <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Link href="/settings" className="flex w-full justify-between">
-              Billing
-              <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Link href="/settings" className="flex w-full justify-between">
-              Settings
-              <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem>New Team</DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          Log out
+        <DropdownMenuItem onClick={signOut} disabled={isLoading}>
+          Cerrar Sesión
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>

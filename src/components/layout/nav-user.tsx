@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from "lucide-react";
 
+import { useLogout } from "@/app/(auth)/log-in/_hooks/use-logout";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -25,6 +26,7 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
+  const { signOut, isLoading } = useLogout();
 
   return (
     <SidebarMenu>
@@ -66,36 +68,17 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
               <DropdownMenuItem asChild>
                 <Link href="/settings/account" className="flex w-full items-center gap-2">
                   <BadgeCheck />
                   Account
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/settings" className="flex w-full items-center gap-2">
-                  <CreditCard />
-                  Billing
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/settings/notifications" className="flex w-full items-center gap-2">
-                  <Bell />
-                  Notifications
-                </Link>
-              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={signOut} disabled={isLoading} className="flex items-center gap-2">
               <LogOut />
-              Log out
+              Cerrar Sesión
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

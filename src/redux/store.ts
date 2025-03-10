@@ -1,0 +1,57 @@
+import { configureStore } from "@reduxjs/toolkit";
+import { setupListeners } from "@reduxjs/toolkit/query";
+
+import { adminApi } from "@/app/(admin)/profile/_services/adminApi";
+import { authApi } from "@/app/(auth)/log-in/_services/authApi";
+
+export const store = configureStore({
+  reducer: {
+    [authApi.reducerPath]: authApi.reducer,
+    [adminApi.reducerPath]: adminApi.reducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      // Configuración para evitar errores de "non-serializable value"
+      serializableCheck: {
+        // Ignorar las acciones que no son serializables, específicamente de classApi
+        ignoredActions: [
+          "quotationsApi/executeMutation/fulfilled",
+          "quotationsApi/executeMutation/rejected",
+          "observationApi/executeMutation/fulfilled",
+          "observationApi/executeMutation/rejected",
+          "designProjectApi/executeMutation/fulfilled",
+          "designProjectApi/executeMutation/rejected",
+          "budgetsApi/executeMutation/fulfilled",
+          "budgetsApi/executeMutation/rejected",
+          "finishesBudgetsApi/executeMutation/fulfilled",
+          "finishesBudgetsApi/executeMutation/rejected",
+          "finishesApi/executeMutation/fulfilled",
+          "finishesApi/executeMutation/rejected",
+          "reportsApi/executeMutation/rejected",
+          "reportsApi/executeMutation/fulfilled",
+          "purchaseOrderApi/executeMutation/fulfilled",
+          "purchaseOrderApi/executeMutation/rejected",
+          "finishesPurchaseOrderApi/executeMutation/fulfilled",
+          "finishesPurchaseOrderApi/executeMutation/rejected",
+        ],
+        // Ignorar las rutas en el estado que contienen valores no serializables
+        ignoredPaths: [
+          "quotationsApi.mutations",
+          "designProjectApi.mutations",
+          "observationApi.mutations",
+          "budgetsApi.mutations",
+          "finishesBudgetsApi.mutations",
+          "finishesApi.mutations",
+          "reportsApi.mutations",
+          "purchaseOrderApi.mutations",
+          "finishesPurchaseOrderApi.mutations",
+        ],
+      },
+    })
+      .concat(authApi.middleware)
+      .concat(adminApi.middleware),
+});
+setupListeners(store.dispatch);
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
