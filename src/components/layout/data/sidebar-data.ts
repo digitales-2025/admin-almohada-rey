@@ -1,28 +1,21 @@
 import {
-  AlertCircle,
-  AlertTriangle,
+  ArrowDownCircle,
+  ArrowUpCircle,
   AudioWaveform,
-  Bell,
-  Bug,
-  CheckSquare,
+  BedDouble,
+  Building2,
+  CalendarCheck,
+  ClipboardEdit,
   Command,
-  FileLock,
+  CreditCard,
   GalleryVerticalEnd,
-  HelpCircle,
   LayoutDashboard,
-  Lock,
-  LockOpen,
-  MessageSquare,
+  ListPlus,
   Package,
-  Palette,
-  PenTool,
-  ServerOff,
   Settings,
-  Shield,
-  ShieldOff,
-  UserCheck,
+  UserCircle,
   Users,
-  UserX,
+  Warehouse,
 } from "lucide-react";
 
 import { type SidebarData } from "../types";
@@ -56,132 +49,80 @@ export const sidebarData: SidebarData = {
       items: [
         {
           title: "Dashboard",
-          url: "/",
+          url: "/dashboard",
           icon: LayoutDashboard,
         },
+      ],
+    },
+
+    {
+      title: "Inventario",
+      items: [
         {
-          title: "Tasks",
-          url: "/tasks",
-          icon: CheckSquare,
-        },
-        {
-          title: "Apps",
-          url: "/apps",
+          title: "Movimientos",
           icon: Package,
+          items: [
+            {
+              title: "Entradas",
+              url: "/inventory/input",
+              icon: ArrowDownCircle,
+            },
+            {
+              title: "Salidas",
+              url: "/inventory/outputs",
+              icon: ArrowUpCircle,
+            },
+          ],
         },
         {
-          title: "Chats",
-          url: "/chats",
-          badge: "3",
-          icon: MessageSquare,
+          title: "Almacén",
+          url: "/inventory/warehouse",
+          icon: Warehouse,
+        },
+      ],
+    },
+    {
+      title: "Gestión Hotelera",
+      items: [
+        {
+          title: "Habitaciones",
+          url: "/rooms",
+          icon: BedDouble,
         },
         {
-          title: "Users",
+          title: "Reservas",
+          url: "/bookings",
+          icon: CalendarCheck,
+        },
+        {
+          title: "Clientes",
+          url: "/clients",
+          icon: UserCircle,
+        },
+        {
+          title: "Pagos",
+          url: "/payments",
+          icon: CreditCard,
+        },
+      ],
+    },
+    {
+      title: "Administración",
+      items: [
+        {
+          title: "Usuarios",
           url: "/users",
           icon: Users,
         },
       ],
     },
     {
-      title: "Pages",
+      title: "Configuración",
       items: [
         {
-          title: "Auth",
-          icon: LockOpen,
-          items: [
-            {
-              title: "Sign In",
-              url: "/sign-in",
-            },
-            {
-              title: "Sign In (2 Col)",
-              url: "/sign-in-2",
-            },
-            {
-              title: "Sign Up",
-              url: "/sign-up",
-            },
-            {
-              title: "Forgot Password",
-              url: "/forgot-password",
-            },
-            {
-              title: "OTP",
-              url: "/otp",
-            },
-          ],
-        },
-        {
-          title: "Errors",
-          icon: Bug,
-          items: [
-            {
-              title: "Unauthorized",
-              url: "/401",
-              icon: Shield,
-            },
-            {
-              title: "Forbidden",
-              url: "/403",
-              icon: ShieldOff,
-            },
-            {
-              title: "Not Found",
-              url: "/404",
-              icon: AlertCircle,
-            },
-            {
-              title: "Internal Server Error",
-              url: "/500",
-              icon: AlertTriangle,
-            },
-            {
-              title: "Maintenance Error",
-              url: "/503",
-              icon: FileLock,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      title: "Other",
-      items: [
-        {
-          title: "Settings",
+          title: "Ajustes",
+          url: "/ajustes",
           icon: Settings,
-          items: [
-            {
-              title: "Profile",
-              url: "/settings",
-              icon: UserCheck,
-            },
-            {
-              title: "Account",
-              url: "/settings/account",
-              icon: PenTool,
-            },
-            {
-              title: "Appearance",
-              url: "/settings/appearance",
-              icon: Palette,
-            },
-            {
-              title: "Notifications",
-              url: "/settings/notifications",
-              icon: Bell,
-            },
-            {
-              title: "Display",
-              url: "/settings/display",
-              icon: FileLock,
-            },
-          ],
-        },
-        {
-          title: "Help Center",
-          url: "/help-center",
-          icon: HelpCircle,
         },
       ],
     },
