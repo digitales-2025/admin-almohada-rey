@@ -1,16 +1,10 @@
 import {
   ArrowDownCircle,
   ArrowUpCircle,
-  AudioWaveform,
   BedDouble,
-  Building2,
   CalendarCheck,
-  ClipboardEdit,
-  Command,
   CreditCard,
-  GalleryVerticalEnd,
   LayoutDashboard,
-  ListPlus,
   Package,
   Settings,
   UserCircle,
@@ -26,23 +20,6 @@ export const sidebarData: SidebarData = {
     email: "satnaingdev@gmail.com",
     avatar: "/avatars/shadcn.jpg",
   },
-  teams: [
-    {
-      name: "Shadcn Admin",
-      logo: Command,
-      plan: "Vite + ShadcnUI",
-    },
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-  ],
   navGroups: [
     {
       title: "General",
