@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { ArrowBigRightDash, Laptop, Moon, Sun } from "lucide-react";
+import { Laptop, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 
 import { useSearch } from "@/context/search-context";
@@ -50,7 +50,7 @@ export function CommandMenu() {
                       }}
                     >
                       <div className="mr-2 flex h-4 w-4 items-center justify-center">
-                        <ArrowBigRightDash className="size-2 text-muted-foreground/80" />
+                        {navItem.icon && <navItem.icon className="size-2 text-muted-foreground/80" />}
                       </div>
                       {navItem.title}
                     </CommandItem>
@@ -65,7 +65,7 @@ export function CommandMenu() {
                     }}
                   >
                     <div className="mr-2 flex h-4 w-4 items-center justify-center">
-                      <ArrowBigRightDash className="size-2 text-muted-foreground/80" />
+                      {subItem.icon && <subItem.icon className="size-2 text-muted-foreground/80" />}
                     </div>
                     {subItem.title}
                   </CommandItem>
@@ -74,17 +74,17 @@ export function CommandMenu() {
             </CommandGroup>
           ))}
           <CommandSeparator />
-          <CommandGroup heading="Theme">
+          <CommandGroup heading="Tema">
             <CommandItem onSelect={() => runCommand(() => setTheme("light"))}>
-              <Sun /> <span>Light</span>
+              <Sun /> <span>Claro</span>
             </CommandItem>
             <CommandItem onSelect={() => runCommand(() => setTheme("dark"))}>
               <Moon className="scale-90" />
-              <span>Dark</span>
+              <span>Oscuro</span>
             </CommandItem>
             <CommandItem onSelect={() => runCommand(() => setTheme("system"))}>
               <Laptop />
-              <span>System</span>
+              <span>Sistema</span>
             </CommandItem>
           </CommandGroup>
         </ScrollArea>
