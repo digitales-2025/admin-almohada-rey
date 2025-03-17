@@ -5,6 +5,12 @@ import { CreateUsersSchema, UpdateUsersSchema } from "../_schema/createUsersSche
 import { SendNewPasswordSchema } from "../_schema/sendNewPasswordSchema";
 import { User } from "../_types/user";
 
+interface UserUpdate {
+  data: User;
+  message: string;
+  statusCode: number;
+}
+
 export const usersApi = createApi({
   reducerPath: "usersApi",
   baseQuery: baseQueryWithReauth,
@@ -22,7 +28,7 @@ export const usersApi = createApi({
     }),
 
     // Actualizar información del usuario por id del parametro /users/:id
-    updateUser: build.mutation<User, UpdateUsersSchema & { id: string }>({
+    updateUser: build.mutation<UserUpdate, UpdateUsersSchema & { id: string }>({
       query: ({ id, ...body }) => ({
         url: `users/${id}`,
         method: "PATCH",
@@ -30,16 +36,6 @@ export const usersApi = createApi({
         credentials: "include",
       }),
 
-      invalidatesTags: ["Users"],
-    }),
-
-    // Eliminar un usuario por id del parametro /users/:id
-    deleteUser: build.mutation<User, string>({
-      query: (id) => ({
-        url: `users/${id}`,
-        method: "DELETE",
-        credentials: "include",
-      }),
       invalidatesTags: ["Users"],
     }),
 
@@ -97,16 +93,6 @@ export const usersApi = createApi({
       }),
       invalidatesTags: ["Users"],
     }),
-
-    //Reactivar a un usuario
-    reactivateUser: build.mutation<User, string>({
-      query: (id) => ({
-        url: `users/reactivate/${id}`,
-        method: "PATCH",
-        credentials: "include",
-      }),
-      invalidatesTags: ["Users"],
-    }),
   }),
 });
 
@@ -115,9 +101,7 @@ export const {
   useGetUsersQuery,
   useGeneratePasswordMutation,
   useCreateUserMutation,
-  useDeleteUserMutation,
   useDeleteUsersMutation,
   useReactivateUsersMutation,
   useSendNewPasswordMutation,
-  useReactivateUserMutation,
 } = usersApi;
