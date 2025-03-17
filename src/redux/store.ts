@@ -2,12 +2,14 @@ import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 
 import { adminApi } from "@/app/(admin)/profile/_services/adminApi";
+import { usersApi } from "@/app/(admin)/users/_services/usersApi";
 import { authApi } from "@/app/(auth)/log-in/_services/authApi";
 
 export const store = configureStore({
   reducer: {
     [authApi.reducerPath]: authApi.reducer,
     [adminApi.reducerPath]: adminApi.reducer,
+    [usersApi.reducerPath]: usersApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -49,7 +51,8 @@ export const store = configureStore({
       },
     })
       .concat(authApi.middleware)
-      .concat(adminApi.middleware),
+      .concat(adminApi.middleware)
+      .concat(usersApi.middleware),
 });
 setupListeners(store.dispatch);
 
