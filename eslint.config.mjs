@@ -5,6 +5,7 @@ import { FlatCompat } from "@eslint/eslintrc";
 import js from "@eslint/js";
 import typescriptEslintEslintPlugin from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
+import importPlugin from "eslint-plugin-import";
 import prettier from "eslint-plugin-prettier";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -20,6 +21,7 @@ export default [
   {
     plugins: {
       prettier,
+      import: importPlugin,
     },
     rules: {
       "prettier/prettier": "error",
@@ -40,6 +42,8 @@ export default [
           jsx: "never",
         },
       ],
+      "no-unused-vars": "error", // Para detectar variables no usadas en JS
+      "import/no-unused-modules": "error", // Para detectar importaciones no usadas
     },
   },
   ...compat.extends("plugin:@typescript-eslint/recommended", "prettier").map((config) => ({
@@ -50,6 +54,7 @@ export default [
     files: ["**/*.+(ts|tsx)"],
     plugins: {
       "@typescript-eslint": typescriptEslintEslintPlugin,
+      import: importPlugin,
     },
     languageOptions: {
       parser: tsParser,
@@ -74,9 +79,8 @@ export default [
           jsx: "never",
         },
       ],
-      "import/resolve": {
-        extensions: [".js", ".jsx", ".ts", ".tsx"],
-      },
+      "@typescript-eslint/no-unused-vars": "error", // Para detectar variables no usadas en TS
+      "import/no-unused-modules": "error", // Para detectar importaciones no usadas
     },
   },
 ];
