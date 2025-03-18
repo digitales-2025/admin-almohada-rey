@@ -29,13 +29,23 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           {children}
           <Toaster
             richColors
-            position="top-center"
+            position="bottom-right"
+            theme="light"
             toastOptions={{
               style: {
-                background: "#fff",
-                borderBlockColor: "#e2e8f0",
+                background: "var(--color-card)",
+                color: "var(--color-card-foreground)",
+                border: "2px solid var(--color-primary)",
+                borderRadius: "var(--radius-lg)",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                fontSize: "14px",
+                padding: "16px",
+                maxWidth: "380px",
               },
+              duration: 4000,
+              className: "toast-custom",
             }}
+            className="toast-container"
             closeButton
           />
         </Providers>
