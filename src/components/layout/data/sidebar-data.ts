@@ -1,11 +1,11 @@
 import {
-  ArrowDownCircle,
-  ArrowUpCircle,
   BedDouble,
   CalendarCheck,
   CreditCard,
   LayoutDashboard,
   Package,
+  PackageMinus,
+  PackagePlus,
   Settings,
   UserCircle,
   Users,
@@ -42,12 +42,12 @@ export const sidebarData: SidebarData = {
             {
               title: "Entradas",
               url: "/inventory/input",
-              icon: ArrowDownCircle,
+              icon: PackagePlus,
             },
             {
               title: "Salidas",
               url: "/inventory/outputs",
-              icon: ArrowUpCircle,
+              icon: PackageMinus,
             },
           ],
         },
