@@ -32,7 +32,23 @@ export function DataTableFacetedFilter<TData, TValue>({
   title,
   options,
 }: DataTableFacetedFilterProps<TData, TValue>) {
-  const selectedValues = new Set<TValue>(column?.getFilterValue() as TValue[]);
+  // Modificamos esta parte para manejar diferentes tipos de valores
+  const filterValue = column?.getFilterValue(); // Extraemos esto fuera del useMemo
+
+  const selectedValues = React.useMemo(() => {
+    // Si no hay valor de filtro
+    if (filterValue === undefined || filterValue === null) {
+      return new Set<TValue>();
+    }
+
+    // Si es un array, lo convertimos directamente a Set
+    if (Array.isArray(filterValue)) {
+      return new Set<TValue>(filterValue as TValue[]);
+    }
+
+    // Si es un valor único (como un booleano), lo envolvemos en un array
+    return new Set<TValue>([filterValue as TValue]);
+  }, [filterValue]);
 
   return (
     <Popover>
@@ -79,17 +95,24 @@ export function DataTableFacetedFilter<TData, TValue>({
                     onSelect={() => {
                       const filterValues = new Set(selectedValues);
                       if (isSelected) {
-                        filterValues.delete(option.value); // Elimina el valor si ya está seleccionado
+                        filterValues.delete(option.value);
                       } else {
-                        filterValues.add(option.value); // Agrega el valor si no está seleccionado
+                        filterValues.add(option.value);
                       }
-                      column?.setFilterValue(filterValues.size ? Array.from(filterValues) : undefined); // Aplica el filtro
+
+                      // Si solo hay un valor booleano seleccionado, enviamos el valor directamente
+                      // en lugar de un array, para que funcione mejor con el filtro booleano
+                      if (filterValues.size === 1 && typeof Array.from(filterValues)[0] === "boolean") {
+                        column?.setFilterValue(Array.from(filterValues)[0]);
+                      } else {
+                        column?.setFilterValue(filterValues.size ? Array.from(filterValues) : undefined);
+                      }
                     }}
                   >
                     <div
                       className={cn(
                         "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                        isSelected ? "bg-primary text-primary-foreground" : "opacity-50 [&_svg]:invisible"
+                        isSelected ? "" : "opacity-50 [&_svg]:invisible"
                       )}
                     >
                       <Check className={cn("h-4 w-4")} />
