@@ -1,5 +1,6 @@
 import AdminLayout from "@/components/layout/admin-layout";
 import { Header } from "@/components/layout/header";
+import { Main } from "@/components/layout/main";
 import { TopNav } from "@/components/layout/top-nav";
 import { ProfileDropdown } from "@/components/profile-dropdown";
 import { Search } from "@/components/search";
@@ -25,7 +26,7 @@ export default function AdminLayoutWrapper({ children }: { children: React.React
         </div>
       </Header>
       {/* ===== Main Content ===== */}
-      <main className="p-4">{children}</main>
+      <Main>{children}</Main>
     </AdminLayout>
   );
 }
