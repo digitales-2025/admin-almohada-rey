@@ -1,5 +1,6 @@
 "use client";
 
+import { useProfile } from "@/app/(admin)/profile/_hooks/use-profile";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from "../ui/sidebar";
 import { sidebarData } from "./data/sidebar-data";
 import { NavGroup } from "./nav-group";
@@ -7,6 +8,7 @@ import { NavLogo } from "./nav-logo";
 import { NavUser } from "./nav-user";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useProfile();
   return (
     <Sidebar collapsible="icon" variant="inset" {...props} className="bg-sidebar">
       <SidebarHeader>
@@ -18,7 +20,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ))}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={sidebarData.user} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
