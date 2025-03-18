@@ -124,3 +124,30 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Estilos para Sonner Toast */
+[data-sonner-toast] {
+  border-width: 2px !important;
+}
+
+[data-sonner-toast][data-type="success"] {
+  border-color: var(--color-primary) !important;
+}
+
+[data-sonner-toast][data-type="error"] {
+  border-color: var(--color-destructive) !important;
+}
+
+[data-sonner-toast][data-type="warning"] {
+  border-color: var(--color-secondary) !important;
+}
+
+[data-sonner-toast] [data-close-button] {
+  color: var(--color-primary) !important;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+[data-sonner-toast] [data-close-button]:hover {
+  opacity: 1;
+}
