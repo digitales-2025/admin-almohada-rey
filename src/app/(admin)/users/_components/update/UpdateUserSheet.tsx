@@ -79,7 +79,14 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
         <SheetHeader className="text-left pb-0">
           <SheetTitle className="flex flex-col items-start">
             {infoSheet.title}
-            <Badge className="bg-emerald-100 text-emerald-700" variant="secondary">
+            <Badge
+              className={
+                user.isActive
+                  ? "bg-emerald-100 text-emerald-500 border-emerald-200"
+                  : "bg-red-100 text-red-500 border-red-200"
+              }
+              variant="secondary"
+            >
               {user.email}
             </Badge>
           </SheetTitle>
