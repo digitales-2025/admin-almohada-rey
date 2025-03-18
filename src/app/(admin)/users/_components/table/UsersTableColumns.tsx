@@ -18,6 +18,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { User } from "../../_types/user";
+import { DeleteUsersDialog } from "../state-management/DeleteUsersDialog";
+import { ReactivateUsersDialog } from "../state-management/ReactivateUsersDialog";
+import { UpdateUserSheet } from "../update/UpdateUserSheet";
 
 /**
  * Generar las columnas de la tabla de usuarios
@@ -131,12 +134,37 @@ export const usersColumns = (isSuperAdmin: boolean): ColumnDef<User>[] => [
       const [showDeleteDialog, setShowDeleteDialog] = useState(false);
       const [showReactivateDialog, setShowReactivateDialog] = useState(false);
       const [showEditDialog, setShowEditDialog] = useState(false);
-      console.log(showDeleteDialog, showReactivateDialog, showEditDialog);
 
       const { isActive } = row.original;
       return (
         <div>
-          <div></div>
+          <div>
+            {showEditDialog && (
+              <UpdateUserSheet open={showEditDialog} onOpenChange={setShowEditDialog} user={row?.original} />
+            )}
+            {showDeleteDialog && (
+              <DeleteUsersDialog
+                open={showDeleteDialog}
+                onOpenChange={setShowDeleteDialog}
+                users={[row?.original]}
+                showTrigger={false}
+                onSuccess={() => {
+                  row.toggleSelected(false);
+                }}
+              />
+            )}
+            {showReactivateDialog && (
+              <ReactivateUsersDialog
+                open={showReactivateDialog}
+                onOpenChange={setShowReactivateDialog}
+                users={[row?.original]}
+                showTrigger={false}
+                onSuccess={() => {
+                  row.toggleSelected(false);
+                }}
+              />
+            )}
+          </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button aria-label="Open menu" variant="ghost" className="flex size-8 p-0 data-[state=open]:bg-muted">
@@ -156,10 +184,14 @@ export const usersColumns = (isSuperAdmin: boolean): ColumnDef<User>[] => [
                   </DropdownMenuShortcut>
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem onSelect={() => setShowDeleteDialog(true)} disabled={!isActive}>
+              <DropdownMenuItem
+                onSelect={() => setShowDeleteDialog(true)}
+                disabled={!isActive}
+                className="text-red-700"
+              >
                 Eliminar
                 <DropdownMenuShortcut>
-                  <Trash className="size-4" aria-hidden="true" />
+                  <Trash className="size-4 text-red-700" aria-hidden="true" />
                 </DropdownMenuShortcut>
               </DropdownMenuItem>
             </DropdownMenuContent>
