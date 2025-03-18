@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 import { format, parseISO } from "date-fns";
-import { CircleCheck, Ellipsis, RefreshCcwDot, Timer, Trash } from "lucide-react";
+import { Ellipsis, RefreshCcwDot, Trash } from "lucide-react";
+import * as RPNInput from "react-phone-number-input";
+import flags from "react-phone-number-input/flags";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +19,8 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User } from "../../_types/user";
+import { User, UserRolType } from "../../_types/user";
+import { UserRolTypeLabels } from "../../_utils/users.utils";
 import { DeleteUsersDialog } from "../state-management/DeleteUsersDialog";
 import { ReactivateUsersDialog } from "../state-management/ReactivateUsersDialog";
 import { UpdateUserSheet } from "../update/UpdateUserSheet";
@@ -70,54 +73,68 @@ export const usersColumns = (isSuperAdmin: boolean): ColumnDef<User>[] => [
     id: "teléfono",
     accessorKey: "phone",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Teléfono" />,
-    cell: ({ row }) => <div>{row.getValue("teléfono")}</div>,
+    cell: ({ row }) => {
+      const phone = row.getValue("teléfono") as string;
+      if (!phone) return <div>-</div>;
+
+      try {
+        // Obtener el país del número de teléfono
+        const country = RPNInput.parsePhoneNumber(phone)?.country;
+
+        // Formatear el número para mejor legibilidad
+        const formattedPhone = RPNInput.formatPhoneNumberIntl(phone);
+
+        return (
+          <div className="flex items-center gap-2">
+            {country && (
+              <span className="flex h-4 w-6 overflow-hidden rounded-sm">
+                {flags[country] && React.createElement(flags[country], { title: country })}
+              </span>
+            )}
+            <span>{formattedPhone || phone}</span>
+          </div>
+        );
+      } catch {
+        // Si hay algún error al parsear el número, mostramos el número original
+        return <div>{phone}</div>;
+      }
+    },
   },
 
   {
-    id: "acceso",
-    accessorKey: "mustChangePassword",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Acceso" className="min-w-28" />,
-    cell: ({ row }) => (
-      <div className="text-xs">
-        {row.getValue("acceso") ? (
-          <span className="inline-flex items-center gap-2 text-slate-400">
-            <Timer className="size-4 flex-shrink-0" aria-hidden="true" />
-            Debe cambiar contraseña
-          </span>
-        ) : (
-          <span className="inline-flex items-center gap-2 text-emerald-500">
-            <CircleCheck className="size-4" aria-hidden="true" />
-            Habilitado
-          </span>
-        )}
-      </div>
-    ),
-  },
-  {
-    id: "estado",
-    accessorKey: "isActive",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Estado" />,
-    cell: ({ row }) => (
-      <div>
-        {row.getValue("estado") ? (
-          <Badge variant="secondary" className="bg-emerald-100 text-emerald-500">
-            Activo
+    id: "rol",
+    accessorKey: "userRol",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Rol" />,
+    cell: ({ row }) => {
+      const role = row.getValue("rol") as UserRolType;
+      const roleConfig = UserRolTypeLabels[role];
+
+      if (!roleConfig) return <div>Rol no definido</div>;
+
+      const Icon = roleConfig.icon;
+
+      return (
+        <div className="text-xs min-w-32">
+          <Badge variant="default" className={roleConfig.className}>
+            <Icon className="size-4 flex-shrink-0 mr-1" aria-hidden="true" />
+            {roleConfig.label}
           </Badge>
-        ) : (
-          <Badge variant="secondary" className="bg-red-100 text-red-500">
-            Inactivo
-          </Badge>
-        )}
-      </div>
-    ),
+        </div>
+      );
+    },
     filterFn: (row, id, value) => {
       const rowValue = row.getValue(id);
-      // Convertimos el valor del filtro a booleano
-      const filterValue = value[0] === "true" ? true : false;
-      return rowValue === filterValue;
+
+      if (Array.isArray(value)) {
+        if (value.length === 0) return true;
+        return value.includes(rowValue);
+      }
+
+      return rowValue === value;
     },
     enableColumnFilter: true,
   },
+
   {
     id: "conexión",
     accessorKey: "lastLogin",
@@ -128,6 +145,46 @@ export const usersColumns = (isSuperAdmin: boolean): ColumnDef<User>[] => [
       return <div>{format(parseISO(row?.getValue("conexión")), "yyyy-MM-dd HH:mm:ss")}</div>;
     },
   },
+  {
+    id: "estado",
+    accessorKey: "isActive",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Estado" />,
+    cell: ({ row }) => (
+      <div>
+        {row.getValue("estado") ? (
+          <Badge variant="secondary" className="bg-emerald-100 text-emerald-500 border-emerald-200">
+            Activo
+          </Badge>
+        ) : (
+          <Badge variant="secondary" className="bg-red-100 text-red-500 border-red-200">
+            Inactivo
+          </Badge>
+        )}
+      </div>
+    ),
+    filterFn: (row, id, value) => {
+      const rowValue = row.getValue(id);
+
+      // Si value es un array, comprobamos si contiene el valor de la fila
+      if (Array.isArray(value)) {
+        // Si el array está vacío, no filtramos
+        if (value.length === 0) return true;
+
+        // Convertimos cada elemento del array según sea necesario
+        return value.some((v) => {
+          // Si es string "true"/"false", convertimos a booleano
+          if (typeof v === "string") return v === String(rowValue);
+          // Si ya es booleano, comparamos directamente
+          return v === rowValue;
+        });
+      }
+
+      // Si es un valor único, hacemos la comparación directa
+      return rowValue === value;
+    },
+    enableColumnFilter: true,
+  },
+
   {
     id: "actions",
     cell: function Cell({ row }) {

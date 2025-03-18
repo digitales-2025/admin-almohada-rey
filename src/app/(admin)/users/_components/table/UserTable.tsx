@@ -2,36 +2,17 @@
 
 import { useMemo } from "react";
 import { Table as TableInstance } from "@tanstack/react-table";
-import { CheckCircle2, XCircle } from "lucide-react";
 
 import { useProfile } from "@/app/(admin)/profile/_hooks/use-profile";
 import { DataTable } from "@/components/datatable/data-table";
 import { User } from "../../_types/user";
+import { facetedFilters } from "../../_utils/users.filter.utils";
 import { usersColumns } from "./UsersTableColumns";
 import { UsersTableToolbarActions } from "./UsersTableToolbarActions";
 
 export function UsersTable({ data }: { data: User[] }) {
   const { user } = useProfile();
   const columns = useMemo(() => usersColumns(user?.isSuperAdmin || false), [user]);
-
-  const facetedFilters = [
-    {
-      column: "estado",
-      title: "Estado",
-      options: [
-        {
-          label: "Activo",
-          value: true,
-          icon: CheckCircle2,
-        },
-        {
-          label: "Inactivo",
-          value: false,
-          icon: XCircle,
-        },
-      ],
-    },
-  ];
 
   return (
     <DataTable
