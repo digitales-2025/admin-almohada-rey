@@ -8,7 +8,7 @@ import { DataTableViewOptions } from "./data-table-view-options";
 
 interface DataTableToolbarProps<TData, TValue> {
   table: Table<TData>;
-  toolbarActions?: React.ReactNode;
+  toolbarActions?: React.ReactNode | ((table: Table<TData>) => React.ReactNode);
   filterPlaceholder?: string;
   facetedFilters?: {
     column: string;
@@ -68,7 +68,7 @@ export function DataTableToolbar<TData, TValue>({
         )}
       </div>
       <div className="flex items-center space-x-2">
-        {toolbarActions}
+        {typeof toolbarActions === "function" ? toolbarActions(table) : toolbarActions}
         <DataTableViewOptions table={table} />
       </div>
     </div>

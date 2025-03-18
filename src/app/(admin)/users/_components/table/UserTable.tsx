@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import { CheckCircle2, XCircle } from "lucide-react"; // Importa los iconos
+import { Table as TableInstance } from "@tanstack/react-table";
+import { CheckCircle2, XCircle } from "lucide-react";
 
 import { useProfile } from "@/app/(admin)/profile/_hooks/use-profile";
 import { DataTable } from "@/components/datatable/data-table";
@@ -36,7 +37,7 @@ export function UsersTable({ data }: { data: User[] }) {
     <DataTable
       data={data}
       columns={columns}
-      toolBarActions={<UsersTableToolbarActions />}
+      toolbarActions={(table: TableInstance<User>) => <UsersTableToolbarActions table={table} />}
       filterPlaceholder="Buscar usuarios..."
       facetedFilters={facetedFilters}
     />

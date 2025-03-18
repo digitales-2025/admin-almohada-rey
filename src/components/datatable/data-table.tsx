@@ -11,6 +11,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   SortingState,
+  Table as TableInstance, // Añade esta importación
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
@@ -28,7 +29,7 @@ const globalFilterFn = <TData,>(row: TData, columnId: string, value: string): bo
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  toolBarActions?: React.ReactNode;
+  toolbarActions?: React.ReactNode | ((table: TableInstance<TData>) => React.ReactNode); // Actualiza el tipo
   filterPlaceholder?: string;
   facetedFilters?: {
     column: string;
@@ -44,7 +45,7 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
-  toolBarActions,
+  toolbarActions,
   filterPlaceholder,
   facetedFilters,
 }: DataTableProps<TData, TValue>) {
@@ -86,7 +87,7 @@ export function DataTable<TData, TValue>({
     <div className="space-y-4">
       <DataTableToolbar
         table={table}
-        toolbarActions={toolBarActions}
+        toolbarActions={toolbarActions}
         filterPlaceholder={filterPlaceholder}
         facetedFilters={facetedFilters}
       />
