@@ -9,7 +9,7 @@ interface HeaderPageProps {
 
 export const HeaderPage = ({ title, description, badgeContent }: HeaderPageProps) => {
   return (
-    <div>
+    <div className="mb-4">
       <TitleSecction text={title} />
       {badgeContent && (
         <div className="m-2">
