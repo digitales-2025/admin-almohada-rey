@@ -1,6 +1,8 @@
+"use client";
+
 import { useEffect, useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Bot, Plus, RefreshCcw } from "lucide-react";
+import { Plus, RefreshCcw } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
@@ -14,17 +16,30 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { PhoneInput } from "@/components/ui/phone-input";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { useUsers } from "../../_hooks/use-users";
-import { CreateUsersSchema, usersSchema } from "../../_schema/createUsersSchema";
-import { UserRolType } from "../../_types/user";
-import { UserRolTypeLabels } from "../../_utils/users.utils";
+import { usersSchema, type CreateUsersSchema } from "../../_schema/createUsersSchema";
+import CreateUserForm from "./CreateUserForm";
+
+const dataForm = {
+  button: "Crear usuario",
+  title: "Crear Usuario",
+  description: "Complete los detalles a continuación para crear nuevos usuarios.",
+};
 
 export function CreateUsersDialog() {
+  const isDesktop = useMediaQuery("(min-width: 640px)");
   const [open, setOpen] = useState(false);
   const [isCreatePending, startCreateTransition] = useTransition();
   const { onCreateUser, isSuccessCreateUser } = useUsers();
@@ -68,139 +83,79 @@ export function CreateUsersDialog() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccessCreateUser]);
 
+  if (isDesktop)
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button variant="outline" size="sm">
+            <Plus className="mr-2 size-4" aria-hidden="true" />
+            {dataForm.button}
+          </Button>
+        </DialogTrigger>
+        <DialogContent tabIndex={undefined}>
+          <DialogHeader>
+            <DialogTitle>{dataForm.title}</DialogTitle>
+            <DialogDescription>{dataForm.description}</DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="h-full max-h-[80vh] w-full justify-center gap-4 p-0">
+            <div className="p-1">
+              <CreateUserForm form={form} onSubmit={onSubmit} handleGeneratePassword={handleGeneratePassword}>
+                <DialogFooter className="w-full">
+                  <div className="grid grid-cols-2 gap-2 w-full">
+                    <DialogClose asChild>
+                      <Button onClick={handleClose} type="button" variant="outline" className="w-full">
+                        Cancelar
+                      </Button>
+                    </DialogClose>
+                    <Button disabled={isCreatePending} className="w-full">
+                      {isCreatePending && <RefreshCcw className="mr-2 size-4 animate-spin" aria-hidden="true" />}
+                      Registrar
+                    </Button>
+                  </div>
+                </DialogFooter>
+              </CreateUserForm>
+            </div>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+    );
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">
+    <Drawer open={open} onOpenChange={setOpen}>
+      <DrawerTrigger asChild>
+        <Button variant="outline" size="sm">
           <Plus className="mr-2 size-4" aria-hidden="true" />
-          Crear usuario
+          {dataForm.button}
         </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Crear un usuario nuevo</DialogTitle>
-          <DialogDescription>Complete la información y presione el boton Crear.</DialogDescription>
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nombre Completo</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ejm: Juan Perez" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Correo electrónico</FormLabel>
-                  <FormControl>
-                    <Input placeholder="usuario@almohadarey.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Teléfono</FormLabel>
-                  <FormControl>
-                    <PhoneInput
-                      defaultCountry="PE"
-                      placeholder="999 888 777"
-                      value={field.value}
-                      onChange={(value) => field.onChange(value)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel htmlFor="password">Generar contraseña</FormLabel>
-                  <FormControl>
-                    <div className="flex items-center gap-2">
-                      <Input id="password" placeholder="********" {...field} />
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button type="button" variant="outline" onClick={handleGeneratePassword}>
-                              <Bot className="size-4" aria-hidden="true" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Generar constraseña</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="userRol"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel htmlFor="rol">Rol</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value ?? ""}>
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecciona un rol" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectGroup>
-                        {Object.values(UserRolType).map((rol) => {
-                          const roleConfig = UserRolTypeLabels[rol];
-                          const Icon = roleConfig.icon;
+      </DrawerTrigger>
 
-                          return (
-                            <SelectItem key={rol} value={rol} className="flex items-center gap-2">
-                              <Icon className={`size-4 ${roleConfig.className}`} />
-                              <span>{roleConfig.label}</span>
-                            </SelectItem>
-                          );
-                        })}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+      <DrawerContent>
+        <DrawerHeader className="pb-2">
+          <DrawerTitle>{dataForm.title}</DrawerTitle>
+          <DrawerDescription>{dataForm.description}</DrawerDescription>
+        </DrawerHeader>
 
-            <DialogFooter className="w-full">
-              <div className="grid grid-cols-2 gap-2 w-full">
-                <DialogClose asChild>
-                  <Button onClick={handleClose} type="button" variant="outline" className="w-full">
-                    Cancelar
+        {/* The key fix is in this ScrollArea configuration */}
+        <div className="flex-1 overflow-hidden">
+          <ScrollArea className="h-[40vh] px-0">
+            <div className="px-4">
+              <CreateUserForm form={form} onSubmit={onSubmit} handleGeneratePassword={handleGeneratePassword}>
+                <DrawerFooter className="px-0 pt-2">
+                  <Button disabled={isCreatePending} className="w-full">
+                    {isCreatePending && <RefreshCcw className="mr-2 size-4 animate-spin" aria-hidden="true" />}
+                    Registrar
                   </Button>
-                </DialogClose>
-                <Button disabled={isCreatePending} className="w-full">
-                  {isCreatePending && <RefreshCcw className="mr-2 size-4 animate-spin" aria-hidden="true" />}
-                  Registrar
-                </Button>
-              </div>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+                  <DrawerClose asChild>
+                    <Button variant="outline" className="w-full" onClick={handleClose}>
+                      Cancelar
+                    </Button>
+                  </DrawerClose>
+                </DrawerFooter>
+              </CreateUserForm>
+            </div>
+          </ScrollArea>
+        </div>
+      </DrawerContent>
+    </Drawer>
   );
 }
