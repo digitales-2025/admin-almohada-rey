@@ -18,7 +18,7 @@ export const HeaderPage = ({ title, description, badgeContent }: HeaderPageProps
           </Badge>
         </div>
       )}
-      <span className="text-sm text-slate-600">{description}</span>
+      <span className="text-sm text-slate-600 dark:text-white">{description}</span>
     </div>
   );
 };
