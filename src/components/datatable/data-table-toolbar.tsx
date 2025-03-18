@@ -31,7 +31,7 @@ export function DataTableToolbar<TData, TValue>({
 
   return (
     <div className="flex flex-col sm:flex-row gap-2">
-      <div className="flex flex-1 flex-col items-start gap-y-2 sm:flex-row sm:items-center sm:space-x-2">
+      <div className="flex flex-1 flex-col-reverse items-start gap-y-2 sm:flex-row sm:items-center sm:space-x-2">
         <Input
           placeholder={filterPlaceholder}
           value={table.getState().globalFilter ?? ""}
