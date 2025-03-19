@@ -1,5 +1,6 @@
 import { BaseQueryFn } from "@reduxjs/toolkit/query";
 import { fetchBaseQuery, FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
+
 import { translateError } from "./translateError";
 
 const baseQuery = fetchBaseQuery({
