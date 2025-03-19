@@ -97,8 +97,6 @@ export async function serverFetch<Success>(
       ];
     }
   } catch (error) {
-    // FIXME: Quitar en prod
-    console.log(`${process.env.INTERNAL_BACKEND_URL}${url}`);
     console.error(error);
     return [
       // @ts-expect-error allowing null
