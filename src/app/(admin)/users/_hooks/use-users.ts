@@ -71,7 +71,7 @@ export const useUsers = () => {
     const promise = runAndHandleError(() => updateUser(input).unwrap());
     toast.promise(promise, {
       loading: "Actualizando usuario...",
-      success: "Uusuario actualizado exitosamente",
+      success: "Usuario actualizado exitosamente",
       error: (error) => {
         return error.message;
       },

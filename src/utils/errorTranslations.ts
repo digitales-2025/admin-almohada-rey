@@ -25,6 +25,16 @@ const errorTranslations = {
     "La nueva contraseña debe ser diferente a la contraseña temporal",
   "Cannot deactivate admin users": "No puedes desactivar usuarios administradores",
   "You cannot deactivate yourself": "No puedes desactivarte a ti mismo",
+  "This email is already in use": "Este correo ya está en uso",
+  "This email is already in use but the customer is inactive":
+    "Este correo ya está en uso pero el cliente está inactivo",
+  "This document number is already in use": "Este número de documento ya está en uso",
+  "This document number is already in use but the customer is inactive":
+    "Este número de documento ya está en uso pero el cliente está inactivo",
+  "The length of the RUC is incorrect": "La longitud del RUC es incorrecta",
+  "This RUC is already in use but the customer is inactive": "Este RUC ya está en uso pero el cliente está inactivo",
+  "This RUC is already in use": "Este RUC ya está en uso",
+  "phone must be a valid phone number": "El teléfono debe ser un número de teléfono válido",
 };
 
 export default errorTranslations;

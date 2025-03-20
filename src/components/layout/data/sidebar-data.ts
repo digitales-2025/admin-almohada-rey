@@ -73,7 +73,7 @@ export const sidebarData: SidebarData = {
         },
         {
           title: "Clientes",
-          url: "/clients",
+          url: "/customers",
           icon: UserCircle,
         },
         {
