@@ -50,7 +50,7 @@ const CommandInput = React.forwardRef<
     )}
     cmdk-input-wrapper=""
   >
-    <MagnifyingGlassIcon className="mr-2 shrink-0 opacity-50" />
+    <MagnifyingGlassIcon className="h-4 w-4 mr-2 shrink-0 opacity-50" />
     <CommandPrimitive.Input
       ref={ref}
       className={cn(
