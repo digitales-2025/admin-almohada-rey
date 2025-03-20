@@ -5,7 +5,6 @@ import { FlatCompat } from "@eslint/eslintrc";
 import js from "@eslint/js";
 import typescriptEslintEslintPlugin from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
-import importPlugin from "eslint-plugin-import";
 import prettier from "eslint-plugin-prettier";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -21,7 +20,6 @@ export default [
   {
     plugins: {
       prettier,
-      import: importPlugin,
     },
     rules: {
       "prettier/prettier": "error",
@@ -42,8 +40,6 @@ export default [
           jsx: "never",
         },
       ],
-      "no-unused-vars": "error", // Para detectar variables no usadas en JS
-      "import/no-unused-modules": "error", // Para detectar importaciones no usadas
     },
   },
   ...compat.extends("plugin:@typescript-eslint/recommended", "prettier").map((config) => ({
@@ -54,33 +50,17 @@ export default [
     files: ["**/*.+(ts|tsx)"],
     plugins: {
       "@typescript-eslint": typescriptEslintEslintPlugin,
-      import: importPlugin,
     },
     languageOptions: {
       parser: tsParser,
     },
     rules: {
-      "prettier/prettier": "error",
-      camelcase: "off",
-      "import/prefer-default-export": "off",
-      "react/jsx-filename-extension": "off",
-      "react/jsx-props-no-spreading": "off",
-      "react/no-unused-prop-types": "off",
-      "react/require-default-props": "off",
-      "react/no-unescaped-entities": "off",
-      "import/extensions": [
-        "error",
-        "ignorePackages",
-        {
-          "": "never",
-          ts: "never",
-          tsx: "never",
-          js: "never",
-          jsx: "never",
-        },
-      ],
-      "@typescript-eslint/no-unused-vars": "error", // Para detectar variables no usadas en TS
-      "import/no-unused-modules": "error", // Para detectar importaciones no usadas
+      "@typescript-eslint/explicit-function-return-type": "off",
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "no-use-before-define": [0],
+      "@typescript-eslint/no-use-before-define": [1],
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-var-requires": "off",
     },
   },
 ];
