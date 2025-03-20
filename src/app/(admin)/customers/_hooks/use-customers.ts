@@ -10,7 +10,7 @@ import {
 } from "../_services/customersApi";
 import { Customer } from "../_types/customer";
 
-export const useCostumers = () => {
+export const useCustomers = () => {
   const { data: dataCustomersAll, error, isLoading, isSuccess, refetch } = useGetAllCustomersQuery();
 
   const [createCustomer, { isSuccess: isSuccessCreateCustomer }] = useCreateCustomerMutation();
