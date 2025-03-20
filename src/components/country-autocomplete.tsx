@@ -11,9 +11,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 export type CountryOption = {
-  value: string;
-  label: string;
-  [key: string]: string;
+  value: string; // Nombre en español
+  label: string; // Nombre en español
+  original: string; // Código original del país (ej: "ES", "US")
 };
 
 // Define the props that EmbeddedFlag components expect
@@ -35,8 +35,9 @@ type CountryAutocompleteProps = {
   showClearButton?: boolean;
 };
 
-const CountryAutocomplete = forwardRef<HTMLInputElement, CountryAutocompleteProps>(
-  ({
+const CountryAutocomplete = forwardRef<HTMLInputElement, CountryAutocompleteProps>((props) => {
+  // Añadido el parámetro ref
+  const {
     options,
     flags,
     placeholder = "Buscar país...",
@@ -47,125 +48,100 @@ const CountryAutocomplete = forwardRef<HTMLInputElement, CountryAutocompleteProp
     isLoading = false,
     className,
     showClearButton = true,
-  }) => {
-    const inputRef = useRef<HTMLInputElement>(null);
-    const wrapperRef = useRef<HTMLDivElement>(null);
+  } = props;
 
-    const [isOpen, setOpen] = useState(false);
-    const [selected, setSelected] = useState<CountryOption | undefined>(value);
-    const [inputValue, setInputValue] = useState<string>(value?.label || "");
-    const [inputFocused, setInputFocused] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
-    // Update internal state when value prop changes
-    useEffect(() => {
-      setSelected(value);
-      setInputValue(value?.label || "");
-    }, [value]);
+  const [isOpen, setOpen] = useState(false);
+  const [selected, setSelected] = useState<CountryOption | undefined>(value);
+  const [inputValue, setInputValue] = useState<string>(value?.label || "");
+  const [inputFocused, setInputFocused] = useState(false);
 
-    const handleKeyDown = useCallback(
-      (event: KeyboardEvent<HTMLDivElement>) => {
-        const input = inputRef.current;
-        if (!input) {
-          return;
+  // Update internal state when value prop changes
+  useEffect(() => {
+    setSelected(value);
+    setInputValue(value?.label || "");
+  }, [value]);
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLDivElement>) => {
+      const input = inputRef.current;
+      if (!input) {
+        return;
+      }
+
+      if (!isOpen) {
+        setOpen(true);
+      }
+
+      if (event.key === "Enter" && input.value.trim() !== "") {
+        // Find exact matches based on label
+        const exactMatches = options.filter(
+          (option) => option.label.toLowerCase() === input.value.trim().toLowerCase()
+        );
+
+        if (exactMatches.length >= 1) {
+          setSelected(exactMatches[0]);
+          onValueChange?.(exactMatches[0]);
+          setOpen(false);
         }
+      }
 
-        if (!isOpen) {
-          setOpen(true);
-        }
+      if (event.key === "Escape") {
+        input.blur();
+      }
+    },
+    [isOpen, options, onValueChange]
+  );
 
-        if (event.key === "Enter" && input.value.trim() !== "") {
-          // Find exact matches based on label
-          const exactMatches = options.filter(
-            (option) => option.label.toLowerCase() === input.value.trim().toLowerCase()
-          );
+  const handleBlur = useCallback(() => {
+    setOpen(false);
+    setInputValue(selected?.label || "");
+    setInputFocused(false);
+  }, [selected]);
 
-          if (exactMatches.length >= 1) {
-            setSelected(exactMatches[0]);
-            onValueChange?.(exactMatches[0]);
-            setOpen(false);
-          }
-        }
+  const handleFocus = useCallback(() => {
+    setOpen(true);
+    setInputFocused(true);
+  }, []);
 
-        if (event.key === "Escape") {
-          input.blur();
-        }
-      },
-      [isOpen, options, onValueChange]
-    );
-
-    const handleBlur = useCallback(() => {
+  const handleSelectOption = useCallback(
+    (selectedOption: CountryOption) => {
+      setInputValue(selectedOption.label);
+      setSelected(selectedOption);
+      onValueChange?.(selectedOption);
       setOpen(false);
-      setInputValue(selected?.label || "");
-      setInputFocused(false);
-    }, [selected]);
 
-    const handleFocus = useCallback(() => {
-      setOpen(true);
-      setInputFocused(true);
-    }, []);
+      setTimeout(() => {
+        inputRef?.current?.blur();
+      }, 0);
+    },
+    [onValueChange]
+  );
 
-    const handleSelectOption = useCallback(
-      (selectedOption: CountryOption) => {
-        setInputValue(selectedOption.label);
-        setSelected(selectedOption);
-        onValueChange?.(selectedOption);
-        setOpen(false);
+  const handleClearSelection = useCallback(() => {
+    const emptyOption: CountryOption = { value: "", label: "", original: "" };
+    setSelected(undefined);
+    setInputValue("");
+    onValueChange?.(emptyOption);
+  }, [onValueChange]);
 
-        setTimeout(() => {
-          inputRef?.current?.blur();
-        }, 0);
-      },
-      [onValueChange]
-    );
+  // Filter options based on input value
+  const filteredOptions = inputValue
+    ? options.filter(
+        (option) =>
+          option.label.toLowerCase().includes(inputValue.toLowerCase()) ||
+          option.value.toLowerCase().includes(inputValue.toLowerCase())
+      )
+    : options;
 
-    const handleClearSelection = useCallback(() => {
-      const emptyOption: CountryOption = { value: "", label: "" };
-      setSelected(undefined);
-      setInputValue("");
-      onValueChange?.(emptyOption);
-    }, [onValueChange]);
+  // Get the flag component for the selected country
+  const SelectedFlagComponent = selected?.original ? flags[selected.original] : null;
 
-    // Filter options based on input value
-    const filteredOptions = inputValue
-      ? options.filter((option) => option.label.toLowerCase().includes(inputValue.toLowerCase()))
-      : options;
-
-    // Get the flag component for the selected country
-    const SelectedFlagComponent = selected?.value ? flags[selected.value] : null;
-
-    // Custom input rendering to show flag alongside text
-    const renderCustomInput = () => {
-      if (!selected || !SelectedFlagComponent) {
-        return (
-          <CommandInput
-            ref={inputRef}
-            value={inputValue}
-            onValueChange={isLoading ? undefined : setInputValue}
-            onBlur={handleBlur}
-            onFocus={handleFocus}
-            placeholder={placeholder}
-            disabled={disabled}
-            className={cn("border-0 focus-visible:ring-0 focus-visible:ring-offset-0", className)}
-          />
-        );
-      }
-
-      // When a country is selected and not focused, show custom display
-      if (!inputFocused) {
-        return (
-          <div className="flex items-center w-full h-10 px-3 py-2 text-sm" onClick={() => inputRef.current?.focus()}>
-            <div className="flex items-center gap-2 pl-6">
-              <span className="flex h-4 w-6 overflow-hidden rounded-sm">
-                <SelectedFlagComponent title={selected.label} />
-              </span>
-              <span>{selected.label}</span>
-            </div>
-            <input ref={inputRef} onFocus={handleFocus} onBlur={handleBlur} className="absolute opacity-0 w-0 h-0" />
-          </div>
-        );
-      }
-
-      // When focused, show normal input
+  // Custom input rendering to show flag alongside text
+  const renderCustomInput = () => {
+    if (!selected || !SelectedFlagComponent) {
       return (
         <CommandInput
           ref={inputRef}
@@ -175,87 +151,117 @@ const CountryAutocomplete = forwardRef<HTMLInputElement, CountryAutocompleteProp
           onFocus={handleFocus}
           placeholder={placeholder}
           disabled={disabled}
-          className={cn("pl-9 border-0 focus-visible:ring-0 focus-visible:ring-offset-0", className)}
+          className={cn("border-0 focus-visible:ring-0 focus-visible:ring-offset-0", className)}
         />
       );
-    };
+    }
 
-    return (
-      <CommandPrimitive onKeyDown={handleKeyDown}>
-        <div className="relative" ref={wrapperRef}>
-          <div className="relative flex items-center border rounded-md">
-            <Search className="absolute left-3 h-4 w-4 shrink-0 opacity-50 z-[1]" />
-            <div className="flex-1 overflow-hidden">{renderCustomInput()}</div>
-            {selected && showClearButton && (
-              <button
-                type="button"
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-600 z-[2] bg-white"
-                onClick={handleClearSelection}
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
+    // When a country is selected and not focused, show custom display
+    if (!inputFocused) {
+      return (
+        <div className="flex items-center w-full h-10 px-3 py-2 text-sm" onClick={() => inputRef.current?.focus()}>
+          <div className="flex items-center gap-2 pl-6">
+            <span className="flex h-4 w-6 overflow-hidden rounded-sm">
+              <SelectedFlagComponent title={selected.label} />
+            </span>
+            <span>{selected.label}</span>
           </div>
+          <input ref={inputRef} onFocus={handleFocus} onBlur={handleBlur} className="absolute opacity-0 w-0 h-0" />
+        </div>
+      );
+    }
 
-          <div className={cn("relative", isOpen ? "mt-1" : "mt-0")}>
-            <div
-              className={cn(
-                "absolute top-0 z-10 w-full rounded-md border border-input bg-white shadow-md outline-none animate-in fade-in-0 zoom-in-95",
-                isOpen ? "block" : "hidden"
-              )}
+    // When focused, show normal input
+    return (
+      <CommandInput
+        ref={inputRef}
+        value={inputValue}
+        onValueChange={isLoading ? undefined : setInputValue}
+        onBlur={handleBlur}
+        onFocus={handleFocus}
+        placeholder={placeholder}
+        disabled={disabled}
+        className={cn("pl-9 border-0 focus-visible:ring-0 focus-visible:ring-offset-0", className)}
+      />
+    );
+  };
+
+  return (
+    <CommandPrimitive onKeyDown={handleKeyDown}>
+      <div className="relative" ref={wrapperRef}>
+        <div className="relative flex items-center border rounded-md">
+          <Search className="absolute left-3 h-4 w-4 shrink-0 opacity-50 z-[1]" />
+          <div className="flex-1 overflow-hidden">{renderCustomInput()}</div>
+          {selected && showClearButton && (
+            <button
+              type="button"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-600 z-[2] bg-white"
+              onClick={handleClearSelection}
             >
-              <ScrollArea className="h-[300px]">
-                <CommandList className="h-full rounded-md">
-                  {isLoading && (
-                    <CommandPrimitive.Loading>
-                      <div className="p-1">
-                        <Skeleton className="h-8 w-full" />
-                      </div>
-                    </CommandPrimitive.Loading>
-                  )}
-                  {!isLoading && filteredOptions.length > 0 && (
-                    <CommandGroup>
-                      {filteredOptions.map((option) => {
-                        const isSelected = selected?.value === option.value;
-                        const FlagComponent = flags[option.value];
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
 
-                        return (
-                          <CommandItem
-                            key={option.value}
-                            value={option.label}
-                            onMouseDown={(event) => {
-                              event.preventDefault();
-                              event.stopPropagation();
-                            }}
-                            onSelect={() => handleSelectOption(option)}
-                            className={cn("flex items-center gap-2 py-2", !isSelected ? "pl-8" : null)}
-                          >
-                            {isSelected && <Check className="h-4 w-4" />}
-                            {FlagComponent && (
-                              <span className="flex h-4 w-6 overflow-hidden rounded-sm">
-                                <FlagComponent title={option.label} />
-                              </span>
-                            )}
-                            <span>{option.label}</span>
-                          </CommandItem>
-                        );
-                      })}
-                    </CommandGroup>
-                  )}
-                  {!isLoading && filteredOptions.length === 0 && (
-                    <CommandPrimitive.Empty className="select-none rounded-sm px-2 py-3 text-center text-sm">
-                      {emptyMessage}
-                    </CommandPrimitive.Empty>
-                  )}
-                </CommandList>
-              </ScrollArea>
-            </div>
+        <div className={cn("relative", isOpen ? "mt-1" : "mt-0")}>
+          <div
+            className={cn(
+              "absolute top-0 z-10 w-full rounded-md border border-input bg-white shadow-md outline-none animate-in fade-in-0 zoom-in-95",
+              isOpen ? "block" : "hidden"
+            )}
+          >
+            <ScrollArea className="h-[300px]">
+              <CommandList className="h-full rounded-md">
+                {isLoading && (
+                  <CommandPrimitive.Loading>
+                    <div className="p-1">
+                      <Skeleton className="h-8 w-full" />
+                    </div>
+                  </CommandPrimitive.Loading>
+                )}
+                {!isLoading && filteredOptions.length > 0 && (
+                  <CommandGroup>
+                    {filteredOptions.map((option) => {
+                      const isSelected = selected?.value === option.value;
+                      // Usar option.original para obtener el componente de la bandera
+                      const FlagComponent = flags[option.original];
+
+                      return (
+                        <CommandItem
+                          key={option.original}
+                          value={option.label}
+                          onMouseDown={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                          }}
+                          onSelect={() => handleSelectOption(option)}
+                          className={cn("flex items-center gap-2 py-2", !isSelected ? "pl-8" : null)}
+                        >
+                          {isSelected && <Check className="h-4 w-4" />}
+                          {FlagComponent && (
+                            <span className="flex h-4 w-6 overflow-hidden rounded-sm">
+                              <FlagComponent title={option.label} />
+                            </span>
+                          )}
+                          <span>{option.label}</span>
+                        </CommandItem>
+                      );
+                    })}
+                  </CommandGroup>
+                )}
+                {!isLoading && filteredOptions.length === 0 && (
+                  <CommandPrimitive.Empty className="select-none rounded-sm px-2 py-3 text-center text-sm">
+                    {emptyMessage}
+                  </CommandPrimitive.Empty>
+                )}
+              </CommandList>
+            </ScrollArea>
           </div>
         </div>
-      </CommandPrimitive>
-    );
-  }
-);
+      </div>
+    </CommandPrimitive>
+  );
+});
 
 CountryAutocomplete.displayName = "CountryAutocomplete";
 
