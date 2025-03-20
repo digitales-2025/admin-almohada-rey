@@ -35,8 +35,7 @@ type CountryAutocompleteProps = {
   showClearButton?: boolean;
 };
 
-const CountryAutocomplete = forwardRef<HTMLInputElement, CountryAutocompleteProps>((props) => {
-  // Añadido el parámetro ref
+const CountryAutocomplete = forwardRef<HTMLInputElement, CountryAutocompleteProps>((props, ref) => {
   const {
     options,
     flags,
@@ -144,7 +143,7 @@ const CountryAutocomplete = forwardRef<HTMLInputElement, CountryAutocompleteProp
     if (!selected || !SelectedFlagComponent) {
       return (
         <CommandInput
-          ref={inputRef}
+          ref={ref}
           value={inputValue}
           onValueChange={isLoading ? undefined : setInputValue}
           onBlur={handleBlur}
