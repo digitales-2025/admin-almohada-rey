@@ -33,12 +33,13 @@ export function DataTableToolbar<TData, TValue>({
     <div className="flex flex-col sm:flex-row gap-2">
       <div className="flex flex-1 flex-col-reverse items-start gap-y-2 sm:flex-row sm:items-center sm:space-x-2">
         <Input
+          type="search"
           placeholder={filterPlaceholder}
           value={table.getState().globalFilter ?? ""}
           onChange={(event) => table.setGlobalFilter(event.target.value)}
           className="h-8 w-[150px] lg:w-[250px]"
         />
-        <div className="flex gap-2">
+        <div className="flex flex-col flex-wrap sm:flex-row gap-2">
           {facetedFilters.map((filter) => {
             const column = table.getColumn(filter.column);
             return (
