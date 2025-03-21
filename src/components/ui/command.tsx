@@ -44,9 +44,18 @@ function CommandDialog({
   );
 }
 
-function CommandInput({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.Input>) {
+function CommandInput({
+  className,
+  showBorder = false, // Prop con valor predeterminado false
+  ...props
+}: React.ComponentProps<typeof CommandPrimitive.Input> & {
+  showBorder?: boolean;
+}) {
   return (
-    <div data-slot="command-input-wrapper" className="flex h-9 items-center gap-2 border-b px-3">
+    <div
+      data-slot="command-input-wrapper"
+      className={cn("flex h-9 items-center gap-2 px-3", showBorder ? "border rounded-md" : "border-b")}
+    >
       <SearchIcon className="size-4 shrink-0 opacity-50" />
       <CommandPrimitive.Input
         data-slot="command-input"
