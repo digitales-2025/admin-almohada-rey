@@ -39,7 +39,7 @@ export function DataTableToolbar<TData, TValue>({
           onChange={(event) => table.setGlobalFilter(event.target.value)}
           className="h-8 w-[150px] lg:w-[250px]"
         />
-        <div className="flex flex-col flex-wrap sm:flex-row gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {facetedFilters.map((filter) => {
             const column = table.getColumn(filter.column);
             return (
