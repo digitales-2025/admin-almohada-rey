@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { Ellipsis, RefreshCcwDot, Trash } from "lucide-react";
+import { ChevronDown, ChevronRight, Ellipsis, RefreshCcwDot, Trash } from "lucide-react";
 import * as RPNInput from "react-phone-number-input";
 import flags from "react-phone-number-input/flags";
 
@@ -132,6 +132,23 @@ export const customersColumns = (isSuperAdmin: boolean): ColumnDef<Customer>[] =
   },
 
   {
+    id: "N° Doc.",
+    accessorKey: "documentNumber",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="N° Doc." />,
+    cell: ({ row }) => {
+      const documentNumber = row.getValue("N° Doc.") as string;
+
+      if (!documentNumber) return <div className="text-muted-foreground text-sm italic">No disponible</div>;
+
+      return (
+        <div className="font-mono text-sm py-1 px-2 mx-auto bg-slate-50 rounded-md border border-slate-200 inline-block">
+          {documentNumber}
+        </div>
+      );
+    },
+  },
+
+  {
     id: "e. civil",
     accessorKey: "maritalStatus",
     header: ({ column }) => <DataTableColumnHeader column={column} title="E. Civil" />,
@@ -202,6 +219,28 @@ export const customersColumns = (isSuperAdmin: boolean): ColumnDef<Customer>[] =
       return rowValue === value;
     },
     enableColumnFilter: true,
+  },
+
+  {
+    id: "expand", // Nueva columna para expansión
+    header: () => null, // No mostrar un título en el header
+    cell: ({ row }) => (
+      <Button
+        onClick={() => row.toggleExpanded()} // Alternar la expansión de la fila
+        aria-label="Expand row"
+        className="flex items-center justify-center p-2"
+        variant={"ghost"}
+      >
+        {row.getIsExpanded() ? (
+          <ChevronDown className="size-4" /> // Ícono cuando la fila está expandida
+        ) : (
+          <ChevronRight className="size-4" /> // Ícono cuando la fila está colapsada
+        )}
+      </Button>
+    ),
+    enableSorting: false,
+    enableHiding: false,
+    enablePinning: true,
   },
 
   {
