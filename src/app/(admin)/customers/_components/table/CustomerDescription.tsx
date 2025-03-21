@@ -134,7 +134,7 @@ export const CustomerDescription = ({ row }: CustomerDescriptionProps) => {
                 <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                 <div>
                   <p className="text-xs text-muted-foreground">Dirección</p>
-                  <p className="text-sm">{row.address}</p>
+                  <p className="text-sm break-words whitespace-pre-line">{row.address}</p>
                 </div>
               </div>
 
