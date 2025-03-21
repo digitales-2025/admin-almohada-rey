@@ -20,6 +20,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Customer, CustomerDocumentType, CustomerMaritalStatus } from "../../_types/customer";
 import { CustomerDocumentTypeLabels, CustomerMaritalStatusLabels } from "../../_utils/customers.utils";
+import { DeleteCustomersDialog } from "../state-management/DeleteCustomersDialog";
+import { ReactivateCustomersDialog } from "../state-management/ReactivateCustomersDialog";
 import { UpdateCustomerSheet } from "../update/UpdateCustomersSheet";
 
 /**
@@ -251,8 +253,6 @@ export const customersColumns = (isSuperAdmin: boolean): ColumnDef<Customer>[] =
       const [showReactivateDialog, setShowReactivateDialog] = useState(false);
       const [showEditDialog, setShowEditDialog] = useState(false);
 
-      console.log(showDeleteDialog, showReactivateDialog);
-
       const { isActive } = row.original;
       return (
         <div>
@@ -260,12 +260,12 @@ export const customersColumns = (isSuperAdmin: boolean): ColumnDef<Customer>[] =
             {showEditDialog && (
               <UpdateCustomerSheet open={showEditDialog} onOpenChange={setShowEditDialog} customer={row?.original} />
             )}
-            {/*  
+
             {showDeleteDialog && (
-              <DeleteUsersDialog
+              <DeleteCustomersDialog
                 open={showDeleteDialog}
                 onOpenChange={setShowDeleteDialog}
-                users={[row?.original]}
+                customers={[row?.original]}
                 showTrigger={false}
                 onSuccess={() => {
                   row.toggleSelected(false);
@@ -273,16 +273,16 @@ export const customersColumns = (isSuperAdmin: boolean): ColumnDef<Customer>[] =
               />
             )}
             {showReactivateDialog && (
-              <ReactivateUsersDialog
+              <ReactivateCustomersDialog
                 open={showReactivateDialog}
                 onOpenChange={setShowReactivateDialog}
-                users={[row?.original]}
+                customers={[row?.original]}
                 showTrigger={false}
                 onSuccess={() => {
                   row.toggleSelected(false);
                 }}
               />
-            )} */}
+            )}
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
