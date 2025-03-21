@@ -81,7 +81,9 @@ export function DataTableExpanded<TData, TValue>({
     left: ["select"],
     right: ["actions"],
   });
-  const [expandedRows, setExpandedRows] = React.useState<Record<string, boolean>>({}); // Estado para manejar filas expandidas
+
+  // Usamos el estado expandedState de tanstack table directamente
+  const [expanded, setExpanded] = React.useState({});
 
   const table = useReactTable({
     data,
@@ -96,7 +98,10 @@ export function DataTableExpanded<TData, TValue>({
       columnFilters,
       globalFilter,
       columnPinning,
+      expanded, // Utilizar el estado de expansión
     },
+    onExpandedChange: setExpanded, // Manejar los cambios en la expansión
+    getRowCanExpand: () => true, // Permitir que todas las filas puedan expandirse
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
@@ -112,14 +117,6 @@ export function DataTableExpanded<TData, TValue>({
     getFacetedUniqueValues: getFacetedUniqueValues(),
     globalFilterFn: globalFilterFn,
   });
-
-  // Función para manejar la expansión de filas
-  const toggleRowExpansion = (rowId: string) => {
-    setExpandedRows((prev) => ({
-      ...prev,
-      [rowId]: !prev[rowId],
-    }));
-  };
 
   // Estilos para columnas fijadas
   const getCommonPinningStyles = (column: Column<TData>): React.CSSProperties => {
@@ -172,7 +169,7 @@ export function DataTableExpanded<TData, TValue>({
                     data-state={row.getIsSelected() && "selected"}
                     onClick={() => {
                       if (onClickRow) onClickRow(row.original);
-                      toggleRowExpansion(row.id); // Alternar expansión al hacer clic
+                      // Ya no expandimos la fila al hacer clic en la fila completa
                     }}
                   >
                     {row.getVisibleCells().map((cell) => {
@@ -190,7 +187,7 @@ export function DataTableExpanded<TData, TValue>({
                       );
                     })}
                   </TableRow>
-                  {expandedRows[row.id] && renderExpandedRow && (
+                  {row.getIsExpanded() && renderExpandedRow && (
                     <TableRow>
                       <TableCell colSpan={columns.length}>{renderExpandedRow(row.original)}</TableCell>
                     </TableRow>
