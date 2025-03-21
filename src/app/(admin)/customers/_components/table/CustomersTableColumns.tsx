@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Customer, CustomerDocumentType, CustomerMaritalStatus } from "../../_types/customer";
 import { CustomerDocumentTypeLabels, CustomerMaritalStatusLabels } from "../../_utils/customers.utils";
+import { UpdateCustomerSheet } from "../update/UpdateCustomersSheet";
 
 /**
  * Generar las columnas de la tabla de usuarios
@@ -250,15 +251,16 @@ export const customersColumns = (isSuperAdmin: boolean): ColumnDef<Customer>[] =
       const [showReactivateDialog, setShowReactivateDialog] = useState(false);
       const [showEditDialog, setShowEditDialog] = useState(false);
 
-      console.log(showDeleteDialog, showReactivateDialog, showEditDialog);
+      console.log(showDeleteDialog, showReactivateDialog);
 
       const { isActive } = row.original;
       return (
         <div>
           <div>
-            {/*      {showEditDialog && (
-              <UpdateUserSheet open={showEditDialog} onOpenChange={setShowEditDialog} user={row?.original} />
+            {showEditDialog && (
+              <UpdateCustomerSheet open={showEditDialog} onOpenChange={setShowEditDialog} customer={row?.original} />
             )}
+            {/*  
             {showDeleteDialog && (
               <DeleteUsersDialog
                 open={showDeleteDialog}
