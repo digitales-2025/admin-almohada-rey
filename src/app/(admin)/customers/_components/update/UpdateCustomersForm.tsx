@@ -1,58 +1,43 @@
-import React, { useState } from "react";
 import { BriefcaseBusiness, Home, IdCard, Mail, MapPin, User } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
-import { Country, getCountries } from "react-phone-number-input";
 import flags from "react-phone-number-input/flags";
-import es from "react-phone-number-input/locale/es.json";
 
-import { CountryAutocomplete, CountryOption } from "@/components/country-autocomplete";
+import { CountryAutocomplete, type CountryOption } from "@/components/country-autocomplete";
 import { InputWithIcon } from "@/components/input-with-icon";
-import { AutoComplete, Option } from "@/components/ui/autocomplete";
+import { AutoComplete, type Option } from "@/components/ui/autocomplete";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { departments } from "@/data/department";
+import { Sheet } from "@/components/ui/sheet";
 import { City } from "@/types/city";
-import { CreateCustomersSchema } from "../../_schema/createCustomersSchema";
+import { type CreateCustomersSchema } from "../../_schema/createCustomersSchema";
 import { CustomerDocumentType, CustomerMaritalStatus } from "../../_types/customer";
 import { CustomerDocumentTypeLabels, CustomerMaritalStatusLabels } from "../../_utils/customers.utils";
 
-interface CreateCustomersFormProps extends Omit<React.ComponentPropsWithRef<"form">, "onSubmit"> {
+interface UpdateCustomerSheetProps extends Omit<React.ComponentPropsWithRef<typeof Sheet>, "open" | "onOpenChange"> {
   children: React.ReactNode;
   form: UseFormReturn<CreateCustomersSchema>;
   onSubmit: (data: CreateCustomersSchema) => void;
+  countryOptions: CountryOption[];
+  departmentOptions: Option[];
+  handleDepartmentChange: (departmentName: string) => void;
+  cities: City[];
+  isDepartmentSelected: boolean;
 }
 
-export default function CreateCustomersForm({ children, form, onSubmit }: CreateCustomersFormProps) {
-  // Estado para almacenar las ciudades del departamento seleccionado
-  const [cities, setCities] = useState<City[]>([]);
-  const [isDepartmentSelected, setIsDepartmentSelected] = useState(false);
-  const [selectedCountryCode, setSelectedCountryCode] = useState<Country>("PE");
-
-  const countryOptions: CountryOption[] = getCountries().map((country) => ({
-    value: es[country],
-    label: es[country] || country,
-    original: country,
-  }));
-
-  // Prepara las opciones para el AutoComplete
-  const departmentOptions: Option[] = departments.map((department) => ({
-    value: department.name,
-    label: department.name,
-  }));
-
-  // Manejar el cambio de departamento
-  const handleDepartmentChange = (departmentName: string) => {
-    const selectedDepartment = departments.find((dept) => dept.name === departmentName);
-    const selectedCities = selectedDepartment?.cities || [];
-    setCities(selectedCities);
-    setIsDepartmentSelected(true);
-    // Resetear el campo de ciudad cuando se cambia el departamento
-    form.setValue("province", "");
-  };
+export default function UpdateCustomersForm({
+  children,
+  form,
+  onSubmit,
+  countryOptions,
+  departmentOptions,
+  handleDepartmentChange,
+  cities,
+  isDepartmentSelected,
+}: UpdateCustomerSheetProps) {
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4 px-6">
         <FormField
           control={form.control}
           name="name"
@@ -60,7 +45,7 @@ export default function CreateCustomersForm({ children, form, onSubmit }: Create
             <FormItem>
               <FormLabel>Nombre Completo</FormLabel>
               <FormControl>
-                <InputWithIcon Icon={User} placeholder="Ejm: Juan Perez" {...field} />
+                <InputWithIcon Icon={User} placeholder="Ejm: Juan Perez" {...field} className="capitalize" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -95,10 +80,6 @@ export default function CreateCustomersForm({ children, form, onSubmit }: Create
                   placeholder="Seleccione un país"
                   onValueChange={(selectedOption) => {
                     field.onChange(selectedOption?.value || "");
-                    // Actualizar el código de país para el PhoneInput
-                    if (selectedOption) {
-                      setSelectedCountryCode(selectedOption.original as Country);
-                    }
                   }}
                   value={countryOptions.find((option) => option.value === field.value) || undefined}
                 />
@@ -198,7 +179,7 @@ export default function CreateCustomersForm({ children, form, onSubmit }: Create
               <FormLabel>Teléfono</FormLabel>
               <FormControl>
                 <PhoneInput
-                  defaultCountry={selectedCountryCode}
+                  defaultCountry="PE"
                   placeholder="999 888 777"
                   value={field.value}
                   onChange={(value) => field.onChange(value)}
@@ -302,7 +283,6 @@ export default function CreateCustomersForm({ children, form, onSubmit }: Create
             </FormItem>
           )}
         />
-
         {children}
       </form>
     </Form>

@@ -10,8 +10,9 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  Row,
   SortingState,
-  Table as TableInstance, // Añade esta importación
+  Table as TableInstance,
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
@@ -21,16 +22,24 @@ import { Empty } from "../common/Empty";
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 
-// Definir la función de filtrado global con tipos genéricos
-const globalFilterFn = <TData,>(row: TData, columnId: string, value: string): boolean => {
-  const item = String(row[columnId as keyof TData]).toLowerCase();
-  return item.includes(value.toLowerCase());
+// Función de filtrado global correcta para TanStack Table v8
+const globalFilterFn: FilterFn<any> = (row, columnId, value) => {
+  const getValue = (row: Row<any>) => {
+    // Accede a los valores originales de la fila
+    const rowValue = columnId === "_all" ? Object.values(row.original).join(" ") : row.getValue(columnId);
+
+    // Convierte a string para la comparación
+    return typeof rowValue === "string" ? rowValue.toLowerCase() : String(rowValue).toLowerCase();
+  };
+
+  const searchValue = value.toLowerCase();
+  return getValue(row).includes(searchValue);
 };
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  toolbarActions?: React.ReactNode | ((table: TableInstance<TData>) => React.ReactNode); // Actualiza el tipo
+  toolbarActions?: React.ReactNode | ((table: TableInstance<TData>) => React.ReactNode);
   filterPlaceholder?: string;
   facetedFilters?: {
     column: string;
@@ -59,9 +68,6 @@ export function DataTable<TData, TValue>({
   const table = useReactTable({
     data,
     columns,
-    filterFns: {
-      global: globalFilterFn as FilterFn<TData>,
-    },
     state: {
       sorting,
       columnVisibility,
@@ -81,7 +87,11 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    globalFilterFn: globalFilterFn as FilterFn<TData>,
+    globalFilterFn: globalFilterFn,
+    // Aplicar el filtro global a todas las columnas
+    filterFns: {
+      global: globalFilterFn,
+    },
   });
 
   return (

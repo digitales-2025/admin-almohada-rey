@@ -9,6 +9,7 @@ import { CommandGroup, CommandInput, CommandItem, CommandList } from "@/componen
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { Button } from "./ui/button";
 
 export type CountryOption = {
   value: string; // Nombre en español
@@ -192,13 +193,15 @@ const CountryAutocomplete = forwardRef<HTMLInputElement, CountryAutocompleteProp
           <Search className="absolute left-3 h-4 w-4 shrink-0 opacity-50 z-[1]" />
           <div className="flex-1 overflow-hidden">{renderCustomInput()}</div>
           {selected && showClearButton && (
-            <button
+            <Button
               type="button"
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-600 z-[2] bg-white"
+              variant={"icon"}
+              size={"icon"}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-600"
               onClick={handleClearSelection}
             >
               <X className="h-4 w-4" />
-            </button>
+            </Button>
           )}
         </div>
 
