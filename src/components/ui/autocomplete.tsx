@@ -22,7 +22,6 @@ type AutoCompleteProps = {
   disabled?: boolean;
   placeholder?: string;
   className?: string;
-  sizeInput?: string;
   showClearButton?: boolean; // Nuevo prop
 };
 
@@ -37,7 +36,6 @@ const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
       disabled,
       isLoading = false,
       className,
-      sizeInput = "md", // Valor por defecto
       showClearButton = true, // Nuevo prop
     },
     ref
@@ -131,7 +129,6 @@ const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
             placeholder={placeholder}
             disabled={disabled}
             className={cn(className, "pr-8 capitalize")}
-            {...(sizeInput && { sizeInput })}
           />
           {selected && showClearButton && (
             <button
