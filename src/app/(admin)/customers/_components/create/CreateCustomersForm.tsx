@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { BriefcaseBusiness, Home, IdCard, Mail, MapPin, User } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
-import { getCountries } from "react-phone-number-input";
+import { Country, getCountries } from "react-phone-number-input";
 import flags from "react-phone-number-input/flags";
 import es from "react-phone-number-input/locale/es.json";
 
@@ -27,6 +27,8 @@ export default function CreateCustomersForm({ children, form, onSubmit }: Create
   // Estado para almacenar las ciudades del departamento seleccionado
   const [cities, setCities] = useState<City[]>([]);
   const [isDepartmentSelected, setIsDepartmentSelected] = useState(false);
+  const [selectedCountryCode, setSelectedCountryCode] = useState<Country>("PE");
+
   const countryOptions: CountryOption[] = getCountries().map((country) => ({
     value: es[country],
     label: es[country] || country,
@@ -93,6 +95,10 @@ export default function CreateCustomersForm({ children, form, onSubmit }: Create
                   placeholder="Seleccione un país"
                   onValueChange={(selectedOption) => {
                     field.onChange(selectedOption?.value || "");
+                    // Actualizar el código de país para el PhoneInput
+                    if (selectedOption) {
+                      setSelectedCountryCode(selectedOption.original as Country);
+                    }
                   }}
                   value={countryOptions.find((option) => option.value === field.value) || undefined}
                 />
@@ -192,7 +198,7 @@ export default function CreateCustomersForm({ children, form, onSubmit }: Create
               <FormLabel>Teléfono</FormLabel>
               <FormControl>
                 <PhoneInput
-                  defaultCountry="PE"
+                  defaultCountry={selectedCountryCode}
                   placeholder="999 888 777"
                   value={field.value}
                   onChange={(value) => field.onChange(value)}
