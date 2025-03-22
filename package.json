@@ -10,7 +10,8 @@
     "prepare": "husky install",
     "lint:fix": "eslint \"src/**/*.+(ts|tsx)\" --fix",
     "format": "prettier . --write",
-    "format:check": "prettier . --check"
+    "format:check": "prettier . --check",
+    "generate-types": "pnpx tsx  ./src/types/generateTypes.ts"
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": [
@@ -46,6 +47,7 @@
     "clsx": "^2.1.1",
     "cmdk": "1.0.0",
     "date-fns": "^4.1.0",
+    "dotenv": "^16.4.7",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
     "lucide": "^0.477.0",
