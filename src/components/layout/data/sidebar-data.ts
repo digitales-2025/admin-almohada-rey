@@ -6,7 +6,6 @@ import {
   Package,
   PackageMinus,
   PackagePlus,
-  Settings,
   UserCircle,
   Users,
   Warehouse,
@@ -90,16 +89,6 @@ export const sidebarData: SidebarData = {
           title: "Usuarios",
           url: "/users",
           icon: Users,
-        },
-      ],
-    },
-    {
-      title: "Configuración",
-      items: [
-        {
-          title: "Ajustes",
-          url: "/ajustes",
-          icon: Settings,
         },
       ],
     },
