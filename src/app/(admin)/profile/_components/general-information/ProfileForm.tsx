@@ -57,7 +57,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
               <FormItem>
                 <FormLabel>Nombre</FormLabel>
                 <FormControl>
-                  <InputWithIcon Icon={UserIcon} placeholder="Nombre" {...field} />
+                  <InputWithIcon Icon={UserIcon} placeholder="Nombre" {...field} className="capitalize" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
