@@ -34,6 +34,10 @@ pipeline {
 
         // SSH command
         SSH_COM = "ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_IP}"
+
+        // Docker build variables
+        NEXT_PUBLIC_BACKEND_URL = "https://almohada-backend-develop.acide.win/api/v1"
+        INTERNAL_BACKEND_URL = "http://almohada-backend-develop:4000/api/v1"
     }
 
     stages {
@@ -42,7 +46,7 @@ pipeline {
                 sh "cp deploy/Dockerfile.dev ./Dockerfile"
                 script {
                     withDockerRegistry(credentialsId: "${REGISTRY_CREDENTIALS}") {
-                        def image = docker.build("${FULL_REGISTRY_URL}:${BUILD_NUMBER}")
+                        def image = docker.build("${FULL_REGISTRY_URL}:${BUILD_NUMBER}", "--build-arg NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL} --build-arg INTERNAL_BACKEND_URL=${INTERNAL_BACKEND_URL} .")
                         image.push()
                     }
                 }
