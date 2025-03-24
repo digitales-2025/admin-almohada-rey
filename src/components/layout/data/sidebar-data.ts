@@ -55,6 +55,11 @@ export const sidebarData: SidebarData = {
           url: "/inventory/warehouse",
           icon: Warehouse,
         },
+        {
+          title: "Productos",
+          url: "/inventory/products",
+          icon: Package,
+        },
       ],
     },
     {
