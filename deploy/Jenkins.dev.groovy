@@ -36,8 +36,8 @@ pipeline {
         SSH_COM = "ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_IP}"
 
         // Docker build variables
-        NEXT_PUBLIC_BACKEND_URL = "https://almohada-backend-develop.acide.win/api/v1"
-        INTERNAL_BACKEND_URL = "http://almohada-backend-develop:4000/api/v1"
+        NEXT_PUBLIC_BACKEND_URL = "https://almohada-backend-develop.acide.win/v1"
+        INTERNAL_BACKEND_URL = "http://almohada-backend-develop:4000/v1"
     }
 
     stages {
