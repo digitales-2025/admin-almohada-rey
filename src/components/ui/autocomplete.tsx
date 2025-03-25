@@ -167,14 +167,14 @@ const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
           )}
           <div
             className={cn(
-              "absolute top-0 z-50 w-full rounded-xl border border-input bg-white shadow outline-none animate-in fade-in-0 zoom-in-95",
+              "absolute top-0 z-50 w-full rounded-xl border border-input bg-white dark:bg-slate-800 shadow outline-none animate-in fade-in-0 zoom-in-95",
               isOpen ? "block" : "hidden"
             )}
             onMouseDown={(e) => e.stopPropagation()}
           >
-            <div className="max-h-[300px] overflow-y-auto bg-white" onScrollCapture={handleScrollCapture}>
+            <div className="max-h-[300px] overflow-y-auto" onScrollCapture={handleScrollCapture}>
               <CommandList
-                className="h-full rounded-lg capitalize bg-white"
+                className="h-full rounded-lg capitalize bg-white dark:bg-slate-800"
                 onMouseDown={(e) => {
                   // Prevenir que los clics dentro de la lista cierren el dropdown
                   e.preventDefault();
@@ -200,7 +200,7 @@ const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
                             event.stopPropagation();
                           }}
                           onSelect={() => handleSelectOption(option)}
-                          className={cn("flex w-full items-center gap-2 bg-white", !isSelected ? "pl-8" : null)}
+                          className={cn("flex w-full items-center gap-2 ", !isSelected ? "pl-8" : null)}
                         >
                           {isSelected && <Check className="w-4" />}
                           {option.label}
@@ -210,7 +210,7 @@ const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
                   </CommandGroup>
                 )}
                 {!isLoading && options.length === 0 && (
-                  <CommandPrimitive.Empty className="select-none rounded-sm px-2 py-3 text-center text-sm bg-white">
+                  <CommandPrimitive.Empty className="select-none rounded-sm px-2 py-3 text-center text-sm">
                     {emptyMessage}
                   </CommandPrimitive.Empty>
                 )}

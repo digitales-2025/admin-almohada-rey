@@ -218,13 +218,13 @@ const CountryAutocomplete = forwardRef<HTMLInputElement, CountryAutocompleteProp
         <div className={cn("relative", isOpen ? "mt-1" : "mt-0")}>
           <div
             className={cn(
-              "absolute top-0 z-50 w-full rounded-md border border-input bg-white shadow-md outline-none animate-in fade-in-0 zoom-in-95",
+              "absolute top-0 z-50 w-full rounded-md border border-input bg-white dark:bg-slate-800 shadow-md outline-none animate-in fade-in-0 zoom-in-95",
               isOpen ? "block" : "hidden"
             )}
           >
             <ScrollArea className="h-[300px]" onScrollCapture={handleScrollCapture}>
               <CommandList
-                className="h-full rounded-md bg-white"
+                className="h-full rounded-md bg-white dark:bg-slate-800"
                 onMouseDown={(e) => {
                   // Prevenir que los clics dentro de la lista cierren el dropdown
                   e.preventDefault();
