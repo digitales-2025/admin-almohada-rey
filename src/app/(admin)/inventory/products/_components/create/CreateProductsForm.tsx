@@ -45,7 +45,7 @@ export default function CreateProductsForm({ children, form, onSubmit }: CreateP
                   placeholder="Ingrese el precio del producto"
                   {...field}
                   onChange={(e) => field.onChange(e.target.valueAsNumber || 0)}
-                  value={field.value || ""}
+                  value={field.value ?? ""}
                 />
               </FormControl>
               <FormMessage />
@@ -61,19 +61,19 @@ export default function CreateProductsForm({ children, form, onSubmit }: CreateP
               <Select onValueChange={field.onChange} value={field.value ?? ""}>
                 <FormControl>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecciona un tipo de documento" />
+                    <SelectValue placeholder="Selecciona un tipo de producto" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   <SelectGroup>
                     {Object.values(ProductType).map((productType) => {
-                      const documentTypeConfig = ProductTypeLabels[productType];
-                      const Icon = documentTypeConfig.icon;
+                      const productTypeConfig = ProductTypeLabels[productType];
+                      const Icon = productTypeConfig.icon;
 
                       return (
                         <SelectItem key={productType} value={productType} className="flex items-center gap-2">
-                          <Icon className={`size-4 ${documentTypeConfig.className}`} />
-                          <span>{documentTypeConfig.label}</span>
+                          <Icon className={`size-4 ${productTypeConfig.className}`} />
+                          <span>{productTypeConfig.label}</span>
                         </SelectItem>
                       );
                     })}
