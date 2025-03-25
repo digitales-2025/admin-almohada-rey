@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Product, ProductType } from "../../_types/products";
 import { ProductTypeLabels } from "../../_utils/products.utils";
+import { DeleteProductsDialog } from "../state-management/DeleteProductsDialog";
+import { ReactivateProductsDialog } from "../state-management/ReactivateProductsDialog";
 import { UpdateProductSheet } from "../update/UpdateProductsSheet";
 
 /**
@@ -205,6 +207,29 @@ export const productsColumns = (isSuperAdmin: boolean): ColumnDef<Product>[] => 
           <div>
             {showEditDialog && (
               <UpdateProductSheet open={showEditDialog} onOpenChange={setShowEditDialog} product={row?.original} />
+            )}
+
+            {showDeleteDialog && (
+              <DeleteProductsDialog
+                open={showDeleteDialog}
+                onOpenChange={setShowDeleteDialog}
+                products={[row?.original]}
+                showTrigger={false}
+                onSuccess={() => {
+                  row.toggleSelected(false);
+                }}
+              />
+            )}
+            {showReactivateDialog && (
+              <ReactivateProductsDialog
+                open={showReactivateDialog}
+                onOpenChange={setShowReactivateDialog}
+                products={[row?.original]}
+                showTrigger={false}
+                onSuccess={() => {
+                  row.toggleSelected(false);
+                }}
+              />
             )}
           </div>
           <DropdownMenu>
