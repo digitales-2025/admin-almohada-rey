@@ -20,6 +20,23 @@ export type ServerFetchError = {
 };
 
 /**
+ * Permite utilizar un objeto plano como body
+ */
+function processBody(body: BodyInit | object | undefined): BodyInit | undefined {
+  if (
+    body instanceof Blob ||
+    body instanceof ArrayBuffer ||
+    body instanceof FormData ||
+    body instanceof URLSearchParams ||
+    body instanceof ReadableStream
+  ) {
+    return body;
+  } else {
+    return JSON.stringify(body);
+  }
+}
+
+/**
  * Realiza una petición al backend y devuelve un Result.
  *
  * Un Result es una tupla que contiene uno de dos casos:
@@ -190,6 +207,28 @@ export const http = {
   },
 
   /**
+   * Realiza una petición DELETE
+   * @param url - La URL a la que se realizará la petición
+   * @param body - El cuerpo de la petición, puede ser un objeto o BodyInit, por lo general solo estan los ids de los registros a eliminar
+   * @param config - Configuración opcional para la petición fetch
+   * @returns Una promesa que resuelve con los datos de tipo T, o un error
+   * @example
+   * ```ts
+   * const [result, err] = await http.delete<void>("/users/1ca0-0aa3");
+   * ```
+   */
+  deleteMany<T>(url: string, body?: BodyInit | object, config?: ServerFetchConfig) {
+    return serverFetch<T>(url, {
+      ...config,
+      method: "DELETE",
+      body: processBody(body),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  },
+
+  /**
    * Realiza una petición PATCH
    * @param url - La URL a la que se realizará la petición
    * @param body - El cuerpo de la petición, puede ser un objeto o BodyInit
@@ -211,20 +250,3 @@ export const http = {
     });
   },
 };
-
-/**
- * Permite utilizar un objeto plano como body
- */
-function processBody(body: BodyInit | object | undefined): BodyInit | undefined {
-  if (
-    body instanceof Blob ||
-    body instanceof ArrayBuffer ||
-    body instanceof FormData ||
-    body instanceof URLSearchParams ||
-    body instanceof ReadableStream
-  ) {
-    return body;
-  } else {
-    return JSON.stringify(body);
-  }
-}
