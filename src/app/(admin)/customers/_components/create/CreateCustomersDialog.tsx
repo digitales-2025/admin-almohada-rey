@@ -30,7 +30,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useCustomers } from "../../_hooks/use-customers";
 import { CreateCustomersSchema, customersSchema } from "../../_schema/createCustomersSchema";
-import CreateUserForm from "./CreateCustomersForm";
+import CreateCustomersForm from "./CreateCustomersForm";
 
 const dataForm = {
   button: "Crear cliente",
@@ -39,7 +39,7 @@ const dataForm = {
 };
 
 export function CreateCustomersDialog() {
-  const isDesktop = useMediaQuery("(min-width: 640px)");
+  const isDesktop = useMediaQuery("(min-width: 800px)");
   const [open, setOpen] = useState(false);
   const [isCreatePending, startCreateTransition] = useTransition();
   const { onCreateCustomer, isSuccessCreateCustomer } = useCustomers();
@@ -94,7 +94,7 @@ export function CreateCustomersDialog() {
           </DialogHeader>
           <ScrollArea className="h-full max-h-[80vh] px-0">
             <div className="px-6">
-              <CreateUserForm form={form} onSubmit={onSubmit}>
+              <CreateCustomersForm form={form} onSubmit={onSubmit}>
                 <DialogFooter className="w-full">
                   <div className="flex gap-2 w-full">
                     <DialogClose asChild>
@@ -108,7 +108,7 @@ export function CreateCustomersDialog() {
                     </Button>
                   </div>
                 </DialogFooter>
-              </CreateUserForm>
+              </CreateCustomersForm>
             </div>
           </ScrollArea>
         </DialogContent>
@@ -134,7 +134,7 @@ export function CreateCustomersDialog() {
         <div className="flex-1 overflow-hidden">
           <ScrollArea className="h-[40vh] px-0">
             <div className="px-4">
-              <CreateUserForm form={form} onSubmit={onSubmit}>
+              <CreateCustomersForm form={form} onSubmit={onSubmit}>
                 <DrawerFooter className="px-0 pt-2">
                   <Button disabled={isCreatePending} className="w-full">
                     {isCreatePending && <RefreshCcw className="mr-2 size-4 animate-spin" aria-hidden="true" />}
@@ -146,7 +146,7 @@ export function CreateCustomersDialog() {
                     </Button>
                   </DrawerClose>
                 </DrawerFooter>
-              </CreateUserForm>
+              </CreateCustomersForm>
             </div>
           </ScrollArea>
         </div>
