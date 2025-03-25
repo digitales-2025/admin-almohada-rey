@@ -186,9 +186,19 @@ const CountryAutocomplete = forwardRef<HTMLInputElement, CountryAutocompleteProp
     );
   };
 
+  const handleScrollCapture = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    // Detener la propagación de eventos de scroll
+    e.stopPropagation();
+  }, []);
+
+  const handleCommandClick = useCallback((e: React.MouseEvent) => {
+    // Prevenir que los clics dentro del comando provoquen el cierre
+    e.stopPropagation();
+  }, []);
+
   return (
     <CommandPrimitive onKeyDown={handleKeyDown}>
-      <div className="relative" ref={wrapperRef}>
+      <div className="relative" ref={wrapperRef} onClick={handleCommandClick}>
         <div className="relative flex items-center border rounded-md">
           <Search className="absolute left-3 h-4 w-4 shrink-0 opacity-50 z-[1]" />
           <div className="flex-1 overflow-hidden">{renderCustomInput()}</div>
@@ -208,12 +218,18 @@ const CountryAutocomplete = forwardRef<HTMLInputElement, CountryAutocompleteProp
         <div className={cn("relative", isOpen ? "mt-1" : "mt-0")}>
           <div
             className={cn(
-              "absolute top-0 z-10 w-full rounded-md border border-input bg-white shadow-md outline-none animate-in fade-in-0 zoom-in-95",
+              "absolute top-0 z-50 w-full rounded-md border border-input bg-white dark:bg-slate-800 shadow-md outline-none animate-in fade-in-0 zoom-in-95",
               isOpen ? "block" : "hidden"
             )}
           >
-            <ScrollArea className="h-[300px]">
-              <CommandList className="h-full rounded-md">
+            <ScrollArea className="h-[300px]" onScrollCapture={handleScrollCapture}>
+              <CommandList
+                className="h-full rounded-md bg-white dark:bg-slate-800"
+                onMouseDown={(e) => {
+                  // Prevenir que los clics dentro de la lista cierren el dropdown
+                  e.preventDefault();
+                }}
+              >
                 {isLoading && (
                   <CommandPrimitive.Loading>
                     <div className="p-1">
