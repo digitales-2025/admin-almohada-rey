@@ -80,7 +80,7 @@ export function CreateProductsDialog() {
             {dataForm.button}
           </Button>
         </DialogTrigger>
-        <DialogContent tabIndex={undefined} className="sm:max-w-[800px] px-0">
+        <DialogContent tabIndex={undefined} className="px-0">
           <DialogHeader className="px-4">
             <DialogTitle>{dataForm.title}</DialogTitle>
             <DialogDescription>{dataForm.description}</DialogDescription>
