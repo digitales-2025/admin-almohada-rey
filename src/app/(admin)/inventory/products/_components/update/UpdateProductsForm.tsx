@@ -4,20 +4,21 @@ import { UseFormReturn } from "react-hook-form";
 import { InputWithIcon } from "@/components/input-with-icon";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sheet } from "@/components/ui/sheet";
 import { CreateProductsSchema } from "../../_schema/createProductsSchema";
 import { ProductType } from "../../_types/products";
 import { ProductTypeLabels } from "../../_utils/products.utils";
 
-interface CreateProductsFormProps extends Omit<React.ComponentPropsWithRef<"form">, "onSubmit"> {
+interface UpdateCustomerFormProps extends Omit<React.ComponentPropsWithRef<typeof Sheet>, "open" | "onOpenChange"> {
   children: React.ReactNode;
   form: UseFormReturn<CreateProductsSchema>;
   onSubmit: (data: CreateProductsSchema) => void;
 }
 
-export default function CreateProductsForm({ children, form, onSubmit }: CreateProductsFormProps) {
+export default function UpdateCustomersForm({ children, form, onSubmit }: UpdateCustomerFormProps) {
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 gap-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4 px-6">
         <FormField
           control={form.control}
           name="name"
@@ -25,7 +26,12 @@ export default function CreateProductsForm({ children, form, onSubmit }: CreateP
             <FormItem>
               <FormLabel>Nombre</FormLabel>
               <FormControl>
-                <InputWithIcon Icon={Box} placeholder="Ingrese el nombre del producto" {...field} />
+                <InputWithIcon
+                  Icon={Box}
+                  placeholder="Ingrese el nombre del producto"
+                  className="capitalize"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -84,7 +90,6 @@ export default function CreateProductsForm({ children, form, onSubmit }: CreateP
             </FormItem>
           )}
         />
-
         {children}
       </form>
     </Form>

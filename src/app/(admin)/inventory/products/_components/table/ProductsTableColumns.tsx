@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Product, ProductType } from "../../_types/products";
 import { ProductTypeLabels } from "../../_utils/products.utils";
+import { UpdateProductSheet } from "../update/UpdateProductsSheet";
 
 /**
  * Generar las columnas de la tabla de productos
@@ -196,12 +197,16 @@ export const productsColumns = (isSuperAdmin: boolean): ColumnDef<Product>[] => 
       const [showReactivateDialog, setShowReactivateDialog] = useState(false);
       const [showEditDialog, setShowEditDialog] = useState(false);
 
-      console.log(showDeleteDialog, showReactivateDialog, showEditDialog);
+      console.log(showDeleteDialog, showReactivateDialog);
 
       const { isActive } = row.original;
       return (
         <div>
-          <div></div>
+          <div>
+            {showEditDialog && (
+              <UpdateProductSheet open={showEditDialog} onOpenChange={setShowEditDialog} product={row?.original} />
+            )}
+          </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button aria-label="Open menu" variant="ghost" className="flex size-8 p-0 data-[state=open]:bg-muted">
