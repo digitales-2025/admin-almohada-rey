@@ -61,6 +61,7 @@ interface DataTableExpandedProps<TData, TValue> {
   }[];
   renderExpandedRow?: (row: TData) => React.ReactNode; // Nueva prop para el contenido expandido
   onClickRow?: (row: TData) => void;
+  columnVisibilityConfig?: Partial<Record<keyof TData, boolean>>;
 }
 
 export function DataTableExpanded<TData, TValue>({
@@ -71,9 +72,9 @@ export function DataTableExpanded<TData, TValue>({
   facetedFilters,
   renderExpandedRow,
   onClickRow,
+  columnVisibilityConfig,
 }: DataTableExpandedProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -81,6 +82,9 @@ export function DataTableExpanded<TData, TValue>({
     left: ["select"],
     right: ["actions"],
   });
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(
+    (columnVisibilityConfig as VisibilityState) ?? {} //OJO: When defining visibility, at least 1 field must be present
+  );
 
   // Usamos el estado expandedState de tanstack table directamente
   const [expanded, setExpanded] = React.useState({});
