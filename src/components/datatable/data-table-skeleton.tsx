@@ -30,28 +30,25 @@ export function DataTableSkeleton({
   columnWidths: customColumnWidths,
   className = "",
 }: DataTableSkeletonProps) {
-  // Generate array of column widths - make them slightly random for more realistic look
+  // Use fixed widths instead of random ones to avoid hydration mismatch
   const columnWidths = React.useMemo(() => {
     if (customColumnWidths && customColumnWidths.length === columns) {
       return customColumnWidths;
     }
 
+    // Fixed pattern of widths that repeats if needed
+    const baseWidths = [120, 150, 100, 180, 130, 160, 140, 110];
     return Array(columns)
       .fill(0)
-      .map(() => {
-        // Random width between 80px and 200px
-        return Math.floor(Math.random() * 120) + 80;
-      });
+      .map((_, i) => baseWidths[i % baseWidths.length]);
   }, [columns, customColumnWidths]);
 
-  // Generate array of filter widths - make them slightly random for more realistic look
+  // Fixed filter widths
   const filterWidths = React.useMemo(() => {
+    const baseFilterWidths = [100, 120, 140, 110, 130];
     return Array(numFilters)
       .fill(0)
-      .map(() => {
-        // Random width between 80px and 150px
-        return Math.floor(Math.random() * 70) + 80;
-      });
+      .map((_, i) => baseFilterWidths[i % baseFilterWidths.length]);
   }, [numFilters]);
 
   return (
@@ -64,9 +61,11 @@ export function DataTableSkeleton({
               <>
                 <Skeleton className="h-8 w-[150px] lg:w-[250px]" />
                 <div className="flex flex-wrap items-center gap-2">
-                  {filterWidths.map((width, index) => (
-                    <Skeleton key={`filter-${index}`} className={`h-8 w-[${width}px]`} />
-                  ))}
+                  {Array(numFilters)
+                    .fill(0)
+                    .map((_, index) => (
+                      <Skeleton key={`filter-${index}`} className="h-8" style={{ width: `${filterWidths[index]}px` }} />
+                    ))}
                 </div>
               </>
             )}
@@ -88,7 +87,12 @@ export function DataTableSkeleton({
                   .fill(0)
                   .map((_, index) => (
                     <TableHead key={`header-${index}`} className={index > 2 ? "hidden md:table-cell" : ""}>
-                      <Skeleton className={`h-[${Math.floor(cellHeight / 2)}px] w-[${columnWidths[index]}px]`} />
+                      <Skeleton
+                        style={{
+                          height: `${Math.floor(cellHeight / 2)}px`,
+                          width: `${columnWidths[index]}px`,
+                        }}
+                      />
                     </TableHead>
                   ))}
               </TableRow>
@@ -106,7 +110,12 @@ export function DataTableSkeleton({
                         key={`cell-${rowIndex}-${colIndex}`}
                         className={colIndex > 2 ? "hidden md:table-cell" : ""}
                       >
-                        <Skeleton className={`h-[${Math.floor(cellHeight / 2)}px] w-[${columnWidths[colIndex]}px]`} />
+                        <Skeleton
+                          style={{
+                            height: `${Math.floor(cellHeight / 2)}px`,
+                            width: `${columnWidths[colIndex]}px`,
+                          }}
+                        />
                       </TableCell>
                     ))}
                 </TableRow>
