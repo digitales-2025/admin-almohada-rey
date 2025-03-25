@@ -31,7 +31,7 @@ export const CustomerDescription = ({ row }: CustomerDescriptionProps) => {
             <div className={cn("p-1 rounded-full", `border-2 ${documentTypeConfig?.className || "border-primary"}`)}>
               <Avatar className="h-20 w-20 capitalize">
                 <AvatarFallback className="bg-white text-primary">
-                  <span className="text-3xl font-light">{row.name.charAt(0)}</span>
+                  <span className="text-3xl font-light dark:text-slate-800">{row.name.charAt(0)}</span>
                 </AvatarFallback>
               </Avatar>
             </div>

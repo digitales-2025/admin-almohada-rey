@@ -117,9 +117,21 @@ const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
       inputRef.current?.focus();
     }, [onValueChange]);
 
+    // Primero añadimos la función para capturar el scroll
+    const handleScrollCapture = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+      // Detener la propagación de eventos de scroll
+      e.stopPropagation();
+    }, []);
+
+    // Luego añadimos la función para manejar los clicks en el Command
+    const handleCommandClick = useCallback((e: React.MouseEvent) => {
+      // Prevenir que los clics dentro del comando provoquen el cierre
+      e.stopPropagation();
+    }, []);
+
     return (
       <CommandPrimitive onKeyDown={handleKeyDown}>
-        <div className="relative">
+        <div className="relative" onClick={handleCommandClick}>
           <CommandInput
             ref={ref}
             value={inputValue}
@@ -145,50 +157,65 @@ const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
         </div>
 
         <div className={cn("relative", isOpen ? "mt-1" : "mt-0", className)}>
+          {isOpen && (
+            <div
+              className="fixed inset-0 z-40 bg-transparent"
+              onMouseDown={() => {
+                setOpen(false);
+              }}
+            />
+          )}
           <div
             className={cn(
-              "absolute top-0 z-10 w-full rounded-xl border border-input bg-white shadow outline-none animate-in fade-in-0 zoom-in-95",
+              "absolute top-0 z-50 w-full rounded-xl border border-input bg-white shadow outline-none animate-in fade-in-0 zoom-in-95",
               isOpen ? "block" : "hidden"
             )}
+            onMouseDown={(e) => e.stopPropagation()}
           >
-            <CommandList className="h-full rounded-lg capitalize">
-              {isLoading && (
-                <CommandPrimitive.Loading>
-                  <div className="p-1">
-                    <Skeleton className="h-8 w-full" />
-                  </div>
-                </CommandPrimitive.Loading>
-              )}
-              {!isLoading && options.length > 0 && (
-                <CommandGroup>
-                  {options.map((option) => {
-                    const isSelected = selected?.value === option.value;
-                    return (
-                      <CommandItem
-                        // Cambia el valor a option.value para asegurar unicidad
-                        key={option.value}
-                        value={option.label}
-                        onMouseDown={(event) => {
-                          event.preventDefault();
-                          event.stopPropagation();
-                        }}
-                        onSelect={() => handleSelectOption(option)}
-                        className={cn("flex w-full items-center gap-2", !isSelected ? "pl-8" : null)}
-                      >
-                        {isSelected && <Check className="w-4" />}
-                        {/* Muestra la etiqueta dentro del CommandItem */}
-                        {option.label}
-                      </CommandItem>
-                    );
-                  })}
-                </CommandGroup>
-              )}
-              {!isLoading && options.length === 0 && (
-                <CommandPrimitive.Empty className="select-none rounded-sm px-2 py-3 text-center text-sm">
-                  {emptyMessage}
-                </CommandPrimitive.Empty>
-              )}
-            </CommandList>
+            <div className="max-h-[300px] overflow-y-auto bg-white" onScrollCapture={handleScrollCapture}>
+              <CommandList
+                className="h-full rounded-lg capitalize bg-white"
+                onMouseDown={(e) => {
+                  // Prevenir que los clics dentro de la lista cierren el dropdown
+                  e.preventDefault();
+                }}
+              >
+                {isLoading && (
+                  <CommandPrimitive.Loading>
+                    <div className="p-1">
+                      <Skeleton className="h-8 w-full" />
+                    </div>
+                  </CommandPrimitive.Loading>
+                )}
+                {!isLoading && options.length > 0 && (
+                  <CommandGroup>
+                    {options.map((option) => {
+                      const isSelected = selected?.value === option.value;
+                      return (
+                        <CommandItem
+                          key={option.value}
+                          value={option.label}
+                          onMouseDown={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                          }}
+                          onSelect={() => handleSelectOption(option)}
+                          className={cn("flex w-full items-center gap-2 bg-white", !isSelected ? "pl-8" : null)}
+                        >
+                          {isSelected && <Check className="w-4" />}
+                          {option.label}
+                        </CommandItem>
+                      );
+                    })}
+                  </CommandGroup>
+                )}
+                {!isLoading && options.length === 0 && (
+                  <CommandPrimitive.Empty className="select-none rounded-sm px-2 py-3 text-center text-sm bg-white">
+                    {emptyMessage}
+                  </CommandPrimitive.Empty>
+                )}
+              </CommandList>
+            </div>
           </div>
         </div>
       </CommandPrimitive>

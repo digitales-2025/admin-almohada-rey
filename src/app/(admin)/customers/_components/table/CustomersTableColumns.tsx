@@ -108,7 +108,7 @@ export const customersColumns = (isSuperAdmin: boolean): ColumnDef<Customer>[] =
       const documentType = row.getValue("tipo") as CustomerDocumentType;
       const documentTypeConfig = CustomerDocumentTypeLabels[documentType];
 
-      if (!documentTypeConfig) return <div>Rol no definido</div>;
+      if (!documentTypeConfig) return <div>No registrado</div>;
 
       const Icon = documentTypeConfig.icon;
 
@@ -144,7 +144,7 @@ export const customersColumns = (isSuperAdmin: boolean): ColumnDef<Customer>[] =
       if (!documentNumber) return <div className="text-muted-foreground text-sm italic">No disponible</div>;
 
       return (
-        <div className="font-mono text-sm py-1 px-2 mx-auto bg-slate-50 rounded-md border border-slate-200 inline-block">
+        <div className="font-mono text-sm py-1 px-2 mx-auto bg-slate-50 rounded-md border border-slate-200 inline-block dark:bg-slate-800 dark:border-slate-700">
           {documentNumber}
         </div>
       );
