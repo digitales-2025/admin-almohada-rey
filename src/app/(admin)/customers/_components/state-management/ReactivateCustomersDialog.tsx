@@ -66,7 +66,7 @@ export const ReactivateCustomersDialog = ({
             <AlertDialogTitle>¿Estás absolutamente seguro?</AlertDialogTitle>
             <AlertDialogDescription>
               Esta acción reactivará a <span className="font-medium"> {customers.length}</span>
-              {customers.length === 1 ? " usuario" : " usuarios"}
+              {customers.length === 1 ? " cliente" : " clientes"}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2 sm:space-x-0">
