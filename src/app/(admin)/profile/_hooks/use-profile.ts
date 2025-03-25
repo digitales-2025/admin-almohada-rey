@@ -14,7 +14,7 @@ export const useProfile = () => {
   const { setUser } = useAuth();
   const { signOut } = useLogout();
 
-  const { data: user, refetch } = useProfileQuery();
+  const { data: user, refetch, isLoading: isLoadingProfile } = useProfileQuery();
   const [updateUser, { isLoading, isSuccess }] = useUpdateUserMutation();
 
   const onUpdate = async (dataForm: UpdateUsersSchema) => {
@@ -42,7 +42,7 @@ export const useProfile = () => {
 
     toast.promise(promise(), {
       loading: "Actualizando información...",
-      success: "información actualizado correctamente",
+      success: "información actualizada correctamente",
       error: (error) => error.message,
     });
   };
@@ -77,6 +77,7 @@ export const useProfile = () => {
 
   return {
     user,
+    isLoadingProfile,
     onUpdate,
     refetch,
     isLoading,

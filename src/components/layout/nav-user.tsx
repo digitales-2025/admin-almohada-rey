@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { BadgeCheck, ChevronsUpDown, LogOut } from "lucide-react";
+import { ChevronsUpDown, LogOut, UserCircle } from "lucide-react";
 
 import { User } from "@/app/(admin)/users/_types/user";
 import { useLogout } from "@/app/(auth)/log-in/_hooks/use-logout";
@@ -67,8 +67,8 @@ export function NavUser({ user }: { user: User | undefined }) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
-                <Link href="/settings/account" className="flex w-full items-center gap-2">
-                  <BadgeCheck />
+                <Link href="/profile" className="flex w-full items-center gap-2">
+                  <UserCircle />
                   Perfil
                 </Link>
               </DropdownMenuItem>
