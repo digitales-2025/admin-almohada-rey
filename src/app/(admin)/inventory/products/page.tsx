@@ -4,7 +4,7 @@ import { HeaderPage } from "@/components/common/HeaderPage";
 import { DataTableSkeleton } from "@/components/datatable/data-table-skeleton";
 import ErrorGeneral from "@/components/errors/general-error";
 import { ProductsTable } from "./_components/table/ProductsTable";
-import { useProducts } from "./_hooks/use-customers";
+import { useProducts } from "./_hooks/use-products";
 
 export default function ProductsPage() {
   const { dataProductsAll, isLoading } = useProducts();
