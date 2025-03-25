@@ -35,3 +35,13 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 # admin-almohada-rey
+
+## Configuración de TanStack Table
+Para tanstack Table es importante no quitar la declaración de modulo tipado Meta: 
+```typescript
+declare module '@tanstack/react-table' {
+  interface ColumnMeta<TData extends RowData, TValue> {
+    title: string
+  }
+}
+```

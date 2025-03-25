@@ -3,6 +3,7 @@ import { setupListeners } from "@reduxjs/toolkit/query";
 
 import { customersApi } from "@/app/(admin)/customers/_services/customersApi";
 import { adminApi } from "@/app/(admin)/profile/_services/adminApi";
+import { reservationApi } from "@/app/(admin)/reservation/_services/reservationApi";
 import { usersApi } from "@/app/(admin)/users/_services/usersApi";
 import { authApi } from "@/app/(auth)/log-in/_services/authApi";
 
@@ -12,6 +13,7 @@ export const store = configureStore({
     [adminApi.reducerPath]: adminApi.reducer,
     [usersApi.reducerPath]: usersApi.reducer,
     [customersApi.reducerPath]: customersApi.reducer,
+    [reservationApi.reducerPath]: reservationApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -55,7 +57,8 @@ export const store = configureStore({
       .concat(authApi.middleware)
       .concat(adminApi.middleware)
       .concat(usersApi.middleware)
-      .concat(customersApi.middleware),
+      .concat(customersApi.middleware)
+      .concat(reservationApi.middleware),
 });
 setupListeners(store.dispatch);
 

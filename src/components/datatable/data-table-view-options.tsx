@@ -37,7 +37,7 @@ export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps
                 checked={column.getIsVisible()}
                 onCheckedChange={(value) => column.toggleVisibility(!!value)}
               >
-                {column.id}
+                <span className="truncate">{column.columnDef.meta?.title ?? column.id}</span>
               </DropdownMenuCheckboxItem>
             );
           })}
