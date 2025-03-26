@@ -199,8 +199,6 @@ export const productsColumns = (isSuperAdmin: boolean): ColumnDef<Product>[] => 
       const [showReactivateDialog, setShowReactivateDialog] = useState(false);
       const [showEditDialog, setShowEditDialog] = useState(false);
 
-      console.log(showDeleteDialog, showReactivateDialog);
-
       const { isActive } = row.original;
       return (
         <div>
