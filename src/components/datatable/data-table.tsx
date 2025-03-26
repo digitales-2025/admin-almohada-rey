@@ -21,6 +21,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Empty } from "../common/Empty";
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
+import { FacetedFilter } from "./facetedFilters";
 
 // Función de filtrado global correcta para TanStack Table v8
 const globalFilterFn: FilterFn<any> = (row, columnId, value) => {
@@ -41,15 +42,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   toolbarActions?: React.ReactNode | ((table: TableInstance<TData>) => React.ReactNode);
   filterPlaceholder?: string;
-  facetedFilters?: {
-    column: string;
-    title: string;
-    options: {
-      label: string;
-      value: TValue;
-      icon?: React.ComponentType<{ className?: string }>;
-    }[];
-  }[];
+  facetedFilters?: FacetedFilter<TValue>[];
 }
 
 export function DataTable<TData, TValue>({

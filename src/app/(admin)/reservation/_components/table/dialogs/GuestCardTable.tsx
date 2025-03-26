@@ -74,7 +74,7 @@ export function GuestsTable({ data, ...rest }: GuestMetadataTableProps) {
                 <TableHead>{tableValues.documentId.label}</TableHead>
                 <TableHead>{tableValues.phone.label}</TableHead>
                 <TableHead>{tableValues.email.label}</TableHead>
-                <TableHead>{tableValues.age.label}</TableHead>
+                <TableHead className="text-end">{tableValues.age.label}</TableHead>
                 {/* <TableHead>Sucursal</TableHead> */}
               </TableRow>
             </TableHeader>
@@ -97,30 +97,30 @@ export function GuestsTable({ data, ...rest }: GuestMetadataTableProps) {
                           <span className="font-semibold">{tableValues.name.value(guest)}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="font-medium flex justify-center items-center gap-2">
+                      <TableCell className="font-medium flex justify-start items-center gap-2">
                         {docTypeConfig ? (
                           <Badge
                             className={cn(
                               docTypeConfig.backgroundColor,
                               docTypeConfig.textColor,
                               docTypeConfig.hoverBgColor,
-                              "flex space-x-1 items-center justify-center text-sm"
+                              "flex space-x-1 items-center justify-center text-sm border-none"
                             )}
                           >
                             <docTypeConfig.icon className="size-4" />
                             <span>{docTypeConfig.name}</span>
                           </Badge>
                         ) : (
-                          <Badge className="flex space-x-1 items-center justify-center text-sm bg-gray-200 text-gray-800 hover:bg-gray-300">
+                          <Badge className="flex space-x-1 items-center justify-center text-sm bg-gray-200 text-gray-800 hover:bg-gray-300 border-none">
                             <IdCard className="size-4" />
                             <span>{"N/A"}</span>
                           </Badge>
                         )}
                         <span>{tableValues.documentId.value(guest)}</span>
                       </TableCell>
-                      <TableCell></TableCell>
-                      <TableCell className="text-center"></TableCell>
-                      <TableCell className="text-end"></TableCell>
+                      <TableCell>{tableValues.phone.value(guest)}</TableCell>
+                      <TableCell>{tableValues.email.value(guest)}</TableCell>
+                      <TableCell className="text-end">{tableValues.age.value(guest)}</TableCell>
                     </TableRow>
                   );
                 })

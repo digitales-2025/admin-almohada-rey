@@ -23,6 +23,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Empty } from "../common/Empty";
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
+import { FacetedFilter } from "./facetedFilters";
 
 // Función de filtrado global correcta para TanStack Table v8
 const globalFilterFn: FilterFn<any> = (row, columnId, value) => {
@@ -50,15 +51,7 @@ interface DataTableExpandedProps<TData, TValue> {
   data: TData[];
   toolbarActions?: React.ReactNode | ((table: TableInstance<TData>) => React.ReactNode);
   filterPlaceholder?: string;
-  facetedFilters?: {
-    column: string;
-    title: string;
-    options: {
-      label: string;
-      value: TValue;
-      icon?: React.ComponentType<{ className?: string }>;
-    }[];
-  }[];
+  facetedFilters?: FacetedFilter<TValue>[];
   renderExpandedRow?: (row: TData) => React.ReactNode; // Nueva prop para el contenido expandido
   onClickRow?: (row: TData) => void;
   columnVisibilityConfig?: Partial<Record<keyof TData, boolean>>;
@@ -192,7 +185,10 @@ export function DataTableExpanded<TData, TValue>({
                     })}
                   </TableRow>
                   {row.getIsExpanded() && renderExpandedRow && (
-                    <TableRow>
+                    <TableRow
+                      data-state={row.getIsExpanded() ? "expanded" : "collapsed"}
+                      className="animate-fade-down animate-duration-500 animate-ease-in-out animate-fill-forwards data-[state=collapsed]:animate-out data-[state=collapsed]:fade-out-0"
+                    >
                       <TableCell colSpan={columns.length}>{renderExpandedRow(row.original)}</TableCell>
                     </TableRow>
                   )}
