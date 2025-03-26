@@ -25,27 +25,27 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { useCustomers } from "../../_hooks/use-customers";
-import { Customer } from "../../_types/customer";
+import { useProducts } from "../../_hooks/use-products";
+import { Product } from "../../_types/products";
 
-interface ReactivateCustomersDialogProps extends ComponentPropsWithoutRef<typeof AlertDialog> {
-  customers: Row<Customer>["original"][];
+interface ReactivateProductsDialogProps extends ComponentPropsWithoutRef<typeof AlertDialog> {
+  products: Row<Product>["original"][];
   showTrigger?: boolean;
   onSuccess?: () => void;
 }
 
-export const ReactivateCustomersDialog = ({
-  customers,
+export const ReactivateProductsDialog = ({
+  products,
   showTrigger = true,
   onSuccess,
   ...props
-}: ReactivateCustomersDialogProps) => {
+}: ReactivateProductsDialogProps) => {
   const isDesktop = useMediaQuery("(min-width: 640px)");
 
-  const { onReactivateCustomers, isLoadingReactivateCustomers } = useCustomers();
+  const { onReactivateProducts, isLoadingReactivateProducts } = useProducts();
 
-  const onReactivateCustomersHandler = () => {
-    onReactivateCustomers(customers);
+  const onReactivateProductsHandler = () => {
+    onReactivateProducts(products);
     props.onOpenChange?.(false);
     onSuccess?.();
   };
@@ -57,7 +57,7 @@ export const ReactivateCustomersDialog = ({
           <AlertDialogTrigger asChild>
             <Button variant="outline" size="sm">
               <RefreshCcwDot className="mr-2 size-4" aria-hidden="true" />
-              Reactivar ({customers.length})
+              Reactivar ({products.length})
             </Button>
           </AlertDialogTrigger>
         ) : null}
@@ -65,8 +65,8 @@ export const ReactivateCustomersDialog = ({
           <AlertDialogHeader>
             <AlertDialogTitle>¿Estás absolutamente seguro?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción reactivará a <span className="font-medium"> {customers.length}</span>
-              {customers.length === 1 ? " cliente" : " clientes"}
+              Esta acción reactivará a <span className="font-medium"> {products.length}</span>
+              {products.length === 1 ? " producto" : " productos"}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2 sm:space-x-0">
@@ -75,10 +75,10 @@ export const ReactivateCustomersDialog = ({
             </AlertDialogCancel>
             <AlertDialogAction
               aria-label="Reactivate selected rows"
-              onClick={onReactivateCustomersHandler}
-              disabled={isLoadingReactivateCustomers}
+              onClick={onReactivateProductsHandler}
+              disabled={isLoadingReactivateProducts}
             >
-              {isLoadingReactivateCustomers && <RefreshCcw className="mr-2 size-4 animate-spin" aria-hidden="true" />}
+              {isLoadingReactivateProducts && <RefreshCcw className="mr-2 size-4 animate-spin" aria-hidden="true" />}
               Reactivar
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -92,7 +92,7 @@ export const ReactivateCustomersDialog = ({
         <DrawerTrigger asChild>
           <Button variant="outline" size="sm">
             <RefreshCcwDot className="mr-2 size-4" aria-hidden="true" />
-            Reactivar ({customers.length})
+            Reactivar ({products.length})
           </Button>
         </DrawerTrigger>
       ) : null}
@@ -100,17 +100,17 @@ export const ReactivateCustomersDialog = ({
         <DrawerHeader>
           <DrawerTitle>¿Estás absolutamente seguro?</DrawerTitle>
           <DrawerDescription>
-            Esta acción reactivará a<span className="font-medium">{customers.length}</span>
-            {customers.length === 1 ? " usuario" : " usuarios"}
+            Esta acción reactivará a<span className="font-medium">{products.length}</span>
+            {products.length === 1 ? " usuario" : " usuarios"}
           </DrawerDescription>
         </DrawerHeader>
         <DrawerFooter className="gap-2 sm:space-x-0">
           <Button
             aria-label="Reactivate selected rows"
-            onClick={onReactivateCustomersHandler}
-            disabled={isLoadingReactivateCustomers}
+            onClick={onReactivateProductsHandler}
+            disabled={isLoadingReactivateProducts}
           >
-            {isLoadingReactivateCustomers && <RefreshCcw className="mr-2 size-4 animate-spin" aria-hidden="true" />}
+            {isLoadingReactivateProducts && <RefreshCcw className="mr-2 size-4 animate-spin" aria-hidden="true" />}
             Reactivar
           </Button>
           <DrawerClose asChild>

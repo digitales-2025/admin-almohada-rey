@@ -6,6 +6,7 @@ import {
   Package,
   PackageMinus,
   PackagePlus,
+  Tag,
   UserCircle,
   Users,
   Warehouse,
@@ -67,8 +68,19 @@ export const sidebarData: SidebarData = {
       items: [
         {
           title: "Habitaciones",
-          url: "/rooms",
           icon: BedDouble,
+          items: [
+            {
+              title: "Listado",
+              url: "/rooms/list",
+              icon: BedDouble,
+            },
+            {
+              title: "Tipos",
+              url: "/rooms/room-types",
+              icon: Tag,
+            },
+          ],
         },
         {
           title: "Reservas",
