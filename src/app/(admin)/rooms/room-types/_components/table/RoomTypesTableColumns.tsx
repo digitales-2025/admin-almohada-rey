@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 import {
-  AreaChart,
   BanknoteIcon,
   Bed,
   ChevronDown,
   ChevronRight,
   Ellipsis,
   RefreshCcwDot,
+  Ruler,
   Trash,
   User2,
   Users,
@@ -115,10 +115,8 @@ export const roomTypesColumns = (isSuperAdmin: boolean): ColumnDef<RoomType>[] =
     header: ({ column }) => <DataTableColumnHeader column={column} title="Área (m²)" />,
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200 flex items-center gap-1.5">
-          <AreaChart className="h-3.5 w-3.5" />
-          <span className="font-medium">{row.getValue("area")} m²</span>
-        </Badge>
+        <Ruler className="h-3.5 w-3.5" />
+        <span className="font-medium">{row.getValue("area")} m²</span>
       </div>
     ),
   },
@@ -154,10 +152,8 @@ export const roomTypesColumns = (isSuperAdmin: boolean): ColumnDef<RoomType>[] =
 
       return (
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200 flex items-center gap-1.5">
-            <BanknoteIcon className="h-3.5 w-3.5" />
-            <span className="font-medium">{formatted}</span>
-          </Badge>
+          <BanknoteIcon className="h-4 w-4" strokeWidth={1.5} />
+          <span className="font-sans text-sm">{formatted}</span>
         </div>
       );
     },
