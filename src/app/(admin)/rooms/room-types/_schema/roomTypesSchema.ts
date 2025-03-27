@@ -37,11 +37,13 @@ export const updateRoomTypeSchema = z.object({
   area: z.number().positive({ message: "El área debe ser positiva" }).optional(),
   bed: z.string().min(1, { message: "La descripción de la cama es obligatoria" }).optional(),
   newImage: fileValidator("La imagen debe ser un archivo válido").optional(),
-  imageUpdate: z.object({
-    imageId: z.string(),
-    url: z.string(),
-    isMain: z.boolean(),
-  }),
+  imageUpdate: z
+    .object({
+      id: z.string(),
+      url: z.string(),
+      isMain: z.boolean(),
+    })
+    .optional(),
 });
 
 export type UpdateRoomTypeSchema = z.infer<typeof updateRoomTypeSchema>;

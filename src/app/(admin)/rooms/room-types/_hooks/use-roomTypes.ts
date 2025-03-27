@@ -140,85 +140,76 @@ export const useRoomTypes = () => {
 
   /**
    * Actualiza un tipo de habitación existente
-   * @param id ID del tipo de habitación
-   * @param formData FormData con los datos a actualizar
+   * @param data Datos del tipo de habitación a actualizar
    * @returns La data del tipo de habitación actualizado o error
    */
-  async function onUpdateRoomType({
-    id,
-    formData,
-  }: {
-    id: string;
-    formData: TypedFormData<UpdateRoomTypeWithImageDto>;
-  }) {
-    // Verificación similar para el formData de actualización
+  async function onUpdateRoomType(data: UpdateRoomTypeWithImageDto) {
     console.log("===== HOOK: onUpdateRoomType =====");
-    console.log("ID:", id);
-    console.log("Tipo de formData recibido:", Object.prototype.toString.call(formData));
-    console.log("Es instancia de FormData:", formData instanceof FormData);
+    console.log("Datos recibidos:", data);
 
-    let finalFormData: FormData;
-
-    if (!(formData instanceof FormData)) {
-      console.log("Convirtiendo objeto a FormData...");
-      console.log("Datos originales:", formData);
-
-      finalFormData = new FormData();
-
-      // Agregamos los campos de texto
-      Object.entries(formData).forEach(([key, value]) => {
-        if (key !== "newImage" && key !== "selectedImageId") {
-          console.log(`Agregando campo ${key}:`, value);
-          finalFormData.append(key, String(value));
-        }
-      });
-
-      // Agregamos el ID de la imagen seleccionada
-      if (formData.selectedImageId) {
-        console.log("Agregando selectedImageId:", formData.selectedImageId);
-        finalFormData.append("selectedImageId", formData.selectedImageId);
-      }
-
-      // Agregamos la nueva imagen si existe
-      if (formData.newImage && formData.newImage instanceof File) {
-        console.log("Agregando nueva imagen:", formData.newImage.name);
-        finalFormData.append("newImage", formData.newImage);
-      }
-    } else {
-      finalFormData = formData;
-      // Log de contenido del FormData recibido
-      console.log("Contenido del FormData recibido:");
-      finalFormData.forEach((value, key) => {
-        if (value instanceof File) {
-          console.log(`${key}: ${value.name} (${value.type}, ${value.size} bytes)`);
-        } else {
-          console.log(`${key}: ${value}`);
-        }
-      });
+    const id = data.id;
+    if (!id) {
+      throw new Error("ID no proporcionado para actualización");
     }
 
-    console.log("FormData final listo para enviar");
+    // Preparar el objeto final a enviar (convertimos todo a un solo objeto)
+    const requestData = new FormData();
 
-    const promise = runAndHandleError(async () => {
-      try {
-        console.log("Enviando solicitud updateRoomType...");
-        const response = await updateRoomType({ id, formData: finalFormData }).unwrap();
-        console.log("Respuesta recibida:", response);
-        // Extraemos solo la data del BaseApiResponse
-        return response.data;
-      } catch (error) {
-        console.error("Error en updateRoomType:", error);
-        throw error;
+    // Agregar campos básicos de texto
+    if (data.name) requestData.append("name", data.name);
+    if (data.guests) requestData.append("guests", String(data.guests));
+    if (data.price) requestData.append("price", String(data.price));
+    if (data.tv) requestData.append("tv", data.tv);
+    if (data.floorType) requestData.append("floorType", data.floorType);
+    if (data.description) requestData.append("description", data.description);
+    if (data.area) requestData.append("area", String(data.area));
+    if (data.bed) requestData.append("bed", data.bed);
+
+    // Manejar imagen nueva si existe
+    if (data.newImage && data.newImage instanceof File) {
+      requestData.append("newImage", data.newImage);
+    }
+
+    // Manejar correctamente imageUpdate - CLAVE DEL PROBLEMA
+    if (data.imageUpdate) {
+      // Asegurarse de que el objeto imageUpdate tenga la estructura correcta
+      const imageUpdateObject = {
+        id: data.imageUpdate.id, // Asegurarse de que exista este campo
+        url: data.imageUpdate.url, // Asegurarse de que exista este campo
+        isMain: Boolean(data.imageUpdate.isMain), // Convertir a boolean explícito
+      };
+
+      // Como el backend espera un objeto JSON, lo serializamos
+      const imageUpdateJSON = JSON.stringify(imageUpdateObject);
+
+      // Enviar como "data" y no como "blobs" en el FormData
+      requestData.append("imageUpdate", imageUpdateJSON);
+
+      console.log("imageUpdate estructurado correctamente:", imageUpdateObject);
+      console.log("imageUpdate serializado:", imageUpdateJSON);
+    }
+
+    console.log("Contenido del FormData a enviar:");
+    requestData.forEach((value, key) => {
+      if (value instanceof File) {
+        console.log(`${key}: ${value.name} (${value.type}, ${value.size} bytes)`);
+      } else {
+        console.log(`${key}: ${value}`);
       }
+    });
+
+    // Enviar solicitud
+    const promise = runAndHandleError(async () => {
+      console.log("Enviando solicitud updateRoomType...");
+      const response = await updateRoomType({ id, formData: requestData }).unwrap();
+      console.log("Respuesta recibida:", response);
+      return response.data;
     });
 
     toast.promise(promise, {
       loading: "Actualizando tipo de habitación...",
       success: "Tipo de habitación actualizado exitosamente",
-      error: (error) => {
-        console.error("Error en toast de actualización:", error);
-        return error.message;
-      },
+      error: (error) => error.message || "Error al actualizar habitación",
     });
 
     return await promise;

@@ -37,10 +37,12 @@ interface UpdateRoomTypeSheetProps extends Omit<React.ComponentPropsWithRef<type
 export function UpdateRoomTypeSheet({ roomType, open, onOpenChange }: UpdateRoomTypeSheetProps) {
   const [isUpdatePending, startUpdateTransition] = useTransition();
   const { onUpdateRoomType, isSuccessUpdateRoomType } = useRoomTypes();
-  const [selectedImageId, setSelectedImageId] = useState<string | null>(
-    roomType.imagesRoomType?.find((img) => img.isMain)?.id || null
-  );
 
+  // Inicializar con la imagen principal
+  const mainImage = roomType.imagesRoomType?.find((img) => img.isMain);
+  const [selectedImageId, setSelectedImageId] = useState<string | null>(mainImage?.id || null);
+
+  // Inicializar el formulario
   const form = useForm<UpdateRoomTypeSchema>({
     resolver: zodResolver(updateRoomTypeSchema),
     defaultValues: {
@@ -53,12 +55,22 @@ export function UpdateRoomTypeSheet({ roomType, open, onOpenChange }: UpdateRoom
       area: roomType.area,
       bed: roomType.bed || "",
       newImage: undefined,
-      imageUpdate: undefined,
+      // IMPORTANTE: Inicializar con la imagen principal actual como punto de partida
+      imageUpdate: mainImage
+        ? {
+            id: mainImage.id,
+            url: mainImage.url,
+            isMain: true,
+          }
+        : undefined,
     },
   });
 
+  // Reset del formulario cuando cambia el roomType
   useEffect(() => {
     if (open) {
+      const mainImage = roomType.imagesRoomType?.find((img) => img.isMain);
+
       form.reset({
         name: roomType.name,
         guests: roomType.guests,
@@ -69,29 +81,30 @@ export function UpdateRoomTypeSheet({ roomType, open, onOpenChange }: UpdateRoom
         area: roomType.area,
         bed: roomType.bed || "",
         newImage: undefined,
-        imageUpdate: undefined,
+        // IMPORTANTE: Reiniciar con la imagen principal actual
+        imageUpdate: mainImage
+          ? {
+              id: mainImage.id,
+              url: mainImage.url,
+              isMain: true,
+            }
+          : undefined,
       });
 
-      setSelectedImageId(roomType.imagesRoomType?.find((img) => img.isMain)?.id || null);
+      setSelectedImageId(mainImage?.id || null);
     }
   }, [open, roomType, form]);
 
-  const onSubmit = async (input: UpdateRoomTypeSchema) => {
-    // Si se seleccionó una imagen como principal
-    if (selectedImageId) {
-      const selectedImage = roomType.imagesRoomType?.find((img) => img.id === selectedImageId);
-      if (selectedImage) {
-        input.imageUpdate = {
-          imageId: selectedImage.id,
-          url: selectedImage.url,
-          isMain: true,
-        };
-      }
-    }
+  // La función onSubmit recibe los datos ya preparados por el formulario
+  const onSubmit = async (formData: UpdateRoomTypeSchema) => {
+    console.log("⭐ Datos finales a enviar:", {
+      ...formData,
+      id: roomType.id,
+    });
 
     startUpdateTransition(() => {
       onUpdateRoomType({
-        ...input,
+        ...formData,
         id: roomType.id,
       });
     });

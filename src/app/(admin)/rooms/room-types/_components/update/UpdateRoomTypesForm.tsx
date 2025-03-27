@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { AreaChart, Bed, CreditCard, ImageIcon, MonitorDot, Pencil, Settings, User2, X } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
@@ -118,9 +118,93 @@ export default function UpdateRoomTypeForm({
   // Encontrar la imagen principal actual
   const mainImage = roomType.imagesRoomType?.find((img) => img.isMain);
 
+  // Función para preparar y enviar el formulario
+  const handleFormSubmit = (data: UpdateRoomTypeSchema) => {
+    // Crear una copia para no modificar el objeto original
+    const formData = { ...data };
+
+    // 1. Manejar el caso de una imagen seleccionada para hacerla principal
+    if (selectedImageId) {
+      const selectedImage = roomType.imagesRoomType?.find((img) => img.id === selectedImageId);
+      if (selectedImage) {
+        // Importante: Usar 'id' en lugar de 'imageId' como espera el backend
+        formData.imageUpdate = {
+          id: selectedImage.id, // <-- CAMBIO AQUÍ: imageId -> id
+          url: selectedImage.url,
+          isMain: true, // Esta imagen será la principal
+        };
+
+        console.log("Se establecerá como imagen principal:", selectedImage.id);
+      }
+    }
+
+    // 2. Manejar el caso de reemplazar una imagen existente con una nueva
+    if (editingImageId && formData.newImage) {
+      const imageToUpdate = roomType.imagesRoomType?.find((img) => img.id === editingImageId);
+      if (imageToUpdate) {
+        // Si ya tenemos imageUpdate de una selección principal, mantener esa
+        // De lo contrario, crear un objeto imageUpdate para la imagen que estamos editando
+        if (!formData.imageUpdate) {
+          formData.imageUpdate = {
+            id: imageToUpdate.id, // <-- CAMBIO AQUÍ: imageId -> id
+            url: imageToUpdate.url,
+            isMain: imageToUpdate.isMain, // Mantener el estado principal que ya tenía
+          };
+        }
+
+        // ELIMINAR la línea que establece imageToUpdateId
+        // formData.imageToUpdateId = editingImageId;  <-- ELIMINAR ESTA LÍNEA
+
+        console.log("Se reemplazará la imagen:", editingImageId);
+      }
+    }
+
+    // Validación: si el esquema requiere imageUpdate y no lo tenemos, usar la imagen principal actual
+    if (!formData.imageUpdate) {
+      const mainImage = roomType.imagesRoomType?.find((img) => img.isMain);
+      if (mainImage) {
+        formData.imageUpdate = {
+          id: mainImage.id, // <-- CAMBIO AQUÍ: imageId -> id
+          url: mainImage.url,
+          isMain: true,
+        };
+        console.log("Usando imagen principal actual como imageUpdate");
+      } else {
+        console.error("No se encontró una imagen principal y no se seleccionó ninguna imagen");
+      }
+    }
+
+    // Log para depuración
+    console.log("Datos a enviar:", {
+      ...formData,
+      newImage: formData.newImage
+        ? {
+            nombre: formData.newImage.name,
+            tipo: formData.newImage.type,
+            tamaño: `${(formData.newImage.size / 1024).toFixed(2)} KB`,
+          }
+        : undefined,
+      imageUpdate: formData.imageUpdate,
+      // Ya no mostramos imageToUpdateId porque lo eliminamos
+    });
+
+    // Llamar a onSubmit con los datos actualizados
+    onSubmit(formData);
+  };
+
+  // Inicializar la imagen seleccionada cuando se abre el formulario
+  useEffect(() => {
+    if (!selectedImageId && roomType.imagesRoomType) {
+      const mainImage = roomType.imagesRoomType.find((img) => img.isMain);
+      if (mainImage) {
+        setSelectedImageId(mainImage.id);
+      }
+    }
+  }, [roomType, selectedImageId, setSelectedImageId]);
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 gap-4">
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4 gap-4">
         {/* Primera fila: Nombre y Número de huéspedes */}
         <div className="grid grid-cols-2 gap-4">
           <FormField
