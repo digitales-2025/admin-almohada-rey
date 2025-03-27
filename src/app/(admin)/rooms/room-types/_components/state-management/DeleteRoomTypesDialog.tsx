@@ -27,7 +27,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { useRoomTypes } from "../../_hooks/use-roomTypes";
+import { useRoomTypes } from "../../_hooks/use-room-types";
 import { RoomType } from "../../_types/roomTypes";
 
 interface DeleteRoomTypesDialogProps extends ComponentPropsWithoutRef<typeof AlertDialog> {

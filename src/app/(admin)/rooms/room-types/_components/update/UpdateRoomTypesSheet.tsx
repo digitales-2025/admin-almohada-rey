@@ -18,7 +18,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { useRoomTypes } from "../../_hooks/use-roomTypes";
+import { useRoomTypes } from "../../_hooks/use-room-types";
 import { UpdateRoomTypeSchema, updateRoomTypeSchema } from "../../_schema/roomTypesSchema";
 import { RoomType } from "../../_types/roomTypes";
 import UpdateRoomTypeForm from "./UpdateRoomTypesForm";

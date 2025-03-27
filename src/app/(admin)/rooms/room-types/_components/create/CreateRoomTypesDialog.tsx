@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { useRoomTypes } from "../../_hooks/use-roomTypes";
+import { useRoomTypes } from "../../_hooks/use-room-types";
 import { CreateRoomTypeSchema, createRoomTypeSchema } from "../../_schema/roomTypesSchema";
 import CreateRoomTypeForm from "./CreateRoomTypesForm";
 

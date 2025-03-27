@@ -16,7 +16,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FloorType, RoomType } from "../../_types/roomTypes";
+import { FloorTypeAccepted, RoomType } from "../../_types/roomTypes";
 import { FloorTypeLabels } from "../../_utils/roomTypes.utils";
 import { DeleteRoomTypesDialog } from "../state-management/DeleteRoomTypesDialog";
 import { ReactivateRoomTypesDialog } from "../state-management/ReactivateRoomTypesDialog";
@@ -65,7 +65,7 @@ export const roomTypesColumns = (isSuperAdmin: boolean): ColumnDef<RoomType>[] =
     accessorKey: "floorType",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Tipo de Piso" />,
     cell: ({ row }) => {
-      const floorType = row.getValue("tipo de piso") as FloorType;
+      const floorType = row.getValue("tipo de piso") as FloorTypeAccepted;
       const floorTypeConfig = FloorTypeLabels[floorType];
 
       if (!floorTypeConfig) return <div>No definido</div>;

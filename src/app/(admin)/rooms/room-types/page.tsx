@@ -4,7 +4,7 @@ import { HeaderPage } from "@/components/common/HeaderPage";
 import { DataTableSkeleton } from "@/components/datatable/data-table-skeleton";
 import ErrorGeneral from "@/components/errors/general-error";
 import { RoomTypesTable } from "./_components/table/RoomTypesTable";
-import { useRoomTypes } from "./_hooks/use-roomTypes";
+import { useRoomTypes } from "./_hooks/use-room-types";
 
 export default function RoomTypesPage() {
   const { roomTypesList, roomTypesError, isLoadingRoomTypes } = useRoomTypes();
