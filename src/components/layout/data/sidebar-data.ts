@@ -2,6 +2,7 @@ import {
   BedDouble,
   CalendarCheck,
   CreditCard,
+  Hotel,
   LayoutDashboard,
   Package,
   PackageMinus,
@@ -68,7 +69,7 @@ export const sidebarData: SidebarData = {
       items: [
         {
           title: "Habitaciones",
-          icon: BedDouble,
+          icon: Hotel,
           items: [
             {
               title: "Listado",
