@@ -6,6 +6,7 @@ import {
   useDeleteCustomersMutation,
   useGetAllCustomersQuery,
   useReactivateCustomersMutation,
+  useSearchCustomersByDocumentIdQuery,
   useUpdateCustomerMutation,
 } from "../_services/customersApi";
 import { Customer } from "../_types/customer";
@@ -93,3 +94,5 @@ export const useCustomers = () => {
     isLoadingReactivateCustomers,
   };
 };
+
+export const useSearchCustomerByDocId = (docNumber: string) => useSearchCustomersByDocumentIdQuery(docNumber);

@@ -3,6 +3,7 @@
 import { type Table } from "@tanstack/react-table";
 
 import { DetailedReservation } from "../../_schemas/reservation.schemas";
+import { CreateReservationDialog } from "../create/CreateReservationDialog";
 
 export interface ReservationTableToolbarActionsProps {
   table?: Table<DetailedReservation>;
@@ -27,7 +28,7 @@ export function ReservationTableToolbarActions(
           />
         </>
       ) : null} */}
-      {/* <CreateCustomersDialog /> */}
+      <CreateReservationDialog />
     </div>
   );
 }

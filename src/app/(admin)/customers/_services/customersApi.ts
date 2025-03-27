@@ -1,7 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 import baseQueryWithReauth from "@/utils/baseQuery";
-import { Customer } from "../_types/customer";
+import { ApiCustomer, Customer } from "../_types/customer";
 
 export const customersApi = createApi({
   reducerPath: "customersApi",
@@ -66,6 +66,15 @@ export const customersApi = createApi({
       }),
       invalidatesTags: ["Customer"],
     }),
+    //BUscar clientes por numero de documento de identidad
+    searchCustomersByDocumentId: build.query<ApiCustomer[], string>({
+      query: (documentId) => ({
+        url: `/customers/searchByDocNumber?docNumber=${documentId}`,
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: (result) => (result ? result.map(({ id }) => ({ type: "Customer", id })) : ["Customer"]),
+    }),
   }),
 });
 
@@ -76,4 +85,5 @@ export const {
   useGetAllCustomersQuery,
   useDeleteCustomersMutation,
   useReactivateCustomersMutation,
+  useSearchCustomersByDocumentIdQuery,
 } = customersApi;

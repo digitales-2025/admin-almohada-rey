@@ -1,8 +1,27 @@
 import { z } from "zod";
 
 import { components } from "@/types/api";
+import { SelectOption } from "@/types/form/select-option";
 
 export type ReservationStatus = "PENDING" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELED";
+export const reservationStatusSelectOptions: Record<ReservationStatus, SelectOption<ReservationStatus>> = {
+  PENDING: {
+    value: "PENDING",
+    label: "Pendiente",
+  },
+  CHECKED_IN: {
+    value: "CHECKED_IN",
+    label: "Check-in",
+  },
+  CHECKED_OUT: {
+    value: "CHECKED_OUT",
+    label: "Check-out",
+  },
+  CANCELED: {
+    value: "CANCELED",
+    label: "Cancelado",
+  },
+};
 export type DocumentType = "DNI" | "PASSPORT" | "FOREIGNER_CARD";
 export type Reservation = components["schemas"]["Reservation"];
 export type DetailedReservation = components["schemas"]["DetailedReservation"];
@@ -13,6 +32,7 @@ export type CreateReservationDto = components["schemas"]["CreateReservationDto"]
 export type ReservationGuestDto = components["schemas"]["GuestDto"];
 export type ReservationGuest = components["schemas"]["Guest"];
 export type PaginatedResponse = components["schemas"]["PaginatedResponse"];
+export type RoomAvailabilityDto = components["schemas"]["RoomAvailabilityDto"];
 // {
 //     customerId: string;
 //     roomId: string;
