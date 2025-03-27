@@ -60,7 +60,7 @@ export function UpdateRoomTypeSheet({ roomType, open, onOpenChange }: UpdateRoom
         ? {
             id: mainImage.id,
             url: mainImage.url,
-            isMain: true,
+            isMain: mainImage.isMain,
           }
         : undefined,
     },
@@ -86,7 +86,7 @@ export function UpdateRoomTypeSheet({ roomType, open, onOpenChange }: UpdateRoom
           ? {
               id: mainImage.id,
               url: mainImage.url,
-              isMain: true,
+              isMain: mainImage.isMain,
             }
           : undefined,
       });

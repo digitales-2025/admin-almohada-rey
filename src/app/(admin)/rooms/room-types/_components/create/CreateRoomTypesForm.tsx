@@ -290,7 +290,6 @@ export default function CreateRoomTypeForm({ children, form, onSubmit }: CreateR
                   />
                 </FormControl>
                 <FormMessage />
-                <p className="text-xs text-muted-foreground mt-1">Máximo 50 huéspedes</p>
               </FormItem>
             )}
           />
@@ -327,7 +326,6 @@ export default function CreateRoomTypeForm({ children, form, onSubmit }: CreateR
                   />
                 </FormControl>
                 <FormMessage />
-                <p className="text-xs text-muted-foreground mt-1">Entre 1 y 10,000 m²</p>
               </FormItem>
             )}
           />
@@ -364,7 +362,6 @@ export default function CreateRoomTypeForm({ children, form, onSubmit }: CreateR
                   />
                 </FormControl>
                 <FormMessage />
-                <p className="text-xs text-muted-foreground mt-1">Máximo 1,000,000</p>
               </FormItem>
             )}
           />

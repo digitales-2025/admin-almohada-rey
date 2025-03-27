@@ -131,7 +131,7 @@ export default function UpdateRoomTypeForm({
         formData.imageUpdate = {
           id: selectedImage.id, // <-- CAMBIO AQUÍ: imageId -> id
           url: selectedImage.url,
-          isMain: true, // Esta imagen será la principal
+          isMain: selectedImage.isMain, // Esta imagen será la principal
         };
 
         console.log("Se establecerá como imagen principal:", selectedImage.id);
@@ -503,8 +503,8 @@ export default function UpdateRoomTypeForm({
                       </div>
                       <Badge variant="outline">
                         {roomType.imagesRoomType?.find((img) => img.id === editingImageId)?.isMain
-                          ? "Imagen Principal"
-                          : "Imagen Secundaria"}
+                          ? "Principal"
+                          : "Secundaria"}
                       </Badge>
                     </Label>
                     <div className="mt-2">

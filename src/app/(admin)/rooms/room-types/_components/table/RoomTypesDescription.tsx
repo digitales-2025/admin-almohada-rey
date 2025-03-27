@@ -49,7 +49,7 @@ export const RoomTypeDescription = ({ row }: RoomTypeDescriptionProps) => {
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <CarouselPrevious className="left-2 block" />
+              <CarouselPrevious className="left-2" />
               <CarouselNext className="right-2" />
             </Carousel>
           </div>
