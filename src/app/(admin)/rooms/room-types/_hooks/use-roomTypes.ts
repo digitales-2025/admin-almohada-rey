@@ -143,7 +143,7 @@ export const useRoomTypes = () => {
    * @param data Datos del tipo de habitación a actualizar
    * @returns La data del tipo de habitación actualizado o error
    */
-  async function onUpdateRoomType(data: UpdateRoomTypeWithImageDto) {
+  async function onUpdateRoomType(data: UpdateRoomTypeWithImageDto & { id: string }) {
     console.log("===== HOOK: onUpdateRoomType =====");
     console.log("Datos recibidos:", data);
 

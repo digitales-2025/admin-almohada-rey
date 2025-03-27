@@ -105,7 +105,7 @@ export function UpdateRoomTypeSheet({ roomType, open, onOpenChange }: UpdateRoom
     startUpdateTransition(() => {
       onUpdateRoomType({
         ...formData,
-        id: roomType.id,
+        id: roomType?.id,
       });
     });
   };

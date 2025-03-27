@@ -1,7 +1,8 @@
 import { components } from "@/types/api";
 
 // Tipo personalizado para FormData tipado
-export type TypedFormData<T> = FormData & { _type?: T };
+/* export type TypedFormData<T> = FormData & { _type?: T }; */
+export type TypedFormData<T> = T | FormData;
 
 /**
  * Tipos de pisos enums
@@ -11,7 +12,9 @@ export enum FloorTypeEnum {
   CARPETING = "CARPETING",
 }
 
-export const FloorType = {
+export type FloorTypeAccepted = keyof typeof FloorTypeEnum;
+
+export const FloorType: Record<FloorTypeAccepted, FloorTypeAccepted> = {
   LAMINATING: "LAMINATING",
   CARPETING: "CARPETING",
 };
@@ -40,6 +43,18 @@ export type imagesRoomType = {
   isMain: boolean;
 };
 export interface RoomType extends RoomTypePrototype {
+  id: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  name: string;
+  guests: number;
+  price: number;
+  tv: string;
+  floorType: "LAMINATING" | "CARPETING";
+  description: string;
+  area: number;
+  bed: string;
   imagesRoomType: imagesRoomType[];
 }
 /**
@@ -59,7 +74,7 @@ export type CreateRoomTypeWithImagesPrototype = components["schemas"]["CreateRoo
 } */
 
 export interface images {
-  images: File[] | null;
+  images: File[] | undefined;
 }
 export type CreateRoomTypeWithImagesDto = Omit<CreateRoomTypeWithImagesPrototype, "images"> & images;
 
@@ -79,14 +94,24 @@ export type UpdateRoomTypeWithImagePrototype = components["schemas"]["UpdateRoom
     newImage?: string;
     imageUpdate?: components["schemas"]["ImageRoomTypeUpdateDto"];
 } */
-export interface newImage {
-  newImage: File | null;
+// Para el tipo File (newImage)
+export interface NewImageField {
+  newImage?: File;
 }
 
-export type UpdateRoomTypeWithImageDto = Omit<UpdateRoomTypeWithImagePrototype, "newImage" | "imageUpdate"> &
-  newImage &
-  imageUpdate;
+// Para el objeto de actualización de imagen
+export interface ImageUpdateField {
+  imageUpdate?: {
+    id: string;
+    url: string;
+    isMain: boolean;
+  } | null;
+}
 
+// Tipo completo combinado
+export type UpdateRoomTypeWithImageDto = Omit<UpdateRoomTypeWithImagePrototype, "newImage" | "imageUpdate"> &
+  NewImageField &
+  ImageUpdateField;
 /**
  * Tipo de ImageRoomTypeUpdateDto con sus características
  */
@@ -96,11 +121,6 @@ export type ImageRoomTypeUpdatePrototype = components["schemas"]["ImageRoomTypeU
     url: string;
     isMain: boolean;
 } */
-export type imageUpdate = {
-  id: string;
-  url: string;
-  isMain: boolean;
-};
 
 /**
  * Tipo de DeleteRoomTypeDto con sus características
