@@ -2,7 +2,18 @@
 
 import { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { ChevronDown, ChevronRight, Ellipsis, RefreshCcwDot, Trash } from "lucide-react";
+import {
+  AreaChart,
+  BanknoteIcon,
+  Bed,
+  ChevronDown,
+  ChevronRight,
+  Ellipsis,
+  RefreshCcwDot,
+  Trash,
+  User2,
+  Users,
+} from "lucide-react";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
@@ -58,7 +69,12 @@ export const roomTypesColumns = (isSuperAdmin: boolean): ColumnDef<RoomType>[] =
     id: "nombre",
     accessorKey: "name",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Nombre" />,
-    cell: ({ row }) => <div className="min-w-40 truncate font-medium">{row.getValue("nombre")}</div>,
+    cell: ({ row }) => (
+      <div className="min-w-40 truncate font-medium flex items-center gap-2">
+        <Bed className="h-4 w-4 text-primary" />
+        <span>{row.getValue("nombre")}</span>
+      </div>
+    ),
   },
   {
     id: "tipo de piso",
@@ -97,13 +113,32 @@ export const roomTypesColumns = (isSuperAdmin: boolean): ColumnDef<RoomType>[] =
     id: "area",
     accessorKey: "area",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Área (m²)" />,
-    cell: ({ row }) => <div>{row.getValue("area")} m²</div>,
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200 flex items-center gap-1.5">
+          <AreaChart className="h-3.5 w-3.5" />
+          <span className="font-medium">{row.getValue("area")} m²</span>
+        </Badge>
+      </div>
+    ),
   },
   {
     id: "huespedes",
     accessorKey: "guests",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Huéspedes" />,
-    cell: ({ row }) => <div>{row.getValue("huespedes")}</div>,
+    cell: ({ row }) => {
+      const guests = row.getValue("huespedes") as number;
+      return (
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="bg-purple-50 text-purple-600 border-purple-200 flex items-center gap-1.5">
+            {guests > 1 ? <Users className="h-3.5 w-3.5" /> : <User2 className="h-3.5 w-3.5" />}
+            <span className="font-medium">
+              {guests} {guests === 1 ? "persona" : "personas"}
+            </span>
+          </Badge>
+        </div>
+      );
+    },
   },
   {
     id: "precio",
@@ -117,7 +152,14 @@ export const roomTypesColumns = (isSuperAdmin: boolean): ColumnDef<RoomType>[] =
         currency: "PEN",
       }).format(price);
 
-      return <div className=" font-medium">{formatted}</div>;
+      return (
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200 flex items-center gap-1.5">
+            <BanknoteIcon className="h-3.5 w-3.5" />
+            <span className="font-medium">{formatted}</span>
+          </Badge>
+        </div>
+      );
     },
   },
   {
@@ -127,11 +169,11 @@ export const roomTypesColumns = (isSuperAdmin: boolean): ColumnDef<RoomType>[] =
     cell: ({ row }) => (
       <div>
         {row.getValue("estado") ? (
-          <Badge variant="secondary" className="bg-emerald-100 text-emerald-500 border-emerald-200">
+          <Badge variant="secondary" className="bg-emerald-100 text-emerald-600 border-emerald-200 px-3 py-1">
             Activo
           </Badge>
         ) : (
-          <Badge variant="secondary" className="bg-red-100 text-red-500 border-red-200">
+          <Badge variant="secondary" className="bg-red-100 text-red-600 border-red-200 px-3 py-1">
             Inactivo
           </Badge>
         )}
