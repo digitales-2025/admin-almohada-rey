@@ -248,6 +248,76 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/product": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get all products */
+    get: operations["ProductController_findAll_v1"];
+    put?: never;
+    /** Create a new product */
+    post: operations["ProductController_create_v1"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/product/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get a product by ID */
+    get: operations["ProductController_findOne_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Update a product by ID */
+    patch: operations["ProductController_update_v1"];
+    trace?: never;
+  };
+  "/v1/product/remove/all": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Deactivate a product by id */
+    delete: operations["ProductController_deactivate_v1"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/product/reactivate/all": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Reactivate a product by id */
+    patch: operations["ProductController_reactivateAll_v1"];
+    trace?: never;
+  };
   "/v1/reservation": {
     parameters: {
       query?: never;
@@ -354,6 +424,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/rooms/{id}/status": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Actualizar estado de una habitación */
+    patch: operations["RoomController_updateStatus_v1"];
+    trace?: never;
+  };
   "/v1/rooms/remove/all": {
     parameters: {
       query?: never;
@@ -455,10 +542,6 @@ export interface paths {
     delete?: never;
     options?: never;
     head?: never;
-    /**
-     * Actualizar tipo de habitación con una imagen
-     * @description Permite actualizar la información del tipo de habitación y una imagen específica.
-     */
     patch: operations["RoomTypeController_updateWithImage_v1"];
     trace?: never;
   };
@@ -536,8 +619,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /** Get all customers */
     get: operations["CustomersController_findAll_v1"];
     put?: never;
+    /** Create a new customer */
     post: operations["CustomersController_create_v1"];
     delete?: never;
     options?: never;
@@ -552,12 +637,14 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /** Get a customer by id */
     get: operations["CustomersController_findOne_v1"];
     put?: never;
     post?: never;
     delete?: never;
     options?: never;
     head?: never;
+    /** Update a customer by id */
     patch: operations["CustomersController_update_v1"];
     trace?: never;
   };
@@ -568,6 +655,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /** Get a customer by document number */
     get: operations["CustomersController_findDocumentNumber_v1"];
     put?: never;
     post?: never;
@@ -587,6 +675,7 @@ export interface paths {
     get?: never;
     put?: never;
     post?: never;
+    /** Deactivate a customer by id */
     delete: operations["CustomersController_deactivate_v1"];
     options?: never;
     head?: never;
@@ -606,7 +695,77 @@ export interface paths {
     delete?: never;
     options?: never;
     head?: never;
+    /** Reactivate a customer by id */
     patch: operations["CustomersController_reactivateAll_v1"];
+    trace?: never;
+  };
+  "/v1/room-cleaning": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Obtener todos los registros de limpieza */
+    get: operations["CleaningChecklistController_findAll_v1"];
+    put?: never;
+    /** Crear nuevo registro de limpieza */
+    post: operations["CleaningChecklistController_create_v1"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/room-cleaning/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Obtener registro de limpieza por ID */
+    get: operations["CleaningChecklistController_findOne_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/room-cleaning/room/{roomId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Obtener registros de limpieza por habitación */
+    get: operations["CleaningChecklistController_findByRoom_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/room-cleaning/date/{date}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Obtener registros de limpieza por fecha */
+    get: operations["CleaningChecklistController_findByDate_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
     trace?: never;
   };
 }
@@ -667,297 +826,30 @@ export interface components {
        */
       password: string;
     };
-    PaginationMetadata: {
-      /** @description Total number of items */
-      total: number;
-      /** @description Current page number */
-      page: number;
-      /** @description Number of items per page */
-      pageSize: number;
-      /** @description Total number of pages */
-      totalPages: number;
-      /** @description Whether there is a next page */
-      hasNext: boolean;
-      /** @description Whether there is a previous page */
-      hasPrevious: boolean;
-    };
-    PaginatedResponse: {
-      /** @description The paginated data */
-      data: unknown[][];
-      /** @description Pagination metadata */
-      meta: components["schemas"]["PaginationMetadata"];
-    };
-    Customer: {
-      /**
-       * @description Unique identifier for the entity
-       * @example 123e4567-e89b-12d3-a456-426614174000
-       */
-      id?: string;
-      /**
-       * @description Indicates whether the entity is active or not
-       * @example true
-       */
-      isActive?: boolean;
-      /**
-       * Format: date-time
-       * @description Timestamp when the entity was created
-       * @example 2025-03-25T18:56:27.399Z
-       */
-      createdAt?: string;
-      /**
-       * Format: date-time
-       * @description Timestamp when the entity was last updated
-       * @example 2025-03-25T18:56:27.399Z
-       */
-      updatedAt?: string;
-      /** @description Customer name */
+    CreateProductDto: {
+      /** @description Nombre del producto */
       name: string;
-      /** @description Customer address */
-      address: string;
-      /** @description Customer birth place */
-      birthPlace: string;
-      /** @description Customer country */
-      country: string;
-      /** @description Customer department */
-      department?: string;
-      /** @description Customer province */
-      province?: string;
-      /** @description Customer phone number */
-      phone: string;
-      /** @description Customer occupation */
-      occupation: string;
+      /** @description Costo unitario del producto */
+      unitCost: number;
       /**
-       * @description Customer document type
-       * @enum {string}
-       */
-      documentType: "DNI" | "PASSPORT" | "FOREIGNER_CARD";
-      /** @description Customer document number */
-      documentNumber: string;
-      /** @description Customer email */
-      email: string;
-      /**
-       * @description Customer marital status
-       * @enum {string}
-       */
-      maritalStatus: "SINGLE" | "MARRIED" | "DIVORCED" | "WIDOWED";
-      /** @description Customer company name */
-      companyName?: string;
-      /** @description Customer RUC number */
-      ruc?: string;
-      /** @description Customer company address */
-      companyAddress?: string;
-    };
-    User: {
-      /**
-       * @description Unique identifier for the entity
-       * @example 123e4567-e89b-12d3-a456-426614174000
-       */
-      id?: string;
-      /**
-       * @description Whether the user is active
-       * @default true
-       * @example true
-       */
-      isActive: boolean;
-      /**
-       * Format: date-time
-       * @description Timestamp when the entity was created
-       * @example 2025-03-25T18:56:27.399Z
-       */
-      createdAt?: string;
-      /**
-       * Format: date-time
-       * @description Timestamp when the entity was last updated
-       * @example 2025-03-25T18:56:27.399Z
-       */
-      updatedAt?: string;
-      /** @description User name */
-      name: string;
-      /** @description User role */
-      userRol: string;
-      /** @description User email */
-      email: string;
-      /** @description User password */
-      password: string;
-      /** @description User phone number */
-      phone?: string;
-      /**
-       * @description Whether the user is a super admin
-       * @default false
-       */
-      isSuperAdmin: boolean;
-      /**
-       * Format: date-time
-       * @description Last login date
-       */
-      lastLogin: string;
-      /**
-       * @description Whether the user must change the password
-       * @default true
-       */
-      mustChangePassword: boolean;
-    };
-    Room: {
-      /**
-       * @description Unique identifier for the entity
-       * @example 123e4567-e89b-12d3-a456-426614174000
-       */
-      id?: string;
-      /**
-       * @description Indica si la habitación está activa
-       * @default true
-       * @example true
-       */
-      isActive: boolean;
-      /**
-       * Format: date-time
-       * @description Timestamp when the entity was created
-       * @example 2025-03-25T18:56:27.399Z
-       */
-      createdAt?: string;
-      /**
-       * Format: date-time
-       * @description Timestamp when the entity was last updated
-       * @example 2025-03-25T18:56:27.399Z
-       */
-      updatedAt?: string;
-      /**
-       * @description ID del tipo de habitación asociado
-       * @example 123e4567-e89b-12d3-a456-426614174000
+       * @description Tipo de producto. Puede ser COMMERCIAL o INTERNAL_USE
+       * @example COMMERCIAL
        */
       type: string;
-      /**
-       * @description Número de la habitación
-       * @example 101
-       */
-      number: number;
-      /**
-       * @description Indica si la habitación tiene papelera
-       * @default true
-       * @example true
-       */
-      trashBin: boolean;
-      /**
-       * @description Indica si la habitación tiene toalla
-       * @default true
-       * @example true
-       */
-      towel: boolean;
-      /**
-       * @description Indica si la habitación tiene papel higiénico
-       * @default true
-       * @example true
-       */
-      toiletPaper: boolean;
-      /**
-       * @description Indica si la habitación tiene jabón de ducha
-       * @default true
-       * @example true
-       */
-      showerSoap: boolean;
-      /**
-       * @description Indica si la habitación tiene jabón de manos
-       * @default true
-       * @example true
-       */
-      handSoap: boolean;
-      /**
-       * @description Indica si la habitación tiene lámpara
-       * @default true
-       * @example true
-       */
-      lamp: boolean;
-      /**
-       * @description Estado de la habitación
-       * @example AVAILABLE
-       * @enum {string}
-       */
-      status: "AVAILABLE" | "OCCUPIED" | "RESERVED" | "CLEANING";
     };
-    DetailedReservation: {
+    UpdateProductDto: {
+      /** @description Nombre del producto */
+      name?: string;
+      /** @description Costo unitario del producto */
+      unitCost?: number;
       /**
-       * @description Unique identifier for the reservation
-       * @example 123e4567-e89b-12d3-a456-426614174000
+       * @description Tipo de producto. Puede ser COMMERCIAL o INTERNAL_USE
+       * @example COMMERCIAL
        */
-      id?: string;
-      /**
-       * @description Whether the reservation is active
-       * @default true
-       * @example true
-       */
-      isActive: boolean;
-      /**
-       * Format: date-time
-       * @description Timestamp when the reservation was created
-       * @example 2025-03-25T18:56:27.399Z
-       */
-      createdAt?: string;
-      /**
-       * Format: date-time
-       * @description Timestamp when the reservation was last updated
-       * @example 2025-03-25T18:56:27.399Z
-       */
-      updatedAt?: string;
-      /** @description Customer ID associated with the reservation */
-      customerId: string;
-      /** @description Room ID associated with the reservation */
-      roomId: string;
-      /** @description User ID of the staff who created the reservation */
-      userId: string;
-      /**
-       * Format: date-time
-       * @description Date when the reservation was made
-       */
-      reservationDate: string;
-      /**
-       * Format: date-time
-       * @description Check-in date for the reservation
-       */
-      checkInDate: string;
-      /**
-       * Format: date-time
-       * @description Check-out date for the reservation
-       */
-      checkOutDate: string;
-      /**
-       * @description Current status of the reservation
-       * @enum {string}
-       */
-      status: "PENDING" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELED";
-      /** @description JSON list of companions/guests */
-      guests?: string;
-      /** @description Additional notes or observations */
-      observations?: string;
-      /** @description Customer associated with the reservation */
-      customer: components["schemas"]["Customer"];
-      /** @description User associated with the reservation */
-      user: components["schemas"]["User"];
-      /** @description Room associated with the reservation */
-      room: components["schemas"]["Room"];
+      type?: string;
     };
-    Guest: {
-      /** @description The name of the guest */
-      name: string;
-      /** @description The age of the guest */
-      age?: number;
-      /** @description The document ID of the guest */
-      documentId?: string;
-      /**
-       * @description The type of document
-       * @enum {string}
-       */
-      documentType?: "DNI" | "PASSPORT" | "FOREIGNER_CARD";
-      /** @description The phone number of the guest */
-      phone?: string;
-      /** @description The email address of the guest */
-      email?: string;
-      /**
-       * Format: date-time
-       * @description The birth date of the guest
-       */
-      birthDate?: string;
-      /** @description Additional information about the guest */
-      additionalInfo?: Record<string, never>;
+    DeleteProductDto: {
+      ids: string[];
     };
     GuestDto: {
       /** @description Guest full name */
@@ -1030,13 +922,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-03-25T18:56:27.399Z
+       * @example 2025-03-27T14:10:49.103Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-03-25T18:56:27.399Z
+       * @example 2025-03-27T14:10:49.103Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -1070,12 +962,145 @@ export interface components {
       /** @description Additional notes or observations */
       observations?: string;
     };
+    Room: {
+      /**
+       * @description Unique identifier for the entity
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      id?: string;
+      /**
+       * @description Indicates whether the entity is active or not
+       * @example true
+       */
+      isActive?: boolean;
+      /**
+       * Format: date-time
+       * @description Timestamp when the entity was created
+       * @example 2025-03-27T14:10:49.103Z
+       */
+      createdAt?: string;
+      /**
+       * Format: date-time
+       * @description Timestamp when the entity was last updated
+       * @example 2025-03-27T14:10:49.103Z
+       */
+      updatedAt?: string;
+      /**
+       * @description ID del tipo de habitación asociado
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      roomTypeId: string;
+      /**
+       * @description Número de la habitación
+       * @example 101
+       */
+      number: number;
+      /**
+       * @description Indica si la habitación tiene papelera
+       * @default true
+       * @example true
+       */
+      trashBin: boolean;
+      /**
+       * @description Indica si la habitación tiene toalla
+       * @default true
+       * @example true
+       */
+      towel: boolean;
+      /**
+       * @description Indica si la habitación tiene papel higiénico
+       * @default true
+       * @example true
+       */
+      toiletPaper: boolean;
+      /**
+       * @description Indica si la habitación tiene jabón de ducha
+       * @default true
+       * @example true
+       */
+      showerSoap: boolean;
+      /**
+       * @description Indica si la habitación tiene jabón de manos
+       * @default true
+       * @example true
+       */
+      handSoap: boolean;
+      /**
+       * @description Indica si la habitación tiene lámpara
+       * @default true
+       * @example true
+       */
+      lamp: boolean;
+      /**
+       * @description Estado de la habitación
+       * @example AVAILABLE
+       * @enum {string}
+       */
+      status: "AVAILABLE" | "OCCUPIED" | "RESERVED" | "CLEANING";
+    };
+    DetailedReservation: {
+      /**
+       * @description Unique identifier for the reservation
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      id?: string;
+      /**
+       * @description Whether the reservation is active
+       * @default true
+       * @example true
+       */
+      isActive: boolean;
+      /**
+       * Format: date-time
+       * @description Timestamp when the reservation was created
+       * @example 2025-03-27T14:10:49.103Z
+       */
+      createdAt?: string;
+      /**
+       * Format: date-time
+       * @description Timestamp when the reservation was last updated
+       * @example 2025-03-27T14:10:49.103Z
+       */
+      updatedAt?: string;
+      /** @description Customer ID associated with the reservation */
+      customerId: string;
+      /** @description Room ID associated with the reservation */
+      roomId: string;
+      /** @description User ID of the staff who created the reservation */
+      userId: string;
+      /**
+       * Format: date-time
+       * @description Date when the reservation was made
+       */
+      reservationDate: string;
+      /**
+       * Format: date-time
+       * @description Check-in date for the reservation
+       */
+      checkInDate: string;
+      /**
+       * Format: date-time
+       * @description Check-out date for the reservation
+       */
+      checkOutDate: string;
+      /**
+       * @description Current status of the reservation
+       * @enum {string}
+       */
+      status: "PENDING" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELED";
+      /** @description JSON list of companions/guests */
+      guests?: string;
+      /** @description Additional notes or observations */
+      observations?: string;
+      /** @description Room associated with the reservation */
+      room: components["schemas"]["Room"];
+    };
     CreateRoomDto: {
       /**
        * @description ID del tipo de habitación
        * @example 123e4567-e89b-12d3-a456-426614174000
        */
-      type: string;
+      roomTypeId: string;
       /**
        * @description Número de la habitación
        * @example 101
@@ -1096,17 +1121,55 @@ export interface components {
       /** @description Datos de la respuesta */
       data: Record<string, never> | null;
     };
+    StatusRoomDto: {
+      /**
+       * @description Disponible, ocupada o reservada
+       * @example AVAILABLE
+       * @enum {string}
+       */
+      status: "AVAILABLE" | "OCCUPIED" | "RESERVED" | "CLEANING";
+    };
     UpdateRoomDto: {
       /**
        * @description ID del tipo de habitación
        * @example 123e4567-e89b-12d3-a456-426614174000
        */
-      type?: string;
+      roomTypeId?: string;
       /**
        * @description Número de la habitación
        * @example 101
        */
       number?: number;
+      /**
+       * @description Estado del tacho de basura
+       * @example true
+       */
+      trashBin?: boolean;
+      /**
+       * @description Estado de la toalla
+       * @example true
+       */
+      towel?: boolean;
+      /**
+       * @description Estado del papel higiénico
+       * @example true
+       */
+      toiletPaper?: boolean;
+      /**
+       * @description Estado del jabón de ducha
+       * @example true
+       */
+      showerSoap?: boolean;
+      /**
+       * @description Estado del jabón de manos
+       * @example true
+       */
+      handSoap?: boolean;
+      /**
+       * @description Estado de la lámpara
+       * @example true
+       */
+      lamp?: boolean;
     };
     DeleteRoomDto: {
       /**
@@ -1131,15 +1194,20 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-03-25T18:56:27.399Z
+       * @example 2025-03-27T14:10:49.103Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-03-25T18:56:27.399Z
+       * @example 2025-03-27T14:10:49.103Z
        */
       updatedAt?: string;
+      /**
+       * @description Nombre del tipo de habitación
+       * @example Habitación doble
+       */
+      name: string;
       /**
        * @description Capacidad máxima de huéspedes
        * @example 2
@@ -1157,10 +1225,10 @@ export interface components {
       tv: string;
       /**
        * @description Tipo de piso
-       * @example LIMINATING
+       * @example LAMINATING
        * @enum {string}
        */
-      floorType: "LIMINATING" | "CARPETING";
+      floorType: "LAMINATING" | "CARPETING";
       /**
        * @description Descripción del tipo de habitación
        * @example Habitación con vista al mar y balcón privado
@@ -1179,6 +1247,11 @@ export interface components {
     };
     CreateRoomTypeWithImagesDto: {
       /**
+       * @description Nombre del tipo de habitación
+       * @example Habitación doble
+       */
+      name: string;
+      /**
        * @description Capacidad máxima de huéspedes
        * @example 2
        */
@@ -1195,10 +1268,10 @@ export interface components {
       tv: string;
       /**
        * @description Tipo de piso
-       * @example LIMINATING
+       * @example LAMINATING
        * @enum {string}
        */
-      floorType: "LIMINATING" | "CARPETING";
+      floorType: "LAMINATING" | "CARPETING";
       /**
        * @description Descripción del tipo de habitación
        * @example Habitación con balcón privado
@@ -1222,7 +1295,7 @@ export interface components {
        * @description ID de la imagen a actualizar
        * @example 123e4567-e89b-12d3-a456-426614174000
        */
-      imageId: string;
+      id: string;
       /**
        * @description URL actual de la imagen
        * @example https://pub-c8a9c1f826c540b981f5cfb49c3a55ea.r2.dev/image.jpg
@@ -1235,6 +1308,11 @@ export interface components {
       isMain: boolean;
     };
     UpdateRoomTypeWithImageDto: {
+      /**
+       * @description Nombre del tipo de habitación
+       * @example Habitación doble
+       */
+      name?: string;
       /**
        * @description Capacidad máxima de huéspedes
        * @example 2
@@ -1252,10 +1330,10 @@ export interface components {
       tv?: string;
       /**
        * @description Tipo de piso
-       * @example LIMINATING
+       * @example LAMINATING
        * @enum {string}
        */
-      floorType?: "LIMINATING" | "CARPETING";
+      floorType?: "LAMINATING" | "CARPETING";
       /**
        * @description Descripción del tipo de habitación
        * @example Habitación con balcón privado
@@ -1272,11 +1350,6 @@ export interface components {
        */
       bed?: string;
       /**
-       * @description Estado de activación
-       * @example true
-       */
-      isActive?: boolean;
-      /**
        * Format: binary
        * @description Nueva imagen para agregar o reemplazar
        */
@@ -1284,7 +1357,7 @@ export interface components {
       /**
        * @description Información para actualizar una imagen existente
        * @example {
-       *       "imageId": "123e4567-e89b-12d3-a456-426614174000",
+       *       "id": "123e4567-e89b-12d3-a456-426614174000",
        *       "url": "https://pub-c8a9c1f826c540b981f5cfb49c3a55ea.r2.dev/image.jpg",
        *       "isMain": true
        *     }
@@ -1372,6 +1445,82 @@ export interface components {
     };
     DeleteCustomerDto: {
       ids: string[];
+    };
+    CreateCleaningChecklistDto: {
+      /**
+       * @description Fecha de la limpieza
+       * @example 2025-03-24
+       */
+      date: string;
+      /**
+       * @description ID de la habitación
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      roomId: string;
+      /**
+       * @description Nombre del personal de limpieza
+       * @example Ana García
+       */
+      staffName: string;
+      /**
+       * @description ID del usuario verificador
+       * @example 123e4567-e89b-12d3-a456-426614174001
+       */
+      userCheckId: string;
+      /**
+       * @description Observaciones o comentarios
+       * @example Se reemplazó jabón y toallas
+       */
+      observations?: string;
+    };
+    CleaningChecklist: {
+      /**
+       * @description Unique identifier for the entity
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      id?: string;
+      /**
+       * @description Indicates whether the entity is active or not
+       * @example true
+       */
+      isActive?: boolean;
+      /**
+       * Format: date-time
+       * @description Timestamp when the entity was created
+       * @example 2025-03-27T14:10:49.103Z
+       */
+      createdAt?: string;
+      /**
+       * Format: date-time
+       * @description Timestamp when the entity was last updated
+       * @example 2025-03-27T14:10:49.103Z
+       */
+      updatedAt?: string;
+      /**
+       * @description Fecha de la limpieza
+       * @example 2025-03-24
+       */
+      date: string;
+      /**
+       * @description ID de la habitación
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      roomId: string;
+      /**
+       * @description Nombre del personal de limpieza
+       * @example Ana García
+       */
+      staffName: string;
+      /**
+       * @description ID del usuario que verifica
+       * @example 123e4567-e89b-12d3-a456-426614174001
+       */
+      userCheckId: string;
+      /**
+       * @description Observaciones o comentarios
+       * @example Se reemplazaron las toallas y se repuso el jabón
+       */
+      observations?: string | null;
     };
   };
   responses: never;
@@ -2022,6 +2171,260 @@ export interface operations {
       };
     };
   };
+  ProductController_findAll_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Products found successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ProductController_create_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateProductDto"];
+      };
+    };
+    responses: {
+      /** @description Product created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ProductController_findOne_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Product found successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ProductController_update_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateProductDto"];
+      };
+    };
+    responses: {
+      /** @description Product updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ProductController_deactivate_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DeleteProductDto"];
+      };
+    };
+    responses: {
+      /** @description Products deactivated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ProductController_reactivateAll_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DeleteProductDto"];
+      };
+    };
+    responses: {
+      /** @description Products reactivated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   ReservationController_findAll_v1: {
     parameters: {
       query?: never;
@@ -2114,10 +2517,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            data?: components["schemas"]["DetailedReservation"][];
-            meta?: components["schemas"]["PaginationMetadata"];
-          };
+          "application/json": components["schemas"]["DetailedReservation"][];
         };
       };
       /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
@@ -2401,6 +2801,47 @@ export interface operations {
       };
       /** @description Habitación no encontrada */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  RoomController_updateStatus_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description ID de la habitación */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StatusRoomDto"];
+      };
+    };
+    responses: {
+      /** @description Estado de habitación actualizado exitosamente */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BaseApiResponse"];
+        };
+      };
+      /** @description ID inválido o estado no permitido */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
         headers: {
           [name: string]: unknown;
         };
@@ -3057,6 +3498,196 @@ export interface operations {
       };
       /** @description Internal server error */
       500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  CleaningChecklistController_findAll_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Lista de todos los registros de limpieza */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CleaningChecklist"][];
+        };
+      };
+      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  CleaningChecklistController_create_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateCleaningChecklistDto"];
+      };
+    };
+    responses: {
+      /** @description Registro de limpieza creado exitosamente */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BaseApiResponse"];
+        };
+      };
+      /** @description Datos de entrada inválidos o registro duplicado */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  CleaningChecklistController_findOne_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description ID del registro de limpieza */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Registro de limpieza encontrado */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CleaningChecklist"];
+        };
+      };
+      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Registro de limpieza no encontrado */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  CleaningChecklistController_findByRoom_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description ID de la habitación */
+        roomId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Registros de limpieza encontrados */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CleaningChecklist"][];
+        };
+      };
+      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  CleaningChecklistController_findByDate_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Fecha (YYYY-MM-DD) */
+        date: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Registros de limpieza encontrados */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CleaningChecklist"][];
+        };
+      };
+      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
         headers: {
           [name: string]: unknown;
         };
