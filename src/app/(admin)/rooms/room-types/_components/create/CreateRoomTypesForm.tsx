@@ -46,16 +46,6 @@ export default function CreateRoomTypeForm({ children, form, onSubmit }: CreateR
 
     // Actualizar el campo 'images' en el formulario
     form.setValue("images", allImages, { shouldValidate: true });
-
-    // Mostrar en consola las imágenes actualizadas
-    console.log("Imágenes actualizadas:", {
-      total: allImages.length,
-      imagenes: allImages.map((file) => ({
-        nombre: file.name,
-        tipo: file.type,
-        tamaño: `${(file.size / 1024).toFixed(2)} KB`,
-      })),
-    });
   };
 
   // Manejar la imagen principal
@@ -196,9 +186,6 @@ export default function CreateRoomTypeForm({ children, form, onSubmit }: CreateR
           form.clearErrors("images");
         }
       }
-
-      // Mostrar todos los valores del formulario cuando cambian
-      console.log("Form values:", value);
     });
 
     return () => subscription.unsubscribe();
@@ -206,16 +193,6 @@ export default function CreateRoomTypeForm({ children, form, onSubmit }: CreateR
 
   // Función personalizada para manejar el envío
   const handleFormSubmit = (data: CreateRoomTypeSchema) => {
-    // Mostrar los datos completos que se enviarán
-    console.log("DATOS A ENVIAR:", {
-      ...data,
-      images: data.images?.map((file) => ({
-        nombre: file.name,
-        tipo: file.type,
-        tamaño: `${(file.size / 1024).toFixed(2)} KB`,
-      })),
-    });
-
     // Continuar con el envío normal
     onSubmit(data);
   };

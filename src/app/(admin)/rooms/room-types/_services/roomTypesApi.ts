@@ -15,37 +15,6 @@ import {
 type RoomTypeResponse = BaseApiResponse<RoomType>;
 type RoomTypesResponse = BaseApiResponse<RoomType[]>;
 
-// Función auxiliar para extraer y loguear datos del FormData
-const logFormData = (formData: FormData, endpoint: string, method: string, id?: string) => {
-  const formDataEntries: Record<string, any> = {};
-
-  // Iteramos por todas las entradas del FormData
-  formData.forEach((value, key) => {
-    if (value instanceof File) {
-      // Si es un archivo, guardamos información específica de archivo
-      formDataEntries[key] = {
-        tipo: "archivo",
-        nombre: value.name,
-        tipo_mime: value.type,
-        tamaño: `${(value.size / 1024).toFixed(2)} KB`,
-      };
-    } else {
-      // Para otros tipos de datos, los guardamos directamente
-      formDataEntries[key] = value;
-    }
-  });
-
-  // Mostramos los datos en consola con formato
-  console.log("======== DATOS ENVIADOS A LA API ========");
-  console.log("Endpoint:", endpoint);
-  console.log("Método:", method);
-  if (id) console.log("ID:", id);
-  console.log("Contenido del FormData:", formDataEntries);
-  console.log("=========================================");
-
-  return formData; // Devolvemos el mismo FormData para no afectar la petición
-};
-
 export const roomTypeApi = createApi({
   reducerPath: "roomTypeApi",
   baseQuery: baseQueryWithReauth,
@@ -83,17 +52,12 @@ export const roomTypeApi = createApi({
 
     // MUTACIÓN: Crear nuevo tipo de habitación con imágenes (requiere 5 imágenes)
     createRoomTypeWithImages: build.mutation<RoomTypeResponse, TypedFormData<CreateRoomTypeWithImagesDto>>({
-      query: (formData) => {
-        // Logueamos los datos del FormData antes de enviarlos
-        logFormData(formData, "/room-types/create-with-images", "POST");
-
-        return {
-          url: "/room-types/create-with-images",
-          method: "POST",
-          body: formData,
-          credentials: "include",
-        };
-      },
+      query: (formData) => ({
+        url: "/room-types/create-with-images",
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      }),
       invalidatesTags: [{ type: "RoomType", id: "LIST" }],
     }),
 
@@ -102,17 +66,12 @@ export const roomTypeApi = createApi({
       RoomTypeResponse,
       { id: string; formData: TypedFormData<UpdateRoomTypeWithImageDto> }
     >({
-      query: ({ id, formData }) => {
-        // Logueamos los datos del FormData antes de enviarlos, incluyendo el ID
-        logFormData(formData, `/room-types/${id}/update-with-images`, "PATCH", id);
-
-        return {
-          url: `/room-types/${id}/update-with-images`,
-          method: "PATCH",
-          body: formData,
-          credentials: "include",
-        };
-      },
+      query: ({ id, formData }) => ({
+        url: `/room-types/${id}/update-with-images`,
+        method: "PATCH",
+        body: formData,
+        credentials: "include",
+      }),
       invalidatesTags: (result, error, { id }) => [
         { type: "RoomType", id },
         { type: "RoomType", id: "LIST" },

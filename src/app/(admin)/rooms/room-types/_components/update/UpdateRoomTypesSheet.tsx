@@ -97,11 +97,6 @@ export function UpdateRoomTypeSheet({ roomType, open, onOpenChange }: UpdateRoom
 
   // La función onSubmit recibe los datos ya preparados por el formulario
   const onSubmit = async (formData: UpdateRoomTypeSchema) => {
-    console.log("⭐ Datos finales a enviar:", {
-      ...formData,
-      id: roomType.id,
-    });
-
     startUpdateTransition(() => {
       onUpdateRoomType({
         ...formData,

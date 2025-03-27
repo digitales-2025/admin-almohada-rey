@@ -15,7 +15,6 @@ interface RoomTypeDescriptionProps {
 }
 
 export const RoomTypeDescription = ({ row }: RoomTypeDescriptionProps) => {
-  console.log("🚀 ~ RoomTypeDescription ~ row:", row);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   return (

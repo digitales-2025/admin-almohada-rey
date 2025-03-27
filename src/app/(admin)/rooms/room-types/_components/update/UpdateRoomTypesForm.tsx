@@ -129,12 +129,10 @@ export default function UpdateRoomTypeForm({
       if (selectedImage) {
         // Importante: Usar 'id' en lugar de 'imageId' como espera el backend
         formData.imageUpdate = {
-          id: selectedImage.id, // <-- CAMBIO AQUÍ: imageId -> id
+          id: selectedImage.id,
           url: selectedImage.url,
-          isMain: selectedImage.isMain, // Esta imagen será la principal
+          isMain: selectedImage.isMain,
         };
-
-        console.log("Se establecerá como imagen principal:", selectedImage.id);
       }
     }
 
@@ -146,16 +144,11 @@ export default function UpdateRoomTypeForm({
         // De lo contrario, crear un objeto imageUpdate para la imagen que estamos editando
         if (!formData.imageUpdate) {
           formData.imageUpdate = {
-            id: imageToUpdate.id, // <-- CAMBIO AQUÍ: imageId -> id
+            id: imageToUpdate.id,
             url: imageToUpdate.url,
-            isMain: imageToUpdate.isMain, // Mantener el estado principal que ya tenía
+            isMain: imageToUpdate.isMain,
           };
         }
-
-        // ELIMINAR la línea que establece imageToUpdateId
-        // formData.imageToUpdateId = editingImageId;  <-- ELIMINAR ESTA LÍNEA
-
-        console.log("Se reemplazará la imagen:", editingImageId);
       }
     }
 
@@ -164,29 +157,12 @@ export default function UpdateRoomTypeForm({
       const mainImage = roomType.imagesRoomType?.find((img) => img.isMain);
       if (mainImage) {
         formData.imageUpdate = {
-          id: mainImage.id, // <-- CAMBIO AQUÍ: imageId -> id
+          id: mainImage.id,
           url: mainImage.url,
           isMain: true,
         };
-        console.log("Usando imagen principal actual como imageUpdate");
-      } else {
-        console.error("No se encontró una imagen principal y no se seleccionó ninguna imagen");
       }
     }
-
-    // Log para depuración
-    console.log("Datos a enviar:", {
-      ...formData,
-      newImage: formData.newImage
-        ? {
-            nombre: formData.newImage.name,
-            tipo: formData.newImage.type,
-            tamaño: `${(formData.newImage.size / 1024).toFixed(2)} KB`,
-          }
-        : undefined,
-      imageUpdate: formData.imageUpdate,
-      // Ya no mostramos imageToUpdateId porque lo eliminamos
-    });
 
     // Llamar a onSubmit con los datos actualizados
     onSubmit(formData);
