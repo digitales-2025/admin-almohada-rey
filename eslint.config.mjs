@@ -5,6 +5,7 @@ import { FlatCompat } from "@eslint/eslintrc";
 import js from "@eslint/js";
 import typescriptEslintEslintPlugin from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
+import importPlugin from "eslint-plugin-import"; // Añadir esta importación
 import prettier from "eslint-plugin-prettier";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -20,6 +21,7 @@ export default [
   {
     plugins: {
       prettier,
+      import: importPlugin, // Añadir el plugin import
     },
     rules: {
       "prettier/prettier": "error",

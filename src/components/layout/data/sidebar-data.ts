@@ -2,10 +2,12 @@ import {
   BedDouble,
   CalendarCheck,
   CreditCard,
+  Hotel,
   LayoutDashboard,
   Package,
   PackageMinus,
   PackagePlus,
+  Tag,
   UserCircle,
   Users,
   Warehouse,
@@ -55,6 +57,11 @@ export const sidebarData: SidebarData = {
           url: "/inventory/warehouse",
           icon: Warehouse,
         },
+        {
+          title: "Productos",
+          url: "/inventory/products",
+          icon: Package,
+        },
       ],
     },
     {
@@ -62,8 +69,19 @@ export const sidebarData: SidebarData = {
       items: [
         {
           title: "Habitaciones",
-          url: "/rooms",
-          icon: BedDouble,
+          icon: Hotel,
+          items: [
+            {
+              title: "Listado",
+              url: "/rooms/list",
+              icon: BedDouble,
+            },
+            {
+              title: "Tipos",
+              url: "/rooms/room-types",
+              icon: Tag,
+            },
+          ],
         },
         {
           title: "Reservas",

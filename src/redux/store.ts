@@ -2,8 +2,10 @@ import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 
 import { customersApi } from "@/app/(admin)/customers/_services/customersApi";
+import { productsApi } from "@/app/(admin)/inventory/products/_services/productsApi";
 import { adminApi } from "@/app/(admin)/profile/_services/adminApi";
 import { reservationApi } from "@/app/(admin)/reservation/_services/reservationApi";
+import { roomsApi } from "@/app/(admin)/rooms/list/_services/roomsApi";
 import { usersApi } from "@/app/(admin)/users/_services/usersApi";
 import { authApi } from "@/app/(auth)/log-in/_services/authApi";
 
@@ -14,6 +16,8 @@ export const store = configureStore({
     [usersApi.reducerPath]: usersApi.reducer,
     [customersApi.reducerPath]: customersApi.reducer,
     [reservationApi.reducerPath]: reservationApi.reducer,
+    [productsApi.reducerPath]: productsApi.reducer,
+    [roomsApi.reducerPath]: roomsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -58,7 +62,9 @@ export const store = configureStore({
       .concat(adminApi.middleware)
       .concat(usersApi.middleware)
       .concat(customersApi.middleware)
-      .concat(reservationApi.middleware),
+      .concat(productsApi.middleware)
+      .concat(reservationApi.middleware)
+      .concat(roomsApi.middleware),
 });
 setupListeners(store.dispatch);
 

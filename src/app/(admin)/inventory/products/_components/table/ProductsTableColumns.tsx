@@ -2,9 +2,7 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { ChevronDown, ChevronRight, Ellipsis, RefreshCcwDot, Trash } from "lucide-react";
-import * as RPNInput from "react-phone-number-input";
-import flags from "react-phone-number-input/flags";
+import { Box, Ellipsis, RefreshCcwDot, ShoppingBag, Trash } from "lucide-react";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
@@ -18,18 +16,18 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Customer, CustomerDocumentType, CustomerMaritalStatus } from "../../_types/customer";
-import { CustomerDocumentTypeLabels, CustomerMaritalStatusLabels } from "../../_utils/customers.utils";
-import { DeleteCustomersDialog } from "../state-management/DeleteCustomersDialog";
-import { ReactivateCustomersDialog } from "../state-management/ReactivateCustomersDialog";
-import { UpdateCustomerSheet } from "../update/UpdateCustomersSheet";
+import { Product, ProductType } from "../../_types/products";
+import { ProductTypeLabels } from "../../_utils/products.utils";
+import { DeleteProductsDialog } from "../state-management/DeleteProductsDialog";
+import { ReactivateProductsDialog } from "../state-management/ReactivateProductsDialog";
+import { UpdateProductSheet } from "../update/UpdateProductsSheet";
 
 /**
- * Generar las columnas de la tabla de usuarios
+ * Generar las columnas de la tabla de productos
  * @param isSuperAdmin Valor si el usuario es super administrador
- * @returns Columnas de la tabla de usuarios
+ * @returns Columnas de la tabla de productos
  */
-export const customersColumns = (isSuperAdmin: boolean): ColumnDef<Customer>[] => [
+export const productsColumns = (isSuperAdmin: boolean): ColumnDef<Product>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -56,59 +54,79 @@ export const customersColumns = (isSuperAdmin: boolean): ColumnDef<Customer>[] =
     enableHiding: false,
     enablePinning: true,
   },
+
+  {
+    id: "código",
+    accessorKey: "code",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Código" />,
+    cell: ({ row }) => {
+      return (
+        <div className="flex items-center gap-2">
+          <ShoppingBag className="h-4 w-4 text-muted-foreground" />
+          <Badge variant={"outline"} className="font-mono text-xs">
+            {row.getValue("código")}
+          </Badge>
+        </div>
+      );
+    },
+  },
+
   {
     id: "nombre",
     accessorKey: "name",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Nombre" />,
-    cell: ({ row }) => <div className="min-w-40 truncate capitalize">{row.getValue("nombre")}</div>,
-  },
-  {
-    id: "correo",
-    accessorKey: "email",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Correo" />,
-    cell: ({ row }) => <div>{row.getValue("correo")}</div>,
-  },
-  {
-    id: "teléfono",
-    accessorKey: "phone",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Teléfono" />,
     cell: ({ row }) => {
-      const phone = row.getValue("teléfono") as string;
-      if (!phone) return <div>-</div>;
+      const CategoryIcon = Box;
 
-      try {
-        // Obtener el país del número de teléfono
-        const country = RPNInput.parsePhoneNumber(phone)?.country;
+      return (
+        <div className="flex items-center gap-2 capitalize">
+          <CategoryIcon className="h-4 w-4 text-muted-foreground" />
+          {row.getValue("nombre")}
+        </div>
+      );
+    },
+  },
 
-        // Formatear el número para mejor legibilidad
-        const formattedPhone = RPNInput.formatPhoneNumberIntl(phone);
+  {
+    id: "precio",
+    accessorKey: "unitCost",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Precio" />,
+    cell: ({ row }) => {
+      const price = Number.parseFloat(row.getValue("precio"));
 
-        return (
-          <div className="flex items-center gap-2">
-            {country && (
-              <span className="flex h-4 w-6 overflow-hidden rounded-sm">
-                {flags[country] && React.createElement(flags[country], { title: country })}
+      return (
+        <div className="flex items-center">
+          <div
+            className="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-950/30 dark:to-green-950/30 
+                            border-l-4 border-emerald-500 shadow-sm rounded-md overflow-hidden group"
+          >
+            <div className="flex items-center px-3 py-1.5 relative">
+              {/* Línea animada */}
+              <div className="absolute bottom-0 left-0 h-0.5 w-0 bg-emerald-500 group-hover:w-full transition-all duration-300 ease-in-out"></div>
+
+              {/* Símbolo de moneda */}
+              <span className="text-emerald-600 dark:text-emerald-400 font-semibold mr-1.5">S/</span>
+
+              {/* Valor del precio */}
+              <span className="font-medium text-gray-800 dark:text-gray-200 tabular-nums tracking-tight">
+                {price.toLocaleString("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
-            )}
-            <span>{formattedPhone || phone}</span>
+            </div>
           </div>
-        );
-      } catch {
-        // Si hay algún error al parsear el número, mostramos el número original
-        return <div>{phone}</div>;
-      }
+        </div>
+      );
     },
   },
 
   {
     id: "tipo",
-    accessorKey: "documentType",
+    accessorKey: "type",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Tipo" />,
     cell: ({ row }) => {
-      const documentType = row.getValue("tipo") as CustomerDocumentType;
-      const documentTypeConfig = CustomerDocumentTypeLabels[documentType];
+      const documentType = row.getValue("tipo") as ProductType;
+      const documentTypeConfig = ProductTypeLabels[documentType];
 
-      if (!documentTypeConfig) return <div>No registrado</div>;
+      if (!documentTypeConfig) return <div>No definido</div>;
 
       const Icon = documentTypeConfig.icon;
 
@@ -134,56 +152,6 @@ export const customersColumns = (isSuperAdmin: boolean): ColumnDef<Customer>[] =
     enableColumnFilter: true,
   },
 
-  {
-    id: "N° Doc.",
-    accessorKey: "documentNumber",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="N° Doc." />,
-    cell: ({ row }) => {
-      const documentNumber = row.getValue("N° Doc.") as string;
-
-      if (!documentNumber) return <div className="text-muted-foreground text-sm italic">No disponible</div>;
-
-      return (
-        <div className="font-mono text-sm py-1 px-2 mx-auto bg-slate-50 rounded-md border border-slate-200 inline-block dark:bg-slate-800 dark:border-slate-700">
-          {documentNumber}
-        </div>
-      );
-    },
-  },
-
-  {
-    id: "e. civil",
-    accessorKey: "maritalStatus",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="E. Civil" />,
-    cell: ({ row }) => {
-      const maritalStatus = row.getValue("e. civil") as CustomerMaritalStatus;
-      const maritalStatusConfig = CustomerMaritalStatusLabels[maritalStatus];
-
-      if (!maritalStatusConfig) return <div>Estado civil no definidos</div>;
-
-      const Icon = maritalStatusConfig.icon;
-
-      return (
-        <div className="text-xs min-w-32">
-          <Badge variant="default" className={maritalStatusConfig.className}>
-            <Icon className="size-4 flex-shrink-0 mr-1" aria-hidden="true" />
-            {maritalStatusConfig.label}
-          </Badge>
-        </div>
-      );
-    },
-    filterFn: (row, id, value) => {
-      const rowValue = row.getValue(id);
-
-      if (Array.isArray(value)) {
-        if (value.length === 0) return true;
-        return value.includes(rowValue);
-      }
-
-      return rowValue === value;
-    },
-    enableColumnFilter: true,
-  },
   {
     id: "estado",
     accessorKey: "isActive",
@@ -225,28 +193,6 @@ export const customersColumns = (isSuperAdmin: boolean): ColumnDef<Customer>[] =
   },
 
   {
-    id: "expand", // Nueva columna para expansión
-    header: () => null, // No mostrar un título en el header
-    cell: ({ row }) => (
-      <Button
-        onClick={() => row.toggleExpanded()} // Alternar la expansión de la fila
-        aria-label="Expand row"
-        className="flex items-center justify-center p-2"
-        variant={"ghost"}
-      >
-        {row.getIsExpanded() ? (
-          <ChevronDown className="size-4" /> // Ícono cuando la fila está expandida
-        ) : (
-          <ChevronRight className="size-4" /> // Ícono cuando la fila está colapsada
-        )}
-      </Button>
-    ),
-    enableSorting: false,
-    enableHiding: false,
-    enablePinning: true,
-  },
-
-  {
     id: "actions",
     cell: function Cell({ row }) {
       const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -258,14 +204,14 @@ export const customersColumns = (isSuperAdmin: boolean): ColumnDef<Customer>[] =
         <div>
           <div>
             {showEditDialog && (
-              <UpdateCustomerSheet open={showEditDialog} onOpenChange={setShowEditDialog} customer={row?.original} />
+              <UpdateProductSheet open={showEditDialog} onOpenChange={setShowEditDialog} product={row?.original} />
             )}
 
             {showDeleteDialog && (
-              <DeleteCustomersDialog
+              <DeleteProductsDialog
                 open={showDeleteDialog}
                 onOpenChange={setShowDeleteDialog}
-                customers={[row?.original]}
+                products={[row?.original]}
                 showTrigger={false}
                 onSuccess={() => {
                   row.toggleSelected(false);
@@ -273,10 +219,10 @@ export const customersColumns = (isSuperAdmin: boolean): ColumnDef<Customer>[] =
               />
             )}
             {showReactivateDialog && (
-              <ReactivateCustomersDialog
+              <ReactivateProductsDialog
                 open={showReactivateDialog}
                 onOpenChange={setShowReactivateDialog}
-                customers={[row?.original]}
+                products={[row?.original]}
                 showTrigger={false}
                 onSuccess={() => {
                   row.toggleSelected(false);

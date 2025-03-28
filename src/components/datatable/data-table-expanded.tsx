@@ -124,7 +124,6 @@ export function DataTableExpanded<TData, TValue>({
       right: isPinned === "right" ? `${column.getAfter("right")}px` : undefined,
       position: isPinned ? "sticky" : "relative",
       zIndex: isPinned ? 1 : 0,
-      backgroundColor: "white",
     };
   };
 
@@ -174,7 +173,6 @@ export function DataTableExpanded<TData, TValue>({
                       return (
                         <TableCell
                           key={cell.id}
-                          className="text-slate-600"
                           style={{
                             ...getCommonPinningStyles(column),
                           }}

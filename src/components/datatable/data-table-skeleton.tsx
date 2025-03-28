@@ -1,104 +1,151 @@
-import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+"use client";
 
-interface TableSkeletonProps {
-  columns: number;
-  rows: number;
-  showHeader?: boolean;
+import * as React from "react";
+
+import { Skeleton } from "@/components/ui/skeleton";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
+interface DataTableSkeletonProps {
+  columns?: number;
+  rows?: number;
   showToolbar?: boolean;
+  showFilter?: boolean;
+  numFilters?: number;
   showPagination?: boolean;
+  showColumnHeader?: boolean;
+  cellHeight?: number;
+  columnWidths?: number[];
   className?: string;
 }
 
-export function TableSkeleton({
-  columns,
-  rows,
-  showHeader = true,
+export function DataTableSkeleton({
+  columns = 5,
+  rows = 5,
   showToolbar = true,
+  showFilter = true,
+  numFilters = 2,
   showPagination = true,
-  className,
-}: TableSkeletonProps) {
+  showColumnHeader = true,
+  cellHeight = 40,
+  columnWidths: customColumnWidths,
+  className = "",
+}: DataTableSkeletonProps) {
+  // Use fixed widths instead of random ones to avoid hydration mismatch
+  const columnWidths = React.useMemo(() => {
+    if (customColumnWidths && customColumnWidths.length === columns) {
+      return customColumnWidths;
+    }
+
+    // Fixed pattern of widths that repeats if needed
+    const baseWidths = [120, 150, 100, 180, 130, 160, 140, 110];
+    return Array(columns)
+      .fill(0)
+      .map((_, i) => baseWidths[i % baseWidths.length]);
+  }, [columns, customColumnWidths]);
+
+  // Fixed filter widths
+  const filterWidths = React.useMemo(() => {
+    const baseFilterWidths = [100, 120, 140, 110, 130];
+    return Array(numFilters)
+      .fill(0)
+      .map((_, i) => baseFilterWidths[i % baseFilterWidths.length]);
+  }, [numFilters]);
+
   return (
-    <div className={cn("w-full space-y-4", className)}>
+    <div className={`space-y-4 w-full ${className}`}>
       {/* Toolbar Skeleton */}
       {showToolbar && (
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-8 w-[250px]" />
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-1 flex-col-reverse items-start gap-y-2 sm:flex-row sm:items-center sm:space-x-2">
+            {showFilter && (
+              <>
+                <Skeleton className="h-8 w-[150px] lg:w-[250px]" />
+                <div className="flex flex-wrap items-center gap-2">
+                  {Array(numFilters)
+                    .fill(0)
+                    .map((_, index) => (
+                      <Skeleton key={`filter-${index}`} className="h-8" style={{ width: `${filterWidths[index]}px` }} />
+                    ))}
+                </div>
+              </>
+            )}
+          </div>
           <div className="flex items-center space-x-2">
-            <Skeleton className="h-8 w-[70px]" />
-            <Skeleton className="h-8 w-[100px]" />
+            <Skeleton className="h-8 w-8" />
+            <Skeleton className="h-8 w-8" />
           </div>
         </div>
       )}
 
+      {/* Table Skeleton */}
       <div className="rounded-md border">
-        <div className="space-y-4">
-          {/* Header Skeleton */}
-          {showHeader && (
-            <div className="border-b bg-muted/30 p-4">
-              <div
-                className="grid items-center gap-4"
-                style={{
-                  gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
-                }}
-              >
-                {Array.from({ length: columns }).map((_, i) => (
-                  <Skeleton key={`header-${i}`} className={cn("h-4", i === 0 ? "w-[80px]" : "w-full")} />
-                ))}
-              </div>
-            </div>
+        <Table>
+          {showColumnHeader && (
+            <TableHeader>
+              <TableRow>
+                {Array(columns)
+                  .fill(0)
+                  .map((_, index) => (
+                    <TableHead key={`header-${index}`} className={index > 2 ? "hidden md:table-cell" : ""}>
+                      <Skeleton
+                        style={{
+                          height: `${Math.floor(cellHeight / 2)}px`,
+                          width: `${columnWidths[index]}px`,
+                        }}
+                      />
+                    </TableHead>
+                  ))}
+              </TableRow>
+            </TableHeader>
           )}
-
-          {/* Rows Skeleton */}
-          <div className="space-y-4 p-4">
-            {Array.from({ length: rows }).map((_, rowIndex) => (
-              <div
-                key={`row-${rowIndex}`}
-                className="grid items-center gap-4"
-                style={{
-                  gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
-                }}
-              >
-                {Array.from({ length: columns }).map((_, colIndex) => (
-                  <Skeleton
-                    key={`cell-${rowIndex}-${colIndex}`}
-                    className={cn("h-4", colIndex === columns - 1 ? "w-[100px]" : "w-full")}
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
+          <TableBody>
+            {Array(rows)
+              .fill(0)
+              .map((_, rowIndex) => (
+                <TableRow key={`row-${rowIndex}`}>
+                  {Array(columns)
+                    .fill(0)
+                    .map((_, colIndex) => (
+                      <TableCell
+                        key={`cell-${rowIndex}-${colIndex}`}
+                        className={colIndex > 2 ? "hidden md:table-cell" : ""}
+                      >
+                        <Skeleton
+                          style={{
+                            height: `${Math.floor(cellHeight / 2)}px`,
+                            width: `${columnWidths[colIndex]}px`,
+                          }}
+                        />
+                      </TableCell>
+                    ))}
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
       </div>
 
       {/* Pagination Skeleton */}
       {showPagination && (
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-8 w-[100px]" />
-          <div className="flex items-center space-x-2">
-            <Skeleton className="h-8 w-[70px]" />
-            <Skeleton className="h-8 w-[70px]" />
+        <div className="flex items-center justify-between px-2">
+          <div className="hidden flex-1 sm:block">
+            <Skeleton className="h-4 w-[250px]" />
+          </div>
+          <div className="flex items-center sm:space-x-6 lg:space-x-8">
+            <div className="hidden sm:flex items-center space-x-2">
+              <Skeleton className="h-8 w-[70px]" />
+            </div>
+            <div className="flex w-[100px] items-center justify-center">
+              <Skeleton className="h-4 w-[80px]" />
+            </div>
+            <div className="flex items-center space-x-2">
+              <Skeleton className="hidden lg:flex h-8 w-8" />
+              <Skeleton className="h-8 w-8" />
+              <Skeleton className="h-8 w-8" />
+              <Skeleton className="hidden lg:flex h-8 w-8" />
+            </div>
           </div>
         </div>
       )}
     </div>
   );
-}
-
-interface DataTableSkeletonProps extends TableSkeletonProps {
-  showSelection?: boolean;
-  showActions?: boolean;
-}
-
-export function DataTableSkeleton({
-  columns,
-  rows,
-  showSelection = true,
-  showActions = true,
-  ...props
-}: DataTableSkeletonProps) {
-  // Ajustamos el número de columnas basado en las opciones
-  const adjustedColumns = columns + (showSelection ? 1 : 0) + (showActions ? 1 : 0);
-
-  return <TableSkeleton columns={adjustedColumns} rows={rows} {...props} />;
 }

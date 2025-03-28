@@ -1,6 +1,7 @@
 "use client";
 
 import { HeaderPage } from "@/components/common/HeaderPage";
+import { DataTableSkeleton } from "@/components/datatable/data-table-skeleton";
 import ErrorGeneral from "@/components/errors/general-error";
 import { UsersTable } from "./_components/table/UserTable";
 import { useUsers } from "./_hooks/use-users";
@@ -12,7 +13,7 @@ export default function UsersPage() {
     return (
       <div>
         <HeaderPage title="Usuarios" description="Usuarios registrados en el sistema." />
-        <div className="flex flex-col items-end justify-center gap-4">{/* Contenido mientras carga */}</div>
+        <DataTableSkeleton columns={6} />
       </div>
     );
   }

@@ -1,6 +1,8 @@
-import { ComponentPropsWithoutRef } from "react";
-import { Row } from "@tanstack/react-table";
-import { RefreshCcw, RefreshCcwDot } from "lucide-react";
+"use client";
+
+import { ComponentPropsWithoutRef, useTransition } from "react";
+import { type Row } from "@tanstack/react-table";
+import { RefreshCcw, Trash } from "lucide-react";
 
 import {
   AlertDialog,
@@ -25,27 +27,23 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { useCustomers } from "../../_hooks/use-customers";
-import { Customer } from "../../_types/customer";
+import { useProducts } from "../../_hooks/use-products";
+import { Product } from "../../_types/products";
 
-interface ReactivateCustomersDialogProps extends ComponentPropsWithoutRef<typeof AlertDialog> {
-  customers: Row<Customer>["original"][];
+interface DeleteProductsDialogProps extends ComponentPropsWithoutRef<typeof AlertDialog> {
+  products: Row<Product>["original"][];
   showTrigger?: boolean;
   onSuccess?: () => void;
 }
 
-export const ReactivateCustomersDialog = ({
-  customers,
-  showTrigger = true,
-  onSuccess,
-  ...props
-}: ReactivateCustomersDialogProps) => {
+export function DeleteProductsDialog({ products, showTrigger = true, onSuccess, ...props }: DeleteProductsDialogProps) {
+  const [isDeletePending] = useTransition();
   const isDesktop = useMediaQuery("(min-width: 640px)");
 
-  const { onReactivateCustomers, isLoadingReactivateCustomers } = useCustomers();
+  const { onDeleteProducts } = useProducts();
 
-  const onReactivateCustomersHandler = () => {
-    onReactivateCustomers(customers);
+  const onDeleteProductsHandler = () => {
+    onDeleteProducts(products);
     props.onOpenChange?.(false);
     onSuccess?.();
   };
@@ -56,8 +54,8 @@ export const ReactivateCustomersDialog = ({
         {showTrigger ? (
           <AlertDialogTrigger asChild>
             <Button variant="outline" size="sm">
-              <RefreshCcwDot className="mr-2 size-4" aria-hidden="true" />
-              Reactivar ({customers.length})
+              <Trash className="mr-2 size-4" aria-hidden="true" />
+              Eliminar ({products.length})
             </Button>
           </AlertDialogTrigger>
         ) : null}
@@ -65,8 +63,8 @@ export const ReactivateCustomersDialog = ({
           <AlertDialogHeader>
             <AlertDialogTitle>¿Estás absolutamente seguro?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción reactivará a <span className="font-medium"> {customers.length}</span>
-              {customers.length === 1 ? " cliente" : " clientes"}
+              Esta acción eliminará a<span className="font-medium"> {products.length}</span>
+              {products.length === 1 ? " producto" : " productos"}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2 sm:space-x-0">
@@ -74,25 +72,26 @@ export const ReactivateCustomersDialog = ({
               <Button variant="outline">Cancelar</Button>
             </AlertDialogCancel>
             <AlertDialogAction
-              aria-label="Reactivate selected rows"
-              onClick={onReactivateCustomersHandler}
-              disabled={isLoadingReactivateCustomers}
+              aria-label="Delete selected rows"
+              onClick={onDeleteProductsHandler}
+              disabled={isDeletePending}
             >
-              {isLoadingReactivateCustomers && <RefreshCcw className="mr-2 size-4 animate-spin" aria-hidden="true" />}
-              Reactivar
+              {isDeletePending && <RefreshCcw className="mr-2 size-4 animate-spin" aria-hidden="true" />}
+              Eliminar
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     );
   }
+
   return (
     <Drawer {...props}>
       {showTrigger ? (
         <DrawerTrigger asChild>
           <Button variant="outline" size="sm">
-            <RefreshCcwDot className="mr-2 size-4" aria-hidden="true" />
-            Reactivar ({customers.length})
+            <Trash className="mr-2 size-4" aria-hidden="true" />
+            Eliminar ({products.length})
           </Button>
         </DrawerTrigger>
       ) : null}
@@ -100,18 +99,14 @@ export const ReactivateCustomersDialog = ({
         <DrawerHeader>
           <DrawerTitle>¿Estás absolutamente seguro?</DrawerTitle>
           <DrawerDescription>
-            Esta acción reactivará a<span className="font-medium">{customers.length}</span>
-            {customers.length === 1 ? " usuario" : " usuarios"}
+            Esta acción eliminará a<span className="font-medium">{products.length}</span>
+            {products.length === 1 ? " cliente" : " clientes"}
           </DrawerDescription>
         </DrawerHeader>
         <DrawerFooter className="gap-2 sm:space-x-0">
-          <Button
-            aria-label="Reactivate selected rows"
-            onClick={onReactivateCustomersHandler}
-            disabled={isLoadingReactivateCustomers}
-          >
-            {isLoadingReactivateCustomers && <RefreshCcw className="mr-2 size-4 animate-spin" aria-hidden="true" />}
-            Reactivar
+          <Button aria-label="Delete selected rows" onClick={onDeleteProductsHandler} disabled={isDeletePending}>
+            {isDeletePending && <RefreshCcw className="mr-2 size-4 animate-spin" aria-hidden="true" />}
+            Eliminar
           </Button>
           <DrawerClose asChild>
             <Button variant="outline">Cancelar</Button>
@@ -120,4 +115,4 @@ export const ReactivateCustomersDialog = ({
       </DrawerContent>
     </Drawer>
   );
-};
+}
