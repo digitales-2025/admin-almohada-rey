@@ -88,11 +88,11 @@ export const roomsColumns = (isSuperAdmin: boolean): ColumnDef<Room>[] => [
   },
 
   {
-    id: "E. Habitación",
+    id: "disponibilidad",
     accessorKey: "status",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="E. Habitación" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Disponibilidad" />,
     cell: ({ row }) => {
-      const roomStatus = row.getValue("E. Habitación") as RoomStatus;
+      const roomStatus = row.getValue("disponibilidad") as RoomStatus;
       const roomStatusConfig = RoomStatusLabels[roomStatus];
 
       if (!roomStatusConfig) return <div>No definido</div>;

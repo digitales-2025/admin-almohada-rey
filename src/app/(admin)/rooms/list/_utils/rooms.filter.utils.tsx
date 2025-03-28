@@ -42,8 +42,8 @@ export const facetedFilters = [
   },
   {
     // Filtro para el estado civil generado dinámicamente
-    column: "E. Habitación",
-    title: "Estado Habitación",
+    column: "disponibilidad",
+    title: "Disponibilidad",
     options: Object.entries(RoomStatusLabels).map(([roomStatus, config]) => ({
       label: config.label,
       value: roomStatus,
