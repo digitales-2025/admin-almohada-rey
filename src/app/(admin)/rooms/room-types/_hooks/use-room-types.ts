@@ -5,6 +5,7 @@ import {
   useCreateRoomTypeWithImagesMutation,
   useDeleteRoomTypesMutation,
   useGetAllRoomTypesQuery,
+  useGetAllSummaryRoomTypeQuery,
   useGetRoomTypeByIdQuery,
   useGetRoomTypeWithImagesByIdQuery,
   useReactivateRoomTypesMutation,
@@ -34,6 +35,8 @@ export const useRoomTypes = () => {
     const { data, isLoading, error } = useGetRoomTypeByIdQuery(id);
     return { roomType: data, isLoading, error };
   };
+
+  const { data: dataCreatableTypeRooms, refetch: refetchDataCreatableTypeRooms } = useGetAllSummaryRoomTypeQuery();
 
   // Cambiamos de useGetRoomTypeWithImagesById a getRoomTypeWithImagesById (no es un hook, es una función)
   const useGetRoomTypeWithImagesById = (id: string) => {
@@ -244,5 +247,9 @@ export const useRoomTypes = () => {
     isLoadingDeleteRoomTypes,
     isSuccessReactivateRoomTypes,
     isLoadingReactivateRoomTypes,
+
+    // Datos de tipos habitaciones activas
+    dataCreatableTypeRooms,
+    refetchDataCreatableTypeRooms,
   };
 };

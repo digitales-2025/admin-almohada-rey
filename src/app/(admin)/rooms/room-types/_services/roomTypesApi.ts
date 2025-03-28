@@ -7,6 +7,7 @@ import {
   DeleteRoomTypeDto,
   ReactivateRoomTypeDto,
   RoomType,
+  SummaryRoomType,
   TypedFormData,
   UpdateRoomTypeWithImageDto,
 } from "../_types/roomTypes";
@@ -30,6 +31,15 @@ export const roomTypeApi = createApi({
         result
           ? [...result.map(({ id }) => ({ type: "RoomType" as const, id })), { type: "RoomType", id: "LIST" }]
           : [{ type: "RoomType", id: "LIST" }],
+    }),
+
+    getAllSummaryRoomType: build.query<SummaryRoomType[], void>({
+      query: () => ({
+        url: "/room-types/summary/active",
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["RoomType"],
     }),
 
     getRoomTypeById: build.query<RoomType, string>({
@@ -102,6 +112,7 @@ export const roomTypeApi = createApi({
 
 export const {
   useGetAllRoomTypesQuery,
+  useGetAllSummaryRoomTypeQuery,
   useGetRoomTypeByIdQuery,
   useGetRoomTypeWithImagesByIdQuery,
   useCreateRoomTypeWithImagesMutation,
