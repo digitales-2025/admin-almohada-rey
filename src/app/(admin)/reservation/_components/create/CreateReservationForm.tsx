@@ -258,7 +258,7 @@ export default function CreateReservationForm({
           control={form.control}
           name="status"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="col-span-2">
               <FormLabel htmlFor="city">{FORMSTATICS.status.label}</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
