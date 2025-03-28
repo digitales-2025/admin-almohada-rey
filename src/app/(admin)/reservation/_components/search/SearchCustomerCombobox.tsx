@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 
-import { useSearchCustomerByDocId } from "@/app/(admin)/customers/_hooks/use-customers";
+import { useCustomers } from "@/app/(admin)/customers/_hooks/use-customers";
 import { ApiCustomer } from "@/app/(admin)/customers/_types/customer";
 // import { useProducts } from "@/app/(admin)/(catalog)/product/products/_hooks/useProduct";
 import { RTKUseQueryHookResult, SearchCombobox } from "@/components/form/RemoteSearchCombobox";
@@ -25,9 +25,9 @@ export function SearchCustomerCombobox({ onValueChange, defaultValue }: SearchOr
   // const [entity, setEntity] = useState<T | null>(null);
   const [search, setSearch] = useState(DefaultSearchValue);
 
-  const queryResponse = useSearchCustomerByDocId(search);
+  const { searchQuery } = useCustomers({ search: search });
 
-  const { data, isLoading, isError, error, refetch } = queryResponse;
+  const { data, isLoading, isError, error, refetch } = searchQuery;
   // console.log("queryResponse", queryResponse);
 
   const mapToComboboxItem = useCallback((customer: ApiCustomer): ComboboxItem<ApiCustomer> => {
