@@ -371,6 +371,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/reservation/check-availability": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Verificar disponibilidad de habitación */
+    get: operations["ReservationController_checkAvailability_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v1/rooms": {
     parameters: {
       query?: never;
@@ -630,6 +647,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/customers/searchByDocNumber": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Busqueda rápida de cliente por su número de documento de identidad, siempre se tiene que enviar un string o "None" al query param docNumber */
+    get: operations["CustomersController_searchByDocNumber_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v1/customers/{id}": {
     parameters: {
       query?: never;
@@ -851,116 +885,135 @@ export interface components {
     DeleteProductDto: {
       ids: string[];
     };
-    GuestDto: {
-      /** @description Guest full name */
-      name: string;
-      /** @description Guest age */
-      age?: number;
-      /** @description Guest document identification */
-      documentId?: string;
-      /**
-       * @description Type of document
-       * @enum {string}
-       */
-      documentType?: "DNI" | "PASSPORT" | "FOREIGNER_CARD";
-      /** @description Guest phone number */
-      phone?: string;
-      /** @description Guest email address */
-      email?: string;
-      /**
-       * Format: date-time
-       * @description Guest date of birth
-       */
-      birthDate?: string;
-      /** @description Additional guest information */
-      additionalInfo?: string;
+    PaginationMetadata: {
+      /** @description Total number of items */
+      total: number;
+      /** @description Current page number */
+      page: number;
+      /** @description Number of items per page */
+      pageSize: number;
+      /** @description Total number of pages */
+      totalPages: number;
+      /** @description Whether there is a next page */
+      hasNext: boolean;
+      /** @description Whether there is a previous page */
+      hasPrevious: boolean;
     };
-    CreateReservationDto: {
-      /** @description Customer ID */
-      customerId: string;
-      /** @description Room ID */
-      roomId: string;
-      /** @description User ID of the person who creates the reservation */
-      userId: string;
-      /**
-       * Format: date-time
-       * @description Date when the reservation was made
-       */
-      reservationDate: string;
-      /**
-       * Format: date-time
-       * @description Check-in date
-       */
-      checkInDate: string;
-      /**
-       * Format: date-time
-       * @description Check-out date
-       */
-      checkOutDate: string;
-      /**
-       * @description Reservation status
-       * @enum {string}
-       */
-      status: "PENDING" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELED";
-      /** @description Guest companions information */
-      guests?: components["schemas"]["GuestDto"][];
-      /** @description Additional observations */
-      observations?: string;
+    PaginatedResponse: {
+      /** @description The paginated data */
+      data: unknown[][];
+      /** @description Pagination metadata */
+      meta: components["schemas"]["PaginationMetadata"];
     };
-    Reservation: {
+    Customer: {
       /**
-       * @description Unique identifier for the reservation
+       * @description Unique identifier for the entity
        * @example 123e4567-e89b-12d3-a456-426614174000
        */
       id?: string;
       /**
-       * @description Whether the reservation is active
+       * @description Indicates whether the entity is active or not
+       * @example true
+       */
+      isActive?: boolean;
+      /**
+       * Format: date-time
+       * @description Timestamp when the entity was created
+       * @example 2025-03-28T14:11:00.178Z
+       */
+      createdAt?: string;
+      /**
+       * Format: date-time
+       * @description Timestamp when the entity was last updated
+       * @example 2025-03-28T14:11:00.178Z
+       */
+      updatedAt?: string;
+      /** @description Customer name */
+      name: string;
+      /** @description Customer address */
+      address: string;
+      /** @description Customer birth place */
+      birthPlace: string;
+      /** @description Customer country */
+      country: string;
+      /** @description Customer department */
+      department?: string;
+      /** @description Customer province */
+      province?: string;
+      /** @description Customer phone number */
+      phone: string;
+      /** @description Customer occupation */
+      occupation: string;
+      /**
+       * @description Customer document type
+       * @enum {string}
+       */
+      documentType: "DNI" | "PASSPORT" | "FOREIGNER_CARD";
+      /** @description Customer document number */
+      documentNumber: string;
+      /** @description Customer email */
+      email: string;
+      /**
+       * @description Customer marital status
+       * @enum {string}
+       */
+      maritalStatus: "SINGLE" | "MARRIED" | "DIVORCED" | "WIDOWED";
+      /** @description Customer company name */
+      companyName?: string;
+      /** @description Customer RUC number */
+      ruc?: string;
+      /** @description Customer company address */
+      companyAddress?: string;
+    };
+    User: {
+      /**
+       * @description Unique identifier for the entity
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      id?: string;
+      /**
+       * @description Whether the user is active
        * @default true
        * @example true
        */
       isActive: boolean;
       /**
        * Format: date-time
-       * @description Timestamp when the reservation was created
-       * @example 2025-03-27T14:10:49.103Z
+       * @description Timestamp when the entity was created
+       * @example 2025-03-28T14:11:00.178Z
        */
       createdAt?: string;
       /**
        * Format: date-time
-       * @description Timestamp when the reservation was last updated
-       * @example 2025-03-27T14:10:49.103Z
+       * @description Timestamp when the entity was last updated
+       * @example 2025-03-28T14:11:00.178Z
        */
       updatedAt?: string;
-      /** @description Customer ID associated with the reservation */
-      customerId: string;
-      /** @description Room ID associated with the reservation */
-      roomId: string;
-      /** @description User ID of the staff who created the reservation */
-      userId: string;
+      /** @description User name */
+      name: string;
+      /** @description User role */
+      userRol: string;
+      /** @description User email */
+      email: string;
+      /** @description User password */
+      password: string;
+      /** @description User phone number */
+      phone?: string;
+      /**
+       * @description Whether the user is a super admin
+       * @default false
+       */
+      isSuperAdmin: boolean;
       /**
        * Format: date-time
-       * @description Date when the reservation was made
+       * @description Last login date
        */
-      reservationDate: string;
+      lastLogin: string;
       /**
-       * Format: date-time
-       * @description Check-in date for the reservation
+       * @description Whether the user must change the password
+       * @default true
        */
-      checkInDate: string;
-      /**
-       * Format: date-time
-       * @description Check-out date for the reservation
-       */
-      checkOutDate: string;
-      /**
-       * @description Current status of the reservation
-       * @enum {string}
-       */
-      status: "PENDING" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELED";
-      /** @description JSON list of companions/guests */
-      guests?: string;
-      /** @description Additional notes or observations */
-      observations?: string;
+      mustChangePassword: boolean;
     };
     Room: {
       /**
@@ -976,13 +1029,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-03-27T14:10:49.103Z
+       * @example 2025-03-28T14:11:00.178Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-03-27T14:10:49.103Z
+       * @example 2025-03-28T14:11:00.178Z
        */
       updatedAt?: string;
       /**
@@ -1053,13 +1106,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-03-27T14:10:49.103Z
+       * @example 2025-03-28T14:11:00.178Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-03-27T14:10:49.103Z
+       * @example 2025-03-28T14:11:00.178Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -1070,17 +1123,20 @@ export interface components {
       userId: string;
       /**
        * Format: date-time
-       * @description Date when the reservation was made
+       * @description Fecha y hora de fin de check-out
+       * @example 2024-12-25T15:00:00Z
        */
       reservationDate: string;
       /**
        * Format: date-time
-       * @description Check-in date for the reservation
+       * @description Fecha y hora de fin de check-in
+       * @example 2024-12-25T15:00:00Z
        */
       checkInDate: string;
       /**
        * Format: date-time
-       * @description Check-out date for the reservation
+       * @description Fecha y hora de fin de check-out
+       * @example 2024-12-25T15:00:00Z
        */
       checkOutDate: string;
       /**
@@ -1092,8 +1148,190 @@ export interface components {
       guests?: string;
       /** @description Additional notes or observations */
       observations?: string;
+      /** @description Customer associated with the reservation */
+      customer: components["schemas"]["Customer"];
+      /** @description User associated with the reservation */
+      user: components["schemas"]["User"];
       /** @description Room associated with the reservation */
       room: components["schemas"]["Room"];
+    };
+    Guest: {
+      /** @description The name of the guest */
+      name: string;
+      /** @description The age of the guest */
+      age?: number;
+      /** @description The document ID of the guest */
+      documentId?: string;
+      /**
+       * @description The type of document
+       * @enum {string}
+       */
+      documentType?: "DNI" | "PASSPORT" | "FOREIGNER_CARD";
+      /** @description The phone number of the guest */
+      phone?: string;
+      /** @description The email address of the guest */
+      email?: string;
+      /**
+       * Format: date-time
+       * @description The birth date of the guest
+       */
+      birthDate?: string;
+      /** @description Additional information about the guest */
+      additionalInfo?: Record<string, never>;
+    };
+    GuestDto: {
+      /** @description Guest full name */
+      name: string;
+      /** @description Guest age */
+      age?: number;
+      /** @description Guest document identification */
+      documentId?: string;
+      /**
+       * @description Type of document
+       * @enum {string}
+       */
+      documentType?: "DNI" | "PASSPORT" | "FOREIGNER_CARD";
+      /** @description Guest phone number */
+      phone?: string;
+      /** @description Guest email address */
+      email?: string;
+      /**
+       * Format: date-time
+       * @description Guest date of birth
+       */
+      birthDate?: string;
+      /** @description Additional guest information */
+      additionalInfo?: string;
+    };
+    CreateReservationDto: {
+      /** @description Customer ID */
+      customerId: string;
+      /** @description Room ID */
+      roomId: string;
+      /** @description User ID of the person who creates the reservation */
+      userId: string;
+      /**
+       * Format: date-time
+       * @description Fecha y hora de fin de check-out
+       * @example 2024-12-25T15:00:00Z
+       */
+      reservationDate: string;
+      /**
+       * Format: date-time
+       * @description Fecha y hora de fin de check-in
+       * @example 2024-12-25T15:00:00Z
+       */
+      checkInDate: string;
+      /**
+       * Format: date-time
+       * @description Fecha y hora de fin de check-out
+       * @example 2024-12-25T15:00:00Z
+       */
+      checkOutDate: string;
+      /**
+       * @description Reservation status
+       * @enum {string}
+       */
+      status: "PENDING" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELED";
+      /** @description Guest companions information */
+      guests?: components["schemas"]["GuestDto"][];
+      /** @description Additional observations */
+      observations?: string;
+    };
+    Reservation: {
+      /**
+       * @description Unique identifier for the reservation
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      id?: string;
+      /**
+       * @description Whether the reservation is active
+       * @default true
+       * @example true
+       */
+      isActive: boolean;
+      /**
+       * Format: date-time
+       * @description Timestamp when the reservation was created
+       * @example 2025-03-28T14:11:00.178Z
+       */
+      createdAt?: string;
+      /**
+       * Format: date-time
+       * @description Timestamp when the reservation was last updated
+       * @example 2025-03-28T14:11:00.178Z
+       */
+      updatedAt?: string;
+      /** @description Customer ID associated with the reservation */
+      customerId: string;
+      /** @description Room ID associated with the reservation */
+      roomId: string;
+      /** @description User ID of the staff who created the reservation */
+      userId: string;
+      /**
+       * Format: date-time
+       * @description Fecha y hora de fin de check-out
+       * @example 2024-12-25T15:00:00Z
+       */
+      reservationDate: string;
+      /**
+       * Format: date-time
+       * @description Fecha y hora de fin de check-in
+       * @example 2024-12-25T15:00:00Z
+       */
+      checkInDate: string;
+      /**
+       * Format: date-time
+       * @description Fecha y hora de fin de check-out
+       * @example 2024-12-25T15:00:00Z
+       */
+      checkOutDate: string;
+      /**
+       * @description Current status of the reservation
+       * @enum {string}
+       */
+      status: "PENDING" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELED";
+      /** @description JSON list of companions/guests */
+      guests?: string;
+      /** @description Additional notes or observations */
+      observations?: string;
+    };
+    RoomAvailabilityDto: {
+      /**
+       * @description ID de la habitación consultada
+       * @example 550e8400-e29b-41d4-a716-446655440000
+       */
+      roomId: string;
+      /**
+       * @description Fecha de check-in consultada
+       * @example 2025-04-01T14:00:00.000Z
+       */
+      checkInDate: string;
+      /**
+       * @description Fecha de check-out consultada
+       * @example 2025-04-05T12:00:00.000Z
+       */
+      checkOutDate: string;
+      /**
+       * @description Indica si la habitación está disponible para las fechas solicitadas
+       * @example true
+       */
+      isAvailable: boolean;
+      /**
+       * @description Nombre de la habitación (si está disponible)
+       * @example Suite Presidencial
+       */
+      roomNumber?: string;
+      /**
+       * @description Nombre del tipo de la habitación (si está disponible)
+       * @example Suite Presidencial
+       */
+      roomTypeName?: string;
+      /**
+       * @description Precio de la habitación (si está disponible)
+       * @example 250
+       */
+      roomPrice?: number;
     };
     CreateRoomDto: {
       /**
@@ -1194,13 +1432,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-03-27T14:10:49.103Z
+       * @example 2025-03-28T14:11:00.178Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-03-27T14:10:49.103Z
+       * @example 2025-03-28T14:11:00.178Z
        */
       updatedAt?: string;
       /**
@@ -1487,13 +1725,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-03-27T14:10:49.103Z
+       * @example 2025-03-28T14:11:00.178Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-03-27T14:10:49.103Z
+       * @example 2025-03-28T14:11:00.178Z
        */
       updatedAt?: string;
       /**
@@ -2517,7 +2755,10 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["DetailedReservation"][];
+          "application/json": {
+            data?: components["schemas"]["DetailedReservation"][];
+            meta?: components["schemas"]["PaginationMetadata"];
+          };
         };
       };
       /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
@@ -2591,6 +2832,47 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ReservationController_checkAvailability_v1: {
+    parameters: {
+      query: {
+        /** @description ID de la habitación */
+        roomId: string;
+        /** @description Fecha de check-in en formato ISO */
+        checkInDate: string;
+        /** @description Fecha de check-out en formato ISO */
+        checkOutDate: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Información de disponibilidad de la habitación */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RoomAvailabilityDto"];
+        };
       };
       /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
       400: {
@@ -3268,6 +3550,49 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  CustomersController_searchByDocNumber_v1: {
+    parameters: {
+      query: {
+        docNumber: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Customers found successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Customer"][];
+        };
       };
       /** @description Bad request */
       400: {
