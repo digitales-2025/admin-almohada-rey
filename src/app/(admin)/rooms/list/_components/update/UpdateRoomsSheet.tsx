@@ -26,20 +26,20 @@ const infoSheet = {
   description: "Actualiza la información del habitación y guarda los cambios",
 };
 
-interface UpdateCustomerSheetProps extends Omit<React.ComponentPropsWithRef<typeof Sheet>, "open" | "onOpenChange"> {
+interface UpdateRoomSheetProps extends Omit<React.ComponentPropsWithRef<typeof Sheet>, "open" | "onOpenChange"> {
   room: Room;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function UpdateCustomerSheet({ room, open, onOpenChange }: UpdateCustomerSheetProps) {
+export function UpdateRoomSheet({ room, open, onOpenChange }: UpdateRoomSheetProps) {
   const { onUpdateRoom, isSuccessUpdateRoom, isLoadingUpdateRoom } = useRooms();
 
   const form = useForm<CreateRoomsSchema>({
     resolver: zodResolver(roomsSchema),
     defaultValues: {
       number: room.number,
-      roomTypeId: room.roomTypeId,
+      roomTypeId: room.RoomTypes?.id,
     },
   });
 
@@ -47,7 +47,7 @@ export function UpdateCustomerSheet({ room, open, onOpenChange }: UpdateCustomer
     if (open) {
       form.reset({
         number: room.number,
-        roomTypeId: room.roomTypeId,
+        roomTypeId: room.RoomTypes?.id,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
