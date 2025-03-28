@@ -48,6 +48,7 @@
     "cmdk": "1.0.0",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
+    "embla-carousel-react": "^8.5.2",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
     "lucide": "^0.477.0",
