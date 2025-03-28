@@ -5,7 +5,7 @@ import { InputWithIcon } from "@/components/input-with-icon";
 import { AutoComplete, Option } from "@/components/ui/autocomplete";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { CreateRoomsSchema } from "../../_schema/createRoomsSchema";
-import { getRoomTypeKey, RoomTypeLabels } from "../../_utils/rooms.utils";
+import { RoomTypeOption } from "../../_utils/rooms.filter.utils";
 import { useRoomTypes } from "../../../room-types/_hooks/use-room-types";
 
 interface CreateRoomsFormProps extends Omit<React.ComponentPropsWithRef<"form">, "onSubmit"> {
@@ -13,24 +13,6 @@ interface CreateRoomsFormProps extends Omit<React.ComponentPropsWithRef<"form">,
   form: UseFormReturn<CreateRoomsSchema>;
   onSubmit: (data: CreateRoomsSchema) => void;
 }
-
-// Componente para renderizar el contenido personalizado de cada opción
-interface RoomTypeOptionProps {
-  label: string;
-  className?: string;
-}
-
-const RoomTypeOption = ({ label, className }: RoomTypeOptionProps) => {
-  const typeKey = getRoomTypeKey(label);
-  const { icon: Icon, className: iconClass } = RoomTypeLabels[typeKey];
-
-  return (
-    <div className="flex items-center gap-2">
-      <Icon className={`${iconClass} h-4 w-4`} />
-      <span className={className}>{label}</span>
-    </div>
-  );
-};
 
 export default function CreateRoomsForm({ children, form, onSubmit }: CreateRoomsFormProps) {
   const { dataCreatableTypeRooms } = useRoomTypes();
