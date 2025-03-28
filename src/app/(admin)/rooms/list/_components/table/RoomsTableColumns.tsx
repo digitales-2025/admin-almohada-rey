@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Room, RoomStatus } from "../../_types/room";
 import { getRoomTypeKey, RoomStatusLabels, RoomTypeLabels } from "../../_utils/rooms.utils";
+import { DeleteRoomsDialog } from "../state-management/DeleteRoomsDialog";
+import { ReactivateRoomsDialog } from "../state-management/ReactivateRoomsDialog";
 import { UpdateRoomSheet } from "../update/UpdateRoomsSheet";
 import { RoomNumberCell } from "./RoomNumberCell";
 import { RoomImageCell } from "./view-image/RoomImageViewer";
@@ -169,14 +171,35 @@ export const roomsColumns = (isSuperAdmin: boolean): ColumnDef<Room>[] => [
       const [showReactivateDialog, setShowReactivateDialog] = useState(false);
       const [showEditDialog, setShowEditDialog] = useState(false);
 
-      console.log(showDeleteDialog, showReactivateDialog);
-
       const { isActive } = row.original;
       return (
         <div>
           <div>
             {showEditDialog && (
               <UpdateRoomSheet open={showEditDialog} onOpenChange={setShowEditDialog} room={row?.original} />
+            )}
+
+            {showDeleteDialog && (
+              <DeleteRoomsDialog
+                open={showDeleteDialog}
+                onOpenChange={setShowDeleteDialog}
+                rooms={[row?.original]}
+                showTrigger={false}
+                onSuccess={() => {
+                  row.toggleSelected(false);
+                }}
+              />
+            )}
+            {showReactivateDialog && (
+              <ReactivateRoomsDialog
+                open={showReactivateDialog}
+                onOpenChange={setShowReactivateDialog}
+                rooms={[row?.original]}
+                showTrigger={false}
+                onSuccess={() => {
+                  row.toggleSelected(false);
+                }}
+              />
             )}
           </div>
           <DropdownMenu>
