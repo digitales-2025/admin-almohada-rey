@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
+import React, { forwardRef, ReactNode, useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { Command as CommandPrimitive } from "cmdk";
 import { Check, X } from "lucide-react";
 
@@ -22,7 +22,9 @@ type AutoCompleteProps = {
   disabled?: boolean;
   placeholder?: string;
   className?: string;
-  showClearButton?: boolean; // Nuevo prop
+  showClearButton?: boolean;
+  renderOption?: (option: Option) => ReactNode; // Nuevo prop para personalizar el renderizado de las opciones
+  renderSelectedValue?: (option: Option) => ReactNode; // Nuevo prop para personalizar el valor seleccionado
 };
 
 const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
@@ -36,7 +38,9 @@ const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
       disabled,
       isLoading = false,
       className,
-      showClearButton = true, // Nuevo prop
+      showClearButton = true,
+      renderOption,
+      renderSelectedValue,
     },
     ref
   ) => {
@@ -117,42 +121,68 @@ const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
       inputRef.current?.focus();
     }, [onValueChange]);
 
-    // Primero añadimos la función para capturar el scroll
     const handleScrollCapture = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-      // Detener la propagación de eventos de scroll
       e.stopPropagation();
     }, []);
 
-    // Luego añadimos la función para manejar los clicks en el Command
     const handleCommandClick = useCallback((e: React.MouseEvent) => {
-      // Prevenir que los clics dentro del comando provoquen el cierre
       e.stopPropagation();
     }, []);
+
+    // Crear un nuevo componente para mostrar el valor seleccionado personalizado
+    const SelectedValueDisplay = () => {
+      if (!selected) return null;
+
+      if (renderSelectedValue) {
+        return <div className="flex-1 overflow-hidden text-ellipsis">{renderSelectedValue(selected)}</div>;
+      }
+
+      return <div className="flex-1 overflow-hidden text-ellipsis capitalize">{selected.label}</div>;
+    };
 
     return (
       <CommandPrimitive onKeyDown={handleKeyDown}>
         <div className="relative" onClick={handleCommandClick}>
-          <CommandInput
-            ref={ref}
-            value={inputValue}
-            onValueChange={isLoading ? undefined : setInputValue}
-            onBlur={handleBlur}
-            onFocus={() => setOpen(true)}
-            placeholder={placeholder}
-            disabled={disabled}
-            className={cn(className, "capitalize ")}
-            showBorder={true}
-          />
-          {selected && showClearButton && (
-            <Button
-              type="button"
-              variant={"icon"}
-              size={"icon"}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-600"
-              onClick={handleClearSelection}
-            >
-              <X className="h-4 w-4" />
-            </Button>
+          {selected && renderSelectedValue ? (
+            <div className="flex items-center border rounded-md pl-3 pr-8 py-2 h-10 bg-white dark:bg-slate-800 relative">
+              <SelectedValueDisplay />
+              {showClearButton && (
+                <Button
+                  type="button"
+                  variant={"icon"}
+                  size={"icon"}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-600"
+                  onClick={handleClearSelection}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          ) : (
+            <>
+              <CommandInput
+                ref={ref}
+                value={inputValue}
+                onValueChange={isLoading ? undefined : setInputValue}
+                onBlur={handleBlur}
+                onFocus={() => setOpen(true)}
+                placeholder={placeholder}
+                disabled={disabled}
+                className={cn(className, "capitalize")}
+                showBorder={true}
+              />
+              {selected && showClearButton && (
+                <Button
+                  type="button"
+                  variant={"icon"}
+                  size={"icon"}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-600"
+                  onClick={handleClearSelection}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </>
           )}
         </div>
 
@@ -176,7 +206,6 @@ const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
               <CommandList
                 className="h-full rounded-lg capitalize bg-white dark:bg-slate-800"
                 onMouseDown={(e) => {
-                  // Prevenir que los clics dentro de la lista cierren el dropdown
                   e.preventDefault();
                 }}
               >
@@ -203,7 +232,7 @@ const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
                           className={cn("flex w-full items-center gap-2 ", !isSelected ? "pl-8" : null)}
                         >
                           {isSelected && <Check className="w-4" />}
-                          {option.label}
+                          {renderOption ? renderOption(option) : option.label}
                         </CommandItem>
                       );
                     })}
