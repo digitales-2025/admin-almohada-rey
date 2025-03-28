@@ -30,6 +30,5 @@ export type RoomTypes = {
 export enum RoomStatus {
   AVAILABLE = "AVAILABLE",
   OCCUPIED = "OCCUPIED",
-  RESERVED = "RESERVED",
   CLEANING = "CLEANING",
 }

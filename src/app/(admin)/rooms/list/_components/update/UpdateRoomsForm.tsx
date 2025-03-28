@@ -2,19 +2,20 @@ import { DoorClosed } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
 import { InputWithIcon } from "@/components/input-with-icon";
-import { AutoComplete, Option } from "@/components/ui/autocomplete";
+import { AutoComplete, type Option } from "@/components/ui/autocomplete";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Sheet } from "@/components/ui/sheet";
 import { CreateRoomsSchema } from "../../_schema/createRoomsSchema";
 import { RoomTypeOption } from "../../_utils/rooms.filter.utils";
 import { useRoomTypes } from "../../../room-types/_hooks/use-room-types";
 
-interface CreateRoomsFormProps extends Omit<React.ComponentPropsWithRef<"form">, "onSubmit"> {
+interface UpdateRoomsFormProps extends Omit<React.ComponentPropsWithRef<typeof Sheet>, "open" | "onOpenChange"> {
   children: React.ReactNode;
   form: UseFormReturn<CreateRoomsSchema>;
   onSubmit: (data: CreateRoomsSchema) => void;
 }
 
-export default function CreateRoomsForm({ children, form, onSubmit }: CreateRoomsFormProps) {
+export default function UpdateRoomsForm({ children, form, onSubmit }: UpdateRoomsFormProps) {
   const { dataCreatableTypeRooms } = useRoomTypes();
 
   // Prepara las opciones para el AutoComplete
@@ -23,10 +24,9 @@ export default function CreateRoomsForm({ children, form, onSubmit }: CreateRoom
       value: typeRoom.id,
       label: String(typeRoom.name),
     })) ?? [];
-
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 gap-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4 px-6">
         <FormField
           control={form.control}
           name="number"
@@ -70,7 +70,6 @@ export default function CreateRoomsForm({ children, form, onSubmit }: CreateRoom
             </FormItem>
           )}
         />
-
         {children}
       </form>
     </Form>

@@ -1,4 +1,4 @@
-import { BedDouble, BedSingle, CalendarCheck2, ConciergeBell, CookingPot, Home, Hotel, Lamp } from "lucide-react";
+import { BedDouble, BedSingle, ConciergeBell, CookingPot, Home, Hotel, Lamp } from "lucide-react";
 
 import { RoomStatus } from "../_types/room";
 
@@ -24,11 +24,6 @@ export const RoomStatusLabels: Record<
     label: "Ocupada",
     icon: Lamp,
     className: "text-red-700 border-red-200",
-  },
-  [RoomStatus.RESERVED]: {
-    label: "Reservada",
-    icon: CalendarCheck2,
-    className: "text-amber-700 border-amber-200",
   },
 };
 
