@@ -65,7 +65,7 @@ export const RoomTypeOption = ({ label, className }: RoomTypeOptionProps) => {
   return (
     <div className="flex items-center gap-2">
       <Icon className={`${iconClass} h-4 w-4`} />
-      <span className={className}>{label}</span>
+      <span className={`${className} text-sm`}>{label}</span>
     </div>
   );
 };
