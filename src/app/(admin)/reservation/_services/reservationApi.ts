@@ -4,7 +4,13 @@ import { PaginatedResponse, PaginationParams } from "@/types/api/paginated-respo
 import { BaseApiResponse } from "@/types/api/types";
 import baseQueryWithReauth from "@/utils/baseQuery";
 // import { CreateReservationResponse } from "../_actions/reservation.action";
-import { CreateReservationInput, DetailedReservation, Reservation } from "../_schemas/reservation.schemas";
+import {
+  CreateReservationInput,
+  DetailedReservation,
+  Reservation,
+  RoomAvailabilityDto,
+} from "../_schemas/reservation.schemas";
+import { AvailabilityParams } from "../_types/room-availability-query-params";
 
 type CreateReservationReduxResponse = BaseApiResponse<Reservation>;
 
@@ -64,6 +70,14 @@ export const reservationApi = createApi({
         ...(result?.data?.map(({ id }) => ({ type: "Reservation" as const, id })) ?? []),
       ],
     }),
+    //Check room availability
+    getRoomAvailability: build.query<RoomAvailabilityDto, AvailabilityParams>({
+      query: (params) => ({
+        url: "/reservation/check-availability",
+        method: "GET",
+        params,
+      }),
+    }),
     //Eliminar reservaciones
     deleteReservations: build.mutation<void, { ids: string[] }>({
       query: (ids) => ({
@@ -92,4 +106,5 @@ export const {
   useGetReservationByIdQuery,
   useGetAllReservationsQuery,
   useGetPaginatedReservationsQuery,
+  useGetRoomAvailabilityQuery,
 } = reservationApi;

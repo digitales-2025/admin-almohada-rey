@@ -6,12 +6,24 @@ import {
   useDeleteCustomersMutation,
   useGetAllCustomersQuery,
   useReactivateCustomersMutation,
+  useSearchCustomersByDocumentIdQuery,
   useUpdateCustomerMutation,
 } from "../_services/customersApi";
 import { Customer } from "../_types/customer";
 
-export const useCustomers = () => {
+interface UseCustomerProps {
+  search?: string;
+}
+
+export const useCustomers = (options: UseCustomerProps = {}) => {
+  const { search } = options;
+
   const { data: dataCustomersAll, error, isLoading, isSuccess, refetch } = useGetAllCustomersQuery();
+
+  const searchQuery = useSearchCustomersByDocumentIdQuery(search || "None", {
+    skip: !search, // Evita hacer la query si no hay id
+    refetchOnMountOrArgChange: true,
+  });
 
   const [createCustomer, { isSuccess: isSuccessCreateCustomer }] = useCreateCustomerMutation();
 
@@ -91,5 +103,9 @@ export const useCustomers = () => {
     onReactivateCustomers,
     isSuccessReactivateCustomers,
     isLoadingReactivateCustomers,
+    searchQuery,
   };
 };
+
+// export const useSearchCustomerByDocId = (docNumber: string) => useSearchCustomersByDocumentIdQuery(docNumber);
+export const useSearchCustomerByDocId = (docNumber: string) => useSearchCustomersByDocumentIdQuery(docNumber);

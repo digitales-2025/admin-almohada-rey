@@ -1,4 +1,10 @@
-import { GetOneResponse, GetResponse, MutationListResponse, MutationResponse } from "@/types/api/actions-crud";
+import {
+  GetOneResponse,
+  GetResponse,
+  MutationListResponse,
+  MutationResponse,
+  SearchByField,
+} from "@/types/api/actions-crud";
 import { http } from "../serverFetch";
 import { ActionServerOperation, RequestUri } from "./actionOperations";
 
@@ -36,6 +42,27 @@ export abstract class BaseActionOps<T> implements ActionServerOperation<T> {
             typeof error === "object" && error !== null && "message" in error
               ? String(error.message)
               : "Error al obtener el registro",
+        };
+      }
+      return data;
+    } catch (error) {
+      if (error instanceof Error) {
+        return {
+          error: error.message,
+        };
+      }
+      return {
+        error: "Error desconocido",
+      };
+    }
+  }
+
+  async searchByFieldCoincidence<V = T>(uri: RequestUri, field: keyof V, value: string): Promise<SearchByField<V>> {
+    try {
+      const [data, error] = await http.get<SearchByField<V>>(`${uri}?${String(field)}=${value}`);
+      if (error) {
+        return {
+          error: `Error al buscar registros: ${error.message}`,
         };
       }
       return data;

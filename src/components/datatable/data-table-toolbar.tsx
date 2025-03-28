@@ -5,20 +5,13 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 import { DataTableViewOptions } from "./data-table-view-options";
+import { FacetedFilter } from "./facetedFilters";
 
 interface DataTableToolbarProps<TData, TValue> {
   table: Table<TData>;
   toolbarActions?: React.ReactNode | ((table: Table<TData>) => React.ReactNode);
   filterPlaceholder?: string;
-  facetedFilters?: {
-    column: string;
-    title: string;
-    options: {
-      label: string;
-      value: TValue;
-      icon?: React.ComponentType<{ className?: string }>;
-    }[];
-  }[];
+  facetedFilters?: FacetedFilter<TValue>[];
 }
 
 export function DataTableToolbar<TData, TValue>({

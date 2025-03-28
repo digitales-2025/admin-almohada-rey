@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Boxes } from "lucide-react";
+import { Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -30,7 +30,7 @@ export function GuestsDetailsDialog({
   user: ReservationUser;
 }) {
   const DIALOG_MESSAGES = {
-    button: "Mostrar Detalles",
+    button: "Mostrar Acompañantes",
     title: "Detalles de venta de productos",
     description: `Aquí puedes ver el detalle de la venta de productos.`,
     cancel: "Cerrar",
@@ -75,7 +75,7 @@ export function GuestsDetailsDialog({
       aria-label="Open menu"
       className="flex p-2 data-[state=open]:bg-muted text-sm bg-primary/10 hover:scale-105 hover:transition-all"
     >
-      <Boxes className="text-primary !size-6" />
+      <Users className="text-primary !size-5" />
       {DIALOG_MESSAGES.button}
     </Button>
   );
