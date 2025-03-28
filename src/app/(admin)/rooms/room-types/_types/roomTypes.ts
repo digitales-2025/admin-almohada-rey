@@ -138,3 +138,9 @@ export type ReactivateRoomTypeDto = components["schemas"]["DeleteRoomTypeDto"]; 
 /* DeleteRoomTypeDto = {
     ids: string[];
 } */
+
+export type SummaryRoomType = {
+  id: string;
+  name: number;
+  isActive: boolean;
+};
