@@ -1,3 +1,5 @@
+import { components } from "@/types/api";
+
 export type Customer = {
   id: string;
   name: string;
@@ -30,3 +32,5 @@ export enum CustomerMaritalStatus {
   DIVORCED = "DIVORCED",
   WIDOWED = "WIDOWED",
 }
+
+export type ApiCustomer = components["schemas"]["Customer"];

@@ -58,8 +58,8 @@ export const reservationColumns = () // isSuperAdmin: boolean
     header: ({ column }) => <DataTableColumnHeader column={column} title="Cliente" />,
     cell: ({ row }) => (
       <div className="min-w-40 truncate capitalize">
-        <span>{row.original.customerId}</span>
-        <span>{/* Aqui pondremos el telefono y el correo */}</span>
+        <span className="block font-semibold">{row.original.customer.name}</span>
+        <span className="text-xs">{row.original.customer.phone}</span>
       </div>
     ),
   },
@@ -113,7 +113,7 @@ export const reservationColumns = () // isSuperAdmin: boolean
     cell: ({ row }) => {
       return (
         <div>
-          {format(row.original.checkInDate, "PP", {
+          {format(row.original.checkInDate, "PPp", {
             locale: es,
           })}
         </div>
@@ -129,7 +129,7 @@ export const reservationColumns = () // isSuperAdmin: boolean
     cell: ({ row }) => {
       return (
         <div>
-          {format(row.original.checkInDate, "PP", {
+          {format(row.original.checkInDate, "PPp", {
             locale: es,
           })}
         </div>
@@ -153,13 +153,11 @@ export const reservationColumns = () // isSuperAdmin: boolean
     },
   },
   {
+    id: "E. Reserva",
     accessorKey: "status",
-    meta: {
-      title: "Estado de reserva",
-    },
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Estado" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="E. Reserva" />,
     cell: ({ row }) => {
-      const config = reservationStatusConfig[row.original.status];
+      const config = reservationStatusConfig[row.getValue("E. Reserva") as keyof typeof reservationStatusConfig];
       const Icon = config.icon;
       return (
         <Badge
@@ -167,7 +165,7 @@ export const reservationColumns = () // isSuperAdmin: boolean
             config.backgroundColor,
             config.textColor,
             config.hoverBgColor,
-            "flex space-x-1 items-center justify-center text-sm"
+            "flex space-x-1 items-center justify-center text-sm border-none"
           )}
         >
           <Icon className="size-4" />
@@ -175,6 +173,17 @@ export const reservationColumns = () // isSuperAdmin: boolean
         </Badge>
       );
     },
+    filterFn: (row, id, value) => {
+      const rowValue = row.getValue(id);
+
+      if (Array.isArray(value)) {
+        if (value.length === 0) return true;
+        return value.includes(rowValue);
+      }
+
+      return rowValue === value;
+    },
+    enableColumnFilter: true,
   },
   //   {
   //     id: "tipo",
@@ -263,50 +272,6 @@ export const reservationColumns = () // isSuperAdmin: boolean
     },
   },
   {
-    accessorKey: "guests",
-    size: 10,
-    meta: {
-      title: "Detalles",
-    },
-    header: () => <div>Detalles</div>,
-    cell: ({ row }) => {
-      if (!row.original?.guests) {
-        return null;
-      }
-      let guests: ReservationGuest[] | undefined = undefined;
-      try {
-        if (row.original?.guests) {
-          guests = JSON.parse(row.original.guests) as ReservationGuest[];
-        }
-      } catch (error) {
-        if (error instanceof Error) {
-          toast.error("Error al traer huéspedes asociados: " + error.message);
-        }
-        toast.error("Error al traer huéspedes asociados");
-        return null;
-      }
-      if (!!guests) {
-        return (
-          <div>
-            <div className="flex flex-wrap gap-3 mt-2">
-              {guests.map((guest, index) => (
-                <Badge
-                  key={index}
-                  variant="outline"
-                  className="flex items-center gap-1 py-1 px-2 border-amber-200 text-amber-700"
-                >
-                  <span>{guest.name}</span>
-                </Badge>
-              ))}
-            </div>
-          </div>
-        );
-      } else {
-        return null;
-      }
-    },
-  },
-  {
     accessorKey: "isActive",
     meta: {
       title: "¿Archivado?",
@@ -314,7 +279,7 @@ export const reservationColumns = () // isSuperAdmin: boolean
     header: ({ column }) => <DataTableColumnHeader column={column} title="¿Archivado?" />,
     cell: ({ row }) => (
       <div>
-        {row.getValue("estado") ? (
+        {row.original.isActive ? (
           <Badge variant="secondary" className="bg-emerald-100 text-emerald-500 border-emerald-200">
             Activo
           </Badge>
@@ -350,7 +315,7 @@ export const reservationColumns = () // isSuperAdmin: boolean
 
   {
     id: "expand", // Nueva columna para expansión
-    header: () => null, // No mostrar un título en el header
+    header: () => <span>Detalles</span>, // No mostrar un título en el header
     cell: ({ row }) => (
       <Button
         onClick={() => row.toggleExpanded()} // Alternar la expansión de la fila

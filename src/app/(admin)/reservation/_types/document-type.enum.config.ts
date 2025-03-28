@@ -9,6 +9,8 @@ export const documentTypeStatusConfig: Record<DocumentType, EnumConfig> = {
     backgroundColor: "bg-[#E0F2FE]",
     textColor: "text-[#0284C7]",
     hoverBgColor: "hover:bg-[#BAE6FD]",
+    borderColor: "border-[#0284C7]",
+    hoverBorderColor: "hover:border-[#0284C7]",
     icon: IdCard,
   },
   FOREIGNER_CARD: {
@@ -16,6 +18,8 @@ export const documentTypeStatusConfig: Record<DocumentType, EnumConfig> = {
     backgroundColor: "bg-[#FFE1E6]",
     textColor: "text-[#E11D48]",
     hoverBgColor: "hover:bg-[#FFC2CC]",
+    borderColor: "border-[#E11D48]",
+    hoverBorderColor: "hover:border-[#E11D48]",
     icon: IdCard,
   },
   PASSPORT: {
@@ -23,6 +27,8 @@ export const documentTypeStatusConfig: Record<DocumentType, EnumConfig> = {
     backgroundColor: "bg-[#DCFCE7]",
     textColor: "text-[#16A34A]",
     hoverBgColor: "hover:bg-[#BBF7D0]",
+    borderColor: "border-[#16A34A]",
+    hoverBorderColor: "hover:border-[#16A34A]",
     icon: IdCard,
   },
 };
