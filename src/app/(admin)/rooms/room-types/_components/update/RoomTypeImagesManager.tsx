@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { UpdateRoomTypeSchema } from "../../_schema/roomTypesSchema";
 import { RoomType } from "../../_types/roomTypes";
 
@@ -133,275 +134,305 @@ export function RoomTypeImagesManager({
   // Encontrar la imagen principal actual
   const mainImage = roomType.imagesRoomType?.find((img) => img.isMain);
 
+  // Obtener solo las imágenes secundarias (no principales)
+  const secondaryImages = roomType.imagesRoomType?.filter((img) => !img.isMain) || [];
+
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-medium border-b pb-2">Imágenes del tipo de habitación</h3>
+    <TooltipProvider>
+      <div className="space-y-6">
+        <h3 className="text-lg font-medium border-b pb-2">Imágenes del tipo de habitación</h3>
 
-      {/* Sección para mostrar la imagen principal en un lugar destacado */}
-      {mainImage && (
-        <Card>
-          <CardContent className="p-6 space-y-4">
-            <Label className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <ImageIcon className="h-4 w-4 text-primary" />
-                <span>Principal</span>
-              </div>
-              <Badge className="bg-primary text-white">Principal</Badge>
-            </Label>
-            <div className="w-full flex justify-center">
-              <div
-                className={`relative border-2 rounded-lg ${
-                  selectedImageId === mainImage.id ? "border-primary" : "border-transparent"
-                }`}
-                onClick={() => handleSelectMainImage(mainImage.id)}
-              >
-                <Image
-                  src={mainImage.url}
-                  alt={`${roomType.name} - Imagen Principal`}
-                  className="rounded-lg object-contain"
-                  width={400}
-                  height={300}
-                  style={{
-                    maxHeight: "250px",
-                    width: "auto",
-                    maxWidth: "100%",
-                  }}
-                />
-                {selectedImageId === mainImage.id && (
-                  <Badge className="absolute bottom-2 left-2 bg-emerald-500">Seleccionada</Badge>
-                )}
-                <div className="absolute bottom-2 right-2 flex gap-2">
-                  <Button
-                    type="button"
-                    onClick={(e) => handleToggleEdit(mainImage.id, e)}
-                    className="p-1.5 bg-white/90 rounded-full text-gray-700 hover:bg-white hover:text-primary transition-colors"
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </Button>
+        {/* Sección para mostrar la imagen principal en un lugar destacado */}
+        {mainImage && (
+          <Card>
+            <CardContent className="p-6 space-y-4">
+              <Label className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <ImageIcon className="h-4 w-4 text-primary" />
+                  <span>Imagen Principal</span>
                 </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Sección de todas las imágenes existentes */}
-      {roomType.imagesRoomType && roomType.imagesRoomType.length > 0 && (
-        <Card>
-          <CardContent className="p-6 space-y-4">
-            <Label className="flex items-center gap-2">
-              <ImageIcon className="h-4 w-4 text-primary shrink-0" />
-              <span>Todas las imágenes</span>
-              <span className="text-sm text-muted-foreground ml-2">(selecciona para establecer como principal)</span>
-            </Label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {roomType.imagesRoomType.map((image) => (
+                <Badge className="bg-primary text-white">Principal</Badge>
+              </Label>
+              <div className="w-full flex justify-center">
                 <div
-                  key={image.id}
-                  className={`relative group cursor-pointer border-2 rounded-lg ${
-                    selectedImageId === image.id ? "border-primary" : "border-transparent"
+                  className={`relative border-2 rounded-lg ${
+                    selectedImageId === mainImage.id ? "border-primary" : "border-transparent"
                   }`}
-                  onClick={() => {
-                    handleSelectMainImage(image.id);
-                    handleCloseMenus();
-                  }}
+                  onClick={() => handleSelectMainImage(mainImage.id)}
                 >
                   <Image
-                    src={image.url}
-                    alt={`${roomType.name} - Imagen`}
-                    className="w-full h-24 object-cover rounded-lg"
+                    src={mainImage.url}
+                    alt={`${roomType.name} - Imagen Principal`}
+                    className="rounded-lg object-contain"
                     width={400}
                     height={300}
+                    style={{
+                      maxHeight: "250px",
+                      width: "auto",
+                      maxWidth: "100%",
+                    }}
                   />
-                  {image.isMain && <Badge className="absolute top-2 right-2 bg-primary/70">Principal</Badge>}
-                  {selectedImageId === image.id && (
+                  {selectedImageId === mainImage.id && (
                     <Badge className="absolute bottom-2 left-2 bg-emerald-500">Seleccionada</Badge>
                   )}
+                  <div className="absolute bottom-2 right-2 flex gap-2">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          onClick={(e) => handleToggleEdit(mainImage.id, e)}
+                          className="p-1.5 bg-white/90 rounded-full text-gray-700 hover:bg-white hover:text-primary transition-colors"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Cambiar imagen</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-                  {/* Botones de acción para cada imagen */}
-                  <div className="absolute bottom-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    {/* Botón de configuración (solo para imágenes no principales) */}
-                    {!image.isMain && (
-                      <Button
-                        type="button"
-                        onClick={(e) => handleToggleConfig(image.id, e)}
-                        className="p-1.5 bg-white/90 rounded-full text-gray-700 hover:bg-white hover:text-gray-900 transition-colors"
-                      >
-                        <Settings className="w-4 h-4" />
-                      </Button>
+        {/* Sección de imágenes secundarias (no principales) */}
+        {secondaryImages.length > 0 && (
+          <Card>
+            <CardContent className="p-6 space-y-4">
+              <Label className="flex items-center gap-2">
+                <ImageIcon className="h-4 w-4 text-primary shrink-0" />
+                <span>Imágenes</span>
+                <span className="text-sm text-muted-foreground ml-2">(selecciona para establecer como principal)</span>
+              </Label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {secondaryImages.map((image) => (
+                  <div
+                    key={image.id}
+                    className={`relative group cursor-pointer border-2 rounded-lg ${
+                      selectedImageId === image.id ? "border-primary" : "border-transparent"
+                    }`}
+                    onClick={() => {
+                      handleSelectMainImage(image.id);
+                      handleCloseMenus();
+                    }}
+                  >
+                    <Image
+                      src={image.url}
+                      alt={`${roomType.name} - Imagen`}
+                      className="w-full h-24 object-cover rounded-lg"
+                      width={400}
+                      height={300}
+                    />
+                    {selectedImageId === image.id && (
+                      <Badge className="absolute bottom-2 left-2 bg-emerald-500">Seleccionada</Badge>
                     )}
 
-                    {/* Botón de edición */}
-                    <Button
-                      type="button"
-                      onClick={(e) => handleToggleEdit(image.id, e)}
-                      className="p-1.5 bg-white/90 rounded-full text-gray-700 hover:bg-white hover:text-primary transition-colors"
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+                    {/* Botones de acción para cada imagen */}
+                    <div className="absolute bottom-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {/* Botón de configuración */}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="button"
+                            onClick={(e) => handleToggleConfig(image.id, e)}
+                            className="p-1.5 bg-white/90 rounded-full text-gray-700 hover:bg-white hover:text-gray-900 transition-colors"
+                          >
+                            <Settings className="w-4 h-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Establecer como principal</p>
+                        </TooltipContent>
+                      </Tooltip>
 
-      {/* Sección para agregar una nueva imagen - solo visible cuando se edita una imagen */}
-      {editingImageId && (
-        <FormField
-          control={form.control}
-          name="newImage"
-          render={() => (
-            <FormItem>
-              <Card>
-                <CardContent className="p-6 space-y-4">
-                  <Label className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <ImageIcon className="h-4 w-4 text-primary shrink-0" />
-                      <span>Reemplazar imagen seleccionada</span>
+                      {/* Botón de edición */}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="button"
+                            onClick={(e) => handleToggleEdit(image.id, e)}
+                            className="p-1.5 bg-white/90 rounded-full text-gray-700 hover:bg-white hover:text-primary transition-colors"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Cambiar imagen</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
-                    <Badge variant="outline">
-                      {roomType.imagesRoomType?.find((img) => img.id === editingImageId)?.isMain
-                        ? "Principal"
-                        : "Secundaria"}
-                    </Badge>
-                  </Label>
-                  <div className="mt-2">
-                    <input type="file" id="newImage" accept="image/*" onChange={handleNewImage} className="hidden" />
-                    <label
-                      htmlFor="newImage"
-                      className={`inline-flex items-center justify-center px-4 py-2 border border-dashed rounded-md cursor-pointer hover:bg-muted transition-colors ${
-                        imagePreview ? "opacity-50" : ""
-                      }`}
-                    >
-                      <ImageIcon className="w-5 h-5 mr-2" />
-                      <span>{imagePreview ? "Cambiar imagen" : "Agregar imagen"}</span>
-                    </label>
                   </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-                  {imagePreview && (
-                    <div className="mt-4 relative group">
-                      <Image
-                        src={imagePreview}
-                        alt="Nueva imagen"
-                        className="w-full max-h-48 object-contain rounded-lg"
-                        width={400}
-                        height={300}
-                      />
+        {/* Sección para agregar una nueva imagen - solo visible cuando se edita una imagen */}
+        {editingImageId && (
+          <FormField
+            control={form.control}
+            name="newImage"
+            render={() => (
+              <FormItem>
+                <Card>
+                  <CardContent className="p-6 space-y-4">
+                    <Label className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <ImageIcon className="h-4 w-4 text-primary shrink-0" />
+                        <span>Reemplazar imagen seleccionada</span>
+                      </div>
+                      <Badge variant="outline">
+                        {roomType.imagesRoomType?.find((img) => img.id === editingImageId)?.isMain
+                          ? "Principal"
+                          : "Secundaria"}
+                      </Badge>
+                    </Label>
+                    <div className="mt-2">
+                      <input type="file" id="newImage" accept="image/*" onChange={handleNewImage} className="hidden" />
+                      <label
+                        htmlFor="newImage"
+                        className={`inline-flex items-center justify-center px-4 py-2 border border-dashed rounded-md cursor-pointer hover:bg-muted transition-colors ${
+                          imagePreview ? "opacity-50" : ""
+                        }`}
+                      >
+                        <ImageIcon className="w-5 h-5 mr-2" />
+                        <span>{imagePreview ? "Cambiar imagen" : "Agregar imagen"}</span>
+                      </label>
+                    </div>
+
+                    {imagePreview && (
+                      <div className="mt-4 relative group">
+                        <Image
+                          src={imagePreview}
+                          alt="Nueva imagen"
+                          className="w-full max-h-48 object-contain rounded-lg"
+                          width={400}
+                          height={300}
+                        />
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              type="button"
+                              size={"icon"}
+                              onClick={handleRemoveNewImage}
+                              className="absolute -top-2 -right-2 p-1 bg-destructive rounded-full text-destructive-foreground hover:bg-destructive/80"
+                            >
+                              <X className="w-4 h-4 text-white" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Eliminar imagen</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    )}
+                    <div className="flex justify-end mt-4">
                       <Button
                         type="button"
-                        size={"icon"}
-                        onClick={handleRemoveNewImage}
-                        className="absolute -top-2 -right-2 p-1 bg-destructive rounded-full text-destructive-foreground hover:bg-destructive/80"
+                        onClick={() => {
+                          setEditingImageId(null);
+                          handleRemoveNewImage();
+                        }}
+                        variant="outline"
                       >
-                        <X className="w-4 h-4 text-white" />
+                        Cancelar
                       </Button>
                     </div>
-                  )}
-                  <div className="flex justify-end mt-4">
+                    <FormMessage />
+                  </CardContent>
+                </Card>
+              </FormItem>
+            )}
+          />
+        )}
+
+        {/* Sección para configurar una imagen como principal */}
+        {configImageId && (
+          <Card>
+            <CardContent className="p-6 space-y-4">
+              <Label className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Settings className="h-4 w-4 text-primary" />
+                  <span>Configurar imagen</span>
+                </div>
+                <Badge variant="outline">Opciones de imagen</Badge>
+              </Label>
+
+              {/* Vista previa de la imagen que se está configurando */}
+              {roomType.imagesRoomType?.find((img) => img.id === configImageId) && (
+                <div className="w-full flex justify-center mt-2">
+                  <Image
+                    src={roomType.imagesRoomType.find((img) => img.id === configImageId)!.url}
+                    alt="Imagen configurada"
+                    className="rounded-lg object-contain max-h-32"
+                    width={200}
+                    height={150}
+                  />
+                </div>
+              )}
+
+              {!showConfirmation ? (
+                <div className="flex items-center justify-between mt-4 p-2 border rounded-md">
+                  <Label htmlFor="make-main-image" className="text-sm font-medium cursor-pointer">
+                    Establecer como imagen principal
+                  </Label>
+                  <Switch
+                    id="make-main-image"
+                    checked={switchValue}
+                    onCheckedChange={(checked) => {
+                      setSwitchValue(checked);
+                      if (checked) {
+                        setShowConfirmation(true);
+                      }
+                    }}
+                  />
+                </div>
+              ) : (
+                <div className="mt-4 p-4 bg-muted rounded-md space-y-3">
+                  <p className="text-sm font-medium text-center">¿Confirmar establecer esta imagen como principal?</p>
+                  <div className="flex justify-center gap-2 mt-2">
                     <Button
                       type="button"
-                      onClick={() => {
-                        setEditingImageId(null);
-                        handleRemoveNewImage();
-                      }}
                       variant="outline"
+                      size="sm"
+                      onClick={cancelMainImageChange}
+                      className="min-w-20 dark:border-white"
                     >
-                      Cancelar
+                      No
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="default"
+                      size="sm"
+                      onClick={confirmMainImageChange}
+                      className="min-w-20 bg-secondary dark:bg-white dark:border-white hover:bg-gray-700"
+                    >
+                      Sí
                     </Button>
                   </div>
-                  <FormMessage />
-                </CardContent>
-              </Card>
-            </FormItem>
-          )}
-        />
-      )}
-
-      {/* Sección para configurar una imagen como principal */}
-      {configImageId && (
-        <Card>
-          <CardContent className="p-6 space-y-4">
-            <Label className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Settings className="h-4 w-4 text-primary" />
-                <span>Configurar imagen</span>
-              </div>
-              <Badge variant="outline">Opciones de imagen</Badge>
-            </Label>
-
-            {/* Vista previa de la imagen que se está configurando */}
-            {roomType.imagesRoomType?.find((img) => img.id === configImageId) && (
-              <div className="w-full flex justify-center mt-2">
-                <Image
-                  src={roomType.imagesRoomType.find((img) => img.id === configImageId)!.url}
-                  alt="Imagen configurada"
-                  className="rounded-lg object-contain max-h-32"
-                  width={200}
-                  height={150}
-                />
-              </div>
-            )}
-
-            {!showConfirmation ? (
-              <div className="flex items-center justify-between mt-4 p-2 border rounded-md">
-                <Label htmlFor="make-main-image" className="text-sm font-medium cursor-pointer">
-                  Establecer como imagen principal
-                </Label>
-                <Switch
-                  id="make-main-image"
-                  checked={switchValue}
-                  onCheckedChange={(checked) => {
-                    setSwitchValue(checked);
-                    if (checked) {
-                      setShowConfirmation(true);
-                    }
-                  }}
-                />
-              </div>
-            ) : (
-              <div className="mt-4 p-4 bg-muted rounded-md space-y-3">
-                <p className="text-sm font-medium text-center">¿Confirmar establecer esta imagen como principal?</p>
-                <div className="flex justify-center gap-2 mt-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={cancelMainImageChange}
-                    className="min-w-20 dark:border-white"
-                  >
-                    No
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="default"
-                    size="sm"
-                    onClick={confirmMainImageChange}
-                    className="min-w-20 bg-secondary dark:bg-white dark:border-white hover:bg-gray-700"
-                  >
-                    Sí
-                  </Button>
                 </div>
-              </div>
-            )}
+              )}
 
-            <div className="flex justify-end mt-4">
-              <Button
-                type="button"
-                onClick={() => {
-                  setConfigImageId(null);
-                  setSwitchValue(false);
-                  setShowConfirmation(false);
-                }}
-                variant="outline"
-              >
-                Cancelar
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+              <div className="flex justify-end mt-4">
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setConfigImageId(null);
+                    setSwitchValue(false);
+                    setShowConfirmation(false);
+                  }}
+                  variant="outline"
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </TooltipProvider>
   );
 }
