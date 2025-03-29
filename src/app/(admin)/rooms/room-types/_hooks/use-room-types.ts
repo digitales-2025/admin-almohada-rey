@@ -234,7 +234,8 @@ export const useRoomTypes = () => {
   async function onUpdateMainImage(
     roomTypeId: string,
     imageUpdate: { id: string; url: string; isMain: boolean }
-  ): Promise<RoomType> {
+  ): Promise<void> {
+    // Cambiamos el tipo de retorno a void
     if (!roomTypeId) {
       throw new Error("ID de tipo de habitación no proporcionado");
     }
@@ -247,8 +248,8 @@ export const useRoomTypes = () => {
     imageUpdate.isMain = true;
 
     const promise = runAndHandleError(async () => {
-      const response = await updateMainImage({ roomTypeId, imageUpdate }).unwrap();
-      return response.data; // Esto es de tipo RoomType
+      await updateMainImage({ roomTypeId, imageUpdate }).unwrap();
+      // No es necesario retornar nada aquí
     });
 
     toast.promise(promise, {
@@ -257,7 +258,8 @@ export const useRoomTypes = () => {
       error: (error) => error.message || "Error al actualizar imagen principal",
     });
 
-    return await promise;
+    // Esperamos a que termine la promesa pero no retornamos su valor
+    await promise;
   }
 
   return {

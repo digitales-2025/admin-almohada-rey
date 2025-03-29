@@ -15,10 +15,7 @@ interface UpdateRoomTypeFormProps extends Omit<React.ComponentPropsWithRef<"form
   children: React.ReactNode;
   form: UseFormReturn<UpdateRoomTypeSchema>;
   onSubmit: (data: UpdateRoomTypeSchema) => void;
-  onUpdateMainImage: (
-    roomTypeId: string,
-    imageUpdate: { id: string; url: string; isMain: boolean }
-  ) => Promise<RoomType>;
+  onUpdateMainImage: (roomTypeId: string, imageUpdate: { id: string; url: string; isMain: boolean }) => Promise<void>; // Cambiado a Promise<void>
   roomType: RoomType;
   selectedImageId: string | null;
   setSelectedImageId: (id: string | null) => void;

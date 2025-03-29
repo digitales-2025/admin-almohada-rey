@@ -18,10 +18,7 @@ interface RoomTypeImagesManagerProps {
   roomType: RoomType;
   selectedImageId: string | null;
   setSelectedImageId: (id: string | null) => void;
-  onUpdateMainImage: (
-    roomTypeId: string,
-    imageUpdate: { id: string; url: string; isMain: boolean }
-  ) => Promise<RoomType>;
+  onUpdateMainImage: (roomTypeId: string, imageUpdate: { id: string; url: string; isMain: boolean }) => Promise<void>; // Cambiado de Promise<RoomType> a Promise<void>
 }
 
 export function RoomTypeImagesManager({
