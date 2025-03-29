@@ -9,6 +9,7 @@ import {
   useGetRoomTypeByIdQuery,
   useGetRoomTypeWithImagesByIdQuery,
   useReactivateRoomTypesMutation,
+  useUpdateMainImageMutation,
   useUpdateRoomTypeWithImageMutation,
 } from "../_services/roomTypesApi";
 import {
@@ -56,6 +57,9 @@ export const useRoomTypes = () => {
 
   const [reactivateRoomTypes, { isSuccess: isSuccessReactivateRoomTypes, isLoading: isLoadingReactivateRoomTypes }] =
     useReactivateRoomTypesMutation();
+
+  const [updateMainImage, { isSuccess: isSuccessUpdateMainImage, isLoading: isLoadingUpdateMainImage }] =
+    useUpdateMainImageMutation();
 
   // FUNCIONES DE ACCIÓN
 
@@ -222,6 +226,37 @@ export const useRoomTypes = () => {
     return await promise;
   };
 
+  /**
+   * Establece una imagen como principal para un tipo de habitación
+   * @param roomTypeId ID del tipo de habitación
+   * @param imageUpdate Objeto con datos de la imagen a establecer como principal
+   */
+  async function onUpdateMainImage(roomTypeId: string, imageUpdate: { id: string; url: string; isMain: boolean }) {
+    if (!roomTypeId) {
+      throw new Error("ID de tipo de habitación no proporcionado");
+    }
+
+    if (!imageUpdate || !imageUpdate.id) {
+      throw new Error("Datos de imagen incorrectos");
+    }
+
+    // Asegurarse de que isMain sea true
+    imageUpdate.isMain = true;
+
+    const promise = runAndHandleError(async () => {
+      const response = await updateMainImage({ roomTypeId, imageUpdate }).unwrap();
+      return response.data;
+    });
+
+    toast.promise(promise, {
+      loading: "Actualizando imagen principal...",
+      success: "Imagen principal actualizada exitosamente",
+      error: (error) => error.message || "Error al actualizar imagen principal",
+    });
+
+    return await promise;
+  }
+
   return {
     // Datos y estados de consultas
     roomTypesList,
@@ -237,6 +272,7 @@ export const useRoomTypes = () => {
     onUpdateRoomType,
     onDeleteRoomTypes,
     onReactivateRoomTypes,
+    onUpdateMainImage,
 
     // Estados de mutaciones
     isSuccessCreateRoomType,
@@ -247,6 +283,8 @@ export const useRoomTypes = () => {
     isLoadingDeleteRoomTypes,
     isSuccessReactivateRoomTypes,
     isLoadingReactivateRoomTypes,
+    isSuccessUpdateMainImage,
+    isLoadingUpdateMainImage,
 
     // Datos de tipos habitaciones activas
     dataCreatableTypeRooms,

@@ -16,10 +16,12 @@ import { UpdateRoomTypeSchema } from "../../_schema/roomTypesSchema";
 import { FloorTypeEnum, RoomType } from "../../_types/roomTypes";
 import { FloorTypeLabels } from "../../_utils/roomTypes.utils";
 
+// Actualizar la interfaz para incluir onUpdateMainImage
 interface UpdateRoomTypeFormProps extends Omit<React.ComponentPropsWithRef<"form">, "onSubmit"> {
   children: React.ReactNode;
   form: UseFormReturn<UpdateRoomTypeSchema>;
   onSubmit: (data: UpdateRoomTypeSchema) => void;
+  onUpdateMainImage: (roomTypeId: string, imageUpdate: { id: string; url: string; isMain: boolean }) => Promise<any>;
   roomType: RoomType;
   selectedImageId: string | null;
   setSelectedImageId: (id: string | null) => void;
@@ -29,6 +31,7 @@ export default function UpdateRoomTypeForm({
   children,
   form,
   onSubmit,
+  onUpdateMainImage, // <-- Añadir este parámetro
   roomType,
   selectedImageId,
   setSelectedImageId,
@@ -67,8 +70,29 @@ export default function UpdateRoomTypeForm({
   };
 
   // Confirmar cambio a imagen principal
-  const confirmMainImageChange = () => {
-    handleSelectMainImage(configImageId!);
+  const confirmMainImageChange = async () => {
+    if (!configImageId) return;
+
+    const selectedImage = roomType.imagesRoomType?.find((img) => img.id === configImageId);
+
+    if (selectedImage && roomType.id) {
+      try {
+        // Llamar al endpoint para actualizar la imagen principal
+        await onUpdateMainImage(roomType.id, {
+          id: selectedImage.id,
+          url: selectedImage.url,
+          isMain: true,
+        });
+
+        // Actualizar la UI después de una actualización exitosa
+        handleSelectMainImage(configImageId);
+      } catch (error) {
+        // El toast ya es manejado por onUpdateMainImage
+        console.error("Error al actualizar imagen principal:", error);
+      }
+    }
+
+    // Limpiar estados
     setShowConfirmation(false);
     setConfigImageId(null);
     setSwitchValue(false);

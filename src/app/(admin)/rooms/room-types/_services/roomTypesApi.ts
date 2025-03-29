@@ -107,6 +107,22 @@ export const roomTypeApi = createApi({
       }),
       invalidatesTags: [{ type: "RoomType", id: "LIST" }],
     }),
+
+    updateMainImage: build.mutation<
+      RoomTypeResponse,
+      { roomTypeId: string; imageUpdate: { id: string; url: string; isMain: boolean } }
+    >({
+      query: ({ roomTypeId, imageUpdate }) => ({
+        url: `/room-types/${roomTypeId}/update-main-image`,
+        method: "PATCH",
+        body: { imageUpdate },
+        credentials: "include",
+      }),
+      invalidatesTags: (result, error, { roomTypeId }) => [
+        { type: "RoomType", id: roomTypeId },
+        { type: "RoomType", id: "LIST" },
+      ],
+    }),
   }),
 });
 
@@ -119,4 +135,5 @@ export const {
   useUpdateRoomTypeWithImageMutation,
   useDeleteRoomTypesMutation,
   useReactivateRoomTypesMutation,
+  useUpdateMainImageMutation,
 } = roomTypeApi;
