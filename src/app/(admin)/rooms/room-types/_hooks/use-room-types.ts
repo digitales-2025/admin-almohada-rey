@@ -231,7 +231,10 @@ export const useRoomTypes = () => {
    * @param roomTypeId ID del tipo de habitación
    * @param imageUpdate Objeto con datos de la imagen a establecer como principal
    */
-  async function onUpdateMainImage(roomTypeId: string, imageUpdate: { id: string; url: string; isMain: boolean }) {
+  async function onUpdateMainImage(
+    roomTypeId: string,
+    imageUpdate: { id: string; url: string; isMain: boolean }
+  ): Promise<RoomType> {
     if (!roomTypeId) {
       throw new Error("ID de tipo de habitación no proporcionado");
     }
@@ -245,7 +248,7 @@ export const useRoomTypes = () => {
 
     const promise = runAndHandleError(async () => {
       const response = await updateMainImage({ roomTypeId, imageUpdate }).unwrap();
-      return response.data;
+      return response.data; // Esto es de tipo RoomType
     });
 
     toast.promise(promise, {
