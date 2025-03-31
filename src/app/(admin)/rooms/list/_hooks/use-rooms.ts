@@ -2,13 +2,15 @@ import { toast } from "sonner";
 
 import { runAndHandleError } from "@/utils/baseQuery";
 import {
+  StatusRoomDto,
   useCreateRoomMutation,
   useDeleteRoomsMutation,
   useGetAllRoomsQuery,
   useReactivateRoomsMutation,
   useUpdateRoomMutation,
+  useUpdateRoomStatusMutation,
 } from "../_services/roomsApi";
-import { Room } from "../_types/room";
+import { Room, RoomStatus } from "../_types/room";
 
 export const useRooms = () => {
   const { data: dataRoomsAll, error, isLoading, isSuccess, refetch } = useGetAllRoomsQuery();
@@ -16,6 +18,9 @@ export const useRooms = () => {
   const [createRoom, { isSuccess: isSuccessCreateRoom }] = useCreateRoomMutation();
 
   const [updateRoom, { isSuccess: isSuccessUpdateRoom, isLoading: isLoadingUpdateRoom }] = useUpdateRoomMutation();
+
+  const [updateRoomStatus, { isSuccess: isSuccessUpdateRoomStatus, isLoading: isLoadingUpdateRoomStatus }] =
+    useUpdateRoomStatusMutation();
 
   const [deleteRooms, { isSuccess: isSuccessDeleteRooms }] = useDeleteRoomsMutation();
 
@@ -41,6 +46,19 @@ export const useRooms = () => {
         return error.message;
       },
     });
+    return await promise;
+  }
+
+  async function onUpdateRoomStatus(roomId: string, status: RoomStatus) {
+    const statusDto: StatusRoomDto = { status };
+    const promise = runAndHandleError(() => updateRoomStatus({ id: roomId, statusDto }).unwrap());
+
+    toast.promise(promise, {
+      loading: "Actualizando disponibilidad de habitación...",
+      success: "Disponibilidad actualizada exitosamente",
+      error: (error) => error.message,
+    });
+
     return await promise;
   }
 
@@ -85,6 +103,9 @@ export const useRooms = () => {
     onUpdateRoom,
     isSuccessUpdateRoom,
     isLoadingUpdateRoom,
+    onUpdateRoomStatus,
+    isSuccessUpdateRoomStatus,
+    isLoadingUpdateRoomStatus,
     onDeleteRooms,
     isSuccessDeleteRooms,
     onReactivateRooms,
