@@ -10,23 +10,44 @@ export const statusRoomsSchema = z.object({
 export type UpdateStatusRoomsSchema = z.infer<typeof statusRoomsSchema>;
 
 // Schema for cleaning form
-export const cleaningSchema = z.object({
-  checklist: z.object({
-    trashBin: z.boolean(),
-    towel: z.boolean(),
-    toiletPaper: z.boolean(),
-    showerSoap: z.boolean(),
-    handSoap: z.boolean(),
-    lamp: z.boolean(),
-  }),
-  date: z.string().min(1, { message: "La fecha del proyecto es obligatoria" }),
-  cleanedBy: z
-    .string()
-    .min(2, {
-      message: "El nombre debe tener al menos 2 caracteres",
-    })
-    .optional(),
-  observations: z.string().optional(),
-});
+export const cleaningSchema = z
+  .object({
+    checklist: z.object({
+      trashBin: z.boolean(),
+      towel: z.boolean(),
+      toiletPaper: z.boolean(),
+      showerSoap: z.boolean(),
+      handSoap: z.boolean(),
+      lamp: z.boolean(),
+    }),
+    date: z.string().optional(),
+    cleanedBy: z.string().optional(),
+    observations: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    // Verificar si todos los elementos del checklist están marcados como true
+    const allChecked = Object.values(data.checklist).every((value) => value === true);
+
+    // Solo validar date y cleanedBy si todos los elementos del checklist están completados
+    if (allChecked) {
+      // Validar date
+      if (!data.date || data.date.trim() === "") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "La fecha del proyecto es obligatoria",
+          path: ["date"],
+        });
+      }
+
+      // Validar cleanedBy
+      if (!data.cleanedBy || data.cleanedBy.length < 2) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "El nombre debe tener al menos 2 caracteres",
+          path: ["cleanedBy"],
+        });
+      }
+    }
+  });
 
 export type CleaningStatusRoomsSchema = z.infer<typeof cleaningSchema>;
