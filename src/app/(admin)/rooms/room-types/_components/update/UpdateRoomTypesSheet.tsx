@@ -36,7 +36,11 @@ interface UpdateRoomTypeSheetProps extends Omit<React.ComponentPropsWithRef<type
 
 export function UpdateRoomTypeSheet({ roomType, open, onOpenChange }: UpdateRoomTypeSheetProps) {
   const [isUpdatePending, startUpdateTransition] = useTransition();
-  const { onUpdateRoomType, isSuccessUpdateRoomType } = useRoomTypes();
+  const {
+    onUpdateRoomType,
+    isSuccessUpdateRoomType,
+    onUpdateMainImage, // <-- Añadir esta importación
+  } = useRoomTypes();
 
   // Inicializar con la imagen principal
   const mainImage = roomType.imagesRoomType?.find((img) => img.isMain);
@@ -132,6 +136,7 @@ export function UpdateRoomTypeSheet({ roomType, open, onOpenChange }: UpdateRoom
               roomType={roomType}
               selectedImageId={selectedImageId}
               setSelectedImageId={setSelectedImageId}
+              onUpdateMainImage={onUpdateMainImage} // <-- Pasar la nueva función aquí
             >
               <SheetFooter className="gap-2 pt-2 sm:space-x-0">
                 <div className="flex flex-row-reverse gap-2">
