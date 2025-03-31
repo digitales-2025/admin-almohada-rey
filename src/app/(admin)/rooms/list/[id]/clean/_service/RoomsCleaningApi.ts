@@ -1,7 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 import baseQueryWithReauth from "@/utils/baseQuery";
-import { RoomCleaning } from "../_types/RoomCleaning";
+import { RoomCleaning } from "../_types/roomCleaning";
 
 export const roomsCleaningApi = createApi({
   reducerPath: "roomsCleaningApi",

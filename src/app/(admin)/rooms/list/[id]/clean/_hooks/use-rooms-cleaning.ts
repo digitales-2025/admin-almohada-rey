@@ -6,7 +6,7 @@ import {
   useGetAllRoomsCleaningQuery,
   useUpdateRoomCleaningMutation,
 } from "../_service/RoomsCleaningApi";
-import { RoomCleaning } from "../_types/RoomCleaning";
+import { RoomCleaning } from "../_types/roomCleaning";
 
 export const useRoomsCleaning = () => {
   const { data: dataRoomsCleaningAll, error, isLoading, isSuccess, refetch } = useGetAllRoomsCleaningQuery();
