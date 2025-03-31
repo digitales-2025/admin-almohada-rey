@@ -54,8 +54,9 @@ interface UpdateAvailabilityRoomsDialogProps {
 export function UpdateAvailabilityRoomsDialog({ open, setOpen, room }: UpdateAvailabilityRoomsDialogProps) {
   const isDesktop = useMediaQuery("(min-width: 800px)");
   const [isCreatePending, startCreateTransition] = useTransition();
-  const { onUpdateRoomStatus, isSuccessUpdateRoomStatus, onUpdateRoom } = useRooms();
-  const { onCreateRoomCleaning } = useRoomsCleaning();
+  const { onUpdateRoomStatus, isSuccessUpdateRoomStatus, onUpdateRoom, isSuccessUpdateRoom } = useRooms();
+  const { onCreateRoomCleaning, isSuccessCreateRoomCleaning } = useRoomsCleaning();
+  const { refetch } = useRooms();
 
   // Form for status change
   const statusForm = useForm<UpdateStatusRoomsSchema>({
@@ -91,48 +92,53 @@ export function UpdateAvailabilityRoomsDialog({ open, setOpen, room }: UpdateAva
     startCreateTransition(() => {
       onUpdateRoomStatus(room.id, data.status);
     });
-    setOpen(false);
   };
 
   // Handle save for cleaning
-  const onCleaningSubmit = (data: CleaningStatusRoomsSchema) => {
-    startCreateTransition(() => {
-      // Verificar si algún valor del checklist ha cambiado respecto al valor original de room
-      const checklistChanged =
-        room.trashBin !== data.checklist.trashBin ||
-        room.towel !== data.checklist.towel ||
-        room.toiletPaper !== data.checklist.toiletPaper ||
-        room.showerSoap !== data.checklist.showerSoap ||
-        room.handSoap !== data.checklist.handSoap ||
-        room.lamp !== data.checklist.lamp;
+  const onCleaningSubmit = async (data: CleaningStatusRoomsSchema) => {
+    startCreateTransition(async () => {
+      try {
+        // Verificar si algún valor del checklist ha cambiado respecto al valor original de room
+        const checklistChanged =
+          room.trashBin !== data.checklist.trashBin ||
+          room.towel !== data.checklist.towel ||
+          room.toiletPaper !== data.checklist.toiletPaper ||
+          room.showerSoap !== data.checklist.showerSoap ||
+          room.handSoap !== data.checklist.handSoap ||
+          room.lamp !== data.checklist.lamp;
 
-      // Si hubo cambios en el checklist, actualizar la habitación
-      if (checklistChanged) {
-        onUpdateRoom({
-          trashBin: data.checklist.trashBin,
-          towel: data.checklist.towel,
-          toiletPaper: data.checklist.toiletPaper,
-          showerSoap: data.checklist.showerSoap,
-          handSoap: data.checklist.handSoap,
-          lamp: data.checklist.lamp,
-          id: room.id,
-        });
-      }
+        const allChecked = Object.values(data.checklist).every((value) => value === true);
 
-      // Si todos los elementos del checklist están en true (después de la actualización),
-      // crear el registro de limpieza
-      const allChecked = Object.values(data.checklist).every((value) => value === true);
-      if (allChecked) {
-        onCreateRoomCleaning({
-          staffName: data.cleanedBy || "",
-          observations: data.observations || "",
-          date: data.date,
-          roomId: room.id,
-        });
+        // Primero actualizamos la habitación si es necesario
+        if (checklistChanged) {
+          await onUpdateRoom(
+            {
+              trashBin: data.checklist.trashBin,
+              towel: data.checklist.towel,
+              toiletPaper: data.checklist.toiletPaper,
+              showerSoap: data.checklist.showerSoap,
+              handSoap: data.checklist.handSoap,
+              lamp: data.checklist.lamp,
+              id: room.id,
+            },
+            !allChecked
+          ); // Mostrar toast solo si no vamos a crear un registro de limpieza
+        }
+
+        // Solo después de que la actualización se complete correctamente,
+        // crear el registro de limpieza si todos los elementos están marcados
+        if (allChecked) {
+          await onCreateRoomCleaning({
+            staffName: data.cleanedBy || "",
+            observations: data.observations || "",
+            date: data.date,
+            roomId: room.id,
+          });
+        }
+      } catch (error) {
+        console.error("Error al procesar la actualización:", error);
       }
     });
-
-    setOpen(false);
   };
 
   const handleClose = () => {
@@ -142,11 +148,31 @@ export function UpdateAvailabilityRoomsDialog({ open, setOpen, room }: UpdateAva
 
   useEffect(() => {
     if (isSuccessUpdateRoomStatus) {
-      /* form.reset(); */
+      statusForm.reset();
       setOpen(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccessUpdateRoomStatus]);
+
+  useEffect(() => {
+    // Para el flujo de limpieza:
+    // 1. Si se creó un registro de limpieza (todos los elementos marcados)
+    if (isSuccessCreateRoomCleaning) {
+      cleaningForm.reset();
+      refetch();
+      setOpen(false);
+    }
+    // 2. Si solo se actualizaron elementos de la habitación sin crear registro de limpieza
+    else if (isSuccessUpdateRoom) {
+      // Verificamos si en el último envío del formulario, no se completaron todos los elementos
+      const allChecked = Object.values(cleaningForm.getValues().checklist).every((value) => value === true);
+      if (!allChecked) {
+        cleaningForm.reset();
+        setOpen(false);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccessUpdateRoom, isSuccessCreateRoomCleaning]);
 
   if (isDesktop)
     return (
