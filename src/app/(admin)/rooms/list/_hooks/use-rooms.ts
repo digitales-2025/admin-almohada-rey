@@ -37,15 +37,19 @@ export const useRooms = () => {
     return await promise;
   }
 
-  async function onUpdateRoom(input: Partial<Room> & { id: string }) {
+  async function onUpdateRoom(input: Partial<Room> & { id: string }, showToast: boolean = true) {
     const promise = runAndHandleError(() => updateRoom(input).unwrap());
-    toast.promise(promise, {
-      loading: "Actualizando habitación...",
-      success: "Habitación actualizado exitosamente",
-      error: (error) => {
-        return error.message;
-      },
-    });
+
+    if (showToast) {
+      toast.promise(promise, {
+        loading: "Actualizando habitación...",
+        success: "Habitación actualizada exitosamente",
+        error: (error) => {
+          return error.message;
+        },
+      });
+    }
+
     return await promise;
   }
 
