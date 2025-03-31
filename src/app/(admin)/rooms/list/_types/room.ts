@@ -32,3 +32,12 @@ export enum RoomStatus {
   OCCUPIED = "OCCUPIED",
   CLEANING = "CLEANING",
 }
+
+export interface CleaningChecklist {
+  trashBin: boolean;
+  towel: boolean;
+  toiletPaper: boolean;
+  showerSoap: boolean;
+  handSoap: boolean;
+  lamp: boolean;
+}

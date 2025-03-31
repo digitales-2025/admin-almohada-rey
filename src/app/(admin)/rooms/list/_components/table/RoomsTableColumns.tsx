@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { Ellipsis, RefreshCcwDot, Trash } from "lucide-react";
+import { Ellipsis, RefreshCcwDot, Settings, Trash } from "lucide-react";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Room, RoomStatus } from "../../_types/room";
 import { getRoomTypeKey, RoomStatusLabels, RoomTypeLabels } from "../../_utils/rooms.utils";
+import { UpdateAvailabilityRoomsDialog } from "../availability-management/UpdateAvailabilityRoomsDialog";
 import { DeleteRoomsDialog } from "../state-management/DeleteRoomsDialog";
 import { ReactivateRoomsDialog } from "../state-management/ReactivateRoomsDialog";
 import { UpdateRoomSheet } from "../update/UpdateRoomsSheet";
@@ -170,6 +171,7 @@ export const roomsColumns = (isSuperAdmin: boolean): ColumnDef<Room>[] => [
       const [showDeleteDialog, setShowDeleteDialog] = useState(false);
       const [showReactivateDialog, setShowReactivateDialog] = useState(false);
       const [showEditDialog, setShowEditDialog] = useState(false);
+      const [showUpdateAvailabilityDialog, setShowUpdateAvailabilityDialog] = useState(false);
 
       const { isActive } = row.original;
       return (
@@ -201,6 +203,13 @@ export const roomsColumns = (isSuperAdmin: boolean): ColumnDef<Room>[] => [
                 }}
               />
             )}
+            {showUpdateAvailabilityDialog && (
+              <UpdateAvailabilityRoomsDialog
+                open={showUpdateAvailabilityDialog}
+                setOpen={setShowUpdateAvailabilityDialog}
+                room={row?.original}
+              />
+            )}
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -213,6 +222,12 @@ export const roomsColumns = (isSuperAdmin: boolean): ColumnDef<Room>[] => [
                 Editar
               </DropdownMenuItem>
               <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => setShowUpdateAvailabilityDialog(true)} disabled={!isActive}>
+                Disponibilidad
+                <DropdownMenuShortcut>
+                  <Settings className="size-4" aria-hidden="true" />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
               {isSuperAdmin && (
                 <DropdownMenuItem onSelect={() => setShowReactivateDialog(true)} disabled={isActive}>
                   Reactivar

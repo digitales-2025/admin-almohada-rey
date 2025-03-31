@@ -38,6 +38,7 @@ pipeline {
         // Docker build variables
         NEXT_PUBLIC_BACKEND_URL = "https://almohada-backend-develop.acide.win/v1"
         INTERNAL_BACKEND_URL = "http://almohada-backend-develop:4000/v1"
+        NEXT_PUBLIC_IMAGE_DOMAIN="pub-0974deb2e04246f0ba3e7ab7bad64223.r2.dev"
     }
 
     stages {
@@ -46,7 +47,7 @@ pipeline {
                 sh "cp deploy/Dockerfile.dev ./Dockerfile"
                 script {
                     withDockerRegistry(credentialsId: "${REGISTRY_CREDENTIALS}") {
-                        def image = docker.build("${FULL_REGISTRY_URL}:${BUILD_NUMBER}", "--build-arg NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL} --build-arg INTERNAL_BACKEND_URL=${INTERNAL_BACKEND_URL} .")
+                        def image = docker.build("${FULL_REGISTRY_URL}:${BUILD_NUMBER}", "--build-arg NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL} --build-arg INTERNAL_BACKEND_URL=${INTERNAL_BACKEND_URL} --build-arg NEXT_PUBLIC_IMAGE_DOMAIN=${NEXT_PUBLIC_IMAGE_DOMAIN}  .")
                         image.push()
                     }
                 }

@@ -1,7 +1,11 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 import baseQueryWithReauth from "@/utils/baseQuery";
-import { Room } from "../_types/room";
+import { Room, RoomStatus } from "../_types/room";
+
+export interface StatusRoomDto {
+  status: RoomStatus;
+}
 
 export const roomsApi = createApi({
   reducerPath: "roomsApi",
@@ -24,6 +28,16 @@ export const roomsApi = createApi({
         url: `/rooms/${id}`,
         method: "PATCH",
         body,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Rooms"],
+    }),
+    // Actualizar estado de habitación
+    updateRoomStatus: build.mutation<Room, { id: string; statusDto: StatusRoomDto }>({
+      query: ({ id, statusDto }) => ({
+        url: `/rooms/${id}/status`,
+        method: "PATCH",
+        body: statusDto,
         credentials: "include",
       }),
       invalidatesTags: ["Rooms"],
@@ -72,6 +86,7 @@ export const roomsApi = createApi({
 export const {
   useCreateRoomMutation,
   useUpdateRoomMutation,
+  useUpdateRoomStatusMutation,
   useGetRoomByIdQuery,
   useGetAllRoomsQuery,
   useDeleteRoomsMutation,
