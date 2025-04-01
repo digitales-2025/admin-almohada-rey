@@ -10,6 +10,7 @@ import { roomsCleaningApi } from "@/app/(admin)/rooms/list/[id]/clean/_service/R
 import { roomTypeApi } from "@/app/(admin)/rooms/room-types/_services/roomTypesApi";
 import { usersApi } from "@/app/(admin)/users/_services/usersApi";
 import { authApi } from "@/app/(auth)/log-in/_services/authApi";
+import { servicesApi } from "./servicesApi";
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     [roomsApi.reducerPath]: roomsApi.reducer,
     [roomTypeApi.reducerPath]: roomTypeApi.reducer,
     [roomsCleaningApi.reducerPath]: roomsCleaningApi.reducer,
+    [servicesApi.reducerPath]: servicesApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -70,7 +72,8 @@ export const store = configureStore({
       .concat(reservationApi.middleware)
       .concat(roomTypeApi.middleware)
       .concat(roomsApi.middleware)
-      .concat(roomsCleaningApi.middleware),
+      .concat(roomsCleaningApi.middleware)
+      .concat(servicesApi.middleware),
 });
 setupListeners(store.dispatch);
 
