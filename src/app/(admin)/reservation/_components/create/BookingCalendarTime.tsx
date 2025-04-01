@@ -109,7 +109,7 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
     setSelectedCheckInDate(date);
 
     // Si la fecha de check-out es anterior a la nueva fecha de check-in, ajustarla
-    if (selectedCheckOutDate < date) {
+    if (selectedCheckOutDate <= date) {
       const newCheckOutDate = addDays(date, 1);
       setSelectedCheckOutDate(newCheckOutDate);
 
@@ -267,6 +267,7 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
                     return (
                       <Button
                         key={timeStr}
+                        type="button"
                         variant={isSelected ? "default" : "outline"}
                         className="w-full justify-start"
                         onClick={() => handleCheckInTimeChange(timeStr)}

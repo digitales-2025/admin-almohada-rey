@@ -1,6 +1,20 @@
-import { BedDouble, BedSingle, ConciergeBell, CookingPot, Home, Hotel, Lamp } from "lucide-react";
+import {
+  BedDouble,
+  BedSingle,
+  Check,
+  ConciergeBell,
+  CookingPot,
+  Droplets,
+  HandMetal,
+  Home,
+  Hotel,
+  Lamp,
+  ShowerHeadIcon as Shower,
+  Toilet,
+  Trash2,
+} from "lucide-react";
 
-import { RoomStatus } from "../_types/room";
+import { CleaningChecklist, RoomStatus } from "../_types/room";
 
 export const RoomStatusLabels: Record<
   RoomStatus,
@@ -81,4 +95,42 @@ export const getRoomTypeKey = (typeName: string): RoomTypeKey => {
   if (normalizedType.includes("suite")) return "suite";
 
   return "default";
+};
+
+export const getChecklistIcon = (item: keyof CleaningChecklist) => {
+  switch (item) {
+    case "trashBin":
+      return Trash2;
+    case "towel":
+      return Droplets;
+    case "toiletPaper":
+      return Toilet;
+    case "showerSoap":
+      return Shower;
+    case "handSoap":
+      return HandMetal;
+    case "lamp":
+      return Lamp;
+    default:
+      return Check;
+  }
+};
+
+export const getChecklistLabel = (item: keyof CleaningChecklist) => {
+  switch (item) {
+    case "trashBin":
+      return "Papelera";
+    case "towel":
+      return "Toallas";
+    case "toiletPaper":
+      return "Papel higiénico";
+    case "showerSoap":
+      return "Jabón de ducha";
+    case "handSoap":
+      return "Jabón de manos";
+    case "lamp":
+      return "Lámpara";
+    default:
+      return item;
+  }
 };
