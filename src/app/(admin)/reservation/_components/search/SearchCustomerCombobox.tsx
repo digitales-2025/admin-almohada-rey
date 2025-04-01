@@ -72,9 +72,9 @@ export function SearchCustomerCombobox({ onValueChange, defaultValue }: SearchOr
       }}
       onSearchChange={(val) => setSearch(val === "" ? DefaultSearchValue : val)} // set search to "None" if empty string
       // regexInput={/^[0-9]*$/} // only allow numbers
-      searchPlaceholder="Busca por Nro. de Òrden..."
+      searchPlaceholder="Busca por Nro. de Identidad..."
       noResultsMsg="No se encontro resultados"
-      selectItemMsg="Selecciona una òrden"
+      selectItemMsg="Selecciona una cliente"
     />
   );
 }

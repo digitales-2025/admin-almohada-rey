@@ -7,7 +7,7 @@ import {
   isBefore,
   isSameDay,
   startOfDay,
-  startOfToday,
+  // startOfToday,
   //   isToday,
   //   endOfMonth,
   //   startOfMonth,
@@ -26,6 +26,7 @@ import {
   DEFAULT_CHECKIN_TIME,
   DEFAULT_CHECKOUT_TIME,
   formDateToPeruISO,
+  getPeruStartOfToday,
   getTimeOptionsForDay,
   peruDateTimeToUTC,
 } from "@/utils/peru-datetime";
@@ -59,6 +60,9 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
 
   // Hook personalizado para verificar disponibilidad de habitación
   const { isAvailable, isLoading, checkAvailability, isError, error } = useRoomAvailability();
+  // if (isAvailable){
+  //   toast.success("Habitación disponible para estas fechas");
+  // }
 
   // Efecto para inicializar fechas desde el formulario
   useEffect(() => {
@@ -104,8 +108,8 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
 
     setSelectedCheckInDate(date);
 
-    // Si la fecha de check-out es anterior a la nueva fecha de check-in, ajustarla
-    if (selectedCheckOutDate < date) {
+    // Si la fecha de check-out es anterior o el mismo dia a la nueva fecha de check-in, ajustarla
+    if (selectedCheckOutDate <= date || isSameDay(selectedCheckOutDate, date)) {
       const newCheckOutDate = addDays(date, 1);
       setSelectedCheckOutDate(newCheckOutDate);
 
@@ -190,7 +194,7 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
 
   // Función para verificar si una fecha debe estar deshabilitada
   const isDateDisabled = (date: Date, isCheckIn: boolean) => {
-    const today = startOfToday();
+    const today = getPeruStartOfToday();
 
     // Para check-in, solo deshabilitar fechas pasadas
     if (isCheckIn) {
@@ -220,12 +224,19 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
   }
 
   return (
-    <div className="w-auto space-y-4">
-      <Tabs defaultValue="checkin" value={activeTab} onValueChange={(v) => setActiveTab(v as "checkin" | "checkout")}>
-        <TabsList className="grid grid-cols-2">
-          <TabsTrigger value="checkin">Check-in</TabsTrigger>
-          <TabsTrigger value="checkout">Check-out</TabsTrigger>
-        </TabsList>
+    <div className="w-full space-y-4">
+      <Tabs
+        defaultValue="checkin"
+        value={activeTab}
+        onValueChange={(v) => setActiveTab(v as "checkin" | "checkout")}
+        className="w-full"
+      >
+        <div className="w-full flex justify-center">
+          <TabsList className="grid grid-cols-2 !mb-4">
+            <TabsTrigger value="checkin">Check-in</TabsTrigger>
+            <TabsTrigger value="checkout">Check-out</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="checkin" className="space-y-4">
           <div className="w-auto space-x-10 flex-wrap flex items-start h-fit">
@@ -256,6 +267,7 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
                     return (
                       <Button
                         key={timeStr}
+                        type="button"
                         variant={isSelected ? "default" : "outline"}
                         className="w-full justify-start"
                         onClick={() => handleCheckInTimeChange(timeStr)}

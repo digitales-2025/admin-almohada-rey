@@ -1,10 +1,11 @@
 import { IdCard } from "lucide-react";
 
-import { EnumConfig } from "@/types/enum/enum-ui.config";
+import { EnumConfig, TypedEnumConfig } from "@/types/enum/enum-ui.config";
 import { DocumentType } from "../_schemas/reservation.schemas";
 
-export const documentTypeStatusConfig: Record<DocumentType, EnumConfig> = {
+export const documentTypeStatusConfig: Record<DocumentType, TypedEnumConfig<DocumentType>> = {
   DNI: {
+    value: "DNI",
     name: "DNI",
     backgroundColor: "bg-[#E0F2FE]",
     textColor: "text-[#0284C7]",
@@ -14,6 +15,7 @@ export const documentTypeStatusConfig: Record<DocumentType, EnumConfig> = {
     icon: IdCard,
   },
   FOREIGNER_CARD: {
+    value: "FOREIGNER_CARD",
     name: "CE",
     backgroundColor: "bg-[#FFE1E6]",
     textColor: "text-[#E11D48]",
@@ -23,6 +25,7 @@ export const documentTypeStatusConfig: Record<DocumentType, EnumConfig> = {
     icon: IdCard,
   },
   PASSPORT: {
+    value: "PASSPORT",
     name: "Pasaporte",
     backgroundColor: "bg-[#DCFCE7]",
     textColor: "text-[#16A34A]",

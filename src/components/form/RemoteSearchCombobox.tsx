@@ -130,7 +130,7 @@ export function SearchCombobox<T = unknown>({
           className={cn("justify-between", className)}
           disabled={disabled}
         >
-          <span className="truncate flex items-center">{label ?? selectItemMsg}</span>
+          <span className="truncate flex items-center capitalize">{label ?? selectItemMsg}</span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -193,6 +193,7 @@ export function SearchCombobox<T = unknown>({
                         onSelect(value, item.label, item?.entity);
                         setOpen(false);
                       }}
+                      className="capitalize"
                       disabled={isSelected}
                     >
                       {item.label}

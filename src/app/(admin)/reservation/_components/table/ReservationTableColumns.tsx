@@ -2,8 +2,6 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
 import { ChevronDown, ChevronRight, Ellipsis, HandCoins } from "lucide-react";
 import { toast } from "sonner";
 
@@ -19,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { formatPeruBookingDate } from "@/utils/peru-datetime";
 import { DetailedReservation, ReservationGuest } from "../../_schemas/reservation.schemas";
 import { reservationStatusConfig } from "../../_types/reservation-enum.config";
 import { CreatePaymentDialog } from "../create+payment/CreatePaymentDialog";
@@ -118,13 +117,11 @@ export const reservationColumns = () // isSuperAdmin: boolean
     },
     header: ({ column }) => <DataTableColumnHeader column={column} title="CheckIn" />,
     cell: ({ row }) => {
-      return (
-        <div>
-          {format(row.original.checkInDate, "PPp", {
-            locale: es,
-          })}
-        </div>
-      );
+      // console.log("row", row.original.checkInDate);
+      // console.log('checkInDate', row.original.checkInDate);
+      // console.log('checkOutDate', row.original.checkOutDate);
+      const { localeDateString } = formatPeruBookingDate(row.original.checkInDate);
+      return <div>{localeDateString}</div>;
     },
   },
   {
@@ -134,13 +131,8 @@ export const reservationColumns = () // isSuperAdmin: boolean
     },
     header: ({ column }) => <DataTableColumnHeader column={column} title="CheckOut" />,
     cell: ({ row }) => {
-      return (
-        <div>
-          {format(row.original.checkInDate, "PPp", {
-            locale: es,
-          })}
-        </div>
-      );
+      const { localeDateString } = formatPeruBookingDate(row.original.checkOutDate);
+      return <div>{localeDateString}</div>;
     },
   },
   {
@@ -150,13 +142,8 @@ export const reservationColumns = () // isSuperAdmin: boolean
     },
     header: ({ column }) => <DataTableColumnHeader column={column} title="Reservado en" />,
     cell: ({ row }) => {
-      return (
-        <div>
-          {format(row.original.reservationDate, "PP", {
-            locale: es,
-          })}
-        </div>
-      );
+      const { localeDateString } = formatPeruBookingDate(row.original.reservationDate);
+      return <div>{localeDateString}</div>;
     },
   },
   {

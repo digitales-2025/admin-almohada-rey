@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-import { useGetRoomAvailabilityQuery } from "../_services/reservationApi";
-import { AvailabilityParams } from "../_types/room-availability-query-params";
+import { useGetAllAvailableRoomsQuery, useGetRoomAvailabilityQuery } from "../_services/reservationApi";
+import { AvailabilityParams, GenericAvailabilityParams } from "../_types/room-availability-query-params";
 
 export const useRoomAvailability = () => {
   const [params, setParams] = useState<AvailabilityParams | null>(null);
@@ -31,5 +31,34 @@ export const useRoomAvailability = () => {
     checkAvailability,
     error,
     isError,
+  };
+};
+
+export const useAllAvailableRoomsInTimeInterval = (defaultParams: GenericAvailabilityParams) => {
+  const [params, setParams] = useState<GenericAvailabilityParams | null>(defaultParams);
+
+  // Usar un estado local para manejar los parámetros de consulta
+  const { data, isLoading, isFetching, isError, error, refetch } = useGetAllAvailableRoomsQuery(
+    params ?? {
+      checkInDate: "",
+      checkOutDate: "",
+    },
+    {
+      skip: !params,
+      refetchOnMountOrArgChange: true,
+    }
+  );
+
+  const checkAvailability = (newParams: GenericAvailabilityParams) => {
+    setParams(newParams);
+  };
+
+  return {
+    availableRooms: data ?? [],
+    isLoading: isLoading || isFetching,
+    checkAvailability,
+    error,
+    isError,
+    refetch,
   };
 };
