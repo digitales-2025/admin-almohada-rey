@@ -543,6 +543,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/room-types/summary/active": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Obtener resumen de todos los tipos de habitaciones activas */
+    get: operations["RoomTypeController_findAllActive_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v1/room-types/{id}": {
     parameters: {
       query?: never;
@@ -973,13 +990,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-01T14:43:57.531Z
+       * @example 2025-04-01T18:11:29.449Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-01T14:43:57.531Z
+       * @example 2025-04-01T18:11:29.449Z
        */
       updatedAt: string;
       /** @description Customer name */
@@ -1034,13 +1051,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-01T14:43:57.531Z
+       * @example 2025-04-01T18:11:29.449Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-01T14:43:57.531Z
+       * @example 2025-04-01T18:11:29.449Z
        */
       updatedAt: string;
       /** @description User name */
@@ -1083,13 +1100,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-01T14:43:57.531Z
+       * @example 2025-04-01T18:11:29.449Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-01T14:43:57.531Z
+       * @example 2025-04-01T18:11:29.449Z
        */
       updatedAt: string;
       /**
@@ -1148,13 +1165,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-01T14:43:57.531Z
+       * @example 2025-04-01T18:11:29.449Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-01T14:43:57.531Z
+       * @example 2025-04-01T18:11:29.449Z
        */
       updatedAt: string;
       /**
@@ -1208,7 +1225,7 @@ export interface components {
        * @example AVAILABLE
        * @enum {string}
        */
-      status: "AVAILABLE" | "OCCUPIED" | "RESERVED" | "CLEANING";
+      status: "AVAILABLE" | "OCCUPIED" | "CLEANING";
       /** @description Nombre del tipo de habitación asociado */
       RoomTypes: components["schemas"]["RoomType"];
     };
@@ -1227,13 +1244,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-04-01T14:43:57.531Z
+       * @example 2025-04-01T18:11:29.449Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-04-01T14:43:57.531Z
+       * @example 2025-04-01T18:11:29.449Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -1382,13 +1399,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-04-01T14:43:57.531Z
+       * @example 2025-04-01T18:11:29.449Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-04-01T14:43:57.531Z
+       * @example 2025-04-01T18:11:29.449Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -1506,13 +1523,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-01T14:43:57.531Z
+       * @example 2025-04-01T18:11:29.449Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-01T14:43:57.531Z
+       * @example 2025-04-01T18:11:29.449Z
        */
       updatedAt: string;
       /**
@@ -1566,7 +1583,7 @@ export interface components {
        * @example AVAILABLE
        * @enum {string}
        */
-      status: "AVAILABLE" | "OCCUPIED" | "RESERVED" | "CLEANING";
+      status: "AVAILABLE" | "OCCUPIED" | "CLEANING";
     };
     StatusRoomDto: {
       /**
@@ -1574,7 +1591,7 @@ export interface components {
        * @example AVAILABLE
        * @enum {string}
        */
-      status: "AVAILABLE" | "OCCUPIED" | "RESERVED" | "CLEANING";
+      status: "AVAILABLE" | "OCCUPIED" | "CLEANING";
     };
     UpdateRoomDto: {
       /**
@@ -1869,13 +1886,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-01T14:43:57.531Z
+       * @example 2025-04-01T18:11:29.449Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-01T14:43:57.531Z
+       * @example 2025-04-01T18:11:29.449Z
        */
       updatedAt: string;
       /**
@@ -3446,6 +3463,38 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["RoomType"][];
         };
+      };
+      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  RoomTypeController_findAllActive_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Lista resumida de los tipos de habitaciones activas (solo id, name e isActive) */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
       /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
       400: {
