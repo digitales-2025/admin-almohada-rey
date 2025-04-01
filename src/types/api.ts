@@ -353,35 +353,19 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/v1/reservation/available-rooms": {
+  "/v1/reservation/{id}": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** Obtener habitaciones disponibles */
-    get: operations["ReservationController_getAvailableRooms_v1"];
+    /** Get a reservation by ID */
+    get: operations["ReservationController_findOne_v1"];
     put?: never;
     post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v1/reservation/reservations-in-interval": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Obtener todas las reservaciones disponibles en un intervalo de tiempo */
-    get: operations["ReservationController_getReservationInInterval_v1"];
-    put?: never;
-    post?: never;
-    delete?: never;
+    /** Delete a reservation */
+    delete: operations["ReservationController_remove_v1"];
     options?: never;
     head?: never;
     patch?: never;
@@ -399,24 +383,6 @@ export interface paths {
     put?: never;
     post?: never;
     delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v1/reservation/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get a reservation by ID */
-    get: operations["ReservationController_findOne_v1"];
-    put?: never;
-    post?: never;
-    /** Delete a reservation */
-    delete: operations["ReservationController_remove_v1"];
     options?: never;
     head?: never;
     patch?: never;
@@ -682,6 +648,39 @@ export interface paths {
     options?: never;
     head?: never;
     patch?: never;
+    trace?: never;
+  };
+  "/v1/payments": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["PaymentsController_findAll_v1"];
+    put?: never;
+    /** Create a new payment */
+    post: operations["PaymentsController_create_v1"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/payments/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["PaymentsController_findOne_v1"];
+    put?: never;
+    post?: never;
+    delete: operations["PaymentsController_remove_v1"];
+    options?: never;
+    head?: never;
+    patch: operations["PaymentsController_update_v1"];
     trace?: never;
   };
   "/v1/seeds": {
@@ -981,24 +980,24 @@ export interface components {
        * @description Unique identifier for the entity
        * @example 123e4567-e89b-12d3-a456-426614174000
        */
-      id: string;
+      id?: string;
       /**
        * @description Indicates whether the entity is active or not
        * @example true
        */
-      isActive: boolean;
+      isActive?: boolean;
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-01T18:11:29.449Z
+       * @example 2025-04-01T18:00:33.019Z
        */
-      createdAt: string;
+      createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-01T18:11:29.449Z
+       * @example 2025-04-01T18:00:33.019Z
        */
-      updatedAt: string;
+      updatedAt?: string;
       /** @description Customer name */
       name: string;
       /** @description Customer address */
@@ -1041,7 +1040,7 @@ export interface components {
        * @description Unique identifier for the entity
        * @example 123e4567-e89b-12d3-a456-426614174000
        */
-      id: string;
+      id?: string;
       /**
        * @description Whether the user is active
        * @default true
@@ -1051,15 +1050,15 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-01T18:11:29.449Z
+       * @example 2025-04-01T18:00:33.019Z
        */
-      createdAt: string;
+      createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-01T18:11:29.449Z
+       * @example 2025-04-01T18:00:33.019Z
        */
-      updatedAt: string;
+      updatedAt?: string;
       /** @description User name */
       name: string;
       /** @description User role */
@@ -1086,94 +1085,29 @@ export interface components {
        */
       mustChangePassword: boolean;
     };
-    RoomType: {
+    Room: {
       /**
        * @description Unique identifier for the entity
        * @example 123e4567-e89b-12d3-a456-426614174000
        */
-      id: string;
+      id?: string;
       /**
        * @description Indicates whether the entity is active or not
        * @example true
        */
-      isActive: boolean;
+      isActive?: boolean;
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-01T18:11:29.449Z
+       * @example 2025-04-01T18:00:33.019Z
        */
-      createdAt: string;
+      createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-01T18:11:29.449Z
+       * @example 2025-04-01T18:00:33.019Z
        */
-      updatedAt: string;
-      /**
-       * @description Nombre del tipo de habitación
-       * @example Habitación doble
-       */
-      name: string;
-      /**
-       * @description Capacidad máxima de huéspedes
-       * @example 2
-       */
-      guests: number;
-      /**
-       * @description Precio por noche
-       * @example 150.5
-       */
-      price: number;
-      /**
-       * @description Descripción de la televisión
-       * @example Smart TV 42 pulgadas
-       */
-      tv: string;
-      /**
-       * @description Tipo de piso
-       * @example LAMINATING
-       * @enum {string}
-       */
-      floorType: "LAMINATING" | "CARPETING";
-      /**
-       * @description Descripción del tipo de habitación
-       * @example Habitación con vista al mar y balcón privado
-       */
-      description: string;
-      /**
-       * @description Área en metros cuadrados
-       * @example 25.5
-       */
-      area: number;
-      /**
-       * @description Descripción de la cama
-       * @example Cama matrimonial king size
-       */
-      bed: string;
-    };
-    DetailedRoom: {
-      /**
-       * @description Unique identifier for the entity
-       * @example 123e4567-e89b-12d3-a456-426614174000
-       */
-      id: string;
-      /**
-       * @description Indicates whether the entity is active or not
-       * @example true
-       */
-      isActive: boolean;
-      /**
-       * Format: date-time
-       * @description Timestamp when the entity was created
-       * @example 2025-04-01T18:11:29.449Z
-       */
-      createdAt: string;
-      /**
-       * Format: date-time
-       * @description Timestamp when the entity was last updated
-       * @example 2025-04-01T18:11:29.449Z
-       */
-      updatedAt: string;
+      updatedAt?: string;
       /**
        * @description ID del tipo de habitación asociado
        * @example 123e4567-e89b-12d3-a456-426614174000
@@ -1226,15 +1160,13 @@ export interface components {
        * @enum {string}
        */
       status: "AVAILABLE" | "OCCUPIED" | "CLEANING";
-      /** @description Nombre del tipo de habitación asociado */
-      RoomTypes: components["schemas"]["RoomType"];
     };
     DetailedReservation: {
       /**
        * @description Unique identifier for the reservation
        * @example 123e4567-e89b-12d3-a456-426614174000
        */
-      id: string;
+      id?: string;
       /**
        * @description Whether the reservation is active
        * @default true
@@ -1244,13 +1176,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-04-01T18:11:29.449Z
+       * @example 2025-04-01T18:00:33.019Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-04-01T18:11:29.449Z
+       * @example 2025-04-01T18:00:33.019Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -1282,10 +1214,6 @@ export interface components {
        * @enum {string}
        */
       status: "PENDING" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELED";
-      /** @description Origin place from the customer */
-      origin: string;
-      /** @description Reason for reservation */
-      reason: string;
       /** @description JSON list of companions/guests */
       guests?: string;
       /** @description Additional notes or observations */
@@ -1295,7 +1223,7 @@ export interface components {
       /** @description User associated with the reservation */
       user: components["schemas"]["User"];
       /** @description Room associated with the reservation */
-      room: components["schemas"]["DetailedRoom"];
+      room: components["schemas"]["Room"];
     };
     Guest: {
       /** @description The name of the guest */
@@ -1319,7 +1247,7 @@ export interface components {
        */
       birthDate?: string;
       /** @description Additional information about the guest */
-      additionalInfo?: string;
+      additionalInfo?: Record<string, never>;
     };
     GuestDto: {
       /** @description Guest full name */
@@ -1375,10 +1303,6 @@ export interface components {
        * @enum {string}
        */
       status: "PENDING" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELED";
-      /** @description Origin place from the customer */
-      origin: string;
-      /** @description Reason for reservation */
-      reason: string;
       /** @description Guest companions information */
       guests?: components["schemas"]["GuestDto"][];
       /** @description Additional observations */
@@ -1389,7 +1313,7 @@ export interface components {
        * @description Unique identifier for the reservation
        * @example 123e4567-e89b-12d3-a456-426614174000
        */
-      id: string;
+      id?: string;
       /**
        * @description Whether the reservation is active
        * @default true
@@ -1399,13 +1323,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-04-01T18:11:29.449Z
+       * @example 2025-04-01T18:00:33.019Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-04-01T18:11:29.449Z
+       * @example 2025-04-01T18:00:33.019Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -1437,10 +1361,6 @@ export interface components {
        * @enum {string}
        */
       status: "PENDING" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELED";
-      /** @description Origin place from the customer */
-      origin: string;
-      /** @description Reason for reservation */
-      reason: string;
       /** @description JSON list of companions/guests */
       guests?: string;
       /** @description Additional notes or observations */
@@ -1509,82 +1429,6 @@ export interface components {
       /** @description Datos de la respuesta */
       data: Record<string, never> | null;
     };
-    Room: {
-      /**
-       * @description Unique identifier for the entity
-       * @example 123e4567-e89b-12d3-a456-426614174000
-       */
-      id: string;
-      /**
-       * @description Indicates whether the entity is active or not
-       * @example true
-       */
-      isActive: boolean;
-      /**
-       * Format: date-time
-       * @description Timestamp when the entity was created
-       * @example 2025-04-01T18:11:29.449Z
-       */
-      createdAt: string;
-      /**
-       * Format: date-time
-       * @description Timestamp when the entity was last updated
-       * @example 2025-04-01T18:11:29.449Z
-       */
-      updatedAt: string;
-      /**
-       * @description ID del tipo de habitación asociado
-       * @example 123e4567-e89b-12d3-a456-426614174000
-       */
-      roomTypeId: string;
-      /**
-       * @description Número de la habitación
-       * @example 101
-       */
-      number: number;
-      /**
-       * @description Indica si la habitación tiene papelera
-       * @default true
-       * @example true
-       */
-      trashBin: boolean;
-      /**
-       * @description Indica si la habitación tiene toalla
-       * @default true
-       * @example true
-       */
-      towel: boolean;
-      /**
-       * @description Indica si la habitación tiene papel higiénico
-       * @default true
-       * @example true
-       */
-      toiletPaper: boolean;
-      /**
-       * @description Indica si la habitación tiene jabón de ducha
-       * @default true
-       * @example true
-       */
-      showerSoap: boolean;
-      /**
-       * @description Indica si la habitación tiene jabón de manos
-       * @default true
-       * @example true
-       */
-      handSoap: boolean;
-      /**
-       * @description Indica si la habitación tiene lámpara
-       * @default true
-       * @example true
-       */
-      lamp: boolean;
-      /**
-       * @description Estado de la habitación
-       * @example AVAILABLE
-       * @enum {string}
-       */
-      status: "AVAILABLE" | "OCCUPIED" | "CLEANING";
-    };
     StatusRoomDto: {
       /**
        * @description Disponible, ocupada o reservada
@@ -1643,6 +1487,71 @@ export interface components {
        *     ]
        */
       ids: string[];
+    };
+    RoomType: {
+      /**
+       * @description Unique identifier for the entity
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      id?: string;
+      /**
+       * @description Indicates whether the entity is active or not
+       * @example true
+       */
+      isActive?: boolean;
+      /**
+       * Format: date-time
+       * @description Timestamp when the entity was created
+       * @example 2025-04-01T18:00:33.019Z
+       */
+      createdAt?: string;
+      /**
+       * Format: date-time
+       * @description Timestamp when the entity was last updated
+       * @example 2025-04-01T18:00:33.019Z
+       */
+      updatedAt?: string;
+      /**
+       * @description Nombre del tipo de habitación
+       * @example Habitación doble
+       */
+      name: string;
+      /**
+       * @description Capacidad máxima de huéspedes
+       * @example 2
+       */
+      guests: number;
+      /**
+       * @description Precio por noche
+       * @example 150.5
+       */
+      price: number;
+      /**
+       * @description Descripción de la televisión
+       * @example Smart TV 42 pulgadas
+       */
+      tv: string;
+      /**
+       * @description Tipo de piso
+       * @example LAMINATING
+       * @enum {string}
+       */
+      floorType: "LAMINATING" | "CARPETING";
+      /**
+       * @description Descripción del tipo de habitación
+       * @example Habitación con vista al mar y balcón privado
+       */
+      description: string;
+      /**
+       * @description Área en metros cuadrados
+       * @example 25.5
+       */
+      area: number;
+      /**
+       * @description Descripción de la cama
+       * @example Cama matrimonial king size
+       */
+      bed: string;
     };
     CreateRoomTypeWithImagesDto: {
       /**
@@ -1772,6 +1681,74 @@ export interface components {
        */
       ids: string[];
     };
+    CreatePaymentDto: {
+      /**
+       * @description Monto
+       * @example 37829.85
+       */
+      amount: number;
+      /**
+       * @description Monto pagado
+       * @example 38002.55
+       */
+      amountPaid?: number;
+      /**
+       * @description ID de la reserva
+       * @example ID de la reserva
+       */
+      reservationId: string;
+      /**
+       * @description Observaciones
+       * @example Observaciones
+       */
+      observations?: string;
+      /**
+       * @description Array of details of the payment
+       * @example [
+       *       {
+       *         "quantity": 0,
+       *         "partial": 0,
+       *         "percentage": 0,
+       *         "finishesWorkItemBudgetId": "id de la partida"
+       *       }
+       *     ]
+       */
+      paymentDetail?: string[];
+    };
+    UpdatePaymentDto: {
+      /**
+       * @description Monto
+       * @example 37829.85
+       */
+      amount?: number;
+      /**
+       * @description Monto pagado
+       * @example 38002.55
+       */
+      amountPaid?: number;
+      /**
+       * @description ID de la reserva
+       * @example ID de la reserva
+       */
+      reservationId?: string;
+      /**
+       * @description Observaciones
+       * @example Observaciones
+       */
+      observations?: string;
+      /**
+       * @description Array of details of the payment
+       * @example [
+       *       {
+       *         "quantity": 0,
+       *         "partial": 0,
+       *         "percentage": 0,
+       *         "finishesWorkItemBudgetId": "id de la partida"
+       *       }
+       *     ]
+       */
+      paymentDetail?: string[];
+    };
     CreateCustomerDto: {
       /** @description Nombre del cliente */
       name: string;
@@ -1877,24 +1854,24 @@ export interface components {
        * @description Unique identifier for the entity
        * @example 123e4567-e89b-12d3-a456-426614174000
        */
-      id: string;
+      id?: string;
       /**
        * @description Indicates whether the entity is active or not
        * @example true
        */
-      isActive: boolean;
+      isActive?: boolean;
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-01T18:11:29.449Z
+       * @example 2025-04-01T18:00:33.019Z
        */
-      createdAt: string;
+      createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-01T18:11:29.449Z
+       * @example 2025-04-01T18:00:33.019Z
        */
-      updatedAt: string;
+      updatedAt?: string;
       /**
        * @description Fecha de la limpieza
        * @example 2025-03-24
@@ -2938,125 +2915,6 @@ export interface operations {
       };
     };
   };
-  ReservationController_getAvailableRooms_v1: {
-    parameters: {
-      query: {
-        /** @description Fecha de check-in en formato ISO */
-        checkInDate: string;
-        /** @description Fecha de check-out en formato ISO */
-        checkOutDate: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Lista de habitaciones disponibles */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["DetailedRoom"][];
-        };
-      };
-      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Unauthorized - No autorizado para realizar esta operación */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ReservationController_getReservationInInterval_v1: {
-    parameters: {
-      query: {
-        /** @description Fecha de check-in en formato ISO */
-        checkInDate: string;
-        /** @description Fecha de check-out en formato ISO */
-        checkOutDate: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Lista de reservaciones disponibles en un inetravlo de tiempo */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["DetailedReservation"][];
-        };
-      };
-      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Unauthorized - No autorizado para realizar esta operación */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ReservationController_checkAvailability_v1: {
-    parameters: {
-      query: {
-        /** @description ID de la habitación */
-        roomId: string;
-        /** @description Fecha de check-in en formato ISO */
-        checkInDate: string;
-        /** @description Fecha de check-out en formato ISO */
-        checkOutDate: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Información de disponibilidad de la habitación */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["RoomAvailabilityDto"];
-        };
-      };
-      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Unauthorized - No autorizado para realizar esta operación */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
   ReservationController_findOne_v1: {
     parameters: {
       query?: never;
@@ -3112,6 +2970,47 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ReservationController_checkAvailability_v1: {
+    parameters: {
+      query: {
+        /** @description ID de la habitación */
+        roomId: string;
+        /** @description Fecha de check-in en formato ISO */
+        checkInDate: string;
+        /** @description Fecha de check-out en formato ISO */
+        checkOutDate: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Información de disponibilidad de la habitación */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RoomAvailabilityDto"];
+        };
       };
       /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
       400: {
@@ -3786,6 +3685,211 @@ export interface operations {
       };
       /** @description Tipo de habitación no encontrado */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  PaymentsController_findAll_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  PaymentsController_create_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreatePaymentDto"];
+      };
+    };
+    responses: {
+      /** @description Payment created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  PaymentsController_findOne_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  PaymentsController_remove_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  PaymentsController_update_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdatePaymentDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
         headers: {
           [name: string]: unknown;
         };
