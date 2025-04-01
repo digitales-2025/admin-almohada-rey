@@ -1,20 +1,27 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { ChevronDown, ChevronRight, Ellipsis } from "lucide-react";
+import { ChevronDown, ChevronRight, Ellipsis, HandCoins } from "lucide-react";
 import { toast } from "sonner";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { DetailedReservation, ReservationGuest } from "../../_schemas/reservation.schemas";
 import { reservationStatusConfig } from "../../_types/reservation-enum.config";
+import { CreatePaymentDialog } from "../create+payment/CreatePaymentDialog";
 import { GuestsDetailsDialog } from "./dialogs/GuestDialog";
 
 /**
@@ -343,6 +350,8 @@ export const reservationColumns = () // isSuperAdmin: boolean
       //   const [showReactivateDialog, setShowReactivateDialog] = useState(false);
       //   const [showEditDialog, setShowEditDialog] = useState(false);
 
+      const [showCreatePaymentDialog, setShowCreatePaymentDialog] = useState(false);
+
       // const { isActive } = row.original;
       return (
         <div>
@@ -350,7 +359,12 @@ export const reservationColumns = () // isSuperAdmin: boolean
             {/* {showEditDialog && (
               <UpdateCustomerSheet open={showEditDialog} onOpenChange={setShowEditDialog} customer={row?.original} />
             )}
+            */}
+            {showCreatePaymentDialog && (
+              <CreatePaymentDialog open={showCreatePaymentDialog} setOpen={setShowCreatePaymentDialog} />
+            )}
 
+            {/* 
             {showDeleteDialog && (
               <DeleteCustomersDialog
                 open={showDeleteDialog}
@@ -383,9 +397,17 @@ export const reservationColumns = () // isSuperAdmin: boolean
             <DropdownMenuContent align="end" className="w-40">
               {/* <DropdownMenuItem onSelect={() => setShowEditDialog(true)} disabled={!isActive}>
                 Editar
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               <DropdownMenuSeparator />
-              {isSuperAdmin && (
+
+              <DropdownMenuItem onSelect={() => setShowCreatePaymentDialog(true)}>
+                Crear Pago
+                <DropdownMenuTrigger>
+                  <HandCoins className="size-4" aria-hidden="true" />
+                </DropdownMenuTrigger>
+              </DropdownMenuItem>
+
+              {/*               {isSuperAdmin && (
                 <DropdownMenuItem onSelect={() => setShowReactivateDialog(true)} disabled={isActive}>
                   Reactivar
                   <DropdownMenuShortcut>
