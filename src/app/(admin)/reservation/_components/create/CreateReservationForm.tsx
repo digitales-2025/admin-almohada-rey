@@ -145,8 +145,8 @@ export default function CreateReservationForm({
     append({
       name: "",
       age: 0,
-      documentType: undefined,
-      documentId: undefined,
+      documentType: "DNI",
+      documentId: "",
       phone: undefined,
       email: undefined,
       additionalInfo: undefined,
@@ -266,7 +266,7 @@ export default function CreateReservationForm({
         <Separator className="col-span-2" />
 
         {/* Reemplazar los campos separados de checkIn/checkOut con el nuevo componente */}
-        <div className="sm:col-span-2">
+        <div className="sm:col-span-2 space-y-2">
           <BookingCalendarTime form={form} roomId={roomId} onRoomAvailabilityChange={setIsRoomAvailable} />
           <CustomFormDescription
             required={FORMSTATICS.observations.required}
@@ -453,6 +453,13 @@ export default function CreateReservationForm({
                 <FormLabel>¿Acompañantes?</FormLabel>
                 <FormDescription>
                   Puede agregar mas acompañantes dependiendo de la capacidad del tipo de habitación que escoja.
+                  {selectedRoom?.RoomTypes?.guests && (
+                    <span>
+                      {" "}
+                      Puede agregar hasta{" "}
+                      <span className="text-base font-bold">{selectedRoom?.RoomTypes?.guests - 1}</span> acompañantes.
+                    </span>
+                  )}
                 </FormDescription>
               </div>
               <FormControl>
@@ -462,7 +469,7 @@ export default function CreateReservationForm({
           </div>
         )}
 
-        {(selectedRoom?.RoomTypes?.guests || allowGuests) && (
+        {allowGuests && selectedRoom?.RoomTypes?.guests && (
           <div className="flex flex-col gap-4 sm:col-span-2 animate-ease-in">
             <FormLabel>{FORMSTATICS.guests.label}</FormLabel>
             <Table className="w-full overflow-auto">

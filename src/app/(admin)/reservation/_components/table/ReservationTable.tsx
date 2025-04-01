@@ -30,6 +30,9 @@ export function ReservationTable({ data }: { data: DetailedReservation[] }) {
       filterPlaceholder="Buscar clientes..."
       facetedFilters={facetedFilters}
       renderExpandedRow={(row) => <ReservationAdditionalDetails row={row} />}
+      columnVisibilityConfig={{
+        reservationDate: false,
+      }}
     />
   );
 }
