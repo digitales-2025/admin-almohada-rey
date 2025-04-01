@@ -11,7 +11,7 @@ export const LIMA_TO_UTC_OFFSET = 5; // Diferencia horaria entre Lima y UTC
  */
 export function parsePeruTimeString(timeString: string): { hour: number; minutes: number } {
   const [time, period] = timeString.split(/(?=[AaPp][Mm])/);
-  console.log(`parsePeruTimeString: ${timeString} -> ${time}, ${period}`);
+  // console.log(`parsePeruTimeString: ${timeString} -> ${time}, ${period}`);
   const [hours, minutes] = time.split(":");
   let hour24 = parseInt(hours);
 
@@ -263,9 +263,20 @@ export function validateBookingDates(
 /**
  * Formatea una fecha ISO para mostrar como check-in/check-out
  * @param isoDate Fecha en formato ISO
- * @returns Fecha formateada para mostrar al usuario
+ * @returns Objeto con la fecha formateada en español y un objeto PeruDateTime
+ *         con la fecha y hora en formato de Perú
+ *         longLocaleDateString: Fecha larga en español
+ *        localeDateString: Fecha corta en español
+ *        customPeruDateTime: Objeto con fecha y hora en formato de Perú
+ *        {
+ *          date: "2023-03-28",
+ *         time: "03:00 PM",
+ *         displayDateTime: "28/03/2023, 03:00 PM"
+ *        }
+ *
  */
 export function formatPeruBookingDate(isoDate: string): {
+  longLocaleDateString: string;
   localeDateString: string;
   customPeruDateTime: PeruDateTime;
 } {
@@ -274,17 +285,31 @@ export function formatPeruBookingDate(isoDate: string): {
   // Formato: "Lunes, 28 de marzo de 2023 a las 3:00 PM"
   const date = new Date(isoDate);
 
+  const longLocaleDateString = date.toLocaleDateString("es-PE", {
+    timeZone: LIMA_TIME_ZONE,
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  const shortLocaleDateString = date.toLocaleDateString("es-PE", {
+    timeZone: LIMA_TIME_ZONE,
+    weekday: "short",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+
   return {
-    localeDateString: date.toLocaleDateString("es-PE", {
-      timeZone: LIMA_TIME_ZONE,
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    }),
+    longLocaleDateString,
+    localeDateString: shortLocaleDateString,
     customPeruDateTime: peruDate,
   };
 }
@@ -383,4 +408,71 @@ export function formatTimeToHHMMAMPM(date: Date): string {
     hour12: true,
     timeZone: LIMA_TIME_ZONE,
   });
+}
+
+/**
+ * Obtiene la fecha y hora actual en Perú (America/Lima, UTC-5)
+ * @param format Formato de salida deseado ('iso' | 'date' | 'time' | 'full' | 'object')
+ * @returns La fecha actual en Perú en el formato solicitado
+ */
+export function getCurrentPeruDateTime(
+  format: "iso" | "date" | "time" | "full" | "object" = "object"
+): string | PeruDateTime | Date {
+  // Obtener la fecha actual en UTC
+  const now = new Date();
+
+  // Obtener representación en zona horaria de Perú
+  const peruNow = new Date(now.toLocaleString("en-US", { timeZone: LIMA_TIME_ZONE }));
+
+  switch (format) {
+    case "iso":
+      // Formato ISO pero con la zona horaria de Perú
+      return now.toISOString();
+
+    case "date":
+      // Solo la fecha en formato yyyy-MM-dd
+      return peruNow.toISOString().split("T")[0];
+
+    case "time":
+      // Solo la hora en formato hh:mm AM/PM
+      return formatTimeToHHMMAMPM(peruNow);
+
+    case "full":
+      // Fecha y hora completa en formato localizado español
+      return peruNow.toLocaleString("es-PE", {
+        timeZone: LIMA_TIME_ZONE,
+        dateStyle: "full",
+        timeStyle: "short",
+      });
+
+    case "object":
+    default:
+      // Devolver el objeto PeruDateTime como se usa en otras funciones
+      return utcToPeruDateTime(now.toISOString());
+  }
+}
+
+// Obtener la fecha y hora actual de Perú como objeto
+export const peruNow = getCurrentPeruDateTime();
+// { date: "2025-03-31", time: "02:45 PM", displayDateTime: "31/03/2025, 02:45 PM" }
+
+// Obtener solo la fecha actual en formato yyyy-MM-dd
+export const todayDate = getCurrentPeruDateTime("date") as string;
+// "2025-03-31"
+
+// Obtener solo la hora actual en formato hh:mm AM/PM
+export const currentTime = getCurrentPeruDateTime("time") as string;
+// "02:45 PM"
+
+// Obtener representación completa
+export const fullDateTime = getCurrentPeruDateTime("full") as string;
+// "lunes, 31 de marzo de 2025, 14:45"
+
+/**
+ * Obtiene solo la fecha actual en Perú (sin hora) como objeto Date
+ * @returns Objeto Date configurado en la zona horaria de Lima al inicio del día
+ */
+export function getPeruStartOfToday(): Date {
+  const peruToday = new Date(getCurrentPeruDateTime("iso") as string);
+  return new Date(peruToday.getFullYear(), peruToday.getMonth(), peruToday.getDate(), 0, 0, 0, 0);
 }

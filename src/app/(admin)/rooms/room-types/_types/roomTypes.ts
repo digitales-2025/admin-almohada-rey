@@ -44,9 +44,9 @@ export type imagesRoomType = {
 };
 export interface RoomType extends RoomTypePrototype {
   id: string;
-  isActive?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
   name: string;
   guests: number;
   price: number;

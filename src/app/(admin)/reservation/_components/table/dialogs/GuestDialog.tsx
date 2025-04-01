@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +20,38 @@ import { ReservationCustomer, ReservationGuest, ReservationUser } from "../../..
 import { CustomerMetadata } from "./CustomerMetadata";
 import { GuestsTable } from "./GuestCardTable";
 import { CustomerMetadataMobile } from "./GuestMobileCommonMetadata";
+
+function AddInfoCard({ guests }: { guests: ReservationGuest[] }) {
+  if (!guests || guests.length === 0 || guests.every((guest) => !guest.additionalInfo)) {
+    return null;
+  }
+  const hasAdditionalInfo = guests.some((guest) => guest.additionalInfo !== undefined);
+  if (!hasAdditionalInfo) return null;
+  // const hasAdditionalInfoWithValue = guests.some((guest) => guest.additionalInfo !== undefined && guest.additionalInfo !== "" && Object.keys(guest.additionalInfo).length > 0);
+  // if (!hasAdditionalInfoWithValue) return null;
+  // const hasAdditionalInfoWithValueAndKeys = guests.some((guest) => guest.additionalInfo !== undefined && guest.additionalInfo !== "" && Object.keys(guest.additionalInfo).length > 0 && Object.keys(guest.additionalInfo).some((key) => guest.additionalInfo[key] !== undefined && guest.additionalInfo[key] !== "")
+  // if (!hasAdditionalInfoWithValueAndKeys) return null;
+  // const hasAdditionalInfoWithValueAndKeysAndValues = guests.some((guest) => guest.additionalInfo !== undefined && guest.additionalInfo !== "" && Object.keys(guest.additionalInfo).length > 0 && Object.keys(guest.additionalInfo).some((key) => guest.additionalInfo[key] !== undefined && guest.additionalInfo[key] !== "" && Object.keys(guest.additionalInfo[key]).length > 0)
+  // )
+  return (
+    <Card className="w-full mt-4">
+      <CardHeader>
+        <CardTitle className="text-primary flex space-x-2 items-center">
+          <Users></Users>
+          <span>Detalles adicionales</span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="overflow-auto space-y-3">
+        {guests.map((guest, idx) => (
+          <div key={guest?.documentId ?? idx} className="flex flex-col space-y-2">
+            <div className="text-sm text-muted-foreground">{guest.name}</div>
+            <p>{JSON.stringify(guest.additionalInfo, null, 2)}</p>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
 
 export function GuestsDetailsDialog({
   guests,
@@ -100,9 +133,9 @@ export function GuestsDetailsDialog({
             <CustomerMetadata data={customer}></CustomerMetadata>
           </DialogHeader>
           <div className="overflow-auto max-h-full space-y-3">
-            {/* <MovementsTable data={data}></MovementsTable> */}
             <GuestsTable data={guests}></GuestsTable>
           </div>
+          <AddInfoCard guests={guests}></AddInfoCard>
           <DialogFooter>
             <DialogFooterContent />
           </DialogFooter>
@@ -125,9 +158,9 @@ export function GuestsDetailsDialog({
           <CustomerMetadataMobile data={customer}></CustomerMetadataMobile>
         </DialogHeader>
         <div className="overflow-auto max-h-[calc(100dvh-12rem)] space-y-3">
-          {/* <MovementsTable data={data}></MovementsTable> */}
           <GuestsTable data={guests}></GuestsTable>
         </div>
+        <AddInfoCard guests={guests}></AddInfoCard>
         <DrawerFooter>
           <DialogFooterContent />
         </DrawerFooter>

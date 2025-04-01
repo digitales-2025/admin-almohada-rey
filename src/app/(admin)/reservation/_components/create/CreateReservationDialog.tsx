@@ -93,6 +93,8 @@ export function CreateReservationDialog() {
       checkInDate: checkIn,
       checkOutDate: checkOut,
       guests: [],
+      origin: "",
+      reason: "",
       observations: undefined,
     },
   });
@@ -124,6 +126,7 @@ export function CreateReservationDialog() {
   }
 
   const onSubmit = async (input: CreateReservationInput) => {
+    console.log("input", input);
     startCreateTransition(() => {
       onCreateReservation(input);
     });
