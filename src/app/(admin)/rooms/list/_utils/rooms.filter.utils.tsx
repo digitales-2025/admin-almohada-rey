@@ -1,7 +1,7 @@
 import { CheckCircle2, XCircle } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { RoomStatusLabels } from "./rooms.utils";
+import { getRoomTypeKey, RoomStatusLabels, RoomTypeLabels } from "./rooms.utils";
 
 // Componentes de icono con estilos integrados
 const ActiveIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -42,8 +42,8 @@ export const facetedFilters = [
   },
   {
     // Filtro para el estado civil generado dinámicamente
-    column: "E. Habitación",
-    title: "Estado Habitación",
+    column: "disponibilidad",
+    title: "Disponibilidad",
     options: Object.entries(RoomStatusLabels).map(([roomStatus, config]) => ({
       label: config.label,
       value: roomStatus,
@@ -51,3 +51,21 @@ export const facetedFilters = [
     })),
   },
 ];
+
+// Componente para renderizar el contenido personalizado de cada opción
+export interface RoomTypeOptionProps {
+  label: string;
+  className?: string;
+}
+
+export const RoomTypeOption = ({ label, className }: RoomTypeOptionProps) => {
+  const typeKey = getRoomTypeKey(label);
+  const { icon: Icon, className: iconClass } = RoomTypeLabels[typeKey];
+
+  return (
+    <div className="flex items-center gap-2">
+      <Icon className={`${iconClass} h-4 w-4`} />
+      <span className={`${className} text-sm`}>{label}</span>
+    </div>
+  );
+};

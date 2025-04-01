@@ -30,6 +30,14 @@ export type RoomTypes = {
 export enum RoomStatus {
   AVAILABLE = "AVAILABLE",
   OCCUPIED = "OCCUPIED",
-  RESERVED = "RESERVED",
   CLEANING = "CLEANING",
+}
+
+export interface CleaningChecklist {
+  trashBin: boolean;
+  towel: boolean;
+  toiletPaper: boolean;
+  showerSoap: boolean;
+  handSoap: boolean;
+  lamp: boolean;
 }

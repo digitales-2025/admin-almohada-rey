@@ -1,38 +1,6 @@
 import { ComplexFormStatics } from "@/types/statics/forms";
 import { CreateReservationInput, ReservationGuestDto } from "../_schemas/reservation.schemas";
 
-// export const createReservationSchema = z.object({
-//     customerId: z.string({
-//         required_error: "El cliente es requerido"
-//     }),
-//     roomId: z.string({
-//         required_error: "La habitación es requerida"
-//     }),
-//     userId: z.string({
-//         required_error: "El usuario es requerido"
-//     }),
-//     reservationDate: z.string({
-//         required_error: "La fecha de reserva es requerida"
-//     }),
-//     checkInDate: z.string({
-//         required_error: "La fecha de check-in es requerida"
-//     }),
-//     checkOutDate: z.string({
-//         required_error: "La fecha de check-out es requerida"
-//     }),
-//     status: z.enum(["PENDING", "CHECKED_IN", "CHECKED_OUT", "CANCELED"]),
-//     guests: z.array(z.object({
-//         name: z.string(),
-//         age: z.number().optional(),
-//         documentId: z.string().optional(),
-//         documentType: z.enum(["DNI", "PASSPORT", "FOREIGNER_CARD"]).optional(),
-//         phone: z.string().optional(),
-//         email: z.string().optional(),
-//         birthDate: z.string().optional(),
-//         additionalInfo: z.string().optional()
-//     })).optional(),
-//     observations: z.string().optional()
-// })
 export const FORMSTATICS: ComplexFormStatics<CreateReservationInput, ReservationGuestDto> = {
   customerId: {
     required: true,
@@ -89,9 +57,9 @@ export const FORMSTATICS: ComplexFormStatics<CreateReservationInput, Reservation
   },
   guests: {
     required: false,
-    label: "Huéspedes",
+    label: "Acompañantes",
     type: "array",
-    placeholder: "Huéspedes",
+    placeholder: "Acompañantes",
     name: "guests",
     subFields: {
       name: {
@@ -152,6 +120,20 @@ export const FORMSTATICS: ComplexFormStatics<CreateReservationInput, Reservation
         name: "additionalInfo",
       },
     },
+  },
+  origin: {
+    required: true,
+    label: "Lugar de Procedencia",
+    type: "text",
+    placeholder: "Lugar de Procedencia",
+    name: "origin",
+  },
+  reason: {
+    required: true,
+    label: "Motivo",
+    type: "text",
+    placeholder: "Motivo",
+    name: "reason",
   },
   observations: {
     required: false,

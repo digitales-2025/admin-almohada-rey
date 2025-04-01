@@ -85,7 +85,7 @@ export const sidebarData: SidebarData = {
         },
         {
           title: "Reservas",
-          url: "/bookings",
+          url: "/reservation",
           icon: CalendarCheck,
         },
         {

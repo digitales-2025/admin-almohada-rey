@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { Ellipsis, RefreshCcwDot, Trash } from "lucide-react";
+import { Ellipsis, RefreshCcwDot, Settings, Trash } from "lucide-react";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Room, RoomStatus } from "../../_types/room";
 import { getRoomTypeKey, RoomStatusLabels, RoomTypeLabels } from "../../_utils/rooms.utils";
+import { UpdateAvailabilityRoomsDialog } from "../availability-management/UpdateAvailabilityRoomsDialog";
+import { DeleteRoomsDialog } from "../state-management/DeleteRoomsDialog";
+import { ReactivateRoomsDialog } from "../state-management/ReactivateRoomsDialog";
+import { UpdateRoomSheet } from "../update/UpdateRoomsSheet";
 import { RoomNumberCell } from "./RoomNumberCell";
 import { RoomImageCell } from "./view-image/RoomImageViewer";
 
@@ -80,7 +84,7 @@ export const roomsColumns = (isSuperAdmin: boolean): ColumnDef<Room>[] => [
         <div className="min-w-40 truncate">
           <div className="flex items-center gap-1.5 font-light text-sm">
             <Icon className={`size-4 ${config.className}`} strokeWidth={1.5} />
-            <span className={config.className}>{roomType ? config.label : "No definido"}</span>
+            <span className="text-sm font-normal">{roomType ? config.label : "No definido"}</span>
           </div>
         </div>
       );
@@ -88,11 +92,11 @@ export const roomsColumns = (isSuperAdmin: boolean): ColumnDef<Room>[] => [
   },
 
   {
-    id: "E. Habitación",
+    id: "disponibilidad",
     accessorKey: "status",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="E. Habitación" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Disponibilidad" />,
     cell: ({ row }) => {
-      const roomStatus = row.getValue("E. Habitación") as RoomStatus;
+      const roomStatus = row.getValue("disponibilidad") as RoomStatus;
       const roomStatusConfig = RoomStatusLabels[roomStatus];
 
       if (!roomStatusConfig) return <div>No definido</div>;
@@ -167,13 +171,46 @@ export const roomsColumns = (isSuperAdmin: boolean): ColumnDef<Room>[] => [
       const [showDeleteDialog, setShowDeleteDialog] = useState(false);
       const [showReactivateDialog, setShowReactivateDialog] = useState(false);
       const [showEditDialog, setShowEditDialog] = useState(false);
-
-      console.log(showDeleteDialog, showEditDialog, showReactivateDialog);
+      const [showUpdateAvailabilityDialog, setShowUpdateAvailabilityDialog] = useState(false);
 
       const { isActive } = row.original;
       return (
         <div>
-          <div></div>
+          <div>
+            {showEditDialog && (
+              <UpdateRoomSheet open={showEditDialog} onOpenChange={setShowEditDialog} room={row?.original} />
+            )}
+
+            {showDeleteDialog && (
+              <DeleteRoomsDialog
+                open={showDeleteDialog}
+                onOpenChange={setShowDeleteDialog}
+                rooms={[row?.original]}
+                showTrigger={false}
+                onSuccess={() => {
+                  row.toggleSelected(false);
+                }}
+              />
+            )}
+            {showReactivateDialog && (
+              <ReactivateRoomsDialog
+                open={showReactivateDialog}
+                onOpenChange={setShowReactivateDialog}
+                rooms={[row?.original]}
+                showTrigger={false}
+                onSuccess={() => {
+                  row.toggleSelected(false);
+                }}
+              />
+            )}
+            {showUpdateAvailabilityDialog && (
+              <UpdateAvailabilityRoomsDialog
+                open={showUpdateAvailabilityDialog}
+                setOpen={setShowUpdateAvailabilityDialog}
+                room={row?.original}
+              />
+            )}
+          </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button aria-label="Open menu" variant="ghost" className="flex size-8 p-0 data-[state=open]:bg-muted">
@@ -185,6 +222,12 @@ export const roomsColumns = (isSuperAdmin: boolean): ColumnDef<Room>[] => [
                 Editar
               </DropdownMenuItem>
               <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => setShowUpdateAvailabilityDialog(true)} disabled={!isActive}>
+                Disponibilidad
+                <DropdownMenuShortcut>
+                  <Settings className="size-4" aria-hidden="true" />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
               {isSuperAdmin && (
                 <DropdownMenuItem onSelect={() => setShowReactivateDialog(true)} disabled={isActive}>
                   Reactivar

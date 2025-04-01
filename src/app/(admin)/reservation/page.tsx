@@ -4,6 +4,7 @@ import { toast } from "sonner";
 
 import { HeaderPage } from "@/components/common/HeaderPage";
 import ErrorGeneral from "@/components/errors/general-error";
+import { ReservationTable } from "./_components/table/ReservationTable";
 // import { ReservationTable } from "./_components/table/ReservationTable";
 import { useReservation } from "./_hooks/use-reservation";
 import { METADATA } from "./_statics/metadata";
@@ -44,9 +45,9 @@ export default function CustomersPage() {
 
   return (
     <div>
-      <HeaderPage title="Clientes" description="Clientes registrados en el sistema." />
+      <HeaderPage title={METADATA.entityPluralName} description={METADATA.description} />
       <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0">
-        {/* <ReservationTable data={response.data} /> */}
+        <ReservationTable data={response.data} />
       </div>
     </div>
   );

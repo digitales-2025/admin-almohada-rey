@@ -101,7 +101,7 @@ export const ReactivateCustomersDialog = ({
           <DrawerTitle>¿Estás absolutamente seguro?</DrawerTitle>
           <DrawerDescription>
             Esta acción reactivará a<span className="font-medium">{customers.length}</span>
-            {customers.length === 1 ? " usuario" : " usuarios"}
+            {customers.length === 1 ? " cliente" : " clientes"}
           </DrawerDescription>
         </DrawerHeader>
         <DrawerFooter className="gap-2 sm:space-x-0">

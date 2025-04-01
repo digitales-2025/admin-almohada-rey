@@ -1,4 +1,10 @@
-import { GetOneResponse, GetResponse, MutationListResponse, MutationResponse } from "@/types/api/actions-crud";
+import {
+  GetOneResponse,
+  GetResponse,
+  MutationListResponse,
+  MutationResponse,
+  SearchByField,
+} from "@/types/api/actions-crud";
 
 export type RequestUri = string;
 
@@ -6,6 +12,8 @@ export interface ActionServerOperation<T> {
   get<V = T>(uri: RequestUri): Promise<GetResponse<V>>;
 
   getOne<V = T>(uri: RequestUri): Promise<GetOneResponse<V>>;
+
+  searchByFieldCoincidence<V = T>(uri: RequestUri, field: keyof V, value: string): Promise<SearchByField<V>>;
 
   create<V = T>(uri: RequestUri, dto?: BodyInit | object): Promise<MutationResponse<V>>;
 
