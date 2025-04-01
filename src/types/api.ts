@@ -387,6 +387,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/reservation/check-availability": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Verificar disponibilidad de habitación */
+    get: operations["ReservationController_checkAvailability_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v1/reservation/{id}": {
     parameters: {
       query?: never;
@@ -400,23 +417,6 @@ export interface paths {
     post?: never;
     /** Delete a reservation */
     delete: operations["ReservationController_remove_v1"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v1/reservation/check-availability": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Verificar disponibilidad de habitación */
-    get: operations["ReservationController_checkAvailability_v1"];
-    put?: never;
-    post?: never;
-    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -973,13 +973,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-03-31T20:39:37.894Z
+       * @example 2025-04-01T14:43:57.531Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-03-31T20:39:37.894Z
+       * @example 2025-04-01T14:43:57.531Z
        */
       updatedAt: string;
       /** @description Customer name */
@@ -1034,13 +1034,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-03-31T20:39:37.894Z
+       * @example 2025-04-01T14:43:57.531Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-03-31T20:39:37.894Z
+       * @example 2025-04-01T14:43:57.531Z
        */
       updatedAt: string;
       /** @description User name */
@@ -1083,13 +1083,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-03-31T20:39:37.894Z
+       * @example 2025-04-01T14:43:57.531Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-03-31T20:39:37.894Z
+       * @example 2025-04-01T14:43:57.531Z
        */
       updatedAt: string;
       /**
@@ -1148,13 +1148,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-03-31T20:39:37.894Z
+       * @example 2025-04-01T14:43:57.531Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-03-31T20:39:37.894Z
+       * @example 2025-04-01T14:43:57.531Z
        */
       updatedAt: string;
       /**
@@ -1227,13 +1227,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-03-31T20:39:37.894Z
+       * @example 2025-04-01T14:43:57.531Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-03-31T20:39:37.894Z
+       * @example 2025-04-01T14:43:57.531Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -1302,7 +1302,7 @@ export interface components {
        */
       birthDate?: string;
       /** @description Additional information about the guest */
-      additionalInfo?: Record<string, never>;
+      additionalInfo?: string;
     };
     GuestDto: {
       /** @description Guest full name */
@@ -1382,13 +1382,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-03-31T20:39:37.894Z
+       * @example 2025-04-01T14:43:57.531Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-03-31T20:39:37.894Z
+       * @example 2025-04-01T14:43:57.531Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -1506,13 +1506,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-03-31T20:39:37.894Z
+       * @example 2025-04-01T14:43:57.531Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-03-31T20:39:37.894Z
+       * @example 2025-04-01T14:43:57.531Z
        */
       updatedAt: string;
       /**
@@ -1869,13 +1869,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-03-31T20:39:37.894Z
+       * @example 2025-04-01T14:43:57.531Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-03-31T20:39:37.894Z
+       * @example 2025-04-01T14:43:57.531Z
        */
       updatedAt: string;
       /**
@@ -2999,6 +2999,47 @@ export interface operations {
       };
     };
   };
+  ReservationController_checkAvailability_v1: {
+    parameters: {
+      query: {
+        /** @description ID de la habitación */
+        roomId: string;
+        /** @description Fecha de check-in en formato ISO */
+        checkInDate: string;
+        /** @description Fecha de check-out en formato ISO */
+        checkOutDate: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Información de disponibilidad de la habitación */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RoomAvailabilityDto"];
+        };
+      };
+      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   ReservationController_findOne_v1: {
     parameters: {
       query?: never;
@@ -3054,47 +3095,6 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
-      };
-      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Unauthorized - No autorizado para realizar esta operación */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ReservationController_checkAvailability_v1: {
-    parameters: {
-      query: {
-        /** @description ID de la habitación */
-        roomId: string;
-        /** @description Fecha de check-in en formato ISO */
-        checkInDate: string;
-        /** @description Fecha de check-out en formato ISO */
-        checkOutDate: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Información de disponibilidad de la habitación */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["RoomAvailabilityDto"];
-        };
       };
       /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
       400: {

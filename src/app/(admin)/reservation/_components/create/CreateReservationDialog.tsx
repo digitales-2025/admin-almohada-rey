@@ -126,6 +126,7 @@ export function CreateReservationDialog() {
   }
 
   const onSubmit = async (input: CreateReservationInput) => {
+    console.log("input", input);
     startCreateTransition(() => {
       onCreateReservation(input);
     });

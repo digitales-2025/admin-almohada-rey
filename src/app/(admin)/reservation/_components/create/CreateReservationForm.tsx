@@ -49,7 +49,7 @@ export default function CreateReservationForm({
   controlledFieldArray,
 }: CreateReservationFormProps) {
   // const { dataRoomsAll } = useRooms();
-  const [allowGuests, setAllowGuests] = useState(false);
+  const [allowGuests, setAllowGuests] = useState(true);
   const [selectedRoom, setSelectedRoom] = useState<DetailedRoom | undefined>(undefined);
   const [guestNumber, setGuestNumber] = useState<number>(0);
   const [isRoomAvailable, setIsRoomAvailable] = useState(true);
@@ -71,6 +71,9 @@ export default function CreateReservationForm({
     };
   });
 
+  const defaultOriginalCheckInDate = useRef(form.getValues("checkInDate"));
+  const defaultOriginalCheckOutDate = useRef(form.getValues("checkOutDate"));
+
   const checkInDate = watch("checkInDate");
   const checkOutDate = watch("checkOutDate");
   const roomId = watch("roomId");
@@ -87,8 +90,8 @@ export default function CreateReservationForm({
   // 1. Referencia para almacenar el último valor verificado
   const lastCheckedRef = useRef({
     roomId: "",
-    checkInDate: "",
-    checkOutDate: "",
+    checkInDate: defaultOriginalCheckInDate.current,
+    checkOutDate: defaultOriginalCheckOutDate.current,
   });
 
   // 2. Estado para rastrear si está en proceso de verificación
@@ -96,8 +99,8 @@ export default function CreateReservationForm({
 
   // 3. Memoizar la función de verificación de disponibilidad
   const memoizedCheckAvailability = useCallback(() => {
-    // Solo verificar si hay un ID de habitación
-    if (!roomId) return;
+    // // Solo verificar si hay un ID de habitación
+    // if (!roomId) return;
 
     // Si ya está verificando, no iniciar otra verificación
     if (isChecking) return;
@@ -120,6 +123,8 @@ export default function CreateReservationForm({
       checkInDate,
       checkOutDate,
     };
+
+    // console.log("Verificando disponibilidad para fechas:", { checkInDate, checkOutDate });
 
     // Realizar la verificación después de un pequeño retraso
     setTimeout(() => {
@@ -158,10 +163,11 @@ export default function CreateReservationForm({
     availableRooms?.map((room) => {
       const roomNumber = room.number ?? "Sin número";
       const roomType = room.RoomTypes?.name.toUpperCase() ?? "Sin tipo";
-      const roomPrice = room.RoomTypes.price ?? 0;
+      const roomPrice = room.RoomTypes?.price ?? 0;
+      const roomCapacity = room.RoomTypes?.guests ?? 0;
 
       return {
-        label: `${roomNumber} - ${roomType} - ${roomPrice.toLocaleString("es-PE", {
+        label: `${roomNumber} - ${roomType} ( ${roomCapacity}🧍) - ${roomPrice.toLocaleString("es-PE", {
           style: "currency",
           currency: "PEN",
         })}`,
@@ -440,19 +446,21 @@ export default function CreateReservationForm({
 
         <Separator className="col-span-2" />
 
-        <div className="space-y-4 sm:col-span-2">
-          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-            <div className="space-y-0.5">
-              <FormLabel>¿Acompañantes?</FormLabel>
-              <FormDescription>
-                Puede agregar mas acompañantes dependiendo de la capacidad del tipo de habitación que escoja.
-              </FormDescription>
-            </div>
-            <FormControl>
-              <Switch checked={allowGuests} onCheckedChange={setAllowGuests} />
-            </FormControl>
-          </FormItem>
-        </div>
+        {selectedRoom?.RoomTypes?.guests && (
+          <div className="space-y-4 sm:col-span-2">
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+              <div className="space-y-0.5">
+                <FormLabel>¿Acompañantes?</FormLabel>
+                <FormDescription>
+                  Puede agregar mas acompañantes dependiendo de la capacidad del tipo de habitación que escoja.
+                </FormDescription>
+              </div>
+              <FormControl>
+                <Switch checked={allowGuests} onCheckedChange={setAllowGuests} />
+              </FormControl>
+            </FormItem>
+          </div>
+        )}
 
         {(selectedRoom?.RoomTypes?.guests || allowGuests) && (
           <div className="flex flex-col gap-4 sm:col-span-2 animate-ease-in">
@@ -658,7 +666,9 @@ export default function CreateReservationForm({
                         <FormItem>
                           <Textarea
                             className="min-w-[100px] w-full"
-                            {...register(`guests.${index}.additionalInfo` as const)}
+                            {...register(`guests.${index}.additionalInfo` as const, {
+                              setValueAs: (v) => (v === "" ? undefined : String(v)),
+                            })}
                           />
                           <CustomFormDescription
                             required={FORMSTATICS.guests.subFields?.additionalInfo.required ?? false}
@@ -691,7 +701,7 @@ export default function CreateReservationForm({
               <Button
                 variant={"outline"}
                 disabled={
-                  selectedRoom?.RoomTypes?.guests && guestNumber >= selectedRoom?.RoomTypes?.guests ? true : false
+                  selectedRoom?.RoomTypes?.guests && guestNumber >= selectedRoom?.RoomTypes?.guests - 1 ? true : false
                 }
                 type="button"
                 onClick={handleAddGuest}
@@ -703,7 +713,8 @@ export default function CreateReservationForm({
                   <div>
                     {"("}
                     <span className="text-primary text-base font-bold">
-                      {selectedRoom?.RoomTypes?.guests - guestNumber}
+                      {/* -1 beacause of the current guest who is making the reservation */}
+                      {selectedRoom?.RoomTypes?.guests - 1 - guestNumber}
                     </span>{" "}
                     lugar{selectedRoom?.RoomTypes?.guests > 1 ? "es" : ""} restante
                     {selectedRoom?.RoomTypes?.guests > 1 ? "s" : ""}

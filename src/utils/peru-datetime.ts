@@ -11,7 +11,7 @@ export const LIMA_TO_UTC_OFFSET = 5; // Diferencia horaria entre Lima y UTC
  */
 export function parsePeruTimeString(timeString: string): { hour: number; minutes: number } {
   const [time, period] = timeString.split(/(?=[AaPp][Mm])/);
-  console.log(`parsePeruTimeString: ${timeString} -> ${time}, ${period}`);
+  // console.log(`parsePeruTimeString: ${timeString} -> ${time}, ${period}`);
   const [hours, minutes] = time.split(":");
   let hour24 = parseInt(hours);
 
@@ -263,9 +263,20 @@ export function validateBookingDates(
 /**
  * Formatea una fecha ISO para mostrar como check-in/check-out
  * @param isoDate Fecha en formato ISO
- * @returns Fecha formateada para mostrar al usuario
+ * @returns Objeto con la fecha formateada en español y un objeto PeruDateTime
+ *         con la fecha y hora en formato de Perú
+ *         longLocaleDateString: Fecha larga en español
+ *        localeDateString: Fecha corta en español
+ *        customPeruDateTime: Objeto con fecha y hora en formato de Perú
+ *        {
+ *          date: "2023-03-28",
+ *         time: "03:00 PM",
+ *         displayDateTime: "28/03/2023, 03:00 PM"
+ *        }
+ *
  */
 export function formatPeruBookingDate(isoDate: string): {
+  longLocaleDateString: string;
   localeDateString: string;
   customPeruDateTime: PeruDateTime;
 } {
@@ -274,17 +285,31 @@ export function formatPeruBookingDate(isoDate: string): {
   // Formato: "Lunes, 28 de marzo de 2023 a las 3:00 PM"
   const date = new Date(isoDate);
 
+  const longLocaleDateString = date.toLocaleDateString("es-PE", {
+    timeZone: LIMA_TIME_ZONE,
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  const shortLocaleDateString = date.toLocaleDateString("es-PE", {
+    timeZone: LIMA_TIME_ZONE,
+    weekday: "short",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+
   return {
-    localeDateString: date.toLocaleDateString("es-PE", {
-      timeZone: LIMA_TIME_ZONE,
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    }),
+    longLocaleDateString,
+    localeDateString: shortLocaleDateString,
     customPeruDateTime: peruDate,
   };
 }
