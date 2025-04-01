@@ -21,12 +21,23 @@ export function CustomFormDescription({
   ...props
 }: CustomFormDescriptionProps) {
   const OPTIONAL_MESSAGE = "Opcional";
-  const LOCAL_MESSAGE = validateOptionalField ? OPTIONAL_MESSAGE : REQUIRED_MESSAGE;
+
+  // Definimos qué mensaje mostrar y si mostrarlo
+  let messageToShow = null;
+
+  if (validateOptionalField && !required) {
+    // Si estamos validando campo opcional, siempre mostramos "Opcional"
+    messageToShow = OPTIONAL_MESSAGE;
+  } else if (required && !validateOptionalField) {
+    // Si no estamos validando campo opcional y es requerido, mostramos "Requerido"
+    messageToShow = REQUIRED_MESSAGE;
+  }
   return (
     <>
       {showMessage && (
         <FormDescription className={className} {...props}>
-          {required && !validateOptionalField && <span className="block">{LOCAL_MESSAGE}</span>}
+          {/* Esta es la línea clave: mostrar el mensaje si es requerido o si es opcional */}
+          {messageToShow && <span className="block">{messageToShow}</span>}
           {description && <span className="block">{description}</span>}
           {children && children}
         </FormDescription>

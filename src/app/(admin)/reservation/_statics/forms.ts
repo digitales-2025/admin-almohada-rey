@@ -89,9 +89,9 @@ export const FORMSTATICS: ComplexFormStatics<CreateReservationInput, Reservation
   },
   guests: {
     required: false,
-    label: "Huéspedes",
+    label: "Acompañantes",
     type: "array",
-    placeholder: "Huéspedes",
+    placeholder: "Acompañantes",
     name: "guests",
     subFields: {
       name: {
@@ -152,6 +152,20 @@ export const FORMSTATICS: ComplexFormStatics<CreateReservationInput, Reservation
         name: "additionalInfo",
       },
     },
+  },
+  origin: {
+    required: true,
+    label: "Lugar de Origen",
+    type: "text",
+    placeholder: "Lugar de Origen",
+    name: "origin",
+  },
+  reason: {
+    required: true,
+    label: "Motivo",
+    type: "text",
+    placeholder: "Motivo",
+    name: "reason",
   },
   observations: {
     required: false,

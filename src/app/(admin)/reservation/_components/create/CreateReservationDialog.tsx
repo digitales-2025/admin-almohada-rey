@@ -93,6 +93,8 @@ export function CreateReservationDialog() {
       checkInDate: checkIn,
       checkOutDate: checkOut,
       guests: [],
+      origin: "",
+      reason: "",
       observations: undefined,
     },
   });

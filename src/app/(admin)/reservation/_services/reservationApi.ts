@@ -7,10 +7,11 @@ import baseQueryWithReauth from "@/utils/baseQuery";
 import {
   CreateReservationInput,
   DetailedReservation,
+  DetailedRoom,
   Reservation,
   RoomAvailabilityDto,
 } from "../_schemas/reservation.schemas";
-import { AvailabilityParams } from "../_types/room-availability-query-params";
+import { AvailabilityParams, GenericAvailabilityParams } from "../_types/room-availability-query-params";
 
 type CreateReservationReduxResponse = BaseApiResponse<Reservation>;
 
@@ -70,12 +71,46 @@ export const reservationApi = createApi({
         ...(result?.data?.map(({ id }) => ({ type: "Reservation" as const, id })) ?? []),
       ],
     }),
+    //Obtener todas las reservaciones paginadas
+    getReservationsInTimeInterval: build.query<DetailedReservation[], GenericAvailabilityParams>({
+      query: ({ checkInDate, checkOutDate }) => ({
+        url: `/reservation/reservations-in-interval`,
+        method: "GET",
+        params: { checkInDate, checkOutDate },
+        credentials: "include",
+      }),
+      providesTags: (result) =>
+        result
+          ? [
+              { type: "Reservation", id: "TIME_INTERVAL" },
+              ...(result.map(({ id }) => ({ type: "Reservation" as const, id })) || []),
+            ]
+          : [{ type: "Reservation", id: "TIME_INTERVAL" }],
+    }),
+    //Obtener todas las habitaciones disponibles en reservaciones
+    getAllAvailableRooms: build.query<DetailedRoom[], GenericAvailabilityParams>({
+      query: ({ checkInDate, checkOutDate }) => {
+        // console.log("checkInDate", checkInDate);
+        // console.log("checkOutDate", checkOutDate);
+        return {
+          url: `/reservation/available-rooms`,
+          method: "GET",
+          params: { checkInDate, checkOutDate },
+          credentials: "include",
+        };
+      },
+    }),
     //Check room availability
     getRoomAvailability: build.query<RoomAvailabilityDto, AvailabilityParams>({
-      query: (params) => ({
+      query: ({ roomId, checkInDate, checkOutDate }) => ({
         url: "/reservation/check-availability",
         method: "GET",
-        params,
+        params: {
+          roomId,
+          checkInDate,
+          checkOutDate,
+        },
+        credentials: "include",
       }),
     }),
     //Eliminar reservaciones
@@ -107,4 +142,6 @@ export const {
   useGetAllReservationsQuery,
   useGetPaginatedReservationsQuery,
   useGetRoomAvailabilityQuery,
+  useGetAllAvailableRoomsQuery,
+  useGetReservationsInTimeIntervalQuery,
 } = reservationApi;

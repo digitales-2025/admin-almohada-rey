@@ -20,10 +20,22 @@ function CalendarBig({
   showAvailableDays,
   availableDays,
   onMonthChange,
+  disabled,
   ...props
 }: CalendarProps & { onMonthChange?: (date: Date) => void }) {
   const isDayAvailable = (date: Date) => {
-    return showAvailableDays ? (availableDays || []).some((availableDate) => isSameDay(availableDate, date)) : true;
+    const isAvailable = showAvailableDays
+      ? (availableDays || []).some((availableDate) => isSameDay(availableDate, date))
+      : true;
+
+    // Check if the parent disabled function makes this day disabled
+    if (typeof disabled === "function") {
+      return isAvailable && !disabled(date);
+    } else if (disabled === true) {
+      return false;
+    }
+
+    return isAvailable;
   };
 
   return (
