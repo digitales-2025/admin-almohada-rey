@@ -14,6 +14,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
@@ -28,8 +29,7 @@ import { GuestsDetailsDialog } from "./dialogs/GuestDialog";
  * @param isSuperAdmin Valor si el usuario es super administrador
  * @returns Columnas de la tabla de usuarios
  */
-export const reservationColumns = () // isSuperAdmin: boolean
-: ColumnDef<DetailedReservation>[] => [
+export const reservationColumns = (): ColumnDef<DetailedReservation>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -309,7 +309,7 @@ export const reservationColumns = () // isSuperAdmin: boolean
 
   {
     id: "expand", // Nueva columna para expansión
-    header: () => <span>Detalles</span>, // No mostrar un título en el header
+    header: () => null, // No mostrar un título en el header
     cell: ({ row }) => (
       <Button
         onClick={() => row.toggleExpanded()} // Alternar la expansión de la fila
@@ -331,8 +331,7 @@ export const reservationColumns = () // isSuperAdmin: boolean
 
   {
     id: "actions",
-    cell: function Cell() {
-      // { row }
+    cell: function Cell({ row }) {
       //   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
       //   const [showReactivateDialog, setShowReactivateDialog] = useState(false);
       //   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -348,7 +347,11 @@ export const reservationColumns = () // isSuperAdmin: boolean
             )}
             */}
             {showCreatePaymentDialog && (
-              <CreatePaymentDialog open={showCreatePaymentDialog} setOpen={setShowCreatePaymentDialog} />
+              <CreatePaymentDialog
+                open={showCreatePaymentDialog}
+                setOpen={setShowCreatePaymentDialog}
+                reservation={row.original}
+              />
             )}
 
             {/* 
@@ -389,9 +392,9 @@ export const reservationColumns = () // isSuperAdmin: boolean
 
               <DropdownMenuItem onSelect={() => setShowCreatePaymentDialog(true)}>
                 Crear Pago
-                <DropdownMenuTrigger>
+                <DropdownMenuShortcut>
                   <HandCoins className="size-4" aria-hidden="true" />
-                </DropdownMenuTrigger>
+                </DropdownMenuShortcut>
               </DropdownMenuItem>
 
               {/*               {isSuperAdmin && (
