@@ -1,4 +1,4 @@
-import { CreditCardIcon, Hotel, Receipt } from "lucide-react";
+import { CreditCardIcon, Hotel, Info } from "lucide-react";
 
 interface PaymentHeaderProps {
   step: number;
@@ -9,11 +9,11 @@ export const PaymentHeader = ({ step }: PaymentHeaderProps) => (
     <div className="flex items-center space-x-2">
       {step === 1 && <Hotel className="h-5 w-5 text-primary shrink-0" />}
       {step === 2 && <CreditCardIcon className="h-5 w-5 text-primary shrink-0" />}
-      {step === 3 && <Receipt className="h-5 w-5 text-primary shrink-0" />}
+      {step === 3 && <Info className="h-5 w-5 text-primary shrink-0" />}
       <div className="text-2xl font-bold">
         {step === 1 && "Habitación y Servicios Extra"}
         {step === 2 && "Método de Pago"}
-        {step === 3 && "Confirmación"}
+        {step === 3 && "Resumen"}
       </div>
     </div>
     <div className="pt-2 text-sm text-muted-foreground">
