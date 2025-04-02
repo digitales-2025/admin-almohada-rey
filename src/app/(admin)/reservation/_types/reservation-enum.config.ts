@@ -13,6 +13,15 @@ export const reservationStatusConfig: Record<ReservationStatus, EnumConfig> = {
     hoverBorderColor: "hover:border-[#F57C00]",
     icon: Clock,
   },
+  CONFIRMED: {
+    name: "Confirmado",
+    backgroundColor: "bg-[#E3F2FD]",
+    textColor: "text-[#1976D2]",
+    hoverBgColor: "hover:bg-[#BBDEFB]",
+    borderColor: "border-[#1976D2]",
+    hoverBorderColor: "hover:border-[#1976D2]",
+    icon: CalendarPlus,
+  },
   CHECKED_IN: {
     name: "Check-in",
     backgroundColor: "bg-[#E8F5E9]",
