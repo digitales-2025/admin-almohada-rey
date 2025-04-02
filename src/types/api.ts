@@ -717,6 +717,41 @@ export interface paths {
     patch: operations["PaymentsController_update_v1"];
     trace?: never;
   };
+  "/v1/services": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Obtener todos los servicios */
+    get: operations["ServiceController_findAll_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/services/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Obtener servicio por ID */
+    get: operations["ServiceController_findOne_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Actualizar servicio existente */
+    patch: operations["ServiceController_update_v1"];
+    trace?: never;
+  };
   "/v1/seeds": {
     parameters: {
       query?: never;
@@ -906,41 +941,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/v1/services": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Obtener todos los servicios */
-    get: operations["ServiceController_findAll_v1"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v1/services/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Obtener servicio por ID */
-    get: operations["ServiceController_findOne_v1"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Actualizar servicio existente */
-    patch: operations["ServiceController_update_v1"];
-    trace?: never;
-  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1058,13 +1058,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-01T20:37:57.620Z
+       * @example 2025-04-02T17:39:34.249Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-01T20:37:57.620Z
+       * @example 2025-04-02T17:39:34.249Z
        */
       updatedAt: string;
       /** @description Customer name */
@@ -1119,13 +1119,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-01T20:37:57.620Z
+       * @example 2025-04-02T17:39:34.249Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-01T20:37:57.620Z
+       * @example 2025-04-02T17:39:34.249Z
        */
       updatedAt: string;
       /** @description User name */
@@ -1168,13 +1168,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-01T20:37:57.620Z
+       * @example 2025-04-02T17:39:34.249Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-01T20:37:57.620Z
+       * @example 2025-04-02T17:39:34.249Z
        */
       updatedAt: string;
       /**
@@ -1233,13 +1233,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-01T20:37:57.620Z
+       * @example 2025-04-02T17:39:34.249Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-01T20:37:57.620Z
+       * @example 2025-04-02T17:39:34.249Z
        */
       updatedAt: string;
       /**
@@ -1312,13 +1312,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-04-01T20:37:57.620Z
+       * @example 2025-04-02T17:39:34.249Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-04-01T20:37:57.620Z
+       * @example 2025-04-02T17:39:34.249Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -1349,7 +1349,7 @@ export interface components {
        * @description Current status of the reservation
        * @enum {string}
        */
-      status: "PENDING" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELED";
+      status: "PENDING" | "CONFIRMED" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELED";
       /** @description Origin place from the customer */
       origin: string;
       /** @description Reason for reservation */
@@ -1442,7 +1442,7 @@ export interface components {
        * @description Reservation status
        * @enum {string}
        */
-      status: "PENDING" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELED";
+      status: "PENDING" | "CONFIRMED" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELED";
       /** @description Origin place from the customer */
       origin: string;
       /** @description Reason for reservation */
@@ -1467,13 +1467,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-04-01T20:37:57.620Z
+       * @example 2025-04-02T17:39:34.249Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-04-01T20:37:57.620Z
+       * @example 2025-04-02T17:39:34.249Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -1504,7 +1504,7 @@ export interface components {
        * @description Current status of the reservation
        * @enum {string}
        */
-      status: "PENDING" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELED";
+      status: "PENDING" | "CONFIRMED" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELED";
       /** @description Origin place from the customer */
       origin: string;
       /** @description Reason for reservation */
@@ -1591,13 +1591,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-01T20:37:57.620Z
+       * @example 2025-04-02T17:39:34.249Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-01T20:37:57.620Z
+       * @example 2025-04-02T17:39:34.249Z
        */
       updatedAt: string;
       /**
@@ -1908,6 +1908,51 @@ export interface components {
        */
       paymentDetail?: string[];
     };
+    Service: {
+      /**
+       * @description Unique identifier for the entity
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      id: string;
+      /**
+       * @description Indicates whether the entity is active or not
+       * @example true
+       */
+      isActive: boolean;
+      /**
+       * Format: date-time
+       * @description Timestamp when the entity was created
+       * @example 2025-04-02T17:39:34.249Z
+       */
+      createdAt: string;
+      /**
+       * Format: date-time
+       * @description Timestamp when the entity was last updated
+       * @example 2025-04-02T17:39:34.249Z
+       */
+      updatedAt: string;
+      name: string;
+      description: string;
+      code: string;
+      price: number;
+    };
+    ServiceUpdateDto: {
+      /**
+       * @description Nombre del servicio
+       * @example Desayuno buffet
+       */
+      name?: string;
+      /**
+       * @description Descripción detallada del servicio
+       * @example Desayuno completo con variedad de alimentos, incluye bebidas calientes y frías
+       */
+      description?: string;
+      /**
+       * @description Precio del servicio en moneda local
+       * @example 15.99
+       */
+      price?: number;
+    };
     CreateCustomerDto: {
       /** @description Nombre del cliente */
       name: string;
@@ -2022,13 +2067,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-01T20:37:57.620Z
+       * @example 2025-04-02T17:39:34.249Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-01T20:37:57.620Z
+       * @example 2025-04-02T17:39:34.249Z
        */
       updatedAt: string;
       /**
@@ -2056,51 +2101,6 @@ export interface components {
        * @example Se reemplazaron las toallas y se repuso el jabón
        */
       observations?: string | null;
-    };
-    Service: {
-      /**
-       * @description Unique identifier for the entity
-       * @example 123e4567-e89b-12d3-a456-426614174000
-       */
-      id: string;
-      /**
-       * @description Indicates whether the entity is active or not
-       * @example true
-       */
-      isActive: boolean;
-      /**
-       * Format: date-time
-       * @description Timestamp when the entity was created
-       * @example 2025-04-01T20:37:57.620Z
-       */
-      createdAt: string;
-      /**
-       * Format: date-time
-       * @description Timestamp when the entity was last updated
-       * @example 2025-04-01T20:37:57.620Z
-       */
-      updatedAt: string;
-      name: string;
-      description: string;
-      code: string;
-      price: number;
-    };
-    ServiceUpdateDto: {
-      /**
-       * @description Nombre del servicio
-       * @example Desayuno buffet
-       */
-      name?: string;
-      /**
-       * @description Descripción detallada del servicio
-       * @example Desayuno completo con variedad de alimentos, incluye bebidas calientes y frías
-       */
-      description?: string;
-      /**
-       * @description Precio del servicio en moneda local
-       * @example 15.99
-       */
-      price?: number;
     };
   };
   responses: never;
@@ -4179,6 +4179,124 @@ export interface operations {
       };
     };
   };
+  ServiceController_findAll_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Lista de todos los servicios */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Service"][];
+        };
+      };
+      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ServiceController_findOne_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description ID del servicio */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Servicio encontrado */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Service"];
+        };
+      };
+      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Servicio no encontrado */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ServiceController_update_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ServiceUpdateDto"];
+      };
+    };
+    responses: {
+      /** @description Servicio actualizado exitosamente */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BaseApiResponse"];
+        };
+      };
+      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   SeedsController_initSeed_v1: {
     parameters: {
       query?: never;
@@ -4706,124 +4824,6 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["CleaningChecklist"][];
-        };
-      };
-      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Unauthorized - No autorizado para realizar esta operación */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ServiceController_findAll_v1: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Lista de todos los servicios */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Service"][];
-        };
-      };
-      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Unauthorized - No autorizado para realizar esta operación */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ServiceController_findOne_v1: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description ID del servicio */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Servicio encontrado */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Service"];
-        };
-      };
-      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Unauthorized - No autorizado para realizar esta operación */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Servicio no encontrado */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ServiceController_update_v1: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ServiceUpdateDto"];
-      };
-    };
-    responses: {
-      /** @description Servicio actualizado exitosamente */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["BaseApiResponse"];
         };
       };
       /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
