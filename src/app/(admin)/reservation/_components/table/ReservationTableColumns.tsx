@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 import { ChevronDown, ChevronRight, Ellipsis } from "lucide-react";
 import { toast } from "sonner";
@@ -9,11 +9,17 @@ import { DataTableColumnHeader } from "@/components/datatable/data-table-column-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { formatPeruBookingDate } from "@/utils/peru-datetime";
 import { DetailedReservation, ReservationGuest } from "../../_schemas/reservation.schemas";
 import { reservationStatusConfig } from "../../_types/reservation-enum.config";
+import { UpdateReservationSheet } from "../update/UpdateReservationSheet";
 import { GuestsDetailsDialog } from "./dialogs/GuestDialog";
 
 /**
@@ -324,21 +330,25 @@ export const reservationColumns = () // isSuperAdmin: boolean
 
   {
     id: "actions",
-    cell: function Cell() {
+    cell: function Cell({ row }) {
       // { row }
       //   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
       //   const [showReactivateDialog, setShowReactivateDialog] = useState(false);
-      //   const [showEditDialog, setShowEditDialog] = useState(false);
+      const [showEditDialog, setShowEditDialog] = useState(false);
 
-      // const { isActive } = row.original;
+      const { isActive } = row.original;
       return (
         <div>
           <div>
-            {/* {showEditDialog && (
-              <UpdateCustomerSheet open={showEditDialog} onOpenChange={setShowEditDialog} customer={row?.original} />
+            {showEditDialog && (
+              <UpdateReservationSheet
+                open={showEditDialog}
+                onOpenChange={setShowEditDialog}
+                reservation={row?.original}
+              />
             )}
 
-            {showDeleteDialog && (
+            {/* {showDeleteDialog && (
               <DeleteCustomersDialog
                 open={showDeleteDialog}
                 onOpenChange={setShowDeleteDialog}
@@ -368,10 +378,10 @@ export const reservationColumns = () // isSuperAdmin: boolean
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
-              {/* <DropdownMenuItem onSelect={() => setShowEditDialog(true)} disabled={!isActive}>
+              <DropdownMenuItem onSelect={() => setShowEditDialog(true)} disabled={!isActive}>
                 Editar
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
+              {/* <DropdownMenuSeparator />
               {isSuperAdmin && (
                 <DropdownMenuItem onSelect={() => setShowReactivateDialog(true)} disabled={isActive}>
                   Reactivar

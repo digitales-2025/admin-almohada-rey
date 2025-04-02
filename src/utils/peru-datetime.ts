@@ -173,6 +173,26 @@ export function createPeruBookingDateTime(
 }
 
 /**
+ * Convierte una fecha ISO a formato "hh:mm AM/PM"
+ * @param isoDateString Fecha en formato ISO
+ * @returns Hora formateada en el estilo "03:00 PM"
+ */
+export function isoToPeruTimeString(isoDateString: string): string {
+  const date = new Date(isoDateString);
+
+  // Formatear a "hh:mm AM/PM" usando la zona horaria de Lima
+  return date
+    .toLocaleString("en-US", {
+      timeZone: LIMA_TIME_ZONE,
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    })
+    .replace(/,.*$/, "")
+    .trim(); // Elimina cualquier parte de fecha y espacios extras
+}
+
+/**
  * Calcula la duración de la estancia en noches
  * @param checkInDate Fecha de check-in en formato ISO
  * @param checkOutDate Fecha de check-out en formato ISO
