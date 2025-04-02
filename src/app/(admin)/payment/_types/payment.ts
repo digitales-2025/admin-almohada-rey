@@ -20,16 +20,20 @@ export enum PaymentStatus {
 }
 
 export type PaymentDetail = {
-  id: string;
+  id?: string;
   paymentDate: string;
-  description: number;
+  description: string;
   type: PaymentDetailType;
-  paymentMethod: PaymentDetailMethod;
-  status: PaymentStatus;
+  method: PaymentDetailMethod;
+  status?: PaymentStatus;
   unitPrice: number;
   subtotal: number;
   quantity?: number;
   product?: {
+    id: string;
+    name: string;
+  };
+  service?: {
     id: string;
     name: string;
   };
@@ -43,6 +47,7 @@ export type PaymentDetail = {
     };
   };
   productId?: string;
+  serviceId?: string;
   roomId?: string;
 };
 
