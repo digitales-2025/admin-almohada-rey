@@ -48,12 +48,9 @@ export function CreateRoomTypeDialog() {
     resolver: zodResolver(createRoomTypeSchema),
     defaultValues: {
       name: "",
-      guests: 1,
+      guests: 0,
       price: 0,
-      tv: "",
-      floorType: undefined,
       description: "",
-      area: 0,
       bed: "",
       images: [],
     },

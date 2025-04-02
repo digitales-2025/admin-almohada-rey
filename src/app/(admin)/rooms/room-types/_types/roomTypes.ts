@@ -7,7 +7,7 @@ export type TypedFormData<T> = T | FormData;
 /**
  * Tipos de pisos enums
  */
-export enum FloorTypeEnum {
+/* export enum FloorTypeEnum {
   LAMINATING = "LAMINATING",
   CARPETING = "CARPETING",
 }
@@ -17,24 +17,21 @@ export type FloorTypeAccepted = keyof typeof FloorTypeEnum;
 export const FloorType: Record<FloorTypeAccepted, FloorTypeAccepted> = {
   LAMINATING: "LAMINATING",
   CARPETING: "CARPETING",
-};
+}; */
 /**
  * Tipo de habitación con sus características
  */
 export type RoomTypePrototype = components["schemas"]["RoomType"]; //tipado de la respuesta de la api
 /* RoomType: {
-    id?: string;
-   
+   id: string;
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
     name: string;
-    floorType: "LAMINATING" | "CARPETING";
-    area: number;
     guests: number;
     price: number;
-    isActive?: boolean;
     description: string;
     bed: string;
-    tv: string;
-
 } */
 
 export type imagesRoomType = {
@@ -50,10 +47,7 @@ export interface RoomType extends RoomTypePrototype {
   name: string;
   guests: number;
   price: number;
-  tv: string;
-  floorType: "LAMINATING" | "CARPETING";
   description: string;
-  area: number;
   bed: string;
   imagesRoomType: imagesRoomType[];
 }
@@ -62,13 +56,10 @@ export interface RoomType extends RoomTypePrototype {
  */
 export type CreateRoomTypeWithImagesPrototype = components["schemas"]["CreateRoomTypeWithImagesDto"]; //tipado de create de la api
 /* CreateRoomTypeWithImagesDto: {
-    name: string;
+ name: string;
     guests: number;
     price: number;
-    tv: string;
-    floorType: "LAMINATING" | "CARPETING";
     description: string;
-    area: number;
     bed: string;
     images: string[];
 } */
@@ -86,10 +77,7 @@ export type UpdateRoomTypeWithImagePrototype = components["schemas"]["UpdateRoom
     name?: string;
     guests?: number;
     price?: number;
-    tv?: string;
-    floorType?: "LAMINATING" | "CARPETING";
     description?: string;
-    area?: number;
     bed?: string;
     newImage?: string;
     imageUpdate?: components["schemas"]["ImageRoomTypeUpdateDto"];

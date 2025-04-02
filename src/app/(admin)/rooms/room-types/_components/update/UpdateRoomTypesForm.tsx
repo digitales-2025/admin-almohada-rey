@@ -1,14 +1,14 @@
 import React, { useEffect } from "react";
-import { AreaChart, Bed, CreditCard, MonitorDot, User2 } from "lucide-react";
+import { Bed, CreditCard, User2 } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
 import { InputWithIcon } from "@/components/input-with-icon";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+/* import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; */
 import { Textarea } from "@/components/ui/textarea";
 import { UpdateRoomTypeSchema } from "../../_schema/roomTypesSchema";
-import { FloorTypeEnum, RoomType } from "../../_types/roomTypes";
-import { FloorTypeLabels } from "../../_utils/roomTypes.utils";
+import { /* FloorTypeEnum, */ RoomType } from "../../_types/roomTypes";
+/* import { FloorTypeLabels } from "../../_utils/roomTypes.utils"; */
 import { RoomTypeImagesManager } from "./RoomTypeImagesManager";
 
 interface UpdateRoomTypeFormProps extends Omit<React.ComponentPropsWithRef<"form">, "onSubmit"> {
@@ -118,7 +118,7 @@ export default function UpdateRoomTypeForm({
 
         {/* Segunda fila: Área y Precio */}
         <div className="grid grid-cols-2 gap-4">
-          <FormField
+          {/*      <FormField
             control={form.control}
             name="area"
             render={({ field }) => (
@@ -139,7 +139,7 @@ export default function UpdateRoomTypeForm({
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
 
           <FormField
             control={form.control}
@@ -163,24 +163,6 @@ export default function UpdateRoomTypeForm({
               </FormItem>
             )}
           />
-        </div>
-
-        {/* Tercera fila: TV y Cama */}
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="tv"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>TV / Entretenimiento</FormLabel>
-                <FormControl>
-                  <InputWithIcon Icon={MonitorDot} placeholder="Ej: TV 50 pulgadas con Netflix" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
           <FormField
             control={form.control}
             name="bed"
@@ -196,8 +178,26 @@ export default function UpdateRoomTypeForm({
           />
         </div>
 
+        {/* Tercera fila: TV y Cama */}
+        {/* <div className="grid grid-cols-2 gap-4">
+         <FormField
+            control={form.control}
+            name="tv"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>TV / Entretenimiento</FormLabel>
+                <FormControl>
+                  <InputWithIcon Icon={MonitorDot} placeholder="Ej: TV 50 pulgadas con Netflix" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+        </div>*/}
+
         {/* Tipo de piso (campo único) */}
-        <FormField
+        {/*       <FormField
           control={form.control}
           name="floorType"
           render={({ field }) => (
@@ -228,7 +228,7 @@ export default function UpdateRoomTypeForm({
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
 
         {/* Descripción (campo que ocupa todo el ancho) */}
         <FormField
