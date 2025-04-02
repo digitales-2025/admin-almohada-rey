@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 import { formatPeruBookingDate } from "@/utils/peru-datetime";
 import { DetailedReservation, ReservationGuest } from "../../_schemas/reservation.schemas";
 import { reservationStatusConfig } from "../../_types/reservation-enum.config";
-import { CreatePaymentDialog } from "../create+payment/CreatePaymentDialog";
+import { CreatePaymentDialog } from "../create-payment/CreatePaymentsDialog";
 import { GuestsDetailsDialog } from "./dialogs/GuestDialog";
 
 /**
