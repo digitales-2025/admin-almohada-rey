@@ -338,7 +338,7 @@ export const reservationColumns = (): ColumnDef<DetailedReservation>[] => [
 
       const [showCreatePaymentDialog, setShowCreatePaymentDialog] = useState(false);
 
-      // const { isActive } = row.original;
+      const { status } = row.original;
       return (
         <div>
           <div>
@@ -390,7 +390,7 @@ export const reservationColumns = (): ColumnDef<DetailedReservation>[] => [
               </DropdownMenuItem> */}
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem onSelect={() => setShowCreatePaymentDialog(true)}>
+              <DropdownMenuItem onSelect={() => setShowCreatePaymentDialog(true)} disabled={status !== "PENDING"}>
                 Crear Pago
                 <DropdownMenuShortcut>
                   <HandCoins className="size-4" aria-hidden="true" />
