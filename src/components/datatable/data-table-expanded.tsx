@@ -122,7 +122,6 @@ export function DataTableExpanded<TData, TValue>({
     return {
       left: isPinned === "left" ? `${column.getStart("left")}px` : undefined,
       right: isPinned === "right" ? `${column.getAfter("right")}px` : undefined,
-      position: isPinned ? "sticky" : "relative",
       zIndex: isPinned ? 1 : 0,
     };
   };
