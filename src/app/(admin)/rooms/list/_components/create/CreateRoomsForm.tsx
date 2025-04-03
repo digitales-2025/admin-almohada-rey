@@ -41,6 +41,7 @@ export default function CreateRoomsForm({ children, form, onSubmit }: CreateRoom
                   Icon={DoorClosed}
                   placeholder="Ingrese el número de habitación"
                   type="number"
+                  min={0}
                   {...field}
                   onChange={(e) => field.onChange(Number(e.target.value))}
                   value={field.value?.toString() || ""}
@@ -132,6 +133,8 @@ export default function CreateRoomsForm({ children, form, onSubmit }: CreateRoom
                   Icon={Ruler}
                   placeholder="Ingrese el área de la habitación"
                   type="number"
+                  min={0}
+                  step={0.01}
                   {...field}
                   onChange={(e) => field.onChange(Number(e.target.value))}
                   value={field.value?.toString() || ""}

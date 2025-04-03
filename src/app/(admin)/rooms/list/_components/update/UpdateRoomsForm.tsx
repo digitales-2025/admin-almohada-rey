@@ -41,6 +41,7 @@ export default function UpdateRoomsForm({ children, form, onSubmit }: UpdateRoom
                   Icon={DoorClosed}
                   placeholder="Ingrese el número de habitación"
                   type="number"
+                  min={0}
                   {...field}
                   onChange={(e) => field.onChange(Number(e.target.value))}
                   value={field.value?.toString() || ""}
@@ -131,6 +132,8 @@ export default function UpdateRoomsForm({ children, form, onSubmit }: UpdateRoom
                   Icon={Ruler}
                   placeholder="Ingrese el área de la habitación"
                   type="number"
+                  min={0}
+                  step={0.01}
                   {...field}
                   onChange={(e) => field.onChange(Number(e.target.value))}
                   value={field.value?.toString() || ""}
