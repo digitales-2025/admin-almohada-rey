@@ -28,8 +28,8 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useServices } from "@/hooks/use-services";
+import { calculateStayNights } from "@/utils/peru-datetime";
 import { DetailedReservation } from "../../_schemas/reservation.schemas";
-import { calculateNights } from "../../_utils/reservationPayment.utils";
 import CreatePaymentsForm from "./CreatePaymentsForm";
 import { PaymentHeader } from "./PaymentHeader";
 import { StepsSidebar } from "./PaymentStepsSidebar";
@@ -47,7 +47,7 @@ export function CreatePaymentDialog({ open, setOpen, reservation }: CreatePaymen
   const { onCreatePayment, isSuccessCreatePayment } = usePayments();
   const [step, setStep] = useState(1);
 
-  const nights = calculateNights(reservation.checkInDate, reservation.checkOutDate);
+  const nights = calculateStayNights(reservation.checkInDate, reservation.checkOutDate);
 
   const form = useForm<CreatePaymentSchema>({
     resolver: zodResolver(paymentSchema),
