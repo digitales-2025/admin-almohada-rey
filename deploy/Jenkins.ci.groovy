@@ -9,6 +9,9 @@ pipeline {
           args '-u 0:0'
 				}
 			}
+			environment {
+				NEXT_PUBLIC_IMAGE_DOMAIN="http://example.com"
+			}
 			steps {
 				sh 'npm i -g pnpm'
 				sh 'pnpm i'
