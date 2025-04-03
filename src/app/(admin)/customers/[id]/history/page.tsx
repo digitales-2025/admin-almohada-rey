@@ -20,7 +20,7 @@ import HotelBookingHistorySkeleton from "./_components/skeleton/HotelBookingHist
 
 export default function BookingHistoryCustomerPage() {
   const { id } = useParams();
-  const [yearFilter, setYearFilter] = useState<string | null>(null);
+  const [yearFilter, setYearFilter] = useState<string | null>(new Date().getFullYear().toString());
   const [roomTypeFilter, setRoomTypeFilter] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState("all");
   const { historyCustomerById, isLoadingHistoryCustomerById } = useCustomers({
