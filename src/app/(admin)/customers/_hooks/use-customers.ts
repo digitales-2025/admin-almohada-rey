@@ -5,18 +5,23 @@ import {
   useCreateCustomerMutation,
   useDeleteCustomersMutation,
   useGetAllCustomersQuery,
+  useGetHistoryCustomerByIdQuery,
   useReactivateCustomersMutation,
   useSearchCustomersByDocumentIdQuery,
   useUpdateCustomerMutation,
 } from "../_services/customersApi";
 import { Customer } from "../_types/customer";
+import { ReservationStatus } from "../../reservation/_schemas/reservation.schemas";
 
 interface UseCustomerProps {
   search?: string;
+  historyCustomerId?: string;
+  historyYear?: string;
+  historyStatus?: ReservationStatus;
 }
 
 export const useCustomers = (options: UseCustomerProps = {}) => {
-  const { search } = options;
+  const { search, historyCustomerId, historyStatus, historyYear } = options;
 
   const { data: dataCustomersAll, error, isLoading, isSuccess, refetch } = useGetAllCustomersQuery();
 
@@ -24,6 +29,21 @@ export const useCustomers = (options: UseCustomerProps = {}) => {
     skip: !search, // Evita hacer la query si no hay id
     refetchOnMountOrArgChange: true,
   });
+
+  const {
+    data: historyCustomerById,
+    refetch: refetchHistoryCustomerById,
+    isLoading: isLoadingHistoryCustomerById,
+  } = useGetHistoryCustomerByIdQuery(
+    {
+      id: historyCustomerId as string,
+      year: historyYear,
+      status: historyStatus,
+    },
+    {
+      skip: !historyCustomerId, // Evita hacer la query si no hay id
+    }
+  );
 
   const [createCustomer, { isSuccess: isSuccessCreateCustomer }] = useCreateCustomerMutation();
 
@@ -92,6 +112,9 @@ export const useCustomers = (options: UseCustomerProps = {}) => {
     error,
     isLoading,
     isSuccess,
+    historyCustomerById,
+    isLoadingHistoryCustomerById,
+    refetchHistoryCustomerById,
     refetch,
     onCreateCustomer,
     isSuccessCreateCustomer,
