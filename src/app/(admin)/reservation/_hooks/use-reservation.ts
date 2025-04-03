@@ -1,6 +1,7 @@
 import { toast } from "sonner";
 
 import { runAndHandleError } from "@/utils/baseQuery";
+import { processError } from "@/utils/process-error";
 import { CreateReservationInput, UpdateReservationInput } from "../_schemas/reservation.schemas";
 import {
   useCreateReservationMutation,
@@ -34,7 +35,7 @@ export const useReservation = () => {
     toast.promise(promise, {
       loading: "Actualizando reservación...",
       success: "Reservación actualizada con éxito",
-      error: (err) => err?.message ?? err?.error ?? "Error desconocido al actualizar reservación",
+      error: (err) => processError(err) ?? "Error desconocido al actualizar reservación",
     });
     return await promise;
   }

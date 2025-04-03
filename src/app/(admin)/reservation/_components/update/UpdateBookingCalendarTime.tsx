@@ -31,6 +31,7 @@ import {
   isoToPeruTimeString,
   peruDateTimeToUTC,
 } from "@/utils/peru-datetime";
+import { processError } from "@/utils/process-error";
 import { useRoomAvailabilityForUpdate } from "../../_hooks/use-roomAvailability";
 import { DetailedReservation, UpdateReservationInput } from "../../_schemas/reservation.schemas";
 
@@ -58,6 +59,7 @@ export default function UpdateBookingCalendarTime({
   // originalRoom,
 }: UpdateBookingCalendarTimeProps) {
   const [activeTab, setActiveTab] = useState<"checkin" | "checkout">("checkin");
+  // const [reservationCheckInIsInThePast, setReservationCheckInIsInThePast] = useState(false);
 
   // Estados para manejar selección de fecha y hora
   const [selectedCheckInDate, setSelectedCheckInDate] = useState<Date>(new Date(reservation.checkInDate));
@@ -237,9 +239,9 @@ export default function UpdateBookingCalendarTime({
   const isDateDisabled = (date: Date, isCheckIn: boolean) => {
     const today = getPeruStartOfToday();
 
-    // Para check-in, solo deshabilitar fechas pasadas
+    // Para check-in, solo deshabilitar fechas pasadas y la de hoy
     if (isCheckIn) {
-      return isBefore(startOfDay(date), today);
+      return isBefore(startOfDay(date), today) || isSameDay(startOfDay(date), today);
     }
 
     // Para check-out, deshabilitar fechas anteriores o iguales a check-in
@@ -251,11 +253,9 @@ export default function UpdateBookingCalendarTime({
   const checkOutTimes = getTimeOptionsForDay("checkout");
 
   if (isError) {
-    let errorMessage = "Error Desconocido";
-    if (error instanceof Error) {
-      errorMessage = error.message;
-    }
-    toast.error(`Ocurrió un error al verificar la disponibilidad de la habitación: ${errorMessage}`);
+    const processedError = processError(error);
+
+    toast.error(`Ocurrió un error al verificar la disponibilidad de la habitación: ${processedError}`);
   }
 
   return (
@@ -316,7 +316,7 @@ export default function UpdateBookingCalendarTime({
             </div>
           </div>
           <div className="flex justify-center pt-4">
-            <Button variant="outline" onClick={() => setActiveTab("checkout")} className="w-1/2">
+            <Button variant="outline" onClick={() => setActiveTab("checkout")} className="w-fit">
               Siguiente: Seleccionar Check-out
             </Button>
           </div>

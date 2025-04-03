@@ -30,6 +30,7 @@ import {
   getTimeOptionsForDay,
   peruDateTimeToUTC,
 } from "@/utils/peru-datetime";
+import { processError } from "@/utils/process-error";
 import { useRoomAvailability } from "../../_hooks/use-roomAvailability";
 import { CreateReservationInput } from "../../_schemas/reservation.schemas";
 
@@ -216,10 +217,7 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
     //     <p className="text-sm text-muted-foreground">Por favor, inténtelo de nuevo más tarde.</p>
     //   </div>
     // );
-    let errorMessage = "Error Desconocido";
-    if (error instanceof Error) {
-      errorMessage = error.message;
-    }
+    const errorMessage = processError(error);
     toast.error(`Ocurrió un error al verificar la disponibilidad de la habitación: ${errorMessage}`);
   }
 

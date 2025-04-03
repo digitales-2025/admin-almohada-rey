@@ -220,14 +220,14 @@ export const UPDATE_FORMSTATICS: ComplexFormStatics<CreateReservationInput, Rese
         name: "age",
       },
       documentId: {
-        required: false,
+        required: true,
         label: "Documento",
         type: "text",
         placeholder: "Documento",
         name: "documentId",
       },
       documentType: {
-        required: false,
+        required: true,
         label: "Tipo de documento",
         type: "select",
         placeholder: "Selecciona un tipo de documento",

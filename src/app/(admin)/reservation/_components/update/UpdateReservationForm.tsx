@@ -56,7 +56,7 @@ export default function UpdateReservationForm({
   controlledFieldArray,
 }: UpdateReservationSheetFormProps) {
   const [allowGuests, setAllowGuests] = useState(true);
-  const [selectedRoom, setSelectedRoom] = useState<DetailedRoom | undefined>(undefined);
+  const [selectedRoom, setSelectedRoom] = useState<DetailedRoom | undefined>(reservation.room);
   const [guestNumber, setGuestNumber] = useState<number>(0);
   const [isRoomAvailable, setIsRoomAvailable] = useState(true);
   const [isChecking, setIsChecking] = useState(false);
@@ -95,7 +95,6 @@ export default function UpdateReservationForm({
 
   const { isLoading, isError, error, availableRooms, checkAvailability, refetch } =
     useAllAvailableRoomsInTimeIntervalForUpdate(defaultCheckInCheckOutDates, reservation.id);
-
   // const [isOriginalInterval, setIsOriginalInterval] = useState(true);
 
   const memoizedCheckAvailability = useCallback(() => {
@@ -225,7 +224,7 @@ export default function UpdateReservationForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4 px-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 gap-4 px-6 ">
         <FormField
           control={form.control}
           name="customerId"
@@ -267,7 +266,7 @@ export default function UpdateReservationForm({
           control={form.control}
           name="roomId"
           render={({ field }) => (
-            <FormItem className="sm:col-span-1 w-full">
+            <FormItem className="w-full">
               <FormLabel>{UPDATE_FORMSTATICS.roomId.label}</FormLabel>
               <FormControl>
                 <Popover>
@@ -322,10 +321,10 @@ export default function UpdateReservationForm({
           )}
         />
 
-        <Separator className="col-span-2" />
+        <Separator className="w-full" />
 
         {/* Reemplazar los campos separados de checkIn/checkOut con el nuevo componente */}
-        <div className="sm:col-span-2 space-y-2">
+        <div className="space-y-2">
           <UpdateBookingCalendarTime
             form={form}
             roomId={roomId}
@@ -352,7 +351,7 @@ export default function UpdateReservationForm({
           )}
         </div>
 
-        <Separator className="col-span-2" />
+        <Separator orientation="horizontal" />
 
         <FormField
           control={form.control}
@@ -399,7 +398,18 @@ export default function UpdateReservationForm({
                   </SelectGroup>
                 </SelectContent>
               </Select>
-              <FormMessage />
+              {
+                <CustomFormDescription
+                  required={UPDATE_FORMSTATICS.status.required}
+                  validateOptionalField={true}
+                ></CustomFormDescription>
+              }
+              <FormDescription>
+                Solo se puede actualizar el estado de la reserva por medio de eventos externos.
+              </FormDescription>
+              {form.formState.errors.status && (
+                <FormMessage className="text-destructive">{form.formState.errors.status.message}</FormMessage>
+              )}
             </FormItem>
           )}
         />
@@ -408,7 +418,7 @@ export default function UpdateReservationForm({
           control={form.control}
           name={"origin"}
           render={({ field }) => (
-            <FormItem className="sm:col-span-1">
+            <FormItem>
               <FormLabel>{UPDATE_FORMSTATICS.origin.label}</FormLabel>
               <FormControl>
                 <InputWithIcon {...field} Icon={MapPinHouse} placeholder={UPDATE_FORMSTATICS.origin.placeholder} />
@@ -422,10 +432,10 @@ export default function UpdateReservationForm({
           )}
         />
 
-        <Separator className="col-span-2" />
+        <Separator orientation="horizontal" />
 
         {selectedRoom?.RoomTypes?.guests && (
-          <div className="space-y-4 sm:col-span-2">
+          <div className="space-y-4">
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
               <div className="space-y-0.5">
                 <FormLabel>¿Acompañantes?</FormLabel>
@@ -448,7 +458,7 @@ export default function UpdateReservationForm({
         )}
 
         {allowGuests && selectedRoom?.RoomTypes?.guests && (
-          <div className="flex flex-col gap-4 sm:col-span-2 animate-ease-in">
+          <div className="flex flex-col gap-4 animate-ease-in">
             <FormLabel>{UPDATE_FORMSTATICS.guests.label}</FormLabel>
             <Table className="w-full overflow-auto">
               <TableHeader>
@@ -519,12 +529,12 @@ export default function UpdateReservationForm({
                             </SelectContent>
                           </Select>
                           <CustomFormDescription
-                            required={UPDATE_FORMSTATICS.guests.subFields?.age.required ?? false}
+                            required={UPDATE_FORMSTATICS.guests.subFields?.documentType.required ?? false}
                             validateOptionalField={true}
                           ></CustomFormDescription>
                           <FormMessage>
-                            {form.formState.errors.guests?.[index]?.age &&
-                              form.formState.errors.guests[index]?.age?.message}
+                            {form.formState.errors.guests?.[index]?.documentType &&
+                              form.formState.errors.guests[index]?.documentType?.message}
                           </FormMessage>
                         </FormItem>
                       </TableCell>
@@ -616,7 +626,7 @@ export default function UpdateReservationForm({
                 })}
               </TableBody>
             </Table>
-            <div className="col-span-2 w-full flex flex-col gap-2 justify-center items-center py-4">
+            <div className="w-full flex flex-col gap-2 justify-center items-center py-4">
               <Button
                 variant={"outline"}
                 disabled={
@@ -652,13 +662,13 @@ export default function UpdateReservationForm({
           </div>
         )}
 
-        <Separator className="col-span-2" />
+        <Separator orientation="horizontal" />
 
         <FormField
           control={form.control}
           name={"reason"}
           render={({ field }) => (
-            <FormItem className="sm:col-span-2">
+            <FormItem>
               <FormLabel>{FORMSTATICS.reason.label}</FormLabel>
               <FormControl>
                 <TextareaWithIcon {...field} Icon={UserRoundCheck} placeholder={FORMSTATICS.reason.placeholder} />
@@ -676,7 +686,7 @@ export default function UpdateReservationForm({
           control={form.control}
           name={"observations"}
           render={({ field }) => (
-            <FormItem className="sm:col-span-2">
+            <FormItem>
               <FormLabel>{FORMSTATICS.observations.label}</FormLabel>
               <FormControl>
                 <TextareaWithIcon {...field} Icon={ListCheck} placeholder={FORMSTATICS.observations.placeholder} />

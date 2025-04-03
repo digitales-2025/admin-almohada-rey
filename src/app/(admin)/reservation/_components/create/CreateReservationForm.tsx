@@ -574,12 +574,12 @@ export default function CreateReservationForm({
                             </SelectContent>
                           </Select>
                           <CustomFormDescription
-                            required={FORMSTATICS.guests.subFields?.age.required ?? false}
+                            required={FORMSTATICS.guests.subFields?.documentType?.required ?? false}
                             validateOptionalField={true}
                           ></CustomFormDescription>
                           <FormMessage>
-                            {form.formState.errors.guests?.[index]?.age &&
-                              form.formState.errors.guests[index]?.age?.message}
+                            {form.formState.errors.guests?.[index]?.documentType &&
+                              form.formState.errors.guests[index]?.documentType?.message}
                           </FormMessage>
                         </FormItem>
                       </TableCell>
