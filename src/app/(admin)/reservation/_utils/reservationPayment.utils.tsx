@@ -2,27 +2,6 @@ import { Banknote, Building, CreditCard, Smartphone } from "lucide-react";
 
 import { PaymentDetailMethod } from "../../payment/_types/payment";
 
-// Calcular el número de noches entre check-in y check-out
-export const calculateNights = (checkInDate: string | Date, checkOutDate: string | Date) => {
-  // Convertir fechas a objetos Date
-  const checkIn = new Date(checkInDate);
-  const checkOut = new Date(checkOutDate);
-
-  // Normalizar las fechas eliminando el componente de hora
-  // Usamos UTC para evitar problemas con cambios de zona horaria
-  const normalizedCheckIn = new Date(Date.UTC(checkIn.getFullYear(), checkIn.getMonth(), checkIn.getDate(), 0, 0, 0));
-
-  const normalizedCheckOut = new Date(
-    Date.UTC(checkOut.getFullYear(), checkOut.getMonth(), checkOut.getDate(), 0, 0, 0)
-  );
-
-  // Calcular la diferencia en milisegundos y convertir a días
-  const diffTime = normalizedCheckOut.getTime() - normalizedCheckIn.getTime();
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-  return diffDays;
-};
-
 export const getPaymentMethodLabel = (method: string): string => {
   const methodLabels: Record<string, string> = {
     CASH: "Efectivo",
