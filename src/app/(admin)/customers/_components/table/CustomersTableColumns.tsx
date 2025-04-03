@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { ChevronDown, ChevronRight, Ellipsis, RefreshCcwDot, Trash } from "lucide-react";
+import { CalendarDays, ChevronDown, ChevronRight, Ellipsis, RefreshCcwDot, Trash } from "lucide-react";
 import * as RPNInput from "react-phone-number-input";
 import flags from "react-phone-number-input/flags";
 
@@ -29,7 +29,10 @@ import { UpdateCustomerSheet } from "../update/UpdateCustomersSheet";
  * @param isSuperAdmin Valor si el usuario es super administrador
  * @returns Columnas de la tabla de usuarios
  */
-export const customersColumns = (isSuperAdmin: boolean): ColumnDef<Customer>[] => [
+export const customersColumns = (
+  isSuperAdmin: boolean,
+  handleCustomerHistoryInterface: (id: string) => void
+): ColumnDef<Customer>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -295,6 +298,12 @@ export const customersColumns = (isSuperAdmin: boolean): ColumnDef<Customer>[] =
                 Editar
               </DropdownMenuItem>
               <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => handleCustomerHistoryInterface(row.original.id)} disabled={!isActive}>
+                Historial
+                <DropdownMenuShortcut>
+                  <CalendarDays className="size-4" aria-hidden="true" />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
               {isSuperAdmin && (
                 <DropdownMenuItem onSelect={() => setShowReactivateDialog(true)} disabled={isActive}>
                   Reactivar

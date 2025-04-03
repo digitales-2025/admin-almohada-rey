@@ -1,19 +1,27 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { ChevronDown, ChevronRight, Ellipsis } from "lucide-react";
+import { ChevronDown, ChevronRight, Ellipsis, HandCoins } from "lucide-react";
 import { toast } from "sonner";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { formatPeruBookingDate } from "@/utils/peru-datetime";
 import { DetailedReservation, ReservationGuest } from "../../_schemas/reservation.schemas";
 import { reservationStatusConfig } from "../../_types/reservation-enum.config";
+import { CreatePaymentDialog } from "../create-payment/CreatePaymentsDialog";
 import { GuestsDetailsDialog } from "./dialogs/GuestDialog";
 
 /**
@@ -21,8 +29,7 @@ import { GuestsDetailsDialog } from "./dialogs/GuestDialog";
  * @param isSuperAdmin Valor si el usuario es super administrador
  * @returns Columnas de la tabla de usuarios
  */
-export const reservationColumns = () // isSuperAdmin: boolean
-: ColumnDef<DetailedReservation>[] => [
+export const reservationColumns = (): ColumnDef<DetailedReservation>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -302,7 +309,7 @@ export const reservationColumns = () // isSuperAdmin: boolean
 
   {
     id: "expand", // Nueva columna para expansión
-    header: () => <span>Detalles</span>, // No mostrar un título en el header
+    header: () => null, // No mostrar un título en el header
     cell: ({ row }) => (
       <Button
         onClick={() => row.toggleExpanded()} // Alternar la expansión de la fila
@@ -324,20 +331,30 @@ export const reservationColumns = () // isSuperAdmin: boolean
 
   {
     id: "actions",
-    cell: function Cell() {
-      // { row }
+    cell: function Cell({ row }) {
       //   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
       //   const [showReactivateDialog, setShowReactivateDialog] = useState(false);
       //   const [showEditDialog, setShowEditDialog] = useState(false);
 
-      // const { isActive } = row.original;
+      const [showCreatePaymentDialog, setShowCreatePaymentDialog] = useState(false);
+
+      const { status } = row.original;
       return (
         <div>
           <div>
             {/* {showEditDialog && (
               <UpdateCustomerSheet open={showEditDialog} onOpenChange={setShowEditDialog} customer={row?.original} />
             )}
+            */}
+            {showCreatePaymentDialog && (
+              <CreatePaymentDialog
+                open={showCreatePaymentDialog}
+                setOpen={setShowCreatePaymentDialog}
+                reservation={row.original}
+              />
+            )}
 
+            {/* 
             {showDeleteDialog && (
               <DeleteCustomersDialog
                 open={showDeleteDialog}
@@ -370,9 +387,17 @@ export const reservationColumns = () // isSuperAdmin: boolean
             <DropdownMenuContent align="end" className="w-40">
               {/* <DropdownMenuItem onSelect={() => setShowEditDialog(true)} disabled={!isActive}>
                 Editar
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               <DropdownMenuSeparator />
-              {isSuperAdmin && (
+
+              <DropdownMenuItem onSelect={() => setShowCreatePaymentDialog(true)} disabled={status !== "PENDING"}>
+                Crear Pago
+                <DropdownMenuShortcut>
+                  <HandCoins className="size-4" aria-hidden="true" />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+
+              {/*               {isSuperAdmin && (
                 <DropdownMenuItem onSelect={() => setShowReactivateDialog(true)} disabled={isActive}>
                   Reactivar
                   <DropdownMenuShortcut>

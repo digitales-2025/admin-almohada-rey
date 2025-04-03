@@ -3,6 +3,9 @@ export type Room = {
   number: number;
   status: RoomStatus;
   isActive: boolean;
+  tv: string;
+  area: number;
+  floorType: FloorType;
 
   RoomTypes?: RoomTypes;
 
@@ -31,6 +34,11 @@ export enum RoomStatus {
   AVAILABLE = "AVAILABLE",
   OCCUPIED = "OCCUPIED",
   CLEANING = "CLEANING",
+}
+
+export enum FloorType {
+  LAMINATING = "LAMINATING",
+  CARPETING = "CARPETING",
 }
 
 export interface CleaningChecklist {

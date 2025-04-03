@@ -40,6 +40,9 @@ export function UpdateRoomSheet({ room, open, onOpenChange }: UpdateRoomSheetPro
     defaultValues: {
       number: room.number,
       roomTypeId: room.RoomTypes?.id,
+      tv: room.tv,
+      area: room.area,
+      floorType: room.floorType,
     },
   });
 
@@ -48,6 +51,9 @@ export function UpdateRoomSheet({ room, open, onOpenChange }: UpdateRoomSheetPro
       form.reset({
         number: room.number,
         roomTypeId: room.RoomTypes?.id,
+        tv: room.tv,
+        area: room.area,
+        floorType: room.floorType,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

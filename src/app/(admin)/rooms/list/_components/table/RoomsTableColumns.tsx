@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { Ellipsis, RefreshCcwDot, Settings, Trash } from "lucide-react";
+import { Ellipsis, Monitor, RefreshCcwDot, Ruler, Settings, Trash } from "lucide-react";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
@@ -16,8 +16,8 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Room, RoomStatus } from "../../_types/room";
-import { getRoomTypeKey, RoomStatusLabels, RoomTypeLabels } from "../../_utils/rooms.utils";
+import { FloorType, Room, RoomStatus } from "../../_types/room";
+import { FloorTypeLabels, getRoomTypeKey, RoomStatusLabels, RoomTypeLabels } from "../../_utils/rooms.utils";
 import { UpdateAvailabilityRoomsDialog } from "../availability-management/UpdateAvailabilityRoomsDialog";
 import { DeleteRoomsDialog } from "../state-management/DeleteRoomsDialog";
 import { ReactivateRoomsDialog } from "../state-management/ReactivateRoomsDialog";
@@ -81,7 +81,7 @@ export const roomsColumns = (isSuperAdmin: boolean): ColumnDef<Room>[] => [
       const Icon = config.icon;
 
       return (
-        <div className="min-w-40 truncate">
+        <div className="min-w-24 truncate">
           <div className="flex items-center gap-1.5 font-light text-sm">
             <Icon className={`size-4 ${config.className}`} strokeWidth={1.5} />
             <span className="text-sm font-normal">{roomType ? config.label : "No definido"}</span>
@@ -104,7 +104,7 @@ export const roomsColumns = (isSuperAdmin: boolean): ColumnDef<Room>[] => [
       const Icon = roomStatusConfig.icon;
 
       return (
-        <div className="text-xs min-w-32">
+        <div className="text-xs min-w-28">
           <Badge variant="default" className={roomStatusConfig.className}>
             <Icon className="size-4 flex-shrink-0 mr-1" aria-hidden="true" />
             {roomStatusConfig.label}
@@ -123,6 +123,64 @@ export const roomsColumns = (isSuperAdmin: boolean): ColumnDef<Room>[] => [
       return rowValue === value;
     },
     enableColumnFilter: true,
+  },
+
+  {
+    id: "Televisor",
+    accessorKey: "tv",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Televisor" />,
+    cell: ({ row }) => (
+      <div className="flex flex-row w-fit items-center gap-2 px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+        <Monitor className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+        <span className="truncate capitalize">{row.getValue("Televisor")}</span>
+      </div>
+    ),
+  },
+
+  {
+    id: "piso",
+    accessorKey: "floorType",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Piso" />,
+    cell: ({ row }) => {
+      const floorType = row.getValue("piso") as FloorType;
+      const floorTypeConfig = FloorTypeLabels[floorType];
+
+      if (!floorTypeConfig) return <div>No definido</div>;
+
+      const Icon = floorTypeConfig.icon;
+
+      return (
+        <div className="text-xs min-w-28">
+          <Badge variant="default" className={floorTypeConfig.className}>
+            <Icon className="size-4 flex-shrink-0 mr-1" aria-hidden="true" />
+            {floorTypeConfig.label}
+          </Badge>
+        </div>
+      );
+    },
+    filterFn: (row, id, value) => {
+      const rowValue = row.getValue(id);
+
+      if (Array.isArray(value)) {
+        if (value.length === 0) return true;
+        return value.includes(rowValue);
+      }
+
+      return rowValue === value;
+    },
+    enableColumnFilter: true,
+  },
+
+  {
+    id: "área",
+    accessorKey: "area",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Área" />,
+    cell: ({ row }) => (
+      <div className="w-fit flex items-center gap-2 px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+        <Ruler className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+        <span className="truncate capitalize">{row.getValue("área")}</span>
+      </div>
+    ),
   },
 
   {

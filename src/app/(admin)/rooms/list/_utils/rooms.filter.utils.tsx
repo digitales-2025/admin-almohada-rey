@@ -1,7 +1,7 @@
 import { CheckCircle2, XCircle } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { getRoomTypeKey, RoomStatusLabels, RoomTypeLabels } from "./rooms.utils";
+import { FloorTypeLabels, getRoomTypeKey, RoomStatusLabels, RoomTypeLabels } from "./rooms.utils";
 
 // Componentes de icono con estilos integrados
 const ActiveIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -23,6 +23,16 @@ const RoomStatusIcons = Object.fromEntries(
   })
 );
 
+const FloorTypeIcons = Object.fromEntries(
+  Object.entries(FloorTypeLabels).map(([floorType, config]) => {
+    const IconComponent: React.FC<{ className?: string }> = ({ className }) => {
+      const Icon = config.icon;
+      return <Icon className={cn(className, config.className)} />;
+    };
+    return [floorType, IconComponent];
+  })
+);
+
 export const facetedFilters = [
   {
     column: "estado",
@@ -41,13 +51,24 @@ export const facetedFilters = [
     ],
   },
   {
-    // Filtro para el estado civil generado dinámicamente
+    // Filtro para la disponibilidad generado dinámicamente
     column: "disponibilidad",
     title: "Disponibilidad",
     options: Object.entries(RoomStatusLabels).map(([roomStatus, config]) => ({
       label: config.label,
       value: roomStatus,
       icon: RoomStatusIcons[roomStatus],
+    })),
+  },
+
+  {
+    // Filtro para el tipo de piso generado dinamicamente
+    column: "piso",
+    title: "Piso",
+    options: Object.entries(FloorTypeLabels).map(([floorType, config]) => ({
+      label: config.label,
+      value: floorType,
+      icon: FloorTypeIcons[floorType],
     })),
   },
 ];

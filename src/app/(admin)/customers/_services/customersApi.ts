@@ -1,7 +1,14 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 import baseQueryWithReauth from "@/utils/baseQuery";
-import { ApiCustomer, Customer } from "../_types/customer";
+import { ApiCustomer, Customer, HistoryCustomer } from "../_types/customer";
+import { ReservationStatus } from "../../reservation/_schemas/reservation.schemas";
+
+interface GetHistoryCustomerByIdProps {
+  id: string;
+  year?: string;
+  status?: ReservationStatus;
+}
 
 export const customersApi = createApi({
   reducerPath: "customersApi",
@@ -37,6 +44,34 @@ export const customersApi = createApi({
       }),
       providesTags: (result, error, id) => [{ type: "Customer", id }],
     }),
+    //Obtener historial de clientes por id
+    getHistoryCustomerById: build.query<HistoryCustomer, GetHistoryCustomerByIdProps>({
+      query: ({ id, year, status }) => {
+        let url = `/customers/history/booking/${id}`;
+        const params = new URLSearchParams();
+
+        if (year !== undefined) {
+          params.append("year", year.toString());
+        }
+
+        if (status !== undefined) {
+          params.append("status", status);
+        }
+
+        const queryString = params.toString();
+        if (queryString) {
+          url += `?${queryString}`;
+        }
+
+        return {
+          url,
+          method: "GET",
+          credentials: "include",
+        };
+      },
+      providesTags: ["Customer"],
+    }),
+
     //Obtener todos los clientes
     getAllCustomers: build.query<Customer[], void>({
       query: () => ({
@@ -82,6 +117,7 @@ export const {
   useCreateCustomerMutation,
   useUpdateCustomerMutation,
   useGetCustomerByIdQuery,
+  useGetHistoryCustomerByIdQuery,
   useGetAllCustomersQuery,
   useDeleteCustomersMutation,
   useReactivateCustomersMutation,

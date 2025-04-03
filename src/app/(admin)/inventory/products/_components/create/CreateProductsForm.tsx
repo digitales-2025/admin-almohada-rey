@@ -42,6 +42,8 @@ export default function CreateProductsForm({ children, form, onSubmit }: CreateP
                 <InputWithIcon
                   Icon={Banknote}
                   type="number"
+                  min={0}
+                  step={0.01}
                   placeholder="Ingrese el precio del producto"
                   {...field}
                   onChange={(e) => field.onChange(e.target.valueAsNumber || 0)}

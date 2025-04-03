@@ -3,7 +3,7 @@ import { z } from "zod";
 import { components } from "@/types/api";
 import { SelectOption } from "@/types/form/select-option";
 
-export type ReservationStatus = "PENDING" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELED";
+export type ReservationStatus = "PENDING" | "CONFIRMED" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELED";
 export const reservationStatusSelectOptions: Record<ReservationStatus, SelectOption<ReservationStatus>> = {
   PENDING: {
     value: "PENDING",
@@ -20,6 +20,10 @@ export const reservationStatusSelectOptions: Record<ReservationStatus, SelectOpt
   CANCELED: {
     value: "CANCELED",
     label: "Cancelado",
+  },
+  CONFIRMED: {
+    value: "CONFIRMED",
+    label: "Confirmado",
   },
 };
 export type DocumentType = "DNI" | "PASSPORT" | "FOREIGNER_CARD";
