@@ -49,6 +49,8 @@ export default function UpdateCustomersForm({ children, form, onSubmit }: Update
                   Icon={Banknote}
                   type="number"
                   placeholder="Ingrese el precio del producto"
+                  min={0}
+                  step={0.01}
                   {...field}
                   onChange={(e) => field.onChange(e.target.valueAsNumber || 0)}
                   value={field.value ?? ""}
