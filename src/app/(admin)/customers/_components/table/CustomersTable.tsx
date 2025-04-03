@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Table as TableInstance } from "@tanstack/react-table";
 
 import { useProfile } from "@/app/(admin)/profile/_hooks/use-profile";
@@ -13,7 +14,19 @@ import { CustomersTableToolbarActions } from "./CustomersTableToolbarActions";
 
 export function CustomersTable({ data }: { data: Customer[] }) {
   const { user } = useProfile();
-  const columns = useMemo(() => customersColumns(user?.isSuperAdmin || false), [user]);
+  const router = useRouter();
+
+  const handleCustomerHistoryInterface = useCallback(
+    (id: string) => {
+      router.push(`/customers/${id}/history`);
+    },
+    [router]
+  );
+
+  const columns = useMemo(
+    () => customersColumns(user?.isSuperAdmin || false, handleCustomerHistoryInterface),
+    [user, handleCustomerHistoryInterface]
+  );
 
   return (
     <DataTableExpanded

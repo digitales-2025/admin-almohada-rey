@@ -3,6 +3,7 @@ import { LucideIcon } from "lucide-react";
 export type EnumConfig = {
   name: string;
   backgroundColor: string;
+  backgroundColorIntense?: string;
   textColor: string;
   borderColor: string;
   hoverBorderColor?: string;
