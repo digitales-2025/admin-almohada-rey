@@ -1,4 +1,4 @@
-import { CheckCircle2, XCircle } from "lucide-react";
+/* import { CheckCircle2, XCircle } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { FloorTypeLabels } from "./roomTypes.utils";
@@ -23,10 +23,9 @@ const FloorTypeIcons = Object.fromEntries(
   })
 );
 
-/**
- * Filtros facetados para tipos de habitación
- * Pueden ser usados con componentes como DataTable para filtrar por estado y tipo de piso
- */
+// Filtros facetados para tipos de habitación
+// Pueden ser usados con componentes como DataTable para filtrar por estado y tipo de piso
+
 export const facetedFilters = [
   {
     column: "estado",
@@ -54,3 +53,4 @@ export const facetedFilters = [
     })),
   },
 ];
+ */
