@@ -13,7 +13,7 @@ export default function RoomsPage() {
     return (
       <div>
         <HeaderPage title="Habitaciones" description="Habitaciones registrados en el sistema." />
-        <DataTableSkeleton columns={5} numFilters={2} />
+        <DataTableSkeleton columns={8} numFilters={3} />
       </div>
     );
   }
