@@ -16,6 +16,11 @@ export const processError = (error: unknown, addAltMessage?: string): string => 
     return error;
   }
 
+  if (typeof error === "object" && error !== null && "message" in error) {
+    const errorMessage = (error.message as string) ?? "Error desconocido";
+    return errorMessage;
+  }
+
   if (typeof error === "object" && error !== null && "data" in error) {
     const reduxError = error as ReduxError;
     const errorMessage =

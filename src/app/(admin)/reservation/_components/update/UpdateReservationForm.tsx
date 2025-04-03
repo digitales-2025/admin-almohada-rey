@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Separator } from "@radix-ui/react-separator";
 import { Switch } from "@radix-ui/react-switch";
+import { isBefore, isSameDay } from "date-fns";
 import { Check, ChevronsUpDown, ListCheck, MapPinHouse, Trash2, UserRoundCheck } from "lucide-react";
 import { UseFieldArrayReturn, UseFormReturn } from "react-hook-form";
 
@@ -21,6 +22,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { SelectOption } from "@/types/form/select-option";
+import { formatPeruBookingDate, getPeruStartOfToday } from "@/utils/peru-datetime";
 import { useAllAvailableRoomsInTimeIntervalForUpdate } from "../../_hooks/use-roomAvailability";
 import {
   DetailedReservation,
@@ -60,6 +62,11 @@ export default function UpdateReservationForm({
   const [guestNumber, setGuestNumber] = useState<number>(0);
   const [isRoomAvailable, setIsRoomAvailable] = useState(true);
   const [isChecking, setIsChecking] = useState(false);
+  const reservationCheckInIsInThePast = useMemo(() => {
+    const today = getPeruStartOfToday();
+    const reservationDate = new Date(reservation.checkInDate);
+    return isBefore(reservationDate, today) || isSameDay(reservationDate, today);
+  }, [reservation]);
 
   const { watch, register } = form;
   const { fields, append, remove } = controlledFieldArray;
@@ -323,33 +330,57 @@ export default function UpdateReservationForm({
 
         <Separator className="w-full" />
 
-        {/* Reemplazar los campos separados de checkIn/checkOut con el nuevo componente */}
-        <div className="space-y-2">
-          <UpdateBookingCalendarTime
-            form={form}
-            roomId={roomId}
-            onRoomAvailabilityChange={setIsRoomAvailable}
-            reservation={reservation}
-            // isOriginalInterval={isOriginalInterval}
-            // originalRoom={originalRoom.current}
-          />
-          <CustomFormDescription
-            required={UPDATE_FORMSTATICS.observations.required}
-            validateOptionalField={false}
-          ></CustomFormDescription>
-          {form.formState.errors.checkInDate || form.formState.errors.checkOutDate ? (
-            <FormMessage className="text-destructive">
-              {form.formState.errors.checkInDate?.message || form.formState.errors.checkOutDate?.message}
-            </FormMessage>
-          ) : null}
+        {!reservationCheckInIsInThePast && (
+          <div className="space-y-2">
+            <UpdateBookingCalendarTime
+              form={form}
+              roomId={roomId}
+              onRoomAvailabilityChange={setIsRoomAvailable}
+              reservation={reservation}
+              // isOriginalInterval={isOriginalInterval}
+              // originalRoom={originalRoom.current}
+            />
+            <CustomFormDescription
+              required={UPDATE_FORMSTATICS.observations.required}
+              validateOptionalField={false}
+            ></CustomFormDescription>
+            {form.formState.errors.checkInDate || form.formState.errors.checkOutDate ? (
+              <FormMessage className="text-destructive">
+                {form.formState.errors.checkInDate?.message || form.formState.errors.checkOutDate?.message}
+              </FormMessage>
+            ) : null}
 
-          {!isRoomAvailable && roomId && (
-            <FormMessage className="text-destructive">
-              La habitación seleccionada no está disponible para estas fechas. Por favor, selecciona otras fechas o una
-              habitación diferente.
-            </FormMessage>
-          )}
-        </div>
+            {!isRoomAvailable && roomId && (
+              <FormMessage className="text-destructive">
+                La habitación seleccionada no está disponible para estas fechas. Por favor, selecciona otras fechas o
+                una habitación diferente.
+              </FormMessage>
+            )}
+          </div>
+        )}
+
+        {reservationCheckInIsInThePast && (
+          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+            <div className="space-y-0.5">
+              <FormLabel>Reserva en el pasado</FormLabel>
+              <FormDescription>
+                La reserva no puede ser editada o reprogramada porque la fecha de check-in es anterior a la fecha
+                actual.
+              </FormDescription>
+              <FormDescription>
+                <span className="block">
+                  Fecha de check-in: {formatPeruBookingDate(reservation.checkInDate).localeDateString}
+                </span>
+                <span className="block">
+                  Fecha de check-out: {formatPeruBookingDate(reservation.checkOutDate).localeDateString}
+                </span>
+              </FormDescription>
+            </div>
+            <FormControl>
+              <UserRoundCheck className="text-primary" />
+            </FormControl>
+          </FormItem>
+        )}
 
         <Separator orientation="horizontal" />
 

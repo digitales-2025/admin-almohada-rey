@@ -59,7 +59,6 @@ export default function UpdateBookingCalendarTime({
   // originalRoom,
 }: UpdateBookingCalendarTimeProps) {
   const [activeTab, setActiveTab] = useState<"checkin" | "checkout">("checkin");
-  // const [reservationCheckInIsInThePast, setReservationCheckInIsInThePast] = useState(false);
 
   // Estados para manejar selección de fecha y hora
   const [selectedCheckInDate, setSelectedCheckInDate] = useState<Date>(new Date(reservation.checkInDate));
@@ -97,7 +96,7 @@ export default function UpdateBookingCalendarTime({
       setSelectedCheckOutDate(new Date(reservation.checkOutDate));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [reservation]);
 
   // Efecto para verificar disponibilidad cuando cambia la selección
   useEffect(() => {
