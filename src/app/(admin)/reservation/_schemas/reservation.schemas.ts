@@ -71,7 +71,7 @@ export const createReservationSchema = z.object({
   checkOutDate: z.string({
     required_error: "La fecha de check-out es requerida",
   }),
-  status: z.enum(["PENDING", "CHECKED_IN", "CHECKED_OUT", "CANCELED"]),
+  status: z.enum(["PENDING", "CHECKED_IN", "CHECKED_OUT", "CANCELED", "CONFIRMED"]),
   guests: z
     .array(
       z.object({
@@ -122,7 +122,7 @@ export const updateReservationSchema = z.object({
   checkOutDate: z.string({
     required_error: "La fecha de check-out es requerida",
   }),
-  status: z.enum(["PENDING", "CHECKED_IN", "CHECKED_OUT", "CANCELED"]),
+  status: z.enum(["PENDING", "CHECKED_IN", "CHECKED_OUT", "CANCELED", "CONFIRMED"]),
   guests: z
     .array(
       z
