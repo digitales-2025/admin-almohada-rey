@@ -5,6 +5,7 @@ import {
   ConciergeBell,
   CookingPot,
   Droplets,
+  Grid2x2,
   HandMetal,
   Home,
   Hotel,
@@ -12,9 +13,10 @@ import {
   ShowerHeadIcon as Shower,
   Toilet,
   Trash2,
+  Waves,
 } from "lucide-react";
 
-import { CleaningChecklist, RoomStatus } from "../_types/room";
+import { CleaningChecklist, FloorType, RoomStatus } from "../_types/room";
 
 export const RoomStatusLabels: Record<
   RoomStatus,
@@ -41,6 +43,25 @@ export const RoomStatusLabels: Record<
   },
 };
 
+export const FloorTypeLabels: Record<
+  FloorType,
+  {
+    label: string;
+    icon: React.ElementType;
+    className: string;
+  }
+> = {
+  [FloorType.LAMINATING]: {
+    label: "Laminado",
+    icon: Grid2x2,
+    className: "text-amber-700 border-amber-200",
+  },
+  [FloorType.CARPETING]: {
+    label: "Alfombra",
+    icon: Waves,
+    className: "text-purple-700 border-purple-200",
+  },
+};
 // Tipos de habitación
 export type RoomTypeKey = "matrimonial" | "dobleFamiliar" | "dobleSimple" | "simple" | "suite" | "default";
 
