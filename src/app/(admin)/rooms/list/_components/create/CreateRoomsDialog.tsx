@@ -30,7 +30,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useRooms } from "../../_hooks/use-rooms";
 import { CreateRoomsSchema, roomsSchema } from "../../_schema/createRoomsSchema";
-import CreateCustomersForm from "./CreateRoomsForm";
+import CreateRoomsForm from "./CreateRoomsForm";
 
 const dataForm = {
   button: "Crear habitaciones",
@@ -49,6 +49,9 @@ export function CreateRoomsDialog() {
     defaultValues: {
       number: 0,
       roomTypeId: "",
+      tv: "",
+      area: 0,
+      floorType: undefined,
     },
   });
 
@@ -86,7 +89,7 @@ export function CreateRoomsDialog() {
           </DialogHeader>
           <ScrollArea className="h-full max-h-[80vh] px-0">
             <div className="px-6">
-              <CreateCustomersForm form={form} onSubmit={onSubmit}>
+              <CreateRoomsForm form={form} onSubmit={onSubmit}>
                 <DialogFooter className="w-full">
                   <div className="grid grid-cols-2 gap-2 w-full">
                     <DialogClose asChild>
@@ -100,7 +103,7 @@ export function CreateRoomsDialog() {
                     </Button>
                   </div>
                 </DialogFooter>
-              </CreateCustomersForm>
+              </CreateRoomsForm>
             </div>
           </ScrollArea>
         </DialogContent>
@@ -126,7 +129,7 @@ export function CreateRoomsDialog() {
         <div className="flex-1 overflow-hidden">
           <ScrollArea className="h-[40vh] px-0">
             <div className="px-4">
-              <CreateCustomersForm form={form} onSubmit={onSubmit}>
+              <CreateRoomsForm form={form} onSubmit={onSubmit}>
                 <DrawerFooter className="px-0 pt-2">
                   <Button disabled={isCreatePending} className="w-full">
                     {isCreatePending && <RefreshCcw className="mr-2 size-4 animate-spin" aria-hidden="true" />}
@@ -138,7 +141,7 @@ export function CreateRoomsDialog() {
                     </Button>
                   </DrawerClose>
                 </DrawerFooter>
-              </CreateCustomersForm>
+              </CreateRoomsForm>
             </div>
           </ScrollArea>
         </div>
