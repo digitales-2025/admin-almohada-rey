@@ -53,10 +53,7 @@ export function UpdateRoomTypeSheet({ roomType, open, onOpenChange }: UpdateRoom
       name: roomType.name,
       guests: roomType.guests,
       price: roomType.price,
-      tv: roomType.tv || "",
-      floorType: roomType.floorType,
       description: roomType.description || "",
-      area: roomType.area,
       bed: roomType.bed || "",
       newImage: undefined,
       // IMPORTANTE: Inicializar con la imagen principal actual como punto de partida
@@ -79,10 +76,7 @@ export function UpdateRoomTypeSheet({ roomType, open, onOpenChange }: UpdateRoom
         name: roomType.name,
         guests: roomType.guests,
         price: roomType.price,
-        tv: roomType.tv || "",
-        floorType: roomType.floorType,
         description: roomType.description || "",
-        area: roomType.area,
         bed: roomType.bed || "",
         newImage: undefined,
         // IMPORTANTE: Reiniciar con la imagen principal actual

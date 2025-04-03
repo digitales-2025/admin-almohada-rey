@@ -1,4 +1,4 @@
-import { Grid3X3, Layers } from "lucide-react";
+/* import { Grid3X3, Layers } from "lucide-react";
 
 import { FloorTypeEnum } from "../_types/roomTypes";
 
@@ -24,3 +24,4 @@ export const FloorTypeLabels: Record<
     description: "Piso alfombrado, cálido y confortable",
   },
 };
+ */
