@@ -1,14 +1,14 @@
 import React from "react";
-import { AreaChart, Bed, CreditCard, MonitorDot, User2 } from "lucide-react";
+import { Bed, CreditCard, User2 } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
 import { InputWithIcon } from "@/components/input-with-icon";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+/* import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; */
 import { Textarea } from "@/components/ui/textarea";
 import { CreateRoomTypeSchema } from "../../_schema/roomTypesSchema";
-import { FloorTypeEnum } from "../../_types/roomTypes";
-import { FloorTypeLabels } from "../../_utils/roomTypes.utils";
+/* import { FloorTypeEnum } from "../../_types/roomTypes";
+import { FloorTypeLabels } from "../../_utils/roomTypes.utils"; */
 import { CreateRoomTypeImagesManager } from "./CreateRoomTypeImagesManager";
 
 interface CreateRoomTypeFormProps extends Omit<React.ComponentPropsWithRef<"form">, "onSubmit"> {
@@ -98,7 +98,7 @@ export default function CreateRoomTypeForm({ children, form, onSubmit }: CreateR
             )}
           />
 
-          <FormField
+          {/*      <FormField
             control={form.control}
             name="area"
             render={({ field }) => (
@@ -110,7 +110,7 @@ export default function CreateRoomTypeForm({ children, form, onSubmit }: CreateR
                     placeholder="Ej: 30"
                     type="number"
                     min={1}
-                    max={10000} /* Límite razonable para área */
+                    max={10000} 
                     step="0.01"
                     {...field}
                     onChange={(e) => {
@@ -132,7 +132,7 @@ export default function CreateRoomTypeForm({ children, form, onSubmit }: CreateR
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
 
           <FormField
             control={form.control}
@@ -170,7 +170,7 @@ export default function CreateRoomTypeForm({ children, form, onSubmit }: CreateR
             )}
           />
 
-          <FormField
+          {/*          <FormField
             control={form.control}
             name="tv"
             render={({ field }) => (
@@ -183,7 +183,7 @@ export default function CreateRoomTypeForm({ children, form, onSubmit }: CreateR
               </FormItem>
             )}
           />
-
+*/}
           <FormField
             control={form.control}
             name="bed"
@@ -198,7 +198,7 @@ export default function CreateRoomTypeForm({ children, form, onSubmit }: CreateR
             )}
           />
 
-          <FormField
+          {/*     <FormField
             control={form.control}
             name="floorType"
             render={({ field }) => (
@@ -229,7 +229,7 @@ export default function CreateRoomTypeForm({ children, form, onSubmit }: CreateR
                 <FormMessage />
               </FormItem>
             )}
-          />
+          />*/}
         </div>
 
         {/* Campo de descripción (ocupa todo el ancho) */}

@@ -130,10 +130,7 @@ export const useRoomTypes = () => {
     if (data.name) requestData.append("name", data.name);
     if (data.guests) requestData.append("guests", String(data.guests));
     if (data.price) requestData.append("price", String(data.price));
-    if (data.tv) requestData.append("tv", data.tv);
-    if (data.floorType) requestData.append("floorType", data.floorType);
     if (data.description) requestData.append("description", data.description);
-    if (data.area) requestData.append("area", String(data.area));
     if (data.bed) requestData.append("bed", data.bed);
 
     // Manejar imagen nueva si existe

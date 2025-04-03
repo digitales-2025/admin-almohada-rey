@@ -821,6 +821,23 @@ export interface paths {
     patch: operations["CustomersController_update_v1"];
     trace?: never;
   };
+  "/v1/customers/history/booking/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get a history customer by id with optional filters */
+    get: operations["CustomersController_findCustomerHistoryById_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v1/customers/document/number/{documentNumber}": {
     parameters: {
       query?: never;
@@ -1058,13 +1075,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-02T17:39:34.249Z
+       * @example 2025-04-03T17:40:43.205Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-02T17:39:34.249Z
+       * @example 2025-04-03T17:40:43.205Z
        */
       updatedAt: string;
       /** @description Customer name */
@@ -1119,13 +1136,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-02T17:39:34.249Z
+       * @example 2025-04-03T17:40:43.205Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-02T17:39:34.249Z
+       * @example 2025-04-03T17:40:43.205Z
        */
       updatedAt: string;
       /** @description User name */
@@ -1168,13 +1185,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-02T17:39:34.249Z
+       * @example 2025-04-03T17:40:43.205Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-02T17:39:34.249Z
+       * @example 2025-04-03T17:40:43.205Z
        */
       updatedAt: string;
       /**
@@ -1193,26 +1210,10 @@ export interface components {
        */
       price: number;
       /**
-       * @description Descripción de la televisión
-       * @example Smart TV 42 pulgadas
-       */
-      tv: string;
-      /**
-       * @description Tipo de piso
-       * @example LAMINATING
-       * @enum {string}
-       */
-      floorType: "LAMINATING" | "CARPETING";
-      /**
        * @description Descripción del tipo de habitación
        * @example Habitación con vista al mar y balcón privado
        */
       description: string;
-      /**
-       * @description Área en metros cuadrados
-       * @example 25.5
-       */
-      area: number;
       /**
        * @description Descripción de la cama
        * @example Cama matrimonial king size
@@ -1233,13 +1234,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-02T17:39:34.249Z
+       * @example 2025-04-03T17:40:43.205Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-02T17:39:34.249Z
+       * @example 2025-04-03T17:40:43.205Z
        */
       updatedAt: string;
       /**
@@ -1294,6 +1295,22 @@ export interface components {
        * @enum {string}
        */
       status: "AVAILABLE" | "OCCUPIED" | "CLEANING";
+      /**
+       * @description Descripción de la televisión
+       * @example Smart TV 42 pulgadas
+       */
+      tv: string;
+      /**
+       * @description Área en metros cuadrados
+       * @example 25.5
+       */
+      area: number;
+      /**
+       * @description Tipo de piso
+       * @example LAMINATING
+       * @enum {string}
+       */
+      floorType: "LAMINATING" | "CARPETING";
       /** @description Nombre del tipo de habitación asociado */
       RoomTypes: components["schemas"]["RoomType"];
     };
@@ -1312,13 +1329,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-04-02T17:39:34.249Z
+       * @example 2025-04-03T17:40:43.205Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-04-02T17:39:34.249Z
+       * @example 2025-04-03T17:40:43.205Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -1467,13 +1484,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-04-02T17:39:34.249Z
+       * @example 2025-04-03T17:40:43.205Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-04-02T17:39:34.249Z
+       * @example 2025-04-03T17:40:43.205Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -1562,6 +1579,22 @@ export interface components {
        * @example 101
        */
       number: number;
+      /**
+       * @description Descripción de la televisión
+       * @example Smart TV 42 pulgadas
+       */
+      tv: string;
+      /**
+       * @description Área en metros cuadrados
+       * @example 25.5
+       */
+      area: number;
+      /**
+       * @description Tipo de piso
+       * @example LAMINATING
+       * @enum {string}
+       */
+      floorType: "LAMINATING" | "CARPETING";
     };
     BaseApiResponse: {
       /**
@@ -1591,13 +1624,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-02T17:39:34.249Z
+       * @example 2025-04-03T17:40:43.205Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-02T17:39:34.249Z
+       * @example 2025-04-03T17:40:43.205Z
        */
       updatedAt: string;
       /**
@@ -1652,6 +1685,22 @@ export interface components {
        * @enum {string}
        */
       status: "AVAILABLE" | "OCCUPIED" | "CLEANING";
+      /**
+       * @description Descripción de la televisión
+       * @example Smart TV 42 pulgadas
+       */
+      tv: string;
+      /**
+       * @description Área en metros cuadrados
+       * @example 25.5
+       */
+      area: number;
+      /**
+       * @description Tipo de piso
+       * @example LAMINATING
+       * @enum {string}
+       */
+      floorType: "LAMINATING" | "CARPETING";
     };
     StatusRoomDto: {
       /**
@@ -1702,6 +1751,22 @@ export interface components {
        * @example true
        */
       lamp?: boolean;
+      /**
+       * @description Descripción de la televisión
+       * @example Smart TV 42 pulgadas
+       */
+      tv?: string;
+      /**
+       * @description Área en metros cuadrados
+       * @example 25.5
+       */
+      area?: number;
+      /**
+       * @description Tipo de piso
+       * @example LAMINATING
+       * @enum {string}
+       */
+      floorType?: "LAMINATING" | "CARPETING";
     };
     DeleteRoomDto: {
       /**
@@ -1729,26 +1794,10 @@ export interface components {
        */
       price: number;
       /**
-       * @description Descripción de la televisión
-       * @example Smart TV 42 pulgadas
-       */
-      tv: string;
-      /**
-       * @description Tipo de piso
-       * @example LAMINATING
-       * @enum {string}
-       */
-      floorType: "LAMINATING" | "CARPETING";
-      /**
        * @description Descripción del tipo de habitación
        * @example Habitación con balcón privado
        */
       description: string;
-      /**
-       * @description Área en metros cuadrados
-       * @example 25.5
-       */
-      area: number;
       /**
        * @description Descripción de la cama
        * @example Cama matrimonial king size
@@ -1791,26 +1840,10 @@ export interface components {
        */
       price?: number;
       /**
-       * @description Descripción de la televisión
-       * @example Smart TV 42 pulgadas
-       */
-      tv?: string;
-      /**
-       * @description Tipo de piso
-       * @example LAMINATING
-       * @enum {string}
-       */
-      floorType?: "LAMINATING" | "CARPETING";
-      /**
        * @description Descripción del tipo de habitación
        * @example Habitación con balcón privado
        */
       description?: string;
-      /**
-       * @description Área en metros cuadrados
-       * @example 25.5
-       */
-      area?: number;
       /**
        * @description Descripción de la cama
        * @example Cama matrimonial king size
@@ -1922,13 +1955,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-02T17:39:34.249Z
+       * @example 2025-04-03T17:40:43.205Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-02T17:39:34.249Z
+       * @example 2025-04-03T17:40:43.205Z
        */
       updatedAt: string;
       name: string;
@@ -2067,13 +2100,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-02T17:39:34.249Z
+       * @example 2025-04-03T17:40:43.205Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-02T17:39:34.249Z
+       * @example 2025-04-03T17:40:43.205Z
        */
       updatedAt: string;
       /**
@@ -4496,6 +4529,52 @@ export interface operations {
     };
     responses: {
       /** @description Customer updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  CustomersController_findCustomerHistoryById_v1: {
+    parameters: {
+      query?: {
+        /** @description Filter reservations by year */
+        year?: number;
+        /** @description Filter reservations by status */
+        status?: "PENDING" | "CONFIRMED" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELED";
+      };
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description History Customer found successfully */
       200: {
         headers: {
           [name: string]: unknown;

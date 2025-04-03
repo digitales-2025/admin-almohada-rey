@@ -27,8 +27,8 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FloorTypeAccepted, RoomType } from "../../_types/roomTypes";
-import { FloorTypeLabels } from "../../_utils/roomTypes.utils";
+import { /* FloorTypeAccepted, */ RoomType } from "../../_types/roomTypes";
+/* import { FloorTypeLabels } from "../../_utils/roomTypes.utils"; */
 import { DeleteRoomTypesDialog } from "../state-management/DeleteRoomTypesDialog";
 import { ReactivateRoomTypesDialog } from "../state-management/ReactivateRoomTypesDialog";
 import { UpdateRoomTypeSheet } from "../update/UpdateRoomTypesSheet";
@@ -76,7 +76,7 @@ export const roomTypesColumns = (isSuperAdmin: boolean): ColumnDef<RoomType>[] =
       </div>
     ),
   },
-  {
+  /*   {
     id: "tipo de piso",
     accessorKey: "floorType",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Tipo de Piso" />,
@@ -108,7 +108,7 @@ export const roomTypesColumns = (isSuperAdmin: boolean): ColumnDef<RoomType>[] =
       return rowValue === value;
     },
     enableColumnFilter: true,
-  },
+  }, */
   {
     id: "area",
     accessorKey: "area",
