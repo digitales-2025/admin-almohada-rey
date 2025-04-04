@@ -108,19 +108,12 @@ export default function UpdateReservationForm({
     // Si ya está verificando, no iniciar otra verificación
     if (isChecking) return;
 
-    // //Si es el mismo intervalo de fecha y hora original
-    // if (defaultOriginalCheckInDate.current === checkInDate && defaultOriginalCheckOutDate.current === checkOutDate) {
-    //   setIsOriginalInterval(true);
-    //   // return; //Si se necesita validar si hay otras habitaciones disponibles
-    // }
-
     // Comparar con valores anteriores para evitar verificaciones redundantes
     if (
       lastCheckedRef.current.roomId === roomId &&
       lastCheckedRef.current.checkInDate === checkInDate &&
       lastCheckedRef.current.checkOutDate === checkOutDate
     ) {
-      // setIsOriginalInterval(false);
       return;
     }
 
@@ -134,23 +127,32 @@ export default function UpdateReservationForm({
       checkOutDate,
     };
 
-    // console.log("Verificando disponibilidad para fechas:", { checkInDate, checkOutDate });
-
-    // Realizar la verificación después de un pequeño retraso
-    setTimeout(() => {
+    // Usar un timeout más largo para reducir peticiones durante cambios rápidos
+    const timeoutId = setTimeout(() => {
       checkAvailability({
         checkInDate,
         checkOutDate,
         reservationId: reservation.id,
       });
-      setIsChecking(false);
-    }, 300);
-  }, [roomId, checkInDate, checkOutDate, isChecking, checkAvailability]);
 
-  // 4. Efecto que ejecuta la verificación cuando cambian los valores importantes
+      // Establecer un timeout adicional para finalizar el estado de carga
+      setTimeout(() => {
+        setIsChecking(false);
+      }, 300);
+    }, 500); // Debounce de 500ms
+
+    // Limpieza del timeout si cambian las dependencias antes de que se ejecute
+    return () => clearTimeout(timeoutId);
+  }, [roomId, checkInDate, checkOutDate, isChecking, checkAvailability, reservation.id]);
+
+  // Efecto que ejecuta la verificación cuando cambian los valores importantes
   useEffect(() => {
-    memoizedCheckAvailability();
-  }, [memoizedCheckAvailability]);
+    // Solo verificar si hay valores válidos para todos los campos necesarios
+    if (roomId && checkInDate && checkOutDate) {
+      const cleanup = memoizedCheckAvailability();
+      return cleanup;
+    }
+  }, [memoizedCheckAvailability, roomId, checkInDate, checkOutDate]);
 
   const handleAddGuest = () => {
     append({

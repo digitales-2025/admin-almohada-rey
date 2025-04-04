@@ -85,15 +85,13 @@ export default function UpdateBookingCalendarTime({
   //   toast.success("Habitación disponible para estas fechas");
   // }
 
-  // O ajusta así para que no fuerce los estados si ya están cambiados:
+  // Inicializar con valores de la reservación
   useEffect(() => {
     if (!checkInDate) {
       form.setValue("checkInDate", reservation.checkInDate);
-      setSelectedCheckInDate(new Date(reservation.checkInDate));
     }
     if (!checkOutDate) {
       form.setValue("checkOutDate", reservation.checkOutDate);
-      setSelectedCheckOutDate(new Date(reservation.checkOutDate));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reservation]);
@@ -107,25 +105,6 @@ export default function UpdateBookingCalendarTime({
       // Convertir a formato ISO con zona horaria de Perú
       const checkInISO = peruDateTimeToUTC(formattedCheckIn, selectedCheckInTime);
       const checkOutISO = peruDateTimeToUTC(formattedCheckOut, selectedCheckOutTime);
-
-      // Validacion de disponibilidad, no considerando si se escoge la misma fecha y el mismo room Id
-      // if (isOriginalInterval && roomId) {
-      //   if (roomId !== originalRoom.id) {
-      //     // Verificar disponibilidad
-      //     checkAvailability({
-      //       roomId,
-      //       checkInDate: checkInISO,
-      //       checkOutDate: checkOutISO,
-      //     });
-      //   }
-      // } else {
-      //   // Verificar disponibilidad
-      //   checkAvailability({
-      //     roomId,
-      //     checkInDate: checkInISO,
-      //     checkOutDate: checkOutISO,
-      //   });
-      // }
 
       checkAvailability({
         roomId,
@@ -148,6 +127,7 @@ export default function UpdateBookingCalendarTime({
   const handleCheckInDateChange = (date: Date | undefined) => {
     if (!date) return;
 
+    // Actualizar estado local
     setSelectedCheckInDate(date);
 
     // Si la fecha de check-out es anterior o el mismo dia a la nueva fecha de check-in, ajustarla
@@ -276,14 +256,20 @@ export default function UpdateBookingCalendarTime({
           <div className="w-auto space-x-10 flex-wrap flex items-start h-fit">
             <div className="space-y-4">
               <h3 className="font-semibold">Fecha de Check-in</h3>
-              <CalendarBig
-                locale={es}
-                selected={selectedCheckInDate}
-                mode="single"
-                disabled={(date) => isDateDisabled(date, true)}
-                defaultMonth={selectedCheckInDate}
-                onSelect={handleCheckInDateChange}
-              />
+              {isLoading ? (
+                <div className="flex justify-center items-center p-6 border rounded-md">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : (
+                <CalendarBig
+                  locale={es}
+                  selected={selectedCheckInDate}
+                  mode="single"
+                  disabled={(date) => isDateDisabled(date, true)}
+                  defaultMonth={selectedCheckInDate}
+                  onSelect={handleCheckInDateChange}
+                />
+              )}
             </div>
             <div className="space-y-4">
               <h3 className="font-semibold">Hora de Check-in</h3>
@@ -325,14 +311,20 @@ export default function UpdateBookingCalendarTime({
           <div className="w-auto space-x-10 flex-wrap flex items-start h-fit">
             <div className="space-y-4">
               <h3 className="font-semibold">Fecha de Check-out</h3>
-              <CalendarBig
-                locale={es}
-                selected={selectedCheckOutDate}
-                mode="single"
-                disabled={(date) => isDateDisabled(date, false)}
-                defaultMonth={selectedCheckOutDate}
-                onSelect={handleCheckOutDateChange}
-              />
+              {isLoading ? (
+                <div className="flex justify-center items-center p-6 border rounded-md">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : (
+                <CalendarBig
+                  locale={es}
+                  selected={selectedCheckOutDate}
+                  mode="single"
+                  disabled={(date) => isDateDisabled(date, false)}
+                  defaultMonth={selectedCheckOutDate}
+                  onSelect={handleCheckOutDateChange}
+                />
+              )}
             </div>
             <div className="space-y-4">
               <h3 className="font-semibold">Hora de Check-out</h3>
@@ -350,6 +342,7 @@ export default function UpdateBookingCalendarTime({
                     return (
                       <Button
                         key={timeStr}
+                        type="button"
                         variant={isSelected ? "default" : "outline"}
                         className="w-full justify-start"
                         onClick={() => handleCheckOutTimeChange(timeStr)}
