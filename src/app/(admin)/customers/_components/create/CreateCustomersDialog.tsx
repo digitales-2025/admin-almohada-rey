@@ -61,8 +61,18 @@ export function CreateCustomersDialog() {
   });
 
   const onSubmit = async (input: CreateCustomersSchema) => {
+    const { hasCompany, email, birthDate, ...rest } = input;
     startCreateTransition(() => {
-      onCreateCustomer(input);
+      onCreateCustomer({
+        ...rest,
+        ...(birthDate && { birthDate: birthDate }),
+        ...(email && { email: email }),
+        ...(hasCompany && {
+          companyName: rest.companyName,
+          ruc: rest.ruc,
+          companyAddress: rest.companyAddress,
+        }),
+      });
     });
   };
 
@@ -96,7 +106,7 @@ export function CreateCustomersDialog() {
             <div className="px-6">
               <CreateCustomersForm form={form} onSubmit={onSubmit}>
                 <DialogFooter className="w-full">
-                  <div className="flex gap-2 w-full">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
                     <DialogClose asChild>
                       <Button onClick={handleClose} type="button" variant="outline" className="w-full">
                         Cancelar
@@ -124,7 +134,7 @@ export function CreateCustomersDialog() {
         </Button>
       </DrawerTrigger>
 
-      <DrawerContent>
+      <DrawerContent className="h-[80vh]">
         <DrawerHeader className="pb-2">
           <DrawerTitle>{dataForm.title}</DrawerTitle>
           <DrawerDescription>{dataForm.description}</DrawerDescription>
@@ -132,7 +142,7 @@ export function CreateCustomersDialog() {
 
         {/* The key fix is in this ScrollArea configuration */}
         <div className="flex-1 overflow-hidden">
-          <ScrollArea className="h-[40vh] px-0">
+          <ScrollArea className="h-full px-0">
             <div className="px-4">
               <CreateCustomersForm form={form} onSubmit={onSubmit}>
                 <DrawerFooter className="px-0 pt-2">

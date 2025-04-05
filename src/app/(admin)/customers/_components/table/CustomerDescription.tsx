@@ -1,6 +1,8 @@
 "use client";
 
-import { Briefcase, Building, Globe, Info, Mail, MapPin, Phone, User } from "lucide-react";
+import { format, parseISO } from "date-fns";
+import { es } from "date-fns/locale";
+import { Briefcase, Building, Cake, Globe, Info, Mail, MapPin, Phone, User } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -100,7 +102,11 @@ export const CustomerDescription = ({ row }: CustomerDescriptionProps) => {
                 <Mail className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                 <div>
                   <p className="text-xs text-muted-foreground">Email</p>
-                  <p className="text-sm">{row.email}</p>
+                  {row.email ? (
+                    <p className="text-sm">{row.email}</p>
+                  ) : (
+                    <p className="text-sm italic text-muted-foreground">No registrado</p>
+                  )}
                 </div>
               </div>
 
@@ -113,10 +119,26 @@ export const CustomerDescription = ({ row }: CustomerDescriptionProps) => {
               </div>
 
               <div className="flex items-start gap-3">
+                <Cake className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Fecha de nacimiento</p>
+                  <p className="text-sm">
+                    {row.birthDate ? (
+                      format(parseISO(row.birthDate), "d 'de' MMMM 'de' yyyy", { locale: es })
+                    ) : (
+                      <span className="italic text-muted-foreground">No registrado</span>
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
                 <Globe className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                 <div>
                   <p className="text-xs text-muted-foreground">Lugar de nacimiento</p>
-                  <p className="text-sm">{row.birthPlace}</p>
+                  <p className="text-sm">
+                    {row.birthPlace || <span className="italic text-muted-foreground">No registrado</span>}
+                  </p>
                 </div>
               </div>
             </div>

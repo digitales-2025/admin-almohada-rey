@@ -170,7 +170,7 @@ export default function CustomerReservationDescriptionContent({
                     );
                   })()
                 ) : (
-                  <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-md">
+                  <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 p-3 rounded-md">
                     <CreditCard className="h-4 w-4 text-muted-foreground" />
                     <span>No disponible</span>
                   </div>

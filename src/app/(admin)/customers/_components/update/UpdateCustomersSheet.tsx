@@ -49,6 +49,7 @@ export function UpdateCustomerSheet({ customer, open, onOpenChange }: UpdateCust
       name: customer.name ?? "",
       address: customer.address ?? "",
       birthPlace: customer.birthPlace ?? "",
+      birthDate: customer.birthDate ?? "",
       occupation: customer.occupation ?? "",
       phone: customer.phone ?? "",
       documentType: customer.documentType ?? "",
@@ -59,6 +60,12 @@ export function UpdateCustomerSheet({ customer, open, onOpenChange }: UpdateCust
       ...(customer.department && {
         department: customer.department ?? "",
         province: customer.province ?? "",
+      }),
+      ...(customer.ruc && {
+        hasCompany: true,
+        companyName: customer.companyName ?? "",
+        ruc: customer.ruc ?? "",
+        companyAddress: customer.companyAddress ?? "",
       }),
     },
   });
@@ -91,6 +98,7 @@ export function UpdateCustomerSheet({ customer, open, onOpenChange }: UpdateCust
         name: customer.name ?? "",
         address: customer.address ?? "",
         birthPlace: customer.birthPlace ?? "",
+        birthDate: customer.birthDate ?? "",
         occupation: customer.occupation ?? "",
         phone: customer.phone ?? "",
         documentType: customer.documentType ?? "",
@@ -101,6 +109,12 @@ export function UpdateCustomerSheet({ customer, open, onOpenChange }: UpdateCust
         ...(customer.department && {
           department: customer.department ?? "",
           province: customer.province ?? "",
+        }),
+        ...(customer.ruc && {
+          hasCompany: true,
+          companyName: customer.companyName ?? "",
+          ruc: customer.ruc ?? "",
+          companyAddress: customer.companyAddress ?? "",
         }),
       });
 
@@ -122,8 +136,16 @@ export function UpdateCustomerSheet({ customer, open, onOpenChange }: UpdateCust
   }, [open, customer]);
 
   const onSubmit = async (input: CreateCustomersSchema) => {
+    const { email, birthDate, ...rest } = input;
     onUpdateCustomer({
-      ...input,
+      ...rest,
+      ...(birthDate && { birthDate: birthDate }),
+      ...(email && { email: email }),
+      ...(rest.hasCompany && {
+        companyName: rest.companyName,
+        ruc: rest.ruc,
+        companyAddress: rest.companyAddress,
+      }),
       id: customer.id,
     });
   };

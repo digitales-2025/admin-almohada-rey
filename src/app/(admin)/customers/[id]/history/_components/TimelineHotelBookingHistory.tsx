@@ -142,7 +142,11 @@ export default function TimelineHotelBookingHistory({
                                 </div>
                                 <div>
                                   <p className="text-muted-foreground">Total</p>
-                                  <p className="font-medium">S/. {booking.payment.amountPaid}</p>
+                                  <p className="font-medium">
+                                    {booking.payment && booking.payment.amountPaid !== undefined
+                                      ? `S/. ${booking.payment.amountPaid}`
+                                      : "Pago pendiente"}
+                                  </p>
                                 </div>
                                 <div>
                                   <p className="text-muted-foreground">Motivo</p>

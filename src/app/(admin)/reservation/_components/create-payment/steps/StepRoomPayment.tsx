@@ -258,7 +258,7 @@ export default function StepRoomPayment({
             ) : (
               <div className="space-y-4 max-h-[300px] overflow-y-auto pr-1">
                 {fields.map((field, index) => (
-                  <div key={field.id} className="border-2 rounded-lg overflow-hidden bg-white">
+                  <div key={field.id} className="border-2 rounded-lg overflow-hidden ">
                     <div className="bg-muted/20 px-4 py-2 border-b flex items-center justify-between">
                       <FormField
                         control={form.control}
