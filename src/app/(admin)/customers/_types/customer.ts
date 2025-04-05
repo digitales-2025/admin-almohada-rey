@@ -14,7 +14,8 @@ export type Customer = {
   occupation: string;
   documentType: CustomerDocumentType;
   documentNumber: string;
-  email: string;
+  email?: string;
+  birthDate?: string;
   maritalStatus: CustomerMaritalStatus;
   companyName?: string;
   ruc?: string;
