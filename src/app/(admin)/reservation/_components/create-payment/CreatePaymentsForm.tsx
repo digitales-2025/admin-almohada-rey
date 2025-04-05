@@ -52,6 +52,15 @@ export default function CreatePaymentsForm({
 
   // Add a new extra service
   const addExtraService = (serviceTemplate: Service) => {
+    // Verificar si el servicio ya existe en los extraServices
+    const existingServices = form.getValues("extraServices");
+    const serviceExists = existingServices.some((service) => service.id === serviceTemplate?.id);
+
+    // Si el servicio ya existe, no permitir agregarlo nuevamente
+    if (serviceExists) {
+      return;
+    }
+
     const newService = {
       id: serviceTemplate ? serviceTemplate.id : "",
       name: serviceTemplate ? serviceTemplate.name : "",
