@@ -474,7 +474,6 @@ export default function CreateReservationForm({
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[100px]">Nombre y Apell.</TableHead>
-                  {/* <TableHead className="text-center text-balance max-w-10">Almacén</TableHead> */}
                   <TableHead>Edad</TableHead>
                   <TableHead>Tipo de Identidad</TableHead>
                   <TableHead>Nro. de Identidad</TableHead>
