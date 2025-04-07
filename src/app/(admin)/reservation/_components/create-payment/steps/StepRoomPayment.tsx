@@ -2,7 +2,7 @@ import { format, parse } from "date-fns";
 import { Banknote, Coffee, Hash, Hotel, Moon, ShoppingCart, Trash2, Utensils } from "lucide-react";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
 
-import { CreatePaymentSchema, ExtraServiceItem } from "@/app/(admin)/payment/_schema/createPaymentsSchema";
+import { CreatePaymentSchema, ExtraServiceItem } from "@/app/(admin)/payments/_schema/createPaymentsSchema";
 import { getRoomTypeKey, RoomTypeLabels } from "@/app/(admin)/rooms/list/_utils/rooms.utils";
 import { InputWithIcon } from "@/components/input-with-icon";
 import { Badge } from "@/components/ui/badge";

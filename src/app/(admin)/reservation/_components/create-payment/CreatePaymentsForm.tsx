@@ -1,6 +1,6 @@
 import { useFieldArray, UseFormReturn } from "react-hook-form";
 
-import { CreatePaymentSchema, ExtraServiceItem } from "@/app/(admin)/payment/_schema/createPaymentsSchema";
+import { CreatePaymentSchema, ExtraServiceItem } from "@/app/(admin)/payments/_schema/createPaymentsSchema";
 import { Form } from "@/components/ui/form";
 import { Service } from "@/types/services";
 import { DetailedReservation } from "../../_schemas/reservation.schemas";

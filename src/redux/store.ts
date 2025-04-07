@@ -3,7 +3,7 @@ import { setupListeners } from "@reduxjs/toolkit/query";
 
 import { customersApi } from "@/app/(admin)/customers/_services/customersApi";
 import { productsApi } from "@/app/(admin)/inventory/products/_services/productsApi";
-import { paymentsApi } from "@/app/(admin)/payment/_services/paymentsApi";
+import { paymentsApi } from "@/app/(admin)/payments/_services/paymentsApi";
 import { adminApi } from "@/app/(admin)/profile/_services/adminApi";
 import { reservationApi } from "@/app/(admin)/reservation/_services/reservationApi";
 import { roomsApi } from "@/app/(admin)/rooms/list/_services/roomsApi";

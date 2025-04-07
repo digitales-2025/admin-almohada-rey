@@ -5,9 +5,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronLeft, ChevronRight, RefreshCcw } from "lucide-react";
 import { useForm } from "react-hook-form";
 
-import { usePayments } from "@/app/(admin)/payment/_hooks/use-payments";
-import { CreatePaymentSchema, paymentSchema } from "@/app/(admin)/payment/_schema/createPaymentsSchema";
-import { PaymentDetailMethod, PaymentDetailType } from "@/app/(admin)/payment/_types/payment";
+import { usePayments } from "@/app/(admin)/payments/_hooks/use-payments";
+import { CreatePaymentSchema, paymentSchema } from "@/app/(admin)/payments/_schema/createPaymentsSchema";
+import { PaymentDetailMethod, PaymentDetailType } from "@/app/(admin)/payments/_types/payment";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

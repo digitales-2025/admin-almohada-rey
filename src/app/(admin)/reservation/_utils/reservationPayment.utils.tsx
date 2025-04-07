@@ -1,6 +1,6 @@
 import { Banknote, Building, CreditCard, Smartphone } from "lucide-react";
 
-import { PaymentDetailMethod } from "../../payment/_types/payment";
+import { PaymentDetailMethod } from "../../payments/_types/payment";
 
 export const getPaymentMethodLabel = (method: string): string => {
   const methodLabels: Record<string, string> = {
