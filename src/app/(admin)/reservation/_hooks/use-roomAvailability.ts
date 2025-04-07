@@ -1,7 +1,17 @@
 import { useState } from "react";
 
-import { useGetAllAvailableRoomsQuery, useGetRoomAvailabilityQuery } from "../_services/reservationApi";
-import { AvailabilityParams, GenericAvailabilityParams } from "../_types/room-availability-query-params";
+import {
+  useGetAllAvailableRoomsForUpdateQuery,
+  useGetAllAvailableRoomsQuery,
+  useGetRoomAvailabilityForUpdateQuery,
+  useGetRoomAvailabilityQuery,
+} from "../_services/reservationApi";
+import {
+  AvailabilityFormUpdateParams,
+  AvailabilityParams,
+  GenericAvailabilityFormUpdateParams,
+  GenericAvailabilityParams,
+} from "../_types/room-availability-query-params";
 
 export const useRoomAvailability = () => {
   const [params, setParams] = useState<AvailabilityParams | null>(null);
@@ -34,6 +44,46 @@ export const useRoomAvailability = () => {
   };
 };
 
+export const useRoomAvailabilityForUpdate = ({
+  reservationId,
+  checkInDate,
+  checkOutDate,
+  roomId,
+}: AvailabilityFormUpdateParams) => {
+  const [params, setParams] = useState<AvailabilityFormUpdateParams | null>(null);
+
+  // Usar un estado local para manejar los parámetros de consulta
+  const { data, isLoading, isFetching, isError, error } = useGetRoomAvailabilityForUpdateQuery(
+    params ?? {
+      roomId: roomId,
+      checkInDate: checkInDate,
+      checkOutDate: checkOutDate,
+      reservationId: reservationId,
+    },
+    {
+      skip: !params,
+      refetchOnMountOrArgChange: true,
+    }
+  );
+
+  const isAvailable = data?.isAvailable ? data.isAvailable : false; //lookout this code
+
+  const checkAvailability = (newParams: AvailabilityFormUpdateParams) => {
+    setParams({
+      ...newParams,
+      reservationId: reservationId,
+    });
+  };
+
+  return {
+    isAvailable,
+    isLoading: isLoading || isFetching,
+    checkAvailability,
+    error,
+    isError,
+  };
+};
+
 export const useAllAvailableRoomsInTimeInterval = (defaultParams: GenericAvailabilityParams) => {
   const [params, setParams] = useState<GenericAvailabilityParams | null>(defaultParams);
 
@@ -51,6 +101,42 @@ export const useAllAvailableRoomsInTimeInterval = (defaultParams: GenericAvailab
 
   const checkAvailability = (newParams: GenericAvailabilityParams) => {
     setParams(newParams);
+  };
+
+  return {
+    availableRooms: data ?? [],
+    isLoading: isLoading || isFetching,
+    checkAvailability,
+    error,
+    isError,
+    refetch,
+  };
+};
+
+export const useAllAvailableRoomsInTimeIntervalForUpdate = (
+  defaultParams: GenericAvailabilityFormUpdateParams,
+  reservationId: string
+) => {
+  const [params, setParams] = useState<GenericAvailabilityFormUpdateParams | null>(defaultParams);
+
+  // Usar un estado local para manejar los parámetros de consulta
+  const { data, isLoading, isFetching, isError, error, refetch } = useGetAllAvailableRoomsForUpdateQuery(
+    params ?? {
+      checkInDate: defaultParams.checkInDate,
+      checkOutDate: defaultParams.checkOutDate,
+      reservationId: reservationId,
+    },
+    {
+      skip: !params,
+      refetchOnMountOrArgChange: true,
+    }
+  );
+
+  const checkAvailability = (newParams: GenericAvailabilityFormUpdateParams) => {
+    setParams({
+      ...newParams,
+      reservationId: reservationId,
+    });
   };
 
   return {

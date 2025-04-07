@@ -1,7 +1,7 @@
 "use client";
 
 import type * as React from "react";
-import { format, isSameDay } from "date-fns";
+import { isSameDay } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 
@@ -80,11 +80,8 @@ function CalendarBig({
       {...props}
       disabled={(date) => !isDayAvailable(date)}
       onMonthChange={(date) => {
-        console.log("Mes cambiado en CalendarBig:", date);
-        const formattedDate = format(date, "yyyy-MM-dd"); // Formatear la fecha
-        console.log("Fecha formateada:", formattedDate); // Log de la fecha formateada
+        // console.log("Mes cambiado en CalendarBig:", date);
         if (onMonthChange) {
-          console.log("Llamando a onMonthChange con la fecha:", date);
           onMonthChange(date); // Llama a la función con la fecha original
         }
       }}

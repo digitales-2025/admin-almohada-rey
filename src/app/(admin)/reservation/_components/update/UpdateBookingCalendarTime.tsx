@@ -28,11 +28,12 @@ import {
   formDateToPeruISO,
   getPeruStartOfToday,
   getTimeOptionsForDay,
+  isoToPeruTimeString,
   peruDateTimeToUTC,
 } from "@/utils/peru-datetime";
 import { processError } from "@/utils/process-error";
-import { useRoomAvailability } from "../../_hooks/use-roomAvailability";
-import { CreateReservationInput } from "../../_schemas/reservation.schemas";
+import { useRoomAvailabilityForUpdate } from "../../_hooks/use-roomAvailability";
+import { DetailedReservation, UpdateReservationInput } from "../../_schemas/reservation.schemas";
 
 export type BookingFormData = {
   checkInDate: string;
@@ -40,41 +41,60 @@ export type BookingFormData = {
   roomId?: string;
 };
 
-interface BookingCalendarTimeProps {
-  form: UseFormReturn<CreateReservationInput>;
+interface UpdateBookingCalendarTimeProps {
+  form: UseFormReturn<UpdateReservationInput>;
   roomId?: string;
   onRoomAvailabilityChange?: (available: boolean) => void;
+  reservation: DetailedReservation;
+  // isOriginalInterval: boolean;
+  // originalRoom: DetailedRoom;
 }
 
-export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityChange }: BookingCalendarTimeProps) {
+export default function UpdateBookingCalendarTime({
+  form,
+  roomId,
+  onRoomAvailabilityChange,
+  reservation,
+  // isOriginalInterval,
+  // originalRoom,
+}: UpdateBookingCalendarTimeProps) {
   const [activeTab, setActiveTab] = useState<"checkin" | "checkout">("checkin");
 
   // Estados para manejar selección de fecha y hora
-  const [selectedCheckInDate, setSelectedCheckInDate] = useState<Date>(new Date());
-  const [selectedCheckOutDate, setSelectedCheckOutDate] = useState<Date>(addDays(new Date(), 1));
-  const [selectedCheckInTime, setSelectedCheckInTime] = useState<string>(DEFAULT_CHECKIN_TIME);
-  const [selectedCheckOutTime, setSelectedCheckOutTime] = useState<string>(DEFAULT_CHECKOUT_TIME);
+  const [selectedCheckInDate, setSelectedCheckInDate] = useState<Date>(new Date(reservation.checkInDate));
+  const [selectedCheckOutDate, setSelectedCheckOutDate] = useState<Date>(new Date(reservation.checkOutDate));
+  const [selectedCheckInTime, setSelectedCheckInTime] = useState<string>(
+    reservation.checkInDate ? isoToPeruTimeString(reservation.checkInDate) : DEFAULT_CHECKIN_TIME
+  );
+  const [selectedCheckOutTime, setSelectedCheckOutTime] = useState<string>(
+    reservation.checkOutDate ? isoToPeruTimeString(reservation.checkOutDate) : DEFAULT_CHECKOUT_TIME
+  );
 
   // Obtener valores actuales del formulario
   const checkInDate = form.watch("checkInDate");
   const checkOutDate = form.watch("checkOutDate");
 
   // Hook personalizado para verificar disponibilidad de habitación
-  const { isAvailable, isLoading, checkAvailability, isError, error } = useRoomAvailability();
+  const { isAvailable, isLoading, checkAvailability, isError, error } = useRoomAvailabilityForUpdate({
+    reservationId: reservation.id,
+    checkInDate: reservation.checkInDate,
+    checkOutDate: reservation.checkOutDate,
+    roomId: reservation.roomId,
+  });
   // if (isAvailable){
   //   toast.success("Habitación disponible para estas fechas");
   // }
 
-  // Efecto para inicializar fechas desde el formulario
+  // Inicializar con valores de la reservación
   useEffect(() => {
-    if (checkInDate) {
-      setSelectedCheckInDate(new Date(checkInDate));
+    if (!checkInDate) {
+      form.setValue("checkInDate", reservation.checkInDate);
     }
-    if (checkOutDate) {
-      setSelectedCheckOutDate(new Date(checkOutDate));
+    if (!checkOutDate) {
+      form.setValue("checkOutDate", reservation.checkOutDate);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [reservation]);
 
   // Efecto para verificar disponibilidad cuando cambia la selección
   useEffect(() => {
@@ -86,11 +106,11 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
       const checkInISO = peruDateTimeToUTC(formattedCheckIn, selectedCheckInTime);
       const checkOutISO = peruDateTimeToUTC(formattedCheckOut, selectedCheckOutTime);
 
-      // Verificar disponibilidad
       checkAvailability({
         roomId,
         checkInDate: checkInISO,
         checkOutDate: checkOutISO,
+        reservationId: reservation.id,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -107,6 +127,7 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
   const handleCheckInDateChange = (date: Date | undefined) => {
     if (!date) return;
 
+    // Actualizar estado local
     setSelectedCheckInDate(date);
 
     // Si la fecha de check-out es anterior o el mismo dia a la nueva fecha de check-in, ajustarla
@@ -197,9 +218,9 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
   const isDateDisabled = (date: Date, isCheckIn: boolean) => {
     const today = getPeruStartOfToday();
 
-    // Para check-in, solo deshabilitar fechas pasadas
+    // Para check-in, solo deshabilitar fechas pasadas y la de hoy
     if (isCheckIn) {
-      return isBefore(startOfDay(date), today);
+      return isBefore(startOfDay(date), today) || isSameDay(startOfDay(date), today);
     }
 
     // Para check-out, deshabilitar fechas anteriores o iguales a check-in
@@ -211,14 +232,9 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
   const checkOutTimes = getTimeOptionsForDay("checkout");
 
   if (isError) {
-    // return (
-    //   <div className="w-auto space-y-4">
-    //     <h3 className="font-semibold text-red-800">Ocurrió un error al verificar la disponibilidad</h3>
-    //     <p className="text-sm text-muted-foreground">Por favor, inténtelo de nuevo más tarde.</p>
-    //   </div>
-    // );
-    const errorMessage = processError(error);
-    toast.error(`Ocurrió un error al verificar la disponibilidad de la habitación: ${errorMessage}`);
+    const processedError = processError(error);
+
+    toast.error(`Ocurrió un error al verificar la disponibilidad de la habitación: ${processedError}`);
   }
 
   return (
@@ -240,14 +256,20 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
           <div className="w-auto space-x-10 flex-wrap flex items-start h-fit">
             <div className="space-y-4">
               <h3 className="font-semibold">Fecha de Check-in</h3>
-              <CalendarBig
-                locale={es}
-                selected={selectedCheckInDate}
-                mode="single"
-                disabled={(date) => isDateDisabled(date, true)}
-                defaultMonth={selectedCheckInDate}
-                onSelect={handleCheckInDateChange}
-              />
+              {isLoading ? (
+                <div className="flex justify-center items-center p-6 border rounded-md">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : (
+                <CalendarBig
+                  locale={es}
+                  selected={selectedCheckInDate}
+                  mode="single"
+                  disabled={(date) => isDateDisabled(date, true)}
+                  defaultMonth={selectedCheckInDate}
+                  onSelect={handleCheckInDateChange}
+                />
+              )}
             </div>
             <div className="space-y-4">
               <h3 className="font-semibold">Hora de Check-in</h3>
@@ -279,7 +301,7 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
             </div>
           </div>
           <div className="flex justify-center pt-4">
-            <Button variant="outline" onClick={() => setActiveTab("checkout")} className="w-1/2">
+            <Button variant="outline" onClick={() => setActiveTab("checkout")} className="w-fit">
               Siguiente: Seleccionar Check-out
             </Button>
           </div>
@@ -289,14 +311,20 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
           <div className="w-auto space-x-10 flex-wrap flex items-start h-fit">
             <div className="space-y-4">
               <h3 className="font-semibold">Fecha de Check-out</h3>
-              <CalendarBig
-                locale={es}
-                selected={selectedCheckOutDate}
-                mode="single"
-                disabled={(date) => isDateDisabled(date, false)}
-                defaultMonth={selectedCheckOutDate}
-                onSelect={handleCheckOutDateChange}
-              />
+              {isLoading ? (
+                <div className="flex justify-center items-center p-6 border rounded-md">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : (
+                <CalendarBig
+                  locale={es}
+                  selected={selectedCheckOutDate}
+                  mode="single"
+                  disabled={(date) => isDateDisabled(date, false)}
+                  defaultMonth={selectedCheckOutDate}
+                  onSelect={handleCheckOutDateChange}
+                />
+              )}
             </div>
             <div className="space-y-4">
               <h3 className="font-semibold">Hora de Check-out</h3>
@@ -314,6 +342,7 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
                     return (
                       <Button
                         key={timeStr}
+                        type="button"
                         variant={isSelected ? "default" : "outline"}
                         className="w-full justify-start"
                         onClick={() => handleCheckOutTimeChange(timeStr)}
@@ -335,7 +364,7 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
           {roomId && (
             <div
               className={cn(
-                "mt-2 p-3 rounded-md text-center font-medium",
+                "mt-2 p-3 rounded-md text-center font-medium w-full",
                 isLoading
                   ? "bg-muted text-muted-foreground"
                   : isAvailable
@@ -346,7 +375,7 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
               {isLoading
                 ? "Verificando disponibilidad..."
                 : isAvailable
-                  ? "✓ Habitación disponible para estas fechas"
+                  ? "✓ Habitación disponible para estas fechas o es el rango de la reserva original"
                   : "✗ Habitación no disponible para estas fechas"}
             </div>
           )}
