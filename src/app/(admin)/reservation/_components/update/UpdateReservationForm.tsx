@@ -3,7 +3,7 @@ import { Separator } from "@radix-ui/react-separator";
 import { Switch } from "@radix-ui/react-switch";
 import { isBefore, isSameDay } from "date-fns";
 import { Check, ChevronsUpDown, ListCheck, MapPinHouse, Trash2, UserRoundCheck } from "lucide-react";
-import { UseFieldArrayReturn, UseFormReturn } from "react-hook-form";
+import { Controller, UseFieldArrayReturn, UseFormReturn } from "react-hook-form";
 
 import { CustomFormDescription } from "@/components/form/CustomFormDescription";
 import ErrorMessageForm from "@/components/form/ErrorMessageForm";
@@ -218,7 +218,7 @@ export default function UpdateReservationForm({
       label:
         reservation.customer.name +
         " " +
-        reservation.customer.documentType +
+        documentTypeStatusConfig[reservation.customer.documentType].name +
         `(${reservation.customer.documentNumber})`,
       value: reservation.customerId,
     },
@@ -242,15 +242,15 @@ export default function UpdateReservationForm({
               <FormLabel>{UPDATE_FORMSTATICS.customerId.label}</FormLabel>
               <Select disabled onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger className="w-full text-ellipsis">
-                    <SelectValue placeholder="Seleccione el estado de reserva" />
+                  <SelectTrigger className="w-full text-ellipsis capitalize">
+                    <SelectValue placeholder="Seleccione un cliente" className="capitalize" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   <SelectGroup>
                     {customerOptions.map((customer) => {
                       return (
-                        <SelectItem key={customer.value} value={customer.value}>
+                        <SelectItem className="capitalize" key={customer.value} value={customer.value}>
                           <span>{customer.label}</span>
                         </SelectItem>
                       );
@@ -588,7 +588,7 @@ export default function UpdateReservationForm({
                         </FormItem>
                       </TableCell>
                       <TableCell>
-                        <FormItem>
+                        {/* <FormItem>
                           <FormItem>
                             <FormControl>
                               <PhoneInput
@@ -609,7 +609,29 @@ export default function UpdateReservationForm({
                             {form.formState.errors.guests?.[index]?.phone &&
                               form.formState.errors.guests[index]?.phone?.message}
                           </FormMessage>
-                        </FormItem>
+                        </FormItem> */}
+                        <Controller
+                          control={form.control}
+                          name={`guests.${index}.phone`}
+                          render={({ field: { onChange, value } }) => (
+                            <FormItem>
+                              <FormControl>
+                                <PhoneInput
+                                  className="min-w-[170px] w-full"
+                                  defaultCountry="PE"
+                                  placeholder="999 888 777"
+                                  value={value}
+                                  onChange={onChange}
+                                />
+                              </FormControl>
+                              <CustomFormDescription
+                                required={FORMSTATICS.guests.subFields?.phone.required ?? false}
+                                validateOptionalField={true}
+                              ></CustomFormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </TableCell>
                       <TableCell>
                         <FormItem>

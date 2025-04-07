@@ -6,6 +6,7 @@ import { useCustomers } from "@/app/(admin)/customers/_hooks/use-customers";
 import { ApiCustomer } from "@/app/(admin)/customers/_types/customer";
 // import { useProducts } from "@/app/(admin)/(catalog)/product/products/_hooks/useProduct";
 import { RTKUseQueryHookResult, SearchCombobox } from "@/components/form/RemoteSearchCombobox";
+import { documentTypeStatusConfig } from "../../_types/document-type.enum.config";
 
 type SearchOrderComoBoxProps = {
   onValueChange: (value: string, entity?: unknown) => void;
@@ -31,7 +32,10 @@ export function SearchCustomerCombobox({ onValueChange, defaultValue }: SearchOr
   // console.log("queryResponse", queryResponse);
 
   const mapToComboboxItem = useCallback((customer: ApiCustomer): ComboboxItem<ApiCustomer> => {
-    const documentString = `${customer?.documentType ?? "Sin tipo"}: ${customer?.documentNumber ?? "Sin documento"}`;
+    const documenTypeTranlation = customer?.documentType
+      ? documentTypeStatusConfig[customer.documentType].name
+      : "Sin tipo";
+    const documentString = `${documenTypeTranlation ?? "Sin tipo"}: ${customer?.documentNumber ?? "Sin documento"}`;
     const label = `${customer?.name ?? "Sin nombre"} - ${documentString}`;
     return {
       value: customer.documentNumber ?? "None",

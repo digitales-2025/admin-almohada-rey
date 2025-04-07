@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Check, ChevronsUpDown, ListCheck, MapPinHouse, Trash2, UserRoundCheck } from "lucide-react";
-import { UseFieldArrayReturn, UseFormReturn } from "react-hook-form";
+import { Controller, UseFieldArrayReturn, UseFormReturn } from "react-hook-form";
 
 import { Customer } from "@/app/(admin)/customers/_types/customer";
 import { CustomFormDescription } from "@/components/form/CustomFormDescription";
@@ -609,37 +609,13 @@ export default function CreateReservationForm({
                       </span>
                     </TableCell> */}
                       <TableCell>
-                        <FormItem>
-                          {/* <Input
-                          className="font-bold"
-                          {...register(`guests.${index}.phone` as const, {
-                            valueAsNumber: true,
-                            validate: (value) =>
-                              value > (stockStorage?.stock ?? 0) ? "La cantidad supera el stock disponible" : true,
-                          })}
-                          type="number"
-                          min={1}
-                          placeholder="0"
-                          onInput={(e) => {
-                            const target = e.target as HTMLInputElement;
-                            if (target.value === "") {
-                              return;
-                            }
-                            if (target.valueAsNumber < 0) {
-                              target.value = "0";
-                            }
-                            if (target.valueAsNumber > (stockStorage?.stock ?? 0)) {
-                              target.value = (stockStorage?.stock ?? 0).toString();
-                            }
-                            setTimeout(() => calculateProductTotals(), 0);
-                          }}
-                        /> */}
+                        {/* <FormItem>
                           <FormItem>
                             <FormControl>
                               <PhoneInput
                                 className="min-w-[170px] w-full"
                                 {...register(`guests.${index}.phone` as const)}
-                                defaultCountry={"PE"}
+                                defaultCountry="PE"
                                 placeholder="999 888 777"
                                 value={field.phone}
                                 onChange={(value) => form.setValue(`guests.${index}.phone`, value)}
@@ -654,7 +630,29 @@ export default function CreateReservationForm({
                             {form.formState.errors.guests?.[index]?.phone &&
                               form.formState.errors.guests[index]?.phone?.message}
                           </FormMessage>
-                        </FormItem>
+                        </FormItem> */}
+                        <Controller
+                          control={form.control}
+                          name={`guests.${index}.phone`}
+                          render={({ field: { onChange, value } }) => (
+                            <FormItem>
+                              <FormControl>
+                                <PhoneInput
+                                  className="min-w-[170px] w-full"
+                                  defaultCountry="PE"
+                                  placeholder="999 888 777"
+                                  value={value}
+                                  onChange={onChange}
+                                />
+                              </FormControl>
+                              <CustomFormDescription
+                                required={FORMSTATICS.guests.subFields?.phone.required ?? false}
+                                validateOptionalField={true}
+                              ></CustomFormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </TableCell>
                       <TableCell>
                         <FormItem>
