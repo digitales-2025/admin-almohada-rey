@@ -69,7 +69,13 @@ export const customersColumns = (
     id: "correo",
     accessorKey: "email",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Correo" />,
-    cell: ({ row }) => <div>{row.getValue("correo")}</div>,
+    cell: ({ row }) => {
+      if (!row.getValue("correo")) {
+        return <div className="text-muted-foreground text-sm italic">No registrado</div>;
+      }
+
+      return <div>{row.getValue("correo")}</div>;
+    },
   },
   {
     id: "teléfono",

@@ -66,7 +66,11 @@ export default function CardsViewHotelBookingHistory({
                     ? " noche"
                     : " noches"}
                 </div>
-                <div className="font-bold text-lg">S/. {booking.payment.amountPaid}</div>
+                <div className="font-bold text-lg">
+                  {booking.payment && booking.payment.amountPaid !== undefined
+                    ? `S/. ${booking.payment.amountPaid}`
+                    : "Pago pendiente"}
+                </div>
               </div>
             </div>
 
