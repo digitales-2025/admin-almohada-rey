@@ -588,28 +588,6 @@ export default function UpdateReservationForm({
                         </FormItem>
                       </TableCell>
                       <TableCell>
-                        {/* <FormItem>
-                          <FormItem>
-                            <FormControl>
-                              <PhoneInput
-                                className="min-w-[170px] w-full"
-                                {...register(`guests.${index}.phone` as const)}
-                                defaultCountry={"PE"}
-                                placeholder="999 888 777"
-                                value={field.phone}
-                                onChange={(value) => form.setValue(`guests.${index}.phone`, value)}
-                              />
-                            </FormControl>
-                          </FormItem>
-                          <CustomFormDescription
-                            required={UPDATE_FORMSTATICS.guests.subFields?.phone.required ?? false}
-                            validateOptionalField={true}
-                          ></CustomFormDescription>
-                          <FormMessage>
-                            {form.formState.errors.guests?.[index]?.phone &&
-                              form.formState.errors.guests[index]?.phone?.message}
-                          </FormMessage>
-                        </FormItem> */}
                         <Controller
                           control={form.control}
                           name={`guests.${index}.phone`}

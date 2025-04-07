@@ -124,8 +124,6 @@ export default function CreateReservationForm({
       checkOutDate,
     };
 
-    // console.log("Verificando disponibilidad para fechas:", { checkInDate, checkOutDate });
-
     // Realizar la verificación después de un pequeño retraso
     setTimeout(() => {
       checkAvailability({

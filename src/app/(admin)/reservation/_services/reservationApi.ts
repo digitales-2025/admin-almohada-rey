@@ -97,8 +97,6 @@ export const reservationApi = createApi({
     //Obtener todas las habitaciones disponibles en reservaciones
     getAllAvailableRooms: build.query<DetailedRoom[], GenericAvailabilityParams>({
       query: ({ checkInDate, checkOutDate }) => {
-        // console.log("checkInDate", checkInDate);
-        // console.log("checkOutDate", checkOutDate);
         return {
           url: `/reservation/available-rooms`,
           method: "GET",
@@ -114,8 +112,6 @@ export const reservationApi = createApi({
       }
     >({
       query: ({ checkInDate, checkOutDate, reservationId }) => {
-        // console.log("checkInDate", checkInDate);
-        // console.log("checkOutDate", checkOutDate);
         return {
           url: `/reservation/available-rooms`,
           method: "GET",

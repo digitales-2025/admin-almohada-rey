@@ -118,9 +118,6 @@ export const reservationColumns = (): ColumnDef<DetailedReservation>[] => [
     },
     header: ({ column }) => <DataTableColumnHeader column={column} title="CheckIn" />,
     cell: ({ row }) => {
-      // console.log("row", row.original.checkInDate);
-      // console.log('checkInDate', row.original.checkInDate);
-      // console.log('checkOutDate', row.original.checkOutDate);
       const { localeDateString } = formatPeruBookingDate(row.original.checkInDate);
       return <div>{localeDateString}</div>;
     },

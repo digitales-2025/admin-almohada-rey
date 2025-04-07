@@ -29,7 +29,6 @@ export function SearchCustomerCombobox({ onValueChange, defaultValue }: SearchOr
   const { searchQuery } = useCustomers({ search: search });
 
   const { data, isLoading, isError, error, refetch } = searchQuery;
-  // console.log("queryResponse", queryResponse);
 
   const mapToComboboxItem = useCallback((customer: ApiCustomer): ComboboxItem<ApiCustomer> => {
     const documenTypeTranlation = customer?.documentType
