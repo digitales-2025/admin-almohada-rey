@@ -109,7 +109,7 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
 
   const { queryResponse, updateFilters } = paginatedHookResponse;
 
-  const { data, isLoading, isError } = queryResponse;
+  const { data, isLoading, isError, isSuccess } = queryResponse;
 
   const isDesktop = useMediaQuery("(min-width: 640px)");
 
@@ -148,15 +148,21 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
 
   const onSubmitAllReservations = useCallback(
     ({ pagination = defaultPaginationConfig }: PaginatedReservationParams) => {
-      updateFilters({
+      const localFilters: PaginatedReservationParams = {
         pagination,
-      });
-      if (isError) {
-        toast.error("Error al filtrar reservaciones");
-      }
-      if (data) {
-        toast.success("Reservas filtrado correctamente");
-        if (onSaveFilter) handleClose();
+      };
+      if (onSaveFilter) {
+        onSaveFilter(localFilters);
+        if (isSuccess && data) handleClose();
+      } else {
+        updateFilters(localFilters);
+        if (isError) {
+          toast.error("Error al filtrar reservaciones");
+        }
+        if (data) {
+          toast.success("Reservas filtrado correctamente");
+          handleClose();
+        }
       }
     },
     [updateFilters]
@@ -164,19 +170,24 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
 
   const onSubmitCustomer = useCallback(
     (input: FilterByCustomerInput) => {
-      updateFilters({
+      const localFilters: PaginatedReservationParams = {
         pagination: defaultPaginationConfig,
         fieldFilters: {
           customerId: input.customerId,
         },
-      });
-      if (isError) {
-        toast.error("Error al filtrar las reservas");
-      }
-      if (data) {
-        filterByCustomerForm.reset();
-        toast.success("Reservaciones filtrado correctamente");
-        handleClose();
+      };
+      if (onSaveFilter) {
+        onSaveFilter(localFilters);
+        if (isSuccess && data) handleClose();
+      } else {
+        updateFilters(localFilters);
+        if (isError) {
+          toast.error("Error al filtrar reservaciones");
+        }
+        if (data) {
+          toast.success("Reservas filtrado correctamente");
+          handleClose();
+        }
       }
     },
     [updateFilters]
@@ -184,20 +195,25 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
 
   const onSubmitCheckInOut = useCallback(
     (values: FilterByCheckInOutInput) => {
-      updateFilters({
+      const localFilters: PaginatedReservationParams = {
         pagination: defaultPaginationConfig,
         fieldFilters: {
           checkInDate: values.checkInDate,
           checkOutDate: values.checkOutDate,
         },
-      });
-      if (isError) {
-        toast.error("Error al filtrar stock");
-      }
-      if (data) {
-        filterByCheckInCheckOutForm.reset();
-        toast.success("Stock filtrado correctamente");
-        handleClose();
+      };
+      if (onSaveFilter) {
+        onSaveFilter(localFilters);
+        if (isSuccess && data) handleClose();
+      } else {
+        updateFilters(localFilters);
+        if (isError) {
+          toast.error("Error al filtrar reservaciones");
+        }
+        if (data) {
+          toast.success("Reservas filtrado correctamente");
+          handleClose();
+        }
       }
     },
     [updateFilters]
@@ -205,21 +221,26 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
 
   const onSubmitStorageAndProduct = useCallback(
     (input: FilterByCustomerCheckInOutInput) => {
-      updateFilters({
+      const localFilters: PaginatedReservationParams = {
         pagination: defaultPaginationConfig,
         fieldFilters: {
           customerId: input.customerId,
           checkInDate: input.checkInDate,
           checkOutDate: input.checkOutDate,
         },
-      });
-      if (isError) {
-        toast.error("Error al filtrar stock");
-      }
-      if (data) {
-        filterByCustomerAndDatesForm.reset();
-        toast.success("Stock filtrado correctamente");
-        handleClose();
+      };
+      if (onSaveFilter) {
+        onSaveFilter(localFilters);
+        if (isSuccess && data) handleClose();
+      } else {
+        updateFilters(localFilters);
+        if (isError) {
+          toast.error("Error al filtrar reservaciones");
+        }
+        if (data) {
+          toast.success("Reservas filtrado correctamente");
+          handleClose();
+        }
       }
     },
     [updateFilters]

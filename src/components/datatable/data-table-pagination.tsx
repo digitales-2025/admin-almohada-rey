@@ -3,17 +3,19 @@ import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-r
 
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ServerPaginationTanstackTableConfig } from "@/types/tanstack-table/CustomPagination";
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
+  serverPagination?: ServerPaginationTanstackTableConfig;
 }
 
-export function DataTablePagination<TData>({ table }: DataTablePaginationProps<TData>) {
+export function DataTablePagination<TData>({ table, serverPagination }: DataTablePaginationProps<TData>) {
   return (
     <div className="flex items-center justify-between overflow-clip px-2" style={{ overflowClipMargin: 1 }}>
       <div className="hidden flex-1 text-sm text-muted-foreground sm:block">
-        {table.getFilteredSelectedRowModel().rows.length} de {table.getFilteredRowModel().rows.length} fila(s)
-        seleccionada(s).
+        {table.getFilteredSelectedRowModel().rows.length} de{" "}
+        {serverPagination?.total ?? table.getFilteredRowModel().rows.length} fila(s) seleccionada(s).
       </div>
       <div className="flex items-center sm:space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">
@@ -37,7 +39,7 @@ export function DataTablePagination<TData>({ table }: DataTablePaginationProps<T
           </Select>
         </div>
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-          Página {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+          Página {table.getState().pagination.pageIndex + 1} of {serverPagination?.pageCount ?? table.getPageCount()}
         </div>
         <div className="flex items-center space-x-2">
           <Button
@@ -70,7 +72,7 @@ export function DataTablePagination<TData>({ table }: DataTablePaginationProps<T
           <Button
             variant="outline"
             className="hidden h-8 w-8 p-0 lg:flex"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+            onClick={() => table.setPageIndex((serverPagination?.pageCount ?? table.getPageCount()) - 1)}
             disabled={!table.getCanNextPage()}
           >
             <span className="sr-only">Ir a la última página</span>

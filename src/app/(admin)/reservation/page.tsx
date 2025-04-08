@@ -17,7 +17,7 @@ import Loading from "./loading";
 
 export default function ReservationPage() {
   //This will be used to communicate page to the the pagination config
-  const [_currentFilterConfig, setCurrentFilterConfig] = useState<PaginatedReservationParams>(defaultParamConfig);
+  const [currentFilterConfig, setCurrentFilterConfig] = useState<PaginatedReservationParams>(defaultParamConfig);
 
   const { queryResponse, updateFilters } = usePaginatedReservation();
 
@@ -32,11 +32,32 @@ export default function ReservationPage() {
         toast.error("Error al filtrar reservaciones");
       }
       if (response && isSuccess) {
-        toast.success("Error al filtrar reservaciones");
+        toast.success("Reservaciones filtradas correctamente");
       }
     },
     [updateFilters]
   );
+
+  // Manejar cambios de paginación
+  const handlePaginationChange = useCallback(
+    (page: number, pageSize: number) => {
+      const newFilter: PaginatedReservationParams = {
+        ...currentFilterConfig,
+        pagination: {
+          ...currentFilterConfig.pagination,
+          page,
+          pageSize,
+        },
+      };
+      setCurrentFilterConfig(newFilter);
+      updateFilters(newFilter);
+    },
+    [currentFilterConfig, updateFilters]
+  );
+
+  /*   useEffect(()=>{
+    console.log('Current filter config', currentFilterConfig)
+  }) */
 
   if (isLoading) {
     return <Loading></Loading>;
@@ -76,6 +97,7 @@ export default function ReservationPage() {
             queryResponse,
             updateFilters,
           }}
+          onSaveFilter={(filters) => onSubmitFilter(filters)}
         ></FilterReservationDialog>
         <Button onClick={() => onSubmitFilter()} variant="outline" size="sm" className="flex items-center space-x-1">
           <FilterX></FilterX>
@@ -83,7 +105,16 @@ export default function ReservationPage() {
         </Button>
       </div>
       <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0">
-        <ReservationTable data={response.data} />
+        <ReservationTable
+          data={response.data}
+          pagination={{
+            page: response.meta.page,
+            pageSize: response.meta.pageSize,
+            total: response.meta.total,
+            totalPages: response.meta.totalPages,
+          }}
+          onPaginationChange={handlePaginationChange}
+        />
       </div>
     </div>
   );
