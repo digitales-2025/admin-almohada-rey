@@ -160,3 +160,32 @@ export const updateReservationSchema = z.object({
 }) satisfies z.ZodType<UpdateReservationDto>;
 
 export type UpdateReservationInput = z.infer<typeof updateReservationSchema>;
+
+export const FilterByCustomerSchema = z.object({
+  customerId: z.string({
+    required_error: "El cliente es requerido",
+  }),
+});
+
+export type FilterByCustomerInput = z.infer<typeof FilterByCustomerSchema>;
+
+export const FilterByCheckInOutSchema = z.object({
+  checkInDate: z.string({
+    required_error: "La fecha de check-in es requerida",
+  }),
+  checkOutDate: z.string().optional(),
+});
+
+export type FilterByCheckInOutInput = z.infer<typeof FilterByCheckInOutSchema>;
+
+export const FilterByCustomerCheckInOutSchema = z.object({
+  customerId: z.string({
+    required_error: "El cliente es requerido",
+  }),
+  checkInDate: z.string({
+    required_error: "La fecha de check-in es requerida",
+  }),
+  checkOutDate: z.string().optional(),
+});
+
+export type FilterByCustomerCheckInOutInput = z.infer<typeof FilterByCustomerCheckInOutSchema>;

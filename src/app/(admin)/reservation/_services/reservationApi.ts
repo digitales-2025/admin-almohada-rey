@@ -1,7 +1,8 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
-import { PaginatedResponse, PaginationParams } from "@/types/api/paginated-response";
+import { PaginatedResponse } from "@/types/api/paginated-response";
 import { BaseApiResponse } from "@/types/api/types";
+import { PaginatedQueryParams } from "@/types/query-filters/generic-paginated-query-params";
 import baseQueryWithReauth from "@/utils/baseQuery";
 // import { CreateReservationResponse } from "../_actions/reservation.action";
 import {
@@ -15,6 +16,7 @@ import {
 import { AvailabilityParams, GenericAvailabilityParams } from "../_types/room-availability-query-params";
 
 type CreateReservationReduxResponse = BaseApiResponse<Reservation>;
+export type PaginatedReservationParams = PaginatedQueryParams<Reservation>;
 
 export const reservationApi = createApi({
   reducerPath: "reservationApi",
@@ -66,11 +68,11 @@ export const reservationApi = createApi({
       providesTags: ["Reservation"],
     }),
     //Obtener todas las reservaciones paginadas
-    getPaginatedReservations: build.query<PaginatedResponse<DetailedReservation>, PaginationParams>({
-      query: ({ page = 1, pageSize = 10 }) => ({
+    getPaginatedReservations: build.query<PaginatedResponse<DetailedReservation>, PaginatedReservationParams>({
+      query: ({ pagination: { page = 1, pageSize = 10 }, fieldFilters }) => ({
         url: "/reservation/paginated",
         method: "GET",
-        params: { page, pageSize },
+        params: { page, pageSize, ...fieldFilters },
         credentials: "include",
       }),
       providesTags: (result) => [
