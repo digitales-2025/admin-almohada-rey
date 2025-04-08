@@ -50,16 +50,16 @@ export default function CreatePaymentDetailForm({
   return (
     <div>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-        <div className="px-6">
+        <div>
           <div className="flex items-center justify-between">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="services">
-                <Tag className="h-4 w-4 mr-2" />
-                Servicios Adicionales
+                <Tag className="h-4 w-4 mr-2 shrink-0" />
+                <span className="truncate text-ellipsis">Servicios Adicionales</span>
               </TabsTrigger>
               <TabsTrigger value="payment">
-                <CreditCard className="h-4 w-4 mr-2" />
-                Detalles de Pago
+                <CreditCard className="h-4 w-4 mr-2 shrink-0" />
+                <span className="truncate text-ellipsis">Detalles de Pago</span>
               </TabsTrigger>
             </TabsList>
           </div>

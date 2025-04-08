@@ -36,14 +36,14 @@ export default function PaymentDetailInformation({
   return (
     <div>
       <TabsContent value="payment" className="flex-1 flex flex-col p-0 m-0 border-none">
-        <div className="grid grid-cols-[1fr_300px] h-full">
+        <div className="grid grid-cols-1 sm:grid-cols-[1fr_300px] h-full">
           {/* Main payment form */}
           <div className="p-6 border-r">
             <h3 className="text-lg font-bold mb-6">Información del Pago</h3>
 
             <div className="space-y-6">
               {/* Payment Date */}
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
                   name="paymentDate"
@@ -89,7 +89,7 @@ export default function PaymentDetailInformation({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Método de Pago</FormLabel>
-                      <div className="grid grid-cols-4 gap-3 mt-2">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-2">
                         {Object.values(PaymentDetailMethod).map((method) => (
                           <div
                             key={method}

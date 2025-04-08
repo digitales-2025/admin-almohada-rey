@@ -9,11 +9,18 @@ import { useProducts } from "@/app/(admin)/inventory/products/_hooks/use-product
 import { ProductType } from "@/app/(admin)/inventory/products/_types/products";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { useServices } from "@/hooks/use-services";
 import { usePayments } from "../../_hooks/use-payments";
-import { CreatePaymentDetailSchema, paymentDetailSchema } from "../../_schema/createPaymentDetailsSchema";
-import { CategoryPayment, PaymentDetailMethod, PaymentDetailType, SummaryPayment } from "../../_types/payment";
+import { paymentDetailSchema, type CreatePaymentDetailSchema } from "../../_schema/createPaymentDetailsSchema";
+import {
+  PaymentDetailMethod,
+  PaymentDetailType,
+  type CategoryPayment,
+  type SummaryPayment,
+} from "../../_types/payment";
 import CreatePaymentDetailForm from "./CreatePaymentDetailForm";
 
 interface CreatePaymentDetailDialogProps {
@@ -23,6 +30,7 @@ interface CreatePaymentDetailDialogProps {
 }
 
 export function CreatePaymentDetailDialog({ open, onOpenChange, payment }: CreatePaymentDetailDialogProps) {
+  const isDesktop = useMediaQuery("(min-width: 800px)");
   const [searchTerm, setSearchTerm] = useState("");
   const { dataServicesAll } = useServices();
   const { productByType } = useProducts({ type: ProductType.COMMERCIAL });
@@ -156,62 +164,89 @@ export function CreatePaymentDetailDialog({ open, onOpenChange, payment }: Creat
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccessCreatePaymentDetails]);
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="p-0 rounded-xl sm:max-w-[900px]">
-        <div className="flex flex-col">
-          {/* Header with tabs */}
-          <DialogHeader className="px-6 pt-6 pb-2">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-md bg-primary/10 flex items-center justify-center">
-                  <Receipt className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <DialogTitle className="text-xl font-bold">Agregar Pago</DialogTitle>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    Crear un nuevo pago para servicios adicionales
-                  </div>
-                </div>
-              </div>
-            </div>
+  // Contenido común para ambos componentes (Dialog y Drawer)
+  const renderContent = () => (
+    <CreatePaymentDetailForm
+      form={form}
+      onSubmit={onSubmit}
+      activeTab={activeTab}
+      setActiveTab={setActiveTab}
+      categories={categories}
+      searchTerm={searchTerm}
+      setSearchTerm={setSearchTerm}
+      selectedItems={selectedItems}
+      setSelectedItems={setSelectedItems}
+      filteredItems={filteredItems}
+      fields={fields}
+      append={append}
+      remove={remove}
+      update={update}
+    >
+      <div className="mt-auto space-y-3">
+        {activeTab !== "services" && (
+          <Button type="button" variant="outline" className="w-full" onClick={() => setActiveTab("services")}>
+            <ChevronLeft className="h-4 w-4 mr-2" />
+            Regresar
+          </Button>
+        )}
+        <Button type="submit" disabled={isCreatePending || fields.length === 0} className="w-full">
+          {isCreatePending && <RefreshCcw className="mr-2 size-4 animate-spin" aria-hidden="true" />}
+          Agregar Pago
+        </Button>
+        <Button type="button" variant="outline" className="w-full" onClick={() => onOpenChange(false)}>
+          <X className="h-4 w-4 mr-2" />
+          Cancelar
+        </Button>
+      </div>
+    </CreatePaymentDetailForm>
+  );
+
+  // Contenido del encabezado común para ambos componentes
+  const headerContent = (
+    <div className="flex items-center gap-3">
+      <div className="h-10 w-10 rounded-md bg-primary/10 flex items-center justify-center">
+        <Receipt className="h-5 w-5 text-primary" />
+      </div>
+      <div>
+        <div className="text-xl font-bold">Agregar Pago</div>
+        <div className="text-xs text-muted-foreground mt-1">Crear un nuevo pago para servicios adicionales</div>
+      </div>
+    </div>
+  );
+
+  if (isDesktop) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="p-0 rounded-xl sm:max-w-[900px] max-h-[90vh] flex flex-col">
+          <DialogHeader className="px-6 pt-6 pb-2 flex-shrink-0">
+            <DialogTitle className="sr-only">Agregar Pago</DialogTitle>
+            <div className="flex items-center justify-between mb-4">{headerContent}</div>
           </DialogHeader>
 
-          <ScrollArea className="max-h-[85vh]">
-            <CreatePaymentDetailForm
-              form={form}
-              onSubmit={onSubmit}
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              categories={categories}
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              selectedItems={selectedItems}
-              setSelectedItems={setSelectedItems}
-              filteredItems={filteredItems}
-              fields={fields}
-              append={append}
-              remove={remove}
-              update={update}
-            >
-              <div className="mt-auto space-y-3">
-                <Button type="button" variant="outline" className="w-full" onClick={() => setActiveTab("services")}>
-                  <ChevronLeft className="h-4 w-4 mr-2" />
-                  Regresar
-                </Button>
-                <Button type="submit" disabled={isCreatePending || fields.length === 0} className="w-full">
-                  {isCreatePending && <RefreshCcw className="mr-2 size-4 animate-spin" aria-hidden="true" />}
-                  Agregar Pago
-                </Button>
-                <Button type="button" variant="outline" className="w-full" onClick={() => onOpenChange(false)}>
-                  <X className="h-4 w-4 mr-2" />
-                  Cancelar
-                </Button>
-              </div>
-            </CreatePaymentDetailForm>
+          <div className="flex-1 overflow-hidden">
+            <ScrollArea className="h-[calc(90vh-120px)]">
+              <div className="px-6 pb-6 h-full">{renderContent()}</div>
+            </ScrollArea>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  return (
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <DrawerContent className="h-[85vh] flex flex-col">
+        <DrawerHeader className="px-4 pb-2 flex-shrink-0">
+          <DrawerTitle className="sr-only">Agregar Pago</DrawerTitle>
+          <div className="text-left">{headerContent}</div>
+        </DrawerHeader>
+
+        <div className="flex-1 overflow-hidden">
+          <ScrollArea className="h-full">
+            <div className="px-4 pb-4">{renderContent()}</div>
           </ScrollArea>
         </div>
-      </DialogContent>
-    </Dialog>
+      </DrawerContent>
+    </Drawer>
   );
 }

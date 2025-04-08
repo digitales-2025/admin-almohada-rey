@@ -55,8 +55,8 @@ export default function SelectServicesPaymentDetail({
 
   return (
     <div>
-      <TabsContent value="services" className="flex flex-col">
-        <div className="grid grid-cols-[280px_1fr] h-full">
+      <TabsContent value="services" className="flex flex-col h-[calc(90vh-190px)]">
+        <div className="grid grid-cols-1 sm:grid-cols-[280px_1fr] h-full">
           {/* Left sidebar - Categories and search */}
           <div className="border-r p-4 flex flex-col">
             <div className="relative mb-4">
@@ -225,7 +225,7 @@ export default function SelectServicesPaymentDetail({
 
                         <ScrollArea className="flex-1">
                           <div className="p-4">
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                               {category.items.map((item) => (
                                 <PaymentServiceCard
                                   key={item.id}
@@ -275,7 +275,7 @@ export default function SelectServicesPaymentDetail({
                 </div>
                 <ScrollArea className="max-h-[150px]">
                   <div className="p-2">
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {fields.map((service, index) => {
                         const category = getCategoryById(service.category);
                         return (

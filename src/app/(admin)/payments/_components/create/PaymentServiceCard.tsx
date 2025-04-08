@@ -29,9 +29,9 @@ export default function PaymentServiceCard({ service, category, onSelect }: Paym
           </div>
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="font-bold">S/. {service.price.toFixed(2)}</span>
+            <span className="font-bold text-sm">S/. {service.price.toFixed(2)}</span>
           </div>
           <Button
             type="button"
