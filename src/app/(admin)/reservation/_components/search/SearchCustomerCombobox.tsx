@@ -6,10 +6,13 @@ import { useCustomers } from "@/app/(admin)/customers/_hooks/use-customers";
 import { ApiCustomer } from "@/app/(admin)/customers/_types/customer";
 // import { useProducts } from "@/app/(admin)/(catalog)/product/products/_hooks/useProduct";
 import { RTKUseQueryHookResult, SearchCombobox } from "@/components/form/RemoteSearchCombobox";
+import { cn } from "@/lib/utils";
+import { documentTypeStatusConfig } from "../../_types/document-type.enum.config";
 
 type SearchOrderComoBoxProps = {
   onValueChange: (value: string, entity?: unknown) => void;
   defaultValue?: string;
+  className?: string;
 };
 
 type ComboboxItem<T> = {
@@ -18,7 +21,7 @@ type ComboboxItem<T> = {
   entity: T;
 };
 
-export function SearchCustomerCombobox({ onValueChange, defaultValue }: SearchOrderComoBoxProps) {
+export function SearchCustomerCombobox({ onValueChange, defaultValue, className }: SearchOrderComoBoxProps) {
   const DefaultSearchValue = "None"; //IMPORTANT: This value is used to SEND a request to the backend when the search input is empty
   const [value, setValue] = useState(defaultValue);
   const [label, setLabel] = useState("Buscar Cliente por Nro. de Documento");
@@ -28,10 +31,12 @@ export function SearchCustomerCombobox({ onValueChange, defaultValue }: SearchOr
   const { searchQuery } = useCustomers({ search: search });
 
   const { data, isLoading, isError, error, refetch } = searchQuery;
-  // console.log("queryResponse", queryResponse);
 
   const mapToComboboxItem = useCallback((customer: ApiCustomer): ComboboxItem<ApiCustomer> => {
-    const documentString = `${customer?.documentType ?? "Sin tipo"}: ${customer?.documentNumber ?? "Sin documento"}`;
+    const documenTypeTranlation = customer?.documentType
+      ? documentTypeStatusConfig[customer.documentType].name
+      : "Sin tipo";
+    const documentString = `${documenTypeTranlation ?? "Sin tipo"}: ${customer?.documentNumber ?? "Sin documento"}`;
     const label = `${customer?.name ?? "Sin nombre"} - ${documentString}`;
     return {
       value: customer.documentNumber ?? "None",
@@ -61,7 +66,7 @@ export function SearchCustomerCombobox({ onValueChange, defaultValue }: SearchOr
   return (
     <SearchCombobox<ApiCustomer>
       queryState={queryStateData}
-      className="max-w-90"
+      className={cn("max-w-90", className)}
       items={data ? mapToComboboxItems(data) : []}
       value={value}
       label={label}

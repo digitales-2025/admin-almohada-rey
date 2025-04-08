@@ -69,13 +69,6 @@ export function CreatePaymentDialog({ open, setOpen, reservation }: CreatePaymen
   const watchDays = form.watch("days");
   const watchExtraServices = form.watch("extraServices");
 
-  // Calculate room subtotal
-  const calculateRoomSubtotal = () => {
-    const subtotal = watchRoomUnitPrice * watchDays;
-    form.setValue("subtotal", subtotal);
-    calculateTotalAmount();
-  };
-
   // Calculate total amount (room + extras)
   const calculateTotalAmount = () => {
     const roomSubtotal = form.getValues("subtotal");
@@ -83,13 +76,22 @@ export function CreatePaymentDialog({ open, setOpen, reservation }: CreatePaymen
     form.setValue("totalAmount", roomSubtotal + extrasTotal);
   };
 
+  // Calculate room subtotal
+  const calculateRoomSubtotal = () => {
+    const subtotal = watchRoomUnitPrice * watchDays;
+    form.setValue("subtotal", subtotal);
+    calculateTotalAmount();
+  };
+
   // Update calculations when values change
   useEffect(() => {
     calculateRoomSubtotal();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watchRoomUnitPrice, watchDays]);
 
   useEffect(() => {
     calculateTotalAmount();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watchExtraServices, form.getValues("subtotal")]);
 
   const onSubmit = async (values: CreatePaymentSchema) => {

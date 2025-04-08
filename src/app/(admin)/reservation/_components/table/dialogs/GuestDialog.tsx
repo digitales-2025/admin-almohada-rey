@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Users } from "lucide-react";
+import { LucideIcon, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,7 +21,18 @@ import { CustomerMetadata } from "./CustomerMetadata";
 import { GuestsTable } from "./GuestCardTable";
 import { CustomerMetadataMobile } from "./GuestMobileCommonMetadata";
 
+type DialogConfig = {
+  title: string;
+  description: string;
+  Icon: LucideIcon;
+};
+
 function AddInfoCard({ guests }: { guests: ReservationGuest[] }) {
+  const CONFIG_DATA: DialogConfig = {
+    title: "Información adicional",
+    description: "Aquí puedes ver el detalle de la información adicional.",
+    Icon: Users,
+  };
   if (!guests || guests.length === 0 || guests.every((guest) => !guest.additionalInfo)) {
     return null;
   }
@@ -37,8 +48,8 @@ function AddInfoCard({ guests }: { guests: ReservationGuest[] }) {
     <Card className="w-full mt-4">
       <CardHeader>
         <CardTitle className="text-primary flex space-x-2 items-center">
-          <Users></Users>
-          <span>Detalles adicionales</span>
+          <CONFIG_DATA.Icon></CONFIG_DATA.Icon>
+          <span>{CONFIG_DATA.title}</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="overflow-auto space-y-3">

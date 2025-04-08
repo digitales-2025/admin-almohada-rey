@@ -22,6 +22,7 @@ import { formatPeruBookingDate } from "@/utils/peru-datetime";
 import { DetailedReservation, ReservationGuest } from "../../_schemas/reservation.schemas";
 import { reservationStatusConfig } from "../../_types/reservation-enum.config";
 import { CreatePaymentDialog } from "../create-payment/CreatePaymentsDialog";
+import { UpdateReservationSheet } from "../update/UpdateReservationSheet";
 import { GuestsDetailsDialog } from "./dialogs/GuestDialog";
 
 /**
@@ -117,9 +118,6 @@ export const reservationColumns = (): ColumnDef<DetailedReservation>[] => [
     },
     header: ({ column }) => <DataTableColumnHeader column={column} title="CheckIn" />,
     cell: ({ row }) => {
-      // console.log("row", row.original.checkInDate);
-      // console.log('checkInDate', row.original.checkInDate);
-      // console.log('checkOutDate', row.original.checkOutDate);
       const { localeDateString } = formatPeruBookingDate(row.original.checkInDate);
       return <div>{localeDateString}</div>;
     },
@@ -334,18 +332,22 @@ export const reservationColumns = (): ColumnDef<DetailedReservation>[] => [
     cell: function Cell({ row }) {
       //   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
       //   const [showReactivateDialog, setShowReactivateDialog] = useState(false);
-      //   const [showEditDialog, setShowEditDialog] = useState(false);
+      const [showEditDialog, setShowEditDialog] = useState(false);
 
       const [showCreatePaymentDialog, setShowCreatePaymentDialog] = useState(false);
 
       const { status } = row.original;
+      const { isActive } = row.original;
       return (
         <div>
           <div>
-            {/* {showEditDialog && (
-              <UpdateCustomerSheet open={showEditDialog} onOpenChange={setShowEditDialog} customer={row?.original} />
+            {showEditDialog && (
+              <UpdateReservationSheet
+                open={showEditDialog}
+                onOpenChange={setShowEditDialog}
+                reservation={row?.original}
+              />
             )}
-            */}
             {showCreatePaymentDialog && (
               <CreatePaymentDialog
                 open={showCreatePaymentDialog}
@@ -355,7 +357,7 @@ export const reservationColumns = (): ColumnDef<DetailedReservation>[] => [
             )}
 
             {/* 
-            {showDeleteDialog && (
+            {/* {showDeleteDialog && (
               <DeleteCustomersDialog
                 open={showDeleteDialog}
                 onOpenChange={setShowDeleteDialog}
@@ -385,9 +387,9 @@ export const reservationColumns = (): ColumnDef<DetailedReservation>[] => [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
-              {/* <DropdownMenuItem onSelect={() => setShowEditDialog(true)} disabled={!isActive}>
+              <DropdownMenuItem onSelect={() => setShowEditDialog(true)} disabled={!isActive}>
                 Editar
-              </DropdownMenuItem> */}
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
 
               <DropdownMenuItem onSelect={() => setShowCreatePaymentDialog(true)} disabled={status !== "PENDING"}>

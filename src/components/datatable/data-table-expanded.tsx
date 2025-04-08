@@ -12,6 +12,7 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  PaginationState,
   Row,
   SortingState,
   Table as TableInstance,
@@ -20,6 +21,7 @@ import {
 } from "@tanstack/react-table";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ServerPaginationTanstackTableConfig } from "@/types/tanstack-table/CustomPagination";
 import { Empty } from "../common/Empty";
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
@@ -55,6 +57,8 @@ interface DataTableExpandedProps<TData, TValue> {
   renderExpandedRow?: (row: TData) => React.ReactNode; // Nueva prop para el contenido expandido
   onClickRow?: (row: TData) => void;
   columnVisibilityConfig?: Partial<Record<keyof TData, boolean>>;
+  // Nuevas props para paginación del servidor
+  serverPagination?: ServerPaginationTanstackTableConfig;
 }
 
 export function DataTableExpanded<TData, TValue>({
@@ -66,6 +70,7 @@ export function DataTableExpanded<TData, TValue>({
   renderExpandedRow,
   onClickRow,
   columnVisibilityConfig,
+  serverPagination,
 }: DataTableExpandedProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -82,6 +87,25 @@ export function DataTableExpanded<TData, TValue>({
   // Usamos el estado expandedState de tanstack table directamente
   const [expanded, setExpanded] = React.useState({});
 
+  // Estado de paginación local o del servidor
+  const [pagination, setPagination] = React.useState<PaginationState>({
+    pageIndex: serverPagination?.pageIndex ?? 0,
+    pageSize: serverPagination?.pageSize ?? 10,
+  });
+
+  // Manejar cambios de paginación
+  const handlePaginationChange = React.useCallback(
+    (updaterOrValue: PaginationState | ((old: PaginationState) => PaginationState)) => {
+      const newPagination = typeof updaterOrValue === "function" ? updaterOrValue(pagination) : updaterOrValue;
+
+      setPagination(newPagination);
+      if (serverPagination?.onPaginationChange) {
+        serverPagination.onPaginationChange(newPagination.pageIndex, newPagination.pageSize);
+      }
+    },
+    [pagination, serverPagination]
+  );
+
   const table = useReactTable({
     data,
     columns,
@@ -96,6 +120,7 @@ export function DataTableExpanded<TData, TValue>({
       globalFilter,
       columnPinning,
       expanded, // Utilizar el estado de expansión
+      pagination,
     },
     onExpandedChange: setExpanded, // Manejar los cambios en la expansión
     getRowCanExpand: () => true, // Permitir que todas las filas puedan expandirse
@@ -106,13 +131,17 @@ export function DataTableExpanded<TData, TValue>({
     onGlobalFilterChange: setGlobalFilter,
     onColumnPinningChange: setColumnPinning,
     onColumnVisibilityChange: setColumnVisibility,
+    onPaginationChange: handlePaginationChange,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    getPaginationRowModel: serverPagination ? undefined : getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
     globalFilterFn: globalFilterFn,
+    // Configuración para paginación del servidor
+    pageCount: serverPagination?.pageCount ?? -1,
+    manualPagination: !!serverPagination,
   });
 
   // Estilos para columnas fijadas
@@ -201,7 +230,7 @@ export function DataTableExpanded<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} />
+      <DataTablePagination table={table} serverPagination={serverPagination} />
     </div>
   );
 }

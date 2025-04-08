@@ -174,7 +174,7 @@ export const ReservationAdditionalDetails = ({ row }: ReservationAddDetailsProps
           </div>
 
           {/* Sección de información empresarial (condicional) */}
-          <div className="p-6 pt-2 md:pt-0 space-y-4">
+          <div className="p-6 pt-2 md:pt-0 space-y-4 lg:col-span-3">
             <div className="flex items-center text-sm font-medium text-primary mb-4">
               <h3>Observaciones</h3>
             </div>

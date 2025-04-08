@@ -1,7 +1,8 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
-import { PaginatedResponse, PaginationParams } from "@/types/api/paginated-response";
+import { PaginatedResponse } from "@/types/api/paginated-response";
 import { BaseApiResponse } from "@/types/api/types";
+import { PaginatedQueryParams } from "@/types/query-filters/generic-paginated-query-params";
 import baseQueryWithReauth from "@/utils/baseQuery";
 // import { CreateReservationResponse } from "../_actions/reservation.action";
 import {
@@ -10,10 +11,12 @@ import {
   DetailedRoom,
   Reservation,
   RoomAvailabilityDto,
+  UpdateReservationInput,
 } from "../_schemas/reservation.schemas";
 import { AvailabilityParams, GenericAvailabilityParams } from "../_types/room-availability-query-params";
 
 type CreateReservationReduxResponse = BaseApiResponse<Reservation>;
+export type PaginatedReservationParams = PaginatedQueryParams<Reservation>;
 
 export const reservationApi = createApi({
   reducerPath: "reservationApi",
@@ -31,11 +34,17 @@ export const reservationApi = createApi({
       invalidatesTags: ["Reservation"],
     }),
     //Actualizar reservación
-    updateReservation: build.mutation<Reservation, Partial<Reservation> & { id: string }>({
-      query: ({ id, ...body }) => ({
+    updateReservation: build.mutation<
+      Reservation,
+      {
+        id: string;
+        data: UpdateReservationInput;
+      }
+    >({
+      query: ({ id, data }) => ({
         url: `/reservation/${id}`,
         method: "PATCH",
-        body,
+        body: data,
         credentials: "include",
       }),
       invalidatesTags: ["Reservation"],
@@ -59,11 +68,11 @@ export const reservationApi = createApi({
       providesTags: ["Reservation"],
     }),
     //Obtener todas las reservaciones paginadas
-    getPaginatedReservations: build.query<PaginatedResponse<DetailedReservation>, PaginationParams>({
-      query: ({ page = 1, pageSize = 10 }) => ({
+    getPaginatedReservations: build.query<PaginatedResponse<DetailedReservation>, PaginatedReservationParams>({
+      query: ({ pagination: { page = 1, pageSize = 10 }, fieldFilters }) => ({
         url: "/reservation/paginated",
         method: "GET",
-        params: { page, pageSize },
+        params: { page, pageSize, ...fieldFilters },
         credentials: "include",
       }),
       providesTags: (result) => [
@@ -90,12 +99,25 @@ export const reservationApi = createApi({
     //Obtener todas las habitaciones disponibles en reservaciones
     getAllAvailableRooms: build.query<DetailedRoom[], GenericAvailabilityParams>({
       query: ({ checkInDate, checkOutDate }) => {
-        // console.log("checkInDate", checkInDate);
-        // console.log("checkOutDate", checkOutDate);
         return {
           url: `/reservation/available-rooms`,
           method: "GET",
           params: { checkInDate, checkOutDate },
+          credentials: "include",
+        };
+      },
+    }),
+    getAllAvailableRoomsForUpdate: build.query<
+      DetailedRoom[],
+      GenericAvailabilityParams & {
+        reservationId?: string;
+      }
+    >({
+      query: ({ checkInDate, checkOutDate, reservationId }) => {
+        return {
+          url: `/reservation/available-rooms`,
+          method: "GET",
+          params: { checkInDate, checkOutDate, forUpdate: true, reservationId },
           credentials: "include",
         };
       },
@@ -109,6 +131,27 @@ export const reservationApi = createApi({
           roomId,
           checkInDate,
           checkOutDate,
+        },
+        credentials: "include",
+      }),
+    }),
+
+    //Check room availability
+    getRoomAvailabilityForUpdate: build.query<
+      RoomAvailabilityDto,
+      AvailabilityParams & {
+        reservationId?: string;
+      }
+    >({
+      query: ({ roomId, checkInDate, checkOutDate, reservationId }) => ({
+        url: "/reservation/check-availability",
+        method: "GET",
+        params: {
+          roomId,
+          checkInDate,
+          checkOutDate,
+          forUpdate: true,
+          reservationId,
         },
         credentials: "include",
       }),
@@ -138,10 +181,13 @@ export const reservationApi = createApi({
 
 export const {
   useCreateReservationMutation,
+  useUpdateReservationMutation,
   useGetReservationByIdQuery,
   useGetAllReservationsQuery,
   useGetPaginatedReservationsQuery,
   useGetRoomAvailabilityQuery,
+  useGetRoomAvailabilityForUpdateQuery,
   useGetAllAvailableRoomsQuery,
+  useGetAllAvailableRoomsForUpdateQuery,
   useGetReservationsInTimeIntervalQuery,
 } = reservationApi;

@@ -1,5 +1,5 @@
 import React from "react";
-import { IdCard, Syringe } from "lucide-react";
+import { IdCard, LucideIcon, Users2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +13,12 @@ interface GuestMetadataTableProps extends React.HTMLAttributes<HTMLDivElement> {
   data: ReservationGuest[];
   // branchId: string;
 }
+
+type DataConfig = {
+  cardTitle: string;
+  cardDescription: string;
+  Icon: LucideIcon;
+};
 
 export function GuestsTable({ data, ...rest }: GuestMetadataTableProps) {
   const tableValues: Record<
@@ -56,14 +62,20 @@ export function GuestsTable({ data, ...rest }: GuestMetadataTableProps) {
     },
   };
 
+  const DATA_CONFIG: DataConfig = {
+    cardTitle: "Detalle de acompañantes",
+    cardDescription: "Lista de acompañantes de la reservación",
+    Icon: Users2,
+  };
+
   return (
     <Card className="w-full" {...rest}>
       <CardHeader>
         <CardTitle className="text-primary flex space-x-2 items-center">
-          <Syringe></Syringe>
-          <span>Productos vendidos</span>
+          <DATA_CONFIG.Icon className="size-4"></DATA_CONFIG.Icon>
+          <span>{DATA_CONFIG.cardTitle}</span>
         </CardTitle>
-        <CardDescription>Lista de productos facturados</CardDescription>
+        <CardDescription>{DATA_CONFIG.cardDescription}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
@@ -72,9 +84,10 @@ export function GuestsTable({ data, ...rest }: GuestMetadataTableProps) {
               <TableRow>
                 <TableHead>{tableValues.name.label}</TableHead>
                 <TableHead>{tableValues.documentId.label}</TableHead>
+                <TableHead>{tableValues.age.label}</TableHead>
                 <TableHead>{tableValues.phone.label}</TableHead>
-                <TableHead>{tableValues.email.label}</TableHead>
-                <TableHead className="text-end">{tableValues.age.label}</TableHead>
+                <TableHead className="text-end">{tableValues.email.label}</TableHead>
+
                 {/* <TableHead>Sucursal</TableHead> */}
               </TableRow>
             </TableHeader>
@@ -118,9 +131,9 @@ export function GuestsTable({ data, ...rest }: GuestMetadataTableProps) {
                         )}
                         <span>{tableValues.documentId.value(guest)}</span>
                       </TableCell>
+                      <TableCell>{tableValues.age.value(guest)}</TableCell>
                       <TableCell>{tableValues.phone.value(guest)}</TableCell>
-                      <TableCell>{tableValues.email.value(guest)}</TableCell>
-                      <TableCell className="text-end">{tableValues.age.value(guest)}</TableCell>
+                      <TableCell className="text-end">{tableValues.email.value(guest)}</TableCell>
                     </TableRow>
                   );
                 })

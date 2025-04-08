@@ -110,10 +110,15 @@ export function CreateReservationDialog() {
   });
   // const { remove } = fieldArray;
 
+  const handleClose = () => {
+    form.reset();
+    fieldArray.remove();
+    setOpen(false);
+  };
+
   useEffect(() => {
     if (createReservationResponse.isSuccess) {
-      form.reset();
-      setOpen(false);
+      handleClose();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [createReservationResponse.isSuccess]);
@@ -125,20 +130,21 @@ export function CreateReservationDialog() {
     form.setValue("userId", user.id);
   }
 
+  const onOpenChange = (open: boolean) => {
+    form.reset();
+    fieldArray.remove();
+    setOpen(open);
+  };
+
   const onSubmit = async (input: CreateReservationInput) => {
-    console.log("input", input);
     startCreateTransition(() => {
       onCreateReservation(input);
     });
   };
 
-  const handleClose = () => {
-    form.reset();
-  };
-
   if (isDesktop)
     return (
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogTrigger asChild>
           <Button variant="outline" size="sm">
             <Plus className="mr-2 size-4" aria-hidden="true" />

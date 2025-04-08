@@ -10,6 +10,7 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  PaginationState,
   Row,
   SortingState,
   Table as TableInstance,
@@ -18,6 +19,7 @@ import {
 } from "@tanstack/react-table";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ServerPaginationTanstackTableConfig } from "@/types/tanstack-table/CustomPagination";
 import { Empty } from "../common/Empty";
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
@@ -43,6 +45,8 @@ interface DataTableProps<TData, TValue> {
   toolbarActions?: React.ReactNode | ((table: TableInstance<TData>) => React.ReactNode);
   filterPlaceholder?: string;
   facetedFilters?: FacetedFilter<TValue>[];
+  // Nuevas props para paginación del servidor
+  serverPagination?: ServerPaginationTanstackTableConfig;
 }
 
 export function DataTable<TData, TValue>({
@@ -51,12 +55,32 @@ export function DataTable<TData, TValue>({
   toolbarActions,
   filterPlaceholder,
   facetedFilters,
+  serverPagination,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [sorting, setSorting] = React.useState<SortingState>([]);
+
+  // Estado de paginación local o del servidor
+  const [pagination, setPagination] = React.useState<PaginationState>({
+    pageIndex: serverPagination?.pageIndex ?? 0,
+    pageSize: serverPagination?.pageSize ?? 10,
+  });
+
+  // Manejar cambios de paginación
+  const handlePaginationChange = React.useCallback(
+    (updaterOrValue: PaginationState | ((old: PaginationState) => PaginationState)) => {
+      const newPagination = typeof updaterOrValue === "function" ? updaterOrValue(pagination) : updaterOrValue;
+
+      setPagination(newPagination);
+      if (serverPagination?.onPaginationChange) {
+        serverPagination.onPaginationChange(newPagination.pageIndex, newPagination.pageSize);
+      }
+    },
+    [pagination, serverPagination]
+  );
 
   const table = useReactTable({
     data,
@@ -67,6 +91,7 @@ export function DataTable<TData, TValue>({
       rowSelection,
       columnFilters,
       globalFilter,
+      pagination,
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
@@ -74,9 +99,10 @@ export function DataTable<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
     onColumnVisibilityChange: setColumnVisibility,
+    onPaginationChange: handlePaginationChange,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    getPaginationRowModel: serverPagination ? undefined : getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
@@ -85,6 +111,9 @@ export function DataTable<TData, TValue>({
     filterFns: {
       global: globalFilterFn,
     },
+    // Configuración para paginación del servidor
+    pageCount: serverPagination?.pageCount ?? -1,
+    manualPagination: !!serverPagination,
   });
 
   return (
@@ -127,7 +156,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} />
+      <DataTablePagination table={table} serverPagination={serverPagination} />
     </div>
   );
 }

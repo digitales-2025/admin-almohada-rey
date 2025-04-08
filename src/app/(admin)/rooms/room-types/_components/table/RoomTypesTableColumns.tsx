@@ -8,8 +8,8 @@ import {
   ChevronDown,
   ChevronRight,
   Ellipsis,
+  KeySquare,
   RefreshCcwDot,
-  Ruler,
   Trash,
   User2,
   Users,
@@ -71,7 +71,7 @@ export const roomTypesColumns = (isSuperAdmin: boolean): ColumnDef<RoomType>[] =
     header: ({ column }) => <DataTableColumnHeader column={column} title="Nombre" />,
     cell: ({ row }) => (
       <div className="min-w-40 truncate font-medium flex items-center gap-2">
-        <Bed className="h-4 w-4 text-primary" />
+        <KeySquare className="h-4 w-4 text-primary" />
         <span>{row.getValue("nombre")}</span>
       </div>
     ),
@@ -110,13 +110,13 @@ export const roomTypesColumns = (isSuperAdmin: boolean): ColumnDef<RoomType>[] =
     enableColumnFilter: true,
   }, */
   {
-    id: "area",
-    accessorKey: "area",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Área (m²)" />,
+    id: "Tipo de Cama",
+    accessorKey: "bed",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Tipo de Cama" />,
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <Ruler className="h-3.5 w-3.5" />
-        <span className="font-medium">{row.getValue("area")} m²</span>
+        <Bed className="h-3.5 w-3.5" />
+        <span className="font-medium">{row.getValue("Tipo de Cama")}</span>
       </div>
     ),
   },

@@ -32,7 +32,7 @@ export function CustomerMetadata({
             <SquareUserRound className="text-primary"></SquareUserRound>
             <Label className="text-sm font-medium">Cliente</Label>
             <div className="space-y-1">
-              <span className="text-sm text-muted-foreground block">{data.name ?? "Sin nombre"}</span>
+              <span className="text-sm text-muted-foreground block capitalize">{data.name ?? "Sin nombre"}</span>
               {/* <span className="text-sm text-muted-foreground block">
                 {data.phone ?? "No hay DNI"}
               </span> */}

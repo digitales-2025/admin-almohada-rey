@@ -4,7 +4,20 @@ export type AvailabilityParams = {
   checkOutDate: string;
 };
 
+export type AvailabilityFormUpdateParams = {
+  roomId: string;
+  checkInDate: string;
+  checkOutDate: string;
+  reservationId: string;
+};
+
 export type GenericAvailabilityParams = {
   checkInDate: string;
   checkOutDate: string;
+};
+
+export type GenericAvailabilityFormUpdateParams = {
+  checkInDate: string;
+  checkOutDate: string;
+  reservationId: string;
 };
