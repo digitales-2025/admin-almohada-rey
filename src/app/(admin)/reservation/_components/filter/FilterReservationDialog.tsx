@@ -357,90 +357,103 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
               onSubmit={filterByCheckInCheckOutForm.handleSubmit(onSubmitCheckInOut)}
               className="space-y-4 flex flex-col items-center"
             >
-              <FormField
-                control={filterByCheckInCheckOutForm.control}
-                name={"checkInDate"}
-                render={({ field }) => (
-                  <FormItem className="flex flex-col justify-between h-full">
-                    <FormLabel>{FORMSTATICS.checkInDate.label}</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
-                          >
-                            {field.value ? (
-                              // Verifica si es string
-                              typeof field.value === "string" ? (
-                                formatPeruBookingDate(new Date(field.value).toISOString()).localeDateString
+              <div className="grid sm:grid-cols-2 gap-4 w-full">
+                <FormField
+                  control={filterByCheckInCheckOutForm.control}
+                  name={"checkInDate"}
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col justify-between h-full">
+                      <FormLabel>{FORMSTATICS.checkInDate.label}</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal overflow-ellipsis",
+                                !field.value && "text-muted-foreground "
+                              )}
+                            >
+                              {field.value ? (
+                                // Verifica si es string
+                                typeof field.value === "string" ? (
+                                  formatPeruBookingDate(new Date(field.value).toISOString()).customPeruDateTime
+                                    .displayDateTime
+                                ) : (
+                                  <span>Escoja una fecha</span>
+                                )
                               ) : (
                                 <span>Escoja una fecha</span>
-                              )
-                            ) : (
-                              <span>Escoja una fecha</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={typeof field.value === "string" ? new Date(field.value) : undefined}
-                          onSelect={(val) => field.onChange(val?.toISOString() ?? "")}
-                          disabled={(date) => date < new Date("2000-01-01")}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <CustomFormDescription required={true} validateOptionalField={true} />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={filterByCheckInCheckOutForm.control}
-                name={"checkOutDate"}
-                render={({ field }) => (
-                  <FormItem className="flex flex-col justify-between h-full">
-                    <FormLabel>{FORMSTATICS.checkOutDate.label}</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
-                          >
-                            {field.value ? (
-                              // Verifica si es string
-                              typeof field.value === "string" ? (
-                                formatPeruBookingDate(new Date(field.value).toISOString()).localeDateString
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={typeof field.value === "string" ? new Date(field.value) : undefined}
+                            onSelect={(val) => field.onChange(val?.toISOString() ?? "")}
+                            disabled={(date) => date < new Date("2000-01-01")}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <CustomFormDescription required={true} validateOptionalField={true} />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={filterByCheckInCheckOutForm.control}
+                  name={"checkOutDate"}
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col justify-between h-full">
+                      <FormLabel>{FORMSTATICS.checkOutDate.label}</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal overflow-ellipsis",
+                                !field.value && "text-muted-foreground "
+                              )}
+                            >
+                              {field.value ? (
+                                // Verifica si es string
+                                typeof field.value === "string" ? (
+                                  formatPeruBookingDate(new Date(field.value).toISOString()).customPeruDateTime
+                                    .displayDateTime
+                                ) : (
+                                  <span>Escoja una fecha</span>
+                                )
                               ) : (
                                 <span>Escoja una fecha</span>
-                              )
-                            ) : (
-                              <span>Escoja una fecha</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={typeof field.value === "string" ? new Date(field.value) : undefined}
-                          onSelect={(val) => field.onChange(val?.toISOString() ?? "")}
-                          disabled={(date) => date < new Date("2000-01-01")}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <CustomFormDescription required={true} validateOptionalField={true} />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={typeof field.value === "string" ? new Date(field.value) : undefined}
+                            onSelect={(val) => field.onChange(val?.toISOString() ?? "")}
+                            disabled={(date) =>
+                              date < new Date("2000-01-01") ||
+                              new Date(filterByCheckInCheckOutForm.watch("checkInDate")) > date
+                            }
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <CustomFormDescription required={true} validateOptionalField={true} />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <SubmitButton></SubmitButton>
             </form>
           </Form>
@@ -457,7 +470,7 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
               className="space-y-4 flex flex-col items-center"
             >
               <FormField
-                control={filterByCustomerForm.control}
+                control={filterByCustomerAndDatesForm.control}
                 name="customerId"
                 render={({ field }) => (
                   <FormItem className="w-full">
@@ -473,90 +486,103 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
                   </FormItem>
                 )}
               ></FormField>
-              <FormField
-                control={filterByCheckInCheckOutForm.control}
-                name={"checkInDate"}
-                render={({ field }) => (
-                  <FormItem className="flex flex-col justify-between h-full">
-                    <FormLabel>{FORMSTATICS.checkInDate.label}</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
-                          >
-                            {field.value ? (
-                              // Verifica si es string
-                              typeof field.value === "string" ? (
-                                formatPeruBookingDate(new Date(field.value).toISOString()).localeDateString
+              <div className="grid sm:grid-cols-2 gap-4 w-full">
+                <FormField
+                  control={filterByCustomerAndDatesForm.control}
+                  name={"checkInDate"}
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col justify-between h-full">
+                      <FormLabel>{FORMSTATICS.checkInDate.label}</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal overflow-ellipsis",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                // Verifica si es string
+                                typeof field.value === "string" ? (
+                                  formatPeruBookingDate(new Date(field.value).toISOString()).customPeruDateTime
+                                    .displayDateTime
+                                ) : (
+                                  <span>Escoja una fecha</span>
+                                )
                               ) : (
                                 <span>Escoja una fecha</span>
-                              )
-                            ) : (
-                              <span>Escoja una fecha</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={typeof field.value === "string" ? new Date(field.value) : undefined}
-                          onSelect={(val) => field.onChange(val?.toISOString() ?? "")}
-                          disabled={(date) => date < new Date("2000-01-01")}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <CustomFormDescription required={true} validateOptionalField={true} />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={filterByCheckInCheckOutForm.control}
-                name={"checkOutDate"}
-                render={({ field }) => (
-                  <FormItem className="flex flex-col justify-between h-full">
-                    <FormLabel>{FORMSTATICS.checkOutDate.label}</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
-                          >
-                            {field.value ? (
-                              // Verifica si es string
-                              typeof field.value === "string" ? (
-                                formatPeruBookingDate(new Date(field.value).toISOString()).localeDateString
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={typeof field.value === "string" ? new Date(field.value) : undefined}
+                            onSelect={(val) => field.onChange(val?.toISOString() ?? "")}
+                            disabled={(date) => date < new Date("2000-01-01")}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <CustomFormDescription required={true} validateOptionalField={true} />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={filterByCustomerAndDatesForm.control}
+                  name={"checkOutDate"}
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col justify-between h-full">
+                      <FormLabel>{FORMSTATICS.checkOutDate.label}</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal overflow-ellipsis",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                // Verifica si es string
+                                typeof field.value === "string" ? (
+                                  formatPeruBookingDate(new Date(field.value).toISOString()).customPeruDateTime
+                                    .displayDateTime
+                                ) : (
+                                  <span>Escoja una fecha</span>
+                                )
                               ) : (
                                 <span>Escoja una fecha</span>
-                              )
-                            ) : (
-                              <span>Escoja una fecha</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={typeof field.value === "string" ? new Date(field.value) : undefined}
-                          onSelect={(val) => field.onChange(val?.toISOString() ?? "")}
-                          disabled={(date) => date < new Date("2000-01-01")}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <CustomFormDescription required={true} validateOptionalField={true} />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={typeof field.value === "string" ? new Date(field.value) : undefined}
+                            onSelect={(val) => field.onChange(val?.toISOString() ?? "")}
+                            disabled={(date) =>
+                              date < new Date("2000-01-01") ||
+                              new Date(filterByCheckInCheckOutForm.watch("checkInDate")) > date
+                            }
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <CustomFormDescription required={true} validateOptionalField={true} />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <SubmitButton></SubmitButton>
             </form>
           </Form>

@@ -7,35 +7,21 @@ import { toast } from "sonner";
 import { HeaderPage } from "@/components/common/HeaderPage";
 import ErrorGeneral from "@/components/errors/general-error";
 import { Button } from "@/components/ui/button";
+import { processError } from "@/utils/process-error";
 import { FilterReservationDialog } from "./_components/filter/FilterReservationDialog";
 import { ReservationTable } from "./_components/table/ReservationTable";
-// import { ReservationTable } from "./_components/table/ReservationTable";
 import { defaultParamConfig, usePaginatedReservation } from "./_hooks/use-reservation";
 import { PaginatedReservationParams } from "./_services/reservationApi";
 import { METADATA } from "./_statics/metadata";
 import Loading from "./loading";
 
 export default function ReservationPage() {
-  // const { usePaginatedReservationQuery } = useReservation();
-  // const { data: response, isLoading, isError, error, refetch } = usePaginatedReservationQuery();
-
   //This will be used to communicate page to the the pagination config
   const [_currentFilterConfig, setCurrentFilterConfig] = useState<PaginatedReservationParams>(defaultParamConfig);
 
   const { queryResponse, updateFilters } = usePaginatedReservation();
 
   const { data: response, isLoading, isError, error, refetch, isSuccess } = queryResponse;
-
-  // const onSubmitAllStorages = useCallback(() => {
-  //   updateFilters(currentFilterConfig);
-  //   if (isError) {
-  //     toast.error("Error al filtrar reservaciones");
-  //   }
-  //   if (response) {
-  //     toast.success("Reservaciones filtradas correctamente");
-  //   }
-  // }
-  // , [updateFilters]);
 
   const onSubmitFilter = useCallback(
     (filter?: PaginatedReservationParams) => {
@@ -66,7 +52,7 @@ export default function ReservationPage() {
   }
 
   if (isError) {
-    const localError = error instanceof Error ? error.message : "Error desconocido";
+    const localError = processError(error);
     toast.error(localError, {
       action: {
         label: "Reintentar",
