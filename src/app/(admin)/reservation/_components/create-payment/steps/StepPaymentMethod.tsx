@@ -2,8 +2,8 @@ import React from "react";
 import { Check } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
-import { CreatePaymentSchema } from "@/app/(admin)/payment/_schema/createPaymentsSchema";
-import { PaymentDetailMethod } from "@/app/(admin)/payment/_types/payment";
+import { CreatePaymentSchema } from "@/app/(admin)/payments/_schema/createPaymentsSchema";
+import { PaymentDetailMethod } from "@/app/(admin)/payments/_types/payment";
 import { FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
 import { getMethodColor, getMethodIcon } from "../../../_utils/reservationPayment.utils";

@@ -1,6 +1,6 @@
 import { Car, Coffee, Sparkles, Utensils, Waves, Wifi, Wine, Zap } from "lucide-react";
 
-import { PaymentDetailType } from "@/app/(admin)/payment/_types/payment";
+import { PaymentDetailType } from "@/app/(admin)/payments/_types/payment";
 import { HistoryCustomer } from "../../../_types/customer";
 
 // Actualizar la función getAmenityIcon para usar los nombres de los servicios
