@@ -35,6 +35,7 @@ export default function ReservationPage() {
         toast.success("Reservaciones filtradas correctamente");
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [updateFilters]
   );
 

@@ -165,6 +165,7 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
         }
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [updateFilters]
   );
 
@@ -190,6 +191,7 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
         }
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [updateFilters]
   );
 
@@ -216,6 +218,7 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
         }
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [updateFilters]
   );
 
@@ -243,6 +246,7 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
         }
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [updateFilters]
   );
 

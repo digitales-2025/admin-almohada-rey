@@ -110,11 +110,15 @@ export function CreateReservationDialog() {
   });
   // const { remove } = fieldArray;
 
+  const handleClose = () => {
+    form.reset();
+    fieldArray.remove();
+    setOpen(false);
+  };
+
   useEffect(() => {
     if (createReservationResponse.isSuccess) {
-      form.reset();
-      fieldArray.remove();
-      setOpen(false);
+      handleClose();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [createReservationResponse.isSuccess]);
@@ -136,12 +140,6 @@ export function CreateReservationDialog() {
     startCreateTransition(() => {
       onCreateReservation(input);
     });
-  };
-
-  const handleClose = () => {
-    form.reset();
-    fieldArray.remove();
-    setOpen(false);
   };
 
   if (isDesktop)
