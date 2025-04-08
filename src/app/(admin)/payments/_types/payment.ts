@@ -13,6 +13,7 @@ export type Payment = {
     checkOutDate: Date;
   };
   paymentDetail: PaymentDetail[];
+  paymentId?: string;
 };
 
 export enum PaymentStatus {
@@ -82,3 +83,19 @@ export type SummaryPayment = {
     };
   };
 };
+
+export interface CategoryItemPayment {
+  id: string;
+  name: string;
+  price: number;
+  code: string;
+  description?: string;
+}
+
+export interface CategoryPayment {
+  id: string;
+  name: string;
+  icon: React.ReactNode;
+  color: string;
+  items: CategoryItemPayment[];
+}
