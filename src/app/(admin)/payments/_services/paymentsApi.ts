@@ -19,6 +19,17 @@ export const paymentsApi = createApi({
       invalidatesTags: ["Payment"],
     }),
 
+    //Crear detalles de pagos
+    createPaymentDetails: build.mutation<Payment, Partial<Payment>>({
+      query: (body) => ({
+        url: "/payments/detail",
+        method: "POST",
+        body,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Payment"],
+    }),
+
     //Obtener pago por id
     getPaymentById: build.query<Payment, string>({
       query: (id) => ({
@@ -41,4 +52,9 @@ export const paymentsApi = createApi({
   }),
 });
 
-export const { useCreatePaymentMutation, useGetPaymentByIdQuery, useGetAllPaymentsQuery } = paymentsApi;
+export const {
+  useCreatePaymentMutation,
+  useCreatePaymentDetailsMutation,
+  useGetPaymentByIdQuery,
+  useGetAllPaymentsQuery,
+} = paymentsApi;
