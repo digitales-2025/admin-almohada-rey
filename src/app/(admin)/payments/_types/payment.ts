@@ -1,5 +1,6 @@
 export type Payment = {
   id: string;
+  code: string;
   date: string;
   amount: number;
   amountPaid: number;
@@ -66,3 +67,18 @@ export enum PaymentDetailMethod {
   PAYPAL = "PAYPAL",
   IZI_PAY = "IZI_PAY",
 }
+
+export type SummaryPayment = {
+  id: string;
+  code: string;
+  date: string;
+  amount: number;
+  amountPaid: number;
+  status: PaymentStatus;
+  reservation: {
+    customer: {
+      id: string;
+      name: string;
+    };
+  };
+};

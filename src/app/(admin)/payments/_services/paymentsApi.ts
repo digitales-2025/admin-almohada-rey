@@ -1,7 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 import baseQueryWithReauth from "@/utils/baseQuery";
-import { Payment } from "../_types/payment";
+import { Payment, SummaryPayment } from "../_types/payment";
 
 export const paymentsApi = createApi({
   reducerPath: "paymentsApi",
@@ -18,7 +18,27 @@ export const paymentsApi = createApi({
       }),
       invalidatesTags: ["Payment"],
     }),
+
+    //Obtener pago por id
+    getPaymentById: build.query<Payment, string>({
+      query: (id) => ({
+        url: `/payments/${id}`,
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: (result, error, id) => [{ type: "Payment", id }],
+    }),
+
+    //Obtener todos los pagos
+    getAllPayments: build.query<SummaryPayment[], void>({
+      query: () => ({
+        url: "/payments",
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["Payment"],
+    }),
   }),
 });
 
-export const { useCreatePaymentMutation } = paymentsApi;
+export const { useCreatePaymentMutation, useGetPaymentByIdQuery, useGetAllPaymentsQuery } = paymentsApi;
