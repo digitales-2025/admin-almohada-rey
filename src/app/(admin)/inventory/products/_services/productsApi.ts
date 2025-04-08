@@ -1,7 +1,11 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 import baseQueryWithReauth from "@/utils/baseQuery";
-import { Product } from "../_types/products";
+import { Product, ProductType } from "../_types/products";
+
+interface GetProductsByTypeProps {
+  type: ProductType;
+}
 
 export const productsApi = createApi({
   reducerPath: "productsApi",
@@ -29,7 +33,7 @@ export const productsApi = createApi({
       invalidatesTags: ["Product"],
     }),
     //Obtener producto por id
-    getCProductById: build.query<Product, string>({
+    getProductById: build.query<Product, string>({
       query: (id) => ({
         url: `/product/${id}`,
         method: "GET",
@@ -46,6 +50,16 @@ export const productsApi = createApi({
       }),
       providesTags: ["Product"],
     }),
+    //Obtener productos por tipo
+    getProductsByType: build.query<Product[], GetProductsByTypeProps>({
+      query: ({ type }) => ({
+        url: `/product/all/type/${type}`,
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["Product"],
+    }),
+
     //Eliminar productos
     deleteProducts: build.mutation<void, { ids: string[] }>({
       query: (ids) => ({
@@ -72,8 +86,9 @@ export const productsApi = createApi({
 export const {
   useCreateProductMutation,
   useUpdateProductMutation,
-  useGetCProductByIdQuery,
+  useGetProductByIdQuery,
   useGetAllProductsQuery,
+  useGetProductsByTypeQuery,
   useDeleteProductsMutation,
   useReactivateProductsMutation,
 } = productsApi;
