@@ -2,7 +2,7 @@
 
 import React, { useCallback, useMemo, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon, Filter, Info, LoaderCircle } from "lucide-react";
+import { CalendarIcon, CalendarPlus, Filter, LoaderCircle, User, Users } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -10,7 +10,7 @@ import { Customer } from "@/app/(admin)/customers/_types/customer";
 import { CustomFormDescription } from "@/components/form/CustomFormDescription";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { CardDescription } from "@/components/ui/card";
+// import { CardDescription } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -146,28 +146,28 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
     pageSize: 10,
   };
 
-  const onSubmitAllReservations = useCallback(
-    ({ pagination = defaultPaginationConfig }: PaginatedReservationParams) => {
-      const localFilters: PaginatedReservationParams = {
-        pagination,
-      };
-      if (onSaveFilter) {
-        onSaveFilter(localFilters);
-        if (isSuccess && data) handleClose();
-      } else {
-        updateFilters(localFilters);
-        if (isError) {
-          toast.error("Error al filtrar reservaciones");
-        }
-        if (data) {
-          toast.success("Reservas filtrado correctamente");
-          handleClose();
-        }
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [updateFilters]
-  );
+  // const onSubmitAllReservations = useCallback(
+  //   ({ pagination = defaultPaginationConfig }: PaginatedReservationParams) => {
+  //     const localFilters: PaginatedReservationParams = {
+  //       pagination,
+  //     };
+  //     if (onSaveFilter) {
+  //       onSaveFilter(localFilters);
+  //       if (isSuccess && data) handleClose();
+  //     } else {
+  //       updateFilters(localFilters);
+  //       if (isError) {
+  //         toast.error("Error al filtrar reservaciones");
+  //       }
+  //       if (data) {
+  //         toast.success("Reservas filtrado correctamente");
+  //         handleClose();
+  //       }
+  //     }
+  //   },
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   [updateFilters]
+  // );
 
   const onSubmitCustomer = useCallback(
     (input: FilterByCustomerInput) => {
@@ -296,29 +296,33 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
   const FilteringTabs = () => (
     <div>
       <Tabs
-        defaultValue={TAB_OPTIONS.ALL_BOOKINGS.value}
+        defaultValue={TAB_OPTIONS.BY_CUSTOMER.value}
         value={activeTab}
         onValueChange={setActiveTab}
         className="w-full flex flex-col space-y-4"
       >
         <TabsList className="grid w-full grid-cols-2 h-fit">
-          <TabsTrigger value={TAB_OPTIONS.ALL_BOOKINGS.value}>{TAB_OPTIONS.ALL_BOOKINGS.label}</TabsTrigger>
-          <TabsTrigger value={TAB_OPTIONS.BY_CUSTOMER.value}>{TAB_OPTIONS.BY_CUSTOMER.label}</TabsTrigger>
-          <TabsTrigger value={TAB_OPTIONS.BY_CHECK_INOUT.value}>{TAB_OPTIONS.BY_CHECK_INOUT.label}</TabsTrigger>
-          <TabsTrigger value={TAB_OPTIONS.BY_CUSTOMER_N_CHECK_INOUT.value}>
+          {/* <TabsTrigger value={TAB_OPTIONS.ALL_BOOKINGS.value}>{TAB_OPTIONS.ALL_BOOKINGS.label}</TabsTrigger> */}
+          <TabsTrigger value={TAB_OPTIONS.BY_CUSTOMER.value}>
+            <User className="size-4"></User>
+            {TAB_OPTIONS.BY_CUSTOMER.label}
+          </TabsTrigger>
+          <TabsTrigger value={TAB_OPTIONS.BY_CHECK_INOUT.value}>
+            <CalendarPlus className="size-4"></CalendarPlus>
+            {TAB_OPTIONS.BY_CHECK_INOUT.label}
+          </TabsTrigger>
+          <TabsTrigger value={TAB_OPTIONS.BY_CUSTOMER_N_CHECK_INOUT.value} className="truncate sm:text-ellipsis">
+            <Users className="size-4"></Users>
             {TAB_OPTIONS.BY_CUSTOMER_N_CHECK_INOUT.label}
           </TabsTrigger>
         </TabsList>
 
-        <FilterReservationTabCardContent
+        {/* <FilterReservationTabCardContent
           value={TAB_OPTIONS.ALL_BOOKINGS.value}
           title={TAB_OPTIONS.ALL_BOOKINGS.label}
           description={TAB_OPTIONS.ALL_BOOKINGS.description}
         >
           <section className="space-y-4">
-            {/* <Button onClick={onSubmitAllStorages} className="w-full">
-            {FILTER_DIALOG_MESSAGES.submitButton}
-          </Button> */}
             <header className="flex flex-col space-y-2 justify-center items-center">
               <Info className="size-8"></Info>
               <CardDescription className="text-center">Este es el filtro por defecto</CardDescription>
@@ -338,7 +342,7 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
               {FILTER_DIALOG_MESSAGES.submitButton}
             </SubmitButton>
           </section>
-        </FilterReservationTabCardContent>
+        </FilterReservationTabCardContent> */}
 
         <FilterReservationTabCardContent
           value={TAB_OPTIONS.BY_CUSTOMER.value}
@@ -361,6 +365,7 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
                         const customer = c as Customer;
                         field.onChange(customer.id);
                       }}
+                      className="w-full truncate sm:text-ellipsis"
                     />
                     <FormMessage />
                     <FormDescription>Solo visualizará clientes activos</FormDescription>
@@ -395,7 +400,7 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
                             <Button
                               variant={"outline"}
                               className={cn(
-                                "w-full pl-3 text-left font-normal overflow-ellipsis",
+                                "w-full pl-3 text-left font-normal overflow-ellipsis truncate sm:text-ellipsis",
                                 !field.value && "text-muted-foreground "
                               )}
                             >
@@ -441,7 +446,7 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
                             <Button
                               variant={"outline"}
                               className={cn(
-                                "w-full pl-3 text-left font-normal overflow-ellipsis",
+                                "w-full pl-3 text-left font-normal overflow-ellipsis truncate sm:text-ellipsis",
                                 !field.value && "text-muted-foreground "
                               )}
                             >
@@ -505,6 +510,7 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
                         const customer = c as Customer;
                         field.onChange(customer.id);
                       }}
+                      className="w-full truncate sm:text-ellipsis"
                     />
                     <FormMessage />
                     <FormDescription>Solo visualizará clientes activos</FormDescription>
@@ -524,7 +530,7 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
                             <Button
                               variant={"outline"}
                               className={cn(
-                                "w-full pl-3 text-left font-normal overflow-ellipsis",
+                                "w-full pl-3 text-left font-normal overflow-ellipsis truncate sm:text-ellipsis",
                                 !field.value && "text-muted-foreground"
                               )}
                             >
@@ -570,7 +576,7 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
                             <Button
                               variant={"outline"}
                               className={cn(
-                                "w-full pl-3 text-left font-normal overflow-ellipsis",
+                                "w-full pl-3 text-left font-normal overflow-ellipsis truncate sm:text-ellipsis",
                                 !field.value && "text-muted-foreground"
                               )}
                             >
