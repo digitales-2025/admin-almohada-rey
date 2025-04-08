@@ -333,9 +333,7 @@ export const reservationColumns = (): ColumnDef<DetailedReservation>[] => [
       //   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
       //   const [showReactivateDialog, setShowReactivateDialog] = useState(false);
       const [showEditDialog, setShowEditDialog] = useState(false);
-
       const [showCreatePaymentDialog, setShowCreatePaymentDialog] = useState(false);
-
       const { status } = row.original;
       const { isActive } = row.original;
       return (
