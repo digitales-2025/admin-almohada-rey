@@ -400,7 +400,7 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
                             <Button
                               variant={"outline"}
                               className={cn(
-                                "w-full pl-3 text-left font-normal overflow-ellipsis truncate sm:text-ellipsis",
+                                "w-full pl-3 text-left font-normal truncate sm:text-ellipsis",
                                 !field.value && "text-muted-foreground "
                               )}
                             >
@@ -446,7 +446,7 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
                             <Button
                               variant={"outline"}
                               className={cn(
-                                "w-full pl-3 text-left font-normal overflow-ellipsis truncate sm:text-ellipsis",
+                                "w-full pl-3 text-left font-normal truncate sm:text-ellipsis",
                                 !field.value && "text-muted-foreground "
                               )}
                             >
