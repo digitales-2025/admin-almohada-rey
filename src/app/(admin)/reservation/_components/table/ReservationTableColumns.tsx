@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { ChevronDown, ChevronRight, Ellipsis, HandCoins } from "lucide-react";
+import { ChevronDown, ChevronRight, Ellipsis } from "lucide-react";
 import { toast } from "sonner";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
@@ -19,9 +19,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { formatPeruBookingDate } from "@/utils/peru-datetime";
-import { DetailedReservation, ReservationGuest } from "../../_schemas/reservation.schemas";
+import {
+  DetailedReservation,
+  ReservationGuest,
+  ReservationStatusAvailableActions,
+} from "../../_schemas/reservation.schemas";
 import { reservationStatusConfig } from "../../_types/reservation-enum.config";
+import { getAvailableActions } from "../../_utils/reservation-status-validation.utils";
 import { CreatePaymentDialog } from "../create-payment/CreatePaymentsDialog";
+import { DIALOG_DICTIONARY } from "../state-management/reservation-status-dialog-config";
+import { TransitionReservationStatusDialog } from "../state-management/TransitionReservationStatusDialog";
 import { UpdateReservationSheet } from "../update/UpdateReservationSheet";
 import { GuestsDetailsDialog } from "./dialogs/GuestDialog";
 
@@ -334,8 +341,31 @@ export const reservationColumns = (): ColumnDef<DetailedReservation>[] => [
       //   const [showReactivateDialog, setShowReactivateDialog] = useState(false);
       const [showEditDialog, setShowEditDialog] = useState(false);
       const [showCreatePaymentDialog, setShowCreatePaymentDialog] = useState(false);
+      const [showCancelDialog, setShowCancelDialog] = useState(false);
+      const [showCheckInDialog, setShowCheckInDialog] = useState(false);
+      const [showCheckOutDialog, setShowCheckOutDialog] = useState(false);
+      // const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+      //   const [showDeactivateDialog, setShowDeactivateDialog] = useState(false);
+      //   const [showReactivateDialog, setShowReactivateDialog] = useState(false);
       const { status } = row.original;
       const { isActive } = row.original;
+
+      const confirmConfig = DIALOG_DICTIONARY["CONFIRMED"];
+      const cancelConfig = DIALOG_DICTIONARY["CANCELED"];
+      const checkInConfig = DIALOG_DICTIONARY["CHECKED_IN"];
+      const checkOutConfig = DIALOG_DICTIONARY["CHECKED_OUT"];
+      // const pendingConfig = DIALOG_DICTIONARY['PENDING'];
+
+      const {
+        canCancel,
+        canCheckIn,
+        canCheckOut,
+        canConfirm,
+        // canModify,
+        // canDeactivate,
+        // canReactivate,
+      }: ReservationStatusAvailableActions = getAvailableActions(status);
+
       return (
         <div>
           <div>
@@ -353,9 +383,40 @@ export const reservationColumns = (): ColumnDef<DetailedReservation>[] => [
                 reservation={row.original}
               />
             )}
-
+            {showCancelDialog && (
+              <TransitionReservationStatusDialog
+                open={showCancelDialog}
+                onOpenChange={setShowCancelDialog}
+                reservation={row.original}
+                newStatus="CANCELED"
+              ></TransitionReservationStatusDialog>
+            )}
+            {showCheckInDialog && (
+              <TransitionReservationStatusDialog
+                open={showCheckInDialog}
+                onOpenChange={setShowCheckInDialog}
+                reservation={row.original}
+                newStatus="CHECKED_IN"
+              ></TransitionReservationStatusDialog>
+            )}
+            {showCheckOutDialog && (
+              <TransitionReservationStatusDialog
+                open={showCheckOutDialog}
+                onOpenChange={setShowCheckOutDialog}
+                reservation={row.original}
+                newStatus="CHECKED_OUT"
+              ></TransitionReservationStatusDialog>
+            )}
+            {/* {showConfirmDialog && (
+              <TransitionReservationStatusDialog
+                open={showConfirmDialog}
+                onOpenChange={setShowConfirmDialog}
+                reservation={row.original}
+                newStatus="CONFIRMED"
+              ></TransitionReservationStatusDialog>
+            )} */}
             {/* 
-            {/* {showDeleteDialog && (
+            {showDeleteDialog && (
               <DeleteCustomersDialog
                 open={showDeleteDialog}
                 onOpenChange={setShowDeleteDialog}
@@ -390,12 +451,41 @@ export const reservationColumns = (): ColumnDef<DetailedReservation>[] => [
               </DropdownMenuItem>
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem onSelect={() => setShowCreatePaymentDialog(true)} disabled={status !== "PENDING"}>
-                Crear Pago
-                <DropdownMenuShortcut>
-                  <HandCoins className="size-4" aria-hidden="true" />
-                </DropdownMenuShortcut>
-              </DropdownMenuItem>
+              {canConfirm && (
+                <DropdownMenuItem onSelect={() => setShowCreatePaymentDialog(true)} disabled={status !== "PENDING"}>
+                  {confirmConfig.buttonLabel}
+                  <DropdownMenuShortcut>
+                    <confirmConfig.icon className="size-4" aria-hidden="true" />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              )}
+
+              {canCheckIn && (
+                <DropdownMenuItem onSelect={() => setShowCheckInDialog(true)}>
+                  {checkInConfig.buttonLabel}
+                  <DropdownMenuShortcut>
+                    <checkInConfig.icon className="size-4" aria-hidden="true" />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              )}
+
+              {canCheckOut && (
+                <DropdownMenuItem onSelect={() => setShowCheckOutDialog(true)}>
+                  {checkOutConfig.buttonLabel}
+                  <DropdownMenuShortcut>
+                    <checkOutConfig.icon className="size-4" aria-hidden="true" />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              )}
+
+              {canCancel && (
+                <DropdownMenuItem onSelect={() => setShowCancelDialog(true)} disabled={!isActive}>
+                  {cancelConfig.buttonLabel}
+                  <DropdownMenuShortcut>
+                    <cancelConfig.icon className="size-4" aria-hidden="true" />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              )}
 
               {/*               {isSuperAdmin && (
                 <DropdownMenuItem onSelect={() => setShowReactivateDialog(true)} disabled={isActive}>

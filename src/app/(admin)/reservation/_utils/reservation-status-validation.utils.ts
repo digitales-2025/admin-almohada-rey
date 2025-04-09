@@ -9,6 +9,7 @@ export function getAvailableActions(currentStatus: ReservationStatus): Reservati
         canCheckOut: false,
         canCancel: true,
         canModify: true,
+        canDeactivate: false,
         canReactivate: false,
       };
     case "CONFIRMED":
@@ -18,6 +19,7 @@ export function getAvailableActions(currentStatus: ReservationStatus): Reservati
         canCheckOut: false,
         canCancel: true,
         canModify: true,
+        canDeactivate: false,
         canReactivate: false,
       };
     case "CHECKED_IN":
@@ -27,6 +29,7 @@ export function getAvailableActions(currentStatus: ReservationStatus): Reservati
         canCheckOut: true,
         canCancel: false,
         canModify: false,
+        canDeactivate: false,
         canReactivate: false,
       };
     case "CHECKED_OUT":
@@ -36,6 +39,7 @@ export function getAvailableActions(currentStatus: ReservationStatus): Reservati
         canCheckOut: false,
         canCancel: false,
         canModify: false,
+        canDeactivate: true,
         canReactivate: false,
       };
     case "CANCELED":
@@ -45,6 +49,7 @@ export function getAvailableActions(currentStatus: ReservationStatus): Reservati
         canCheckOut: false,
         canCancel: false,
         canModify: false,
+        canDeactivate: false,
         canReactivate: true,
       };
     default:

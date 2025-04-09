@@ -60,7 +60,7 @@ export const reservationApi = createApi({
       }
     >({
       query: ({ id, status }) => ({
-        url: `/transition-status/${id}`,
+        url: `/reservation/transition-status/${id}`,
         method: "PATCH",
         body: { status },
         credentials: "include",
