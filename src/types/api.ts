@@ -266,6 +266,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/product/all/type/{type}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get all products by type */
+    get: operations["ProductController_findAllByType_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v1/product/{id}": {
     parameters: {
       query?: never;
@@ -351,6 +368,40 @@ export interface paths {
     head?: never;
     /** Update reservation status after being, can support all states */
     patch: operations["ReservationController_transitionStatus_v1"];
+    trace?: never;
+  };
+  "/v1/reservation/deactivate": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Update reservation logic deletion status to deactivate */
+    patch: operations["ReservationController_deactivateReservations_v1"];
+    trace?: never;
+  };
+  "/v1/reservation/reactivate": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Update reservation logic deletion status to reactivate */
+    patch: operations["ReservationController_reactivateReservations_v1"];
     trace?: never;
   };
   "/v1/reservation/{id}": {
@@ -561,6 +612,23 @@ export interface paths {
     patch: operations["RoomController_reactivateAll_v1"];
     trace?: never;
   };
+  "/v1/rooms/{id}/cleaning": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Cambiar estado de habitación a limpieza */
+    patch: operations["RoomController_updateStatusToCleaning_v1"];
+    trace?: never;
+  };
   "/v1/room-types": {
     parameters: {
       query?: never;
@@ -726,10 +794,28 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /** Get all payments */
     get: operations["PaymentsController_findAll_v1"];
     put?: never;
     /** Create a new payment */
     post: operations["PaymentsController_create_v1"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/payments/detail": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Create a new payment detail */
+    post: operations["PaymentsController_createPaymentDetail_v1"];
     delete?: never;
     options?: never;
     head?: never;
@@ -743,6 +829,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /** Get payment by ID */
     get: operations["PaymentsController_findOne_v1"];
     put?: never;
     post?: never;
@@ -1102,6 +1189,8 @@ export interface components {
        */
       type: string;
     };
+    /** @enum {string} */
+    ProductType: "COMMERCIAL" | "INTERNAL_USE";
     UpdateProductDto: {
       /** @description Nombre del producto */
       name?: string;
@@ -1150,13 +1239,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-09T13:56:09.974Z
+       * @example 2025-04-09T21:21:24.578Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-09T13:56:09.974Z
+       * @example 2025-04-09T21:21:24.578Z
        */
       updatedAt: string;
       /** @description Customer name */
@@ -1211,13 +1300,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-09T13:56:09.974Z
+       * @example 2025-04-09T21:21:24.578Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-09T13:56:09.974Z
+       * @example 2025-04-09T21:21:24.578Z
        */
       updatedAt: string;
       /** @description User name */
@@ -1260,13 +1349,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-09T13:56:09.974Z
+       * @example 2025-04-09T21:21:24.578Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-09T13:56:09.974Z
+       * @example 2025-04-09T21:21:24.578Z
        */
       updatedAt: string;
       /**
@@ -1309,13 +1398,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-09T13:56:09.974Z
+       * @example 2025-04-09T21:21:24.578Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-09T13:56:09.974Z
+       * @example 2025-04-09T21:21:24.578Z
        */
       updatedAt: string;
       /**
@@ -1404,13 +1493,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-04-09T13:56:09.974Z
+       * @example 2025-04-09T21:21:24.578Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-04-09T13:56:09.974Z
+       * @example 2025-04-09T21:21:24.578Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -1573,13 +1662,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-04-09T13:56:09.974Z
+       * @example 2025-04-09T21:21:24.578Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-04-09T13:56:09.974Z
+       * @example 2025-04-09T21:21:24.578Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -1627,6 +1716,40 @@ export interface components {
        * @enum {string}
        */
       status: "PENDING" | "CONFIRMED" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELED";
+    };
+    UpdateManyDto: {
+      /**
+       * @description Array of IDs to be updated, but only for deactivate and reactivate use-cases
+       * @example [
+       *       "507f1f77bcf86cd799439011",
+       *       "507f1f77bcf86cd799439012"
+       *     ]
+       */
+      ids: string[];
+    };
+    FailedItem: {
+      /**
+       * @description The ID of the reservation that failed to update
+       * @example 507f1f77bcf86cd799439011
+       */
+      id: string;
+      /**
+       * @description The reason why the update failed
+       * @example Reservation not found
+       */
+      reason: string;
+    };
+    UpdateManyResponseDto: {
+      /**
+       * @description Array of IDs that were successfully updated
+       * @example [
+       *       "507f1f77bcf86cd799439011",
+       *       "507f1f77bcf86cd799439012"
+       *     ]
+       */
+      successful: string[];
+      /** @description Array of objects containing IDs that failed to update and the reasons */
+      failed: components["schemas"]["FailedItem"][];
     };
     UpdateReservationDto: {
       /** @description Customer ID */
@@ -1783,13 +1906,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-09T13:56:09.974Z
+       * @example 2025-04-09T21:21:24.578Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-09T13:56:09.974Z
+       * @example 2025-04-09T21:21:24.578Z
        */
       updatedAt: string;
       /**
@@ -2057,10 +2180,57 @@ export interface components {
        * @description Array of details of the payment
        * @example [
        *       {
-       *         "quantity": 0,
-       *         "partial": 0,
-       *         "percentage": 0,
-       *         "finishesWorkItemBudgetId": "id de la partida"
+       *         "paymentDate": "2023-08-15",
+       *         "description": "Pago de reserva de habitación",
+       *         "type": "ROOM_RESERVATION",
+       *         "method": "CREDIT_CARD",
+       *         "roomId": "7a1b9c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d",
+       *         "days": 3,
+       *         "unitPrice": 150,
+       *         "subtotal": 450
+       *       },
+       *       {
+       *         "paymentDate": "2023-08-15",
+       *         "description": "Servicio de desayuno",
+       *         "type": "EXTRA_SERVICE",
+       *         "method": "CASH",
+       *         "serviceId": "123e4567-e89b-12d3-a456-426614174000",
+       *         "quantity": 2,
+       *         "unitPrice": 25,
+       *         "subtotal": 50
+       *       }
+       *     ]
+       */
+      paymentDetail?: string[];
+    };
+    CreateManyPaymentDetailDto: {
+      /**
+       * @description ID del pago
+       * @example ID del pago
+       */
+      paymentId?: string;
+      /**
+       * @description Array of details of the payment
+       * @example [
+       *       {
+       *         "paymentDate": "2023-08-15",
+       *         "description": "Pago de reserva de habitación",
+       *         "type": "ROOM_RESERVATION",
+       *         "method": "CREDIT_CARD",
+       *         "roomId": "7a1b9c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d",
+       *         "days": 3,
+       *         "unitPrice": 150,
+       *         "subtotal": 450
+       *       },
+       *       {
+       *         "paymentDate": "2023-08-15",
+       *         "description": "Servicio de desayuno",
+       *         "type": "EXTRA_SERVICE",
+       *         "method": "CASH",
+       *         "serviceId": "123e4567-e89b-12d3-a456-426614174000",
+       *         "quantity": 2,
+       *         "unitPrice": 25,
+       *         "subtotal": 50
        *       }
        *     ]
        */
@@ -2091,10 +2261,24 @@ export interface components {
        * @description Array of details of the payment
        * @example [
        *       {
-       *         "quantity": 0,
-       *         "partial": 0,
-       *         "percentage": 0,
-       *         "finishesWorkItemBudgetId": "id de la partida"
+       *         "paymentDate": "2023-08-15",
+       *         "description": "Pago de reserva de habitación",
+       *         "type": "ROOM_RESERVATION",
+       *         "method": "CREDIT_CARD",
+       *         "roomId": "7a1b9c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d",
+       *         "days": 3,
+       *         "unitPrice": 150,
+       *         "subtotal": 450
+       *       },
+       *       {
+       *         "paymentDate": "2023-08-15",
+       *         "description": "Servicio de desayuno",
+       *         "type": "EXTRA_SERVICE",
+       *         "method": "CASH",
+       *         "serviceId": "123e4567-e89b-12d3-a456-426614174000",
+       *         "quantity": 2,
+       *         "unitPrice": 25,
+       *         "subtotal": 50
        *       }
        *     ]
        */
@@ -2114,13 +2298,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-09T13:56:09.974Z
+       * @example 2025-04-09T21:21:24.578Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-09T13:56:09.974Z
+       * @example 2025-04-09T21:21:24.578Z
        */
       updatedAt: string;
       name: string;
@@ -2271,13 +2455,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-09T13:56:09.974Z
+       * @example 2025-04-09T21:21:24.578Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-09T13:56:09.974Z
+       * @example 2025-04-09T21:21:24.578Z
        */
       updatedAt: string;
       /**
@@ -3059,6 +3243,48 @@ export interface operations {
       };
     };
   };
+  ProductController_findAllByType_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Tipo de producto (COMMERCIAL o INTERNAL_USE) */
+        type: components["schemas"]["ProductType"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Products found successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   ProductController_findOne_v1: {
     parameters: {
       query?: never;
@@ -3326,6 +3552,82 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Reservation"];
+        };
+      };
+      /** @description Bad Request - Error en la validación de datos */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ReservationController_deactivateReservations_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateManyDto"];
+      };
+    };
+    responses: {
+      /** @description The updated reservation */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UpdateManyResponseDto"];
+        };
+      };
+      /** @description Bad Request - Error en la validación de datos */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ReservationController_reactivateReservations_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateManyDto"];
+      };
+    };
+    responses: {
+      /** @description The updated reservation */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UpdateManyResponseDto"];
         };
       };
       /** @description Bad Request - Error en la validación de datos */
@@ -3983,6 +4285,50 @@ export interface operations {
       };
     };
   };
+  RoomController_updateStatusToCleaning_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description ID de la habitación */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Estado de habitación cambiado a limpieza exitosamente */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BaseApiResponse"];
+        };
+      };
+      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Habitación no encontrada */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   RoomTypeController_findAll_v1: {
     parameters: {
       query?: never;
@@ -4339,6 +4685,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description Payments retrieved successfully */
       200: {
         headers: {
           [name: string]: unknown;
@@ -4411,6 +4758,49 @@ export interface operations {
       };
     };
   };
+  PaymentsController_createPaymentDetail_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateManyPaymentDetailDto"];
+      };
+    };
+    responses: {
+      /** @description Payment detail created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   PaymentsController_findOne_v1: {
     parameters: {
       query?: never;
@@ -4422,6 +4812,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description Payment retrieved successfully */
       200: {
         headers: {
           [name: string]: unknown;

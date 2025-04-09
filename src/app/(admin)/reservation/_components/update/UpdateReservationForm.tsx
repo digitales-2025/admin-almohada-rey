@@ -37,10 +37,6 @@ import { reservationStatusConfig } from "../../_types/reservation-enum.config";
 import { GenericAvailabilityFormUpdateParams } from "../../_types/room-availability-query-params";
 import UpdateBookingCalendarTime from "./UpdateBookingCalendarTime";
 
-// import { type CreateCustomersSchema } from "../../_schema/createCustomersSchema";
-// import { CustomerDocumentType, CustomerMaritalStatus } from "../../_types/customer";
-// import { CustomerDocumentTypeLabels, CustomerMaritalStatusLabels } from "../../_utils/customers.utils";
-
 interface UpdateReservationSheetFormProps
   extends Omit<React.ComponentPropsWithRef<typeof Sheet>, "open" | "onOpenChange"> {
   children: React.ReactNode;
@@ -195,23 +191,6 @@ export default function UpdateReservationForm({
     // }
     setSelectedRoom(room);
   };
-
-  // if (isOriginalInterval) {
-  //   const originalRoomCapacity = originalRoom.current.RoomTypes?.guests ?? 0;
-  //   const originalRoomPrice = originalRoom.current.RoomTypes?.price ?? 0;
-  //   const originalRoomType = originalRoom.current.RoomTypes?.name.toUpperCase() ?? "Sin tipo";
-  //   const originalRoomNumber = originalRoom.current.number ?? "Sin número";
-  //   roomOptions.unshift({
-  //     label: `${originalRoomNumber} - ${originalRoomType} ( ${originalRoomCapacity}🧍) - ${originalRoomPrice.toLocaleString(
-  //       "es-PE",
-  //       {
-  //         style: "currency",
-  //         currency: "PEN",
-  //       }
-  //     )}`,
-  //     value: originalRoom.current.id,
-  //   });
-  // }
 
   const customerOptions: SelectOption<string>[] = [
     {
