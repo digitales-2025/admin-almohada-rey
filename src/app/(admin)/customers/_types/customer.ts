@@ -1,5 +1,5 @@
 import { components } from "@/types/api";
-import { PaymentDetailMethod, PaymentDetailType, PaymentStatus } from "../../payment/_types/payment";
+import { PaymentDetailMethod, PaymentDetailType, PaymentStatus } from "../../payments/_types/payment";
 import { ReservationStatus } from "../../reservation/_schemas/reservation.schemas";
 
 export type Customer = {

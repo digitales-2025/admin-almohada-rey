@@ -1,7 +1,7 @@
 import { CalendarPlus2Icon as CalendarIcon2, Coffee, Hotel, Receipt, ShoppingCart } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
-import { CreatePaymentSchema } from "@/app/(admin)/payment/_schema/createPaymentsSchema";
+import { CreatePaymentSchema } from "@/app/(admin)/payments/_schema/createPaymentsSchema";
 import { getRoomTypeKey, RoomTypeLabels } from "@/app/(admin)/rooms/list/_utils/rooms.utils";
 import { Separator } from "@/components/ui/separator";
 import { DetailedReservation } from "../../../_schemas/reservation.schemas";

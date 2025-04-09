@@ -5,13 +5,28 @@ import {
   useCreateProductMutation,
   useDeleteProductsMutation,
   useGetAllProductsQuery,
+  useGetProductsByTypeQuery,
   useReactivateProductsMutation,
   useUpdateProductMutation,
 } from "../_services/productsApi";
-import { Product } from "../_types/products";
+import { Product, ProductType } from "../_types/products";
 
-export const useProducts = () => {
+interface UseProductProps {
+  type?: ProductType;
+}
+
+export const useProducts = (options: UseProductProps = {}) => {
+  const { type } = options;
   const { data: dataProductsAll, error, isLoading, isSuccess, refetch } = useGetAllProductsQuery();
+
+  const { data: productByType, refetch: refetchProductByType } = useGetProductsByTypeQuery(
+    {
+      type: type as ProductType,
+    },
+    {
+      skip: !type,
+    }
+  );
 
   const [createProduct, { isSuccess: isSuccessCreateProduct }] = useCreateProductMutation();
 
@@ -81,6 +96,8 @@ export const useProducts = () => {
     isLoading,
     isSuccess,
     refetch,
+    productByType,
+    refetchProductByType,
     onCreateProduct,
     isSuccessCreateProduct,
     onUpdateProduct,

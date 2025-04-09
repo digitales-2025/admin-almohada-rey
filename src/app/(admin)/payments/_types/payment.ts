@@ -1,5 +1,6 @@
 export type Payment = {
   id: string;
+  code: string;
   date: string;
   amount: number;
   amountPaid: number;
@@ -12,6 +13,7 @@ export type Payment = {
     checkOutDate: Date;
   };
   paymentDetail: PaymentDetail[];
+  paymentId?: string;
 };
 
 export enum PaymentStatus {
@@ -65,4 +67,35 @@ export enum PaymentDetailMethod {
   PLIN = "PLIN",
   PAYPAL = "PAYPAL",
   IZI_PAY = "IZI_PAY",
+}
+
+export type SummaryPayment = {
+  id: string;
+  code: string;
+  date: string;
+  amount: number;
+  amountPaid: number;
+  status: PaymentStatus;
+  reservation: {
+    customer: {
+      id: string;
+      name: string;
+    };
+  };
+};
+
+export interface CategoryItemPayment {
+  id: string;
+  name: string;
+  price: number;
+  code: string;
+  description?: string;
+}
+
+export interface CategoryPayment {
+  id: string;
+  name: string;
+  icon: React.ReactNode;
+  color: string;
+  items: CategoryItemPayment[];
 }

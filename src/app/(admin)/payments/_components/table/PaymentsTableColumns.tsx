@@ -1,0 +1,179 @@
+"use client";
+
+import React, { useState } from "react";
+import { type ColumnDef } from "@tanstack/react-table";
+import { format, parseISO } from "date-fns";
+import { es } from "date-fns/locale";
+import { Banknote, CalendarDays, Ellipsis } from "lucide-react";
+
+import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { PaymentStatus, SummaryPayment } from "../../_types/payment";
+import { PaymentStatusLabels } from "../../_utils/payments.utils";
+import { CreatePaymentDetailDialog } from "../create/CreatePaymentDetailDialog";
+
+/**
+ * Generar las columnas de la tabla de usuarios
+ * @param isSuperAdmin Valor si el usuario es super administrador
+ * @returns Columnas de la tabla de usuarios
+ */
+export const paymentsColumns = (isSuperAdmin: boolean): ColumnDef<SummaryPayment>[] => [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <div className="px-2">
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+          className="translate-y-0.5"
+        />
+      </div>
+    ),
+    cell: ({ row }) => (
+      <div className="px-2">
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+          className="translate-y-0.5"
+        />
+      </div>
+    ),
+    enableSorting: false,
+    enableHiding: false,
+    enablePinning: true,
+  },
+  {
+    id: "Código",
+    accessorKey: "code",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Código" />,
+    cell: ({ row }) => <div className="min-w-40 truncate capitalize">{row.getValue("Código")}</div>,
+  },
+
+  {
+    id: "cliente",
+    accessorKey: "reservation.customer.name",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Cliente" />,
+    cell: ({ row }) => <div className="min-w-40 truncate capitalize">{row.getValue("cliente")}</div>,
+  },
+
+  {
+    id: "fecha",
+    accessorKey: "date",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Fecha" />,
+    cell: ({ row }) => {
+      return (
+        <div className="flex items-center space-x-2">
+          <CalendarDays className="h-4 w-4 flex-shrink-0" strokeWidth={1.5} />
+          <span>{format(parseISO(row.getValue("fecha")), "d 'de' MMMM 'de' yyyy", { locale: es })}</span>
+        </div>
+      );
+    },
+  },
+
+  {
+    id: "monto",
+    accessorKey: "amount",
+    size: 20,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Monto" />,
+    cell: ({ row }) => (
+      <div className="flex items-center space-x-2">
+        <Banknote className="h-4 w-4 flex-shrink-0 text-green-500" strokeWidth={1.5} />
+        <span>S/ {parseFloat(row.getValue("monto") as string).toFixed(2)}</span>
+      </div>
+    ),
+  },
+
+  {
+    id: "Monto Pagado",
+    accessorKey: "amountPaid",
+    size: 20,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Monto Pagado" />,
+    cell: ({ row }) => (
+      <div className="flex items-center space-x-2">
+        <Banknote className="h-4 w-4 flex-shrink-0 text-orange-400" strokeWidth={1.5} />
+        <span>S/ {parseFloat(row.getValue("Monto Pagado") as string).toFixed(2)}</span>
+      </div>
+    ),
+  },
+
+  {
+    id: "estado",
+    accessorKey: "status",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Estado" />,
+    cell: ({ row }) => {
+      const paymentStatus = row.getValue("estado") as PaymentStatus;
+      const paymentStatusConfig = PaymentStatusLabels[paymentStatus];
+
+      if (!paymentStatusConfig) return <div>No registrado</div>;
+
+      const Icon = paymentStatusConfig.icon;
+
+      return (
+        <div className="text-xs min-w-32">
+          <Badge variant="default" className={paymentStatusConfig.className}>
+            <Icon className="size-4 flex-shrink-0 mr-1" aria-hidden="true" />
+            {paymentStatusConfig.label}
+          </Badge>
+        </div>
+      );
+    },
+    filterFn: (row, id, value) => {
+      const rowValue = row.getValue(id);
+
+      if (Array.isArray(value)) {
+        if (value.length === 0) return true;
+        return value.includes(rowValue);
+      }
+
+      return rowValue === value;
+    },
+    enableColumnFilter: true,
+  },
+
+  {
+    id: "actions",
+    cell: function Cell({ row }) {
+      const [createDialog, setCreateDialog] = useState(false);
+      console.log(isSuperAdmin);
+
+      return (
+        <div>
+          <div>
+            {createDialog && (
+              <CreatePaymentDetailDialog open={createDialog} onOpenChange={setCreateDialog} payment={row.original} />
+            )}
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button aria-label="Open menu" variant="ghost" className="flex size-8 p-0 data-[state=open]:bg-muted">
+                <Ellipsis className="size-4" aria-hidden="true" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => setCreateDialog(true)}>
+                Agregar Pago
+                <DropdownMenuShortcut>
+                  <Banknote className="size-4" aria-hidden="true" />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      );
+    },
+    enablePinning: true,
+  },
+];
