@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { formatPeruBookingDate } from "@/utils/peru-datetime";
+import { formatPeruBookingDate, formatTimeToHHMMAMPM, formDateToPeruISO } from "@/utils/peru-datetime";
 import {
   DetailedReservation,
   ReservationGuest,
@@ -366,6 +366,15 @@ export const reservationColumns = (): ColumnDef<DetailedReservation>[] => [
         // canReactivate,
       }: ReservationStatusAvailableActions = getAvailableActions(status);
 
+      const today = new Date();
+      const todayFormatted = today.toISOString().split("T")[0];
+      const peruDateFormatted = formDateToPeruISO(todayFormatted, true, formatTimeToHHMMAMPM(new Date()));
+      const peruDate = new Date(peruDateFormatted);
+      console.log("checkindate -todayperudate: ", `${row.original.checkInDate} - ${peruDate}`);
+      const checkInDateObj = new Date(row.original.checkInDate);
+      const hasCheckInDateArrived = checkInDateObj.getDay() <= peruDate.getDay();
+      const enableCheckInButton = hasCheckInDateArrived && canCheckIn;
+
       return (
         <div>
           <div>
@@ -461,7 +470,7 @@ export const reservationColumns = (): ColumnDef<DetailedReservation>[] => [
               )}
 
               {canCheckIn && (
-                <DropdownMenuItem onSelect={() => setShowCheckInDialog(true)}>
+                <DropdownMenuItem disabled={!enableCheckInButton} onSelect={() => setShowCheckInDialog(true)}>
                   {checkInConfig.buttonLabel}
                   <DropdownMenuShortcut>
                     <checkInConfig.icon className="size-4" aria-hidden="true" />
