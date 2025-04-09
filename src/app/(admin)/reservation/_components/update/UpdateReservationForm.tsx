@@ -242,7 +242,7 @@ export default function UpdateReservationForm({
               <FormLabel>{UPDATE_FORMSTATICS.customerId.label}</FormLabel>
               <Select disabled onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger className="w-full text-ellipsis capitalize">
+                  <SelectTrigger className="w-full text-ellipsis capitalize truncate">
                     <SelectValue placeholder="Seleccione un cliente" className="capitalize" />
                   </SelectTrigger>
                 </FormControl>
@@ -284,7 +284,10 @@ export default function UpdateReservationForm({
                       <Button
                         variant="outline"
                         role="combobox"
-                        className={cn("w-full justify-between capitalize", !field.value && "text-muted-foreground")}
+                        className={cn(
+                          "w-full justify-between capitalize truncate",
+                          !field.value && "text-muted-foreground"
+                        )}
                         disabled={roomOptions.length === 0}
                       >
                         {field.value
