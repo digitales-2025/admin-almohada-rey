@@ -10,12 +10,14 @@ import {
   DetailedReservation,
   DetailedRoom,
   Reservation,
+  ReservationStatus,
   RoomAvailabilityDto,
   UpdateReservationInput,
 } from "../_schemas/reservation.schemas";
 import { AvailabilityParams, GenericAvailabilityParams } from "../_types/room-availability-query-params";
 
 type CreateReservationReduxResponse = BaseApiResponse<Reservation>;
+type UpdateReservationReduxResponse = BaseApiResponse<Reservation>;
 export type PaginatedReservationParams = PaginatedQueryParams<Reservation>;
 
 export const reservationApi = createApi({
@@ -35,7 +37,7 @@ export const reservationApi = createApi({
     }),
     //Actualizar reservación
     updateReservation: build.mutation<
-      Reservation,
+      UpdateReservationReduxResponse,
       {
         id: string;
         data: UpdateReservationInput;
@@ -48,6 +50,22 @@ export const reservationApi = createApi({
         credentials: "include",
       }),
       invalidatesTags: ["Reservation"],
+    }),
+    //Change transitions status
+    transitionReservationStatus: build.mutation<
+      UpdateReservationReduxResponse,
+      {
+        id: string;
+        status: ReservationStatus;
+      }
+    >({
+      query: ({ id, status }) => ({
+        url: `/reservation/transition-status/${id}`,
+        method: "PATCH",
+        body: { status },
+        credentials: "include",
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: "Reservation", id }],
     }),
     //Obtener reservación por id
     getReservationById: build.query<Reservation, string>({
@@ -182,6 +200,7 @@ export const reservationApi = createApi({
 export const {
   useCreateReservationMutation,
   useUpdateReservationMutation,
+  useTransitionReservationStatusMutation,
   useGetReservationByIdQuery,
   useGetAllReservationsQuery,
   useGetPaginatedReservationsQuery,

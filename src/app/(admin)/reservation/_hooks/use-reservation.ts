@@ -5,12 +5,18 @@ import { PaginatedResponse, PaginationParams } from "@/types/api/paginated-respo
 import { RTKUseQueryHookResult } from "@/types/hooks/RTKQueryResult";
 import { runAndHandleError } from "@/utils/baseQuery";
 import { processError } from "@/utils/process-error";
-import { CreateReservationInput, DetailedReservation, UpdateReservationInput } from "../_schemas/reservation.schemas";
+import {
+  CreateReservationInput,
+  DetailedReservation,
+  ReservationStatus,
+  UpdateReservationInput,
+} from "../_schemas/reservation.schemas";
 import {
   PaginatedReservationParams,
   useCreateReservationMutation,
   useGetPaginatedReservationsQuery,
   useGetReservationByIdQuery,
+  useTransitionReservationStatusMutation,
   useUpdateReservationMutation,
 } from "../_services/reservationApi";
 
@@ -31,6 +37,7 @@ export const useReservation = () => {
   const useOneReservationQuery = (id: string) => useGetReservationByIdQuery(id);
   const [createReservation, createReservationResponse] = useCreateReservationMutation();
   const [updateReservation, updateReservationResponse] = useUpdateReservationMutation();
+  const [transitionReservationStatus, transitionReservationStatusResponse] = useTransitionReservationStatusMutation();
   async function onCreateReservation(input: CreateReservationInput) {
     const promise = runAndHandleError(() => createReservation(input).unwrap());
     toast.promise(promise, {
@@ -49,6 +56,15 @@ export const useReservation = () => {
     });
     return await promise;
   }
+  async function onTransitionReservationStatus(input: { id: string; status: ReservationStatus }) {
+    const promise = runAndHandleError(() => transitionReservationStatus(input).unwrap());
+    toast.promise(promise, {
+      loading: "Cambiando estado de la reservación...",
+      success: "Estado de la reservación cambiado con éxito",
+      error: (err) => processError(err) ?? "Error desconocido al cambiar el estado de la reservación",
+    });
+    return await promise;
+  }
 
   return {
     usePaginatedReservationQuery,
@@ -57,6 +73,8 @@ export const useReservation = () => {
     createReservationResponse,
     onUpdateReservation,
     updateReservationResponse,
+    onTransitionReservationStatus,
+    transitionReservationStatusResponse,
   };
 };
 

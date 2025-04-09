@@ -39,6 +39,7 @@ export type ReservationGuest = components["schemas"]["Guest"];
 export type PaginatedResponse = components["schemas"]["PaginatedResponse"];
 export type RoomAvailabilityDto = components["schemas"]["RoomAvailabilityDto"];
 export type DetailedRoom = components["schemas"]["DetailedRoom"];
+export type ReservationStatusAvailableActions = components["schemas"]["ReservationStatusAvailableActions"];
 // {
 //     customerId: string;
 //     roomId: string;
