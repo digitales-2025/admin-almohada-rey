@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { Table as TableInstance } from "@tanstack/react-table";
 
+import { useProfile } from "@/app/(admin)/profile/_hooks/use-profile";
 // import { useProfile } from "@/app/(admin)/profile/_hooks/use-profile";
 import { DataTableExpanded } from "@/components/datatable/data-table-expanded";
 import {
@@ -25,9 +26,9 @@ interface ReservationTableProps {
 }
 
 export function ReservationTable({ data, pagination, onPaginationChange }: ReservationTableProps) {
-  // const { user } = useProfile();
+  const { user } = useProfile();
   const columns = useMemo(
-    () => reservationColumns(),
+    () => reservationColumns(user?.isSuperAdmin || false),
     // user?.isSuperAdmin ?? false
     []
   );

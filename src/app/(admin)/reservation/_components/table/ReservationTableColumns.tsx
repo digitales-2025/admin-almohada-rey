@@ -372,7 +372,6 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
       const todayFormatted = today.toISOString().split("T")[0];
       const peruDateFormatted = formDateToPeruISO(todayFormatted, true, formatTimeToHHMMAMPM(new Date()));
       const peruDate = new Date(peruDateFormatted);
-      console.log("checkindate -todayperudate: ", `${row.original.checkInDate} - ${peruDate}`);
       const checkInDateObj = new Date(row.original.checkInDate);
       const hasCheckInDateArrived = checkInDateObj.getDay() <= peruDate.getDay();
       const enableCheckInButton = hasCheckInDateArrived && canCheckIn;
@@ -497,27 +496,29 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
                   </DropdownMenuShortcut>
                 </DropdownMenuItem>
               )}
+              <DropdownMenuSeparator />
 
-              {isSuperAdmin && canReactivate && (
-                <DropdownMenuItem onSelect={() => setShowReactivateDialog(true)} disabled={isActive}>
-                  Reactivar
+              {isSuperAdmin && (
+                <DropdownMenuItem onSelect={() => setShowReactivateDialog(true)} disabled={isActive || !canReactivate}>
+                  Restaurar
                   <DropdownMenuShortcut>
                     <RefreshCcwDot className="size-4" aria-hidden="true" />
                   </DropdownMenuShortcut>
                 </DropdownMenuItem>
               )}
-              {canDeactivate && (
+
+              {
                 <DropdownMenuItem
                   onSelect={() => setShowDeactivateDialog(true)}
-                  disabled={!isActive}
+                  disabled={!isActive || !canDeactivate}
                   className="text-red-700"
                 >
-                  Eliminar
+                  Archivar
                   <DropdownMenuShortcut>
                     <Trash className="size-4 text-red-700" aria-hidden="true" />
                   </DropdownMenuShortcut>
                 </DropdownMenuItem>
-              )}
+              }
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

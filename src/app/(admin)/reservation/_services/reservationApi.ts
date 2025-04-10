@@ -71,12 +71,14 @@ export const reservationApi = createApi({
     }),
 
     deactivateReservations: build.mutation<BaseApiResponse<UpdateManyResponse>, UpdateManyDto>({
-      query: (updateManyDto) => ({
-        url: `/reservation/deactivate`,
-        method: "PATCH",
-        body: updateManyDto,
-        credentials: "include",
-      }),
+      query: (updateManyDto) => {
+        return {
+          url: `/reservation/deactivate`,
+          method: "DELETE",
+          body: updateManyDto,
+          credentials: "include",
+        };
+      },
       invalidatesTags: ["Reservation"],
     }),
     reactivateReservations: build.mutation<BaseApiResponse<UpdateManyResponse>, UpdateManyDto>({
@@ -194,16 +196,6 @@ export const reservationApi = createApi({
         },
         credentials: "include",
       }),
-    }),
-    //Eliminar reservaciones
-    deleteReservations: build.mutation<void, { ids: string[] }>({
-      query: (ids) => ({
-        url: `/reservation/remove/all`,
-        method: "DELETE",
-        body: ids,
-        credentials: "include",
-      }),
-      invalidatesTags: ["Reservation"],
     }),
   }),
 });

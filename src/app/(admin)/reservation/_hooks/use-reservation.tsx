@@ -9,6 +9,7 @@ import {
   CreateReservationInput,
   DetailedReservation,
   ReservationStatus,
+  UpdateManyDto,
   UpdateReservationInput,
 } from "../_schemas/reservation.schemas";
 import {
@@ -69,19 +70,21 @@ export const useReservation = () => {
     });
     return await promise;
   }
-  async function onDeactivateReservations(input: { ids: string[] }) {
+  async function onDeactivateReservations(input: UpdateManyDto) {
     const promise = runAndHandleError(() => deactivateReservations(input).unwrap());
     toast.promise(promise, {
       loading: "Desactivando reservaciones...",
       success: (response) => {
         const { successful, failed } = response.data;
         if (failed.length === 0) {
-          return "Reservaciones desactivadas con éxito";
+          return {
+            message: "Reservaciones archivadas con éxito",
+          };
         }
         const successMessage: ReactElement = (
           <div className="w-full flex flex-col gap-3 text-sm">
             <span>
-              {successful.length} reservaciones desactivadas con éxito.
+              {successful.length} reservaciones archivadas con éxito.
               <br />
               {failed.length} reservaciones fallidas.
             </span>
@@ -90,7 +93,7 @@ export const useReservation = () => {
                 <span className="text-sm font-medium">Razones</span>
                 <div className="flex flex-col gap-1">
                   {failed.map((reservation) => (
-                    <span key={reservation.id} className="text-red-500">
+                    <span key={reservation.id} className="text-red-500 text-wrap">
                       {"- "}
                       {reservation.reason}
                     </span>
@@ -100,7 +103,10 @@ export const useReservation = () => {
             )}
           </div>
         );
-        return successMessage;
+        return {
+          message: "Algunas o ninguna reservaciones archivadas con éxito",
+          description: successMessage,
+        };
       },
       error: (err) => processError(err) ?? "Error desconocido al desactivar reservaciones",
     });
@@ -113,7 +119,9 @@ export const useReservation = () => {
       success: (response) => {
         const { successful, failed } = response.data;
         if (failed.length === 0) {
-          return "Reservaciones reactivadas con éxito";
+          return {
+            message: "Reservaciones restauradas con éxito",
+          };
         }
         const successMessage: ReactElement = (
           <div className="w-full flex flex-col gap-3 text-sm">
@@ -137,7 +145,10 @@ export const useReservation = () => {
             )}
           </div>
         );
-        return successMessage;
+        return {
+          message: "Algunas o ninguna reservaciones restauradas con éxito",
+          description: successMessage,
+        };
       },
       error: (err) => processError(err) ?? "Error desconocido al reactivar reservaciones",
     });

@@ -91,6 +91,21 @@ export function DeactivateReservationsDialog({
               Esta acción archivará a<span className="font-medium"> {reservations.length}</span>
               {reservations.length === 1 ? " reservación" : " reservaciones"}
             </AlertDialogDescription>
+            <div className="text-pretty text-sm">
+              Algunas reservaciones no se pueden archivar debido a:
+              <ul className="mt-2 ml-5 list-disc">
+                <li>Conflictos de horario</li>
+                <li>
+                  Ya han sido marcadas como <span className="font-medium">check-in</span>
+                </li>
+                <li>
+                  Ya han sido marcadas como <span className="font-medium">check-out</span>
+                </li>
+                <li>
+                  Han sido <span className="font-medium">canceladas</span>
+                </li>
+              </ul>
+            </div>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2 sm:space-x-0">
             <AlertDialogCancel asChild>
@@ -126,6 +141,21 @@ export function DeactivateReservationsDialog({
           <DrawerDescription>
             Esta acción archivará a<span className="font-medium">{reservations.length}</span>
             {reservations.length === 1 ? " cliente" : " clientes"}
+          </DrawerDescription>
+          <DrawerDescription className="text-pretty">
+            Algunas reservaciones no se pueden archivar debido a:
+            <ul className="mt-2 ml-5 list-disc">
+              <li>Conflictos de horario</li>
+              <li>
+                Ya han sido marcadas como <span className="font-medium">check-in</span>
+              </li>
+              <li>
+                Ya han sido marcadas como <span className="font-medium">check-out</span>
+              </li>
+              <li>
+                Han sido <span className="font-medium">canceladas</span>
+              </li>
+            </ul>
           </DrawerDescription>
         </DrawerHeader>
         <DrawerFooter className="gap-2 sm:space-x-0">

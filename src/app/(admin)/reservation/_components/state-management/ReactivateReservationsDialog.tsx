@@ -87,7 +87,14 @@ export const ReactivateReservationsDialog = ({
             <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
             <AlertDialogDescription>
               Esta acción restaurará a <span className="font-medium"> {reservations.length}</span>
-              {reservations.length === 1 ? " cliente" : " clientes"}
+              {reservations.length === 1 ? " reserva" : " reservas"}
+            </AlertDialogDescription>
+            <AlertDialogDescription className="text-pretty">
+              Puede que algunas reservaciones no se puedan restaurar debido a:
+              <ul className="list-disc pl-6 mt-2">
+                <li>Ya ha pasado su fecha de check-in</li>
+                <li>Ya no hay horarios disponibles para su habitación desde su cancelación o desactivación</li>
+              </ul>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2 sm:space-x-0">
@@ -113,7 +120,7 @@ export const ReactivateReservationsDialog = ({
         <DrawerTrigger asChild>
           <Button variant="outline" size="sm">
             <RefreshCcwDot className="mr-2 size-4" aria-hidden="true" />
-            Reactivar ({reservations.length})
+            Restaurar ({reservations.length})
           </Button>
         </DrawerTrigger>
       ) : null}
@@ -121,14 +128,21 @@ export const ReactivateReservationsDialog = ({
         <DrawerHeader>
           <DrawerTitle>¿Estás absolutamente seguro?</DrawerTitle>
           <DrawerDescription>
-            Esta acción reactivará a<span className="font-medium">{reservations.length}</span>
-            {reservations.length === 1 ? " cliente" : " clientes"}
+            Esta acción restaurará a<span className="font-medium">{reservations.length}</span>
+            {reservations.length === 1 ? " reserva" : " reservas"}
+          </DrawerDescription>
+          <DrawerDescription className="text-pretty">
+            Puede que algunas reservaciones no se puedan restaurar debido a:
+            <ul className="list-disc pl-6 mt-2">
+              <li>Ya ha pasado su fecha de check-in</li>
+              <li>Ya no hay horarios disponibles para su habitación desde su cancelación o desactivación</li>
+            </ul>
           </DrawerDescription>
         </DrawerHeader>
         <DrawerFooter className="gap-2 sm:space-x-0">
           <Button aria-label="Reactivate selected rows" onClick={onReactivateReservationsHandler} disabled={isLoading}>
             {isLoading && <RefreshCcw className="mr-2 size-4 animate-spin" aria-hidden="true" />}
-            Reactivar
+            Restaurar
           </Button>
           <DrawerClose asChild>
             <Button variant="outline">Cancelar</Button>
