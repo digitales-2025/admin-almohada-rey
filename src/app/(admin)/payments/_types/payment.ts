@@ -11,6 +11,10 @@ export type Payment = {
     id: string;
     checkInDate: Date;
     checkOutDate: Date;
+    customer: {
+      id: string;
+      name: string;
+    };
   };
   paymentDetail: PaymentDetail[];
   paymentId?: string;
