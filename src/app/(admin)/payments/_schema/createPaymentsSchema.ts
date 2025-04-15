@@ -30,5 +30,10 @@ export const paymentSchema = z.object({
   totalAmount: z.number().min(0, "Total amount must be at least 0"),
 });
 
+export const updatePaymentSchema = z.object({
+  observations: z.string().optional(),
+});
+
 export type CreatePaymentSchema = z.infer<typeof paymentSchema>;
 export type ExtraServiceItem = z.infer<typeof extraServiceSchema>;
+export type UpdatePaymentSchema = z.infer<typeof updatePaymentSchema>;
