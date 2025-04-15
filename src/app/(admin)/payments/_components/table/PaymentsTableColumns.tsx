@@ -27,7 +27,10 @@ import { CreatePaymentDetailDialog } from "../create/CreatePaymentDetailDialog";
  * @param isSuperAdmin Valor si el usuario es super administrador
  * @returns Columnas de la tabla de usuarios
  */
-export const paymentsColumns = (isSuperAdmin: boolean): ColumnDef<SummaryPayment>[] => [
+export const paymentsColumns = (
+  isSuperAdmin: boolean,
+  handleManagementPaymentInterface: (id: string) => void
+): ColumnDef<SummaryPayment>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -162,6 +165,9 @@ export const paymentsColumns = (isSuperAdmin: boolean): ColumnDef<SummaryPayment
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuItem onSelect={() => handleManagementPaymentInterface(row.original.id)}>
+                Gestionar Pagos
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={() => setCreateDialog(true)}>
                 Agregar Pago
