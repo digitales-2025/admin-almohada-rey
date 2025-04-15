@@ -3,6 +3,10 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import baseQueryWithReauth from "@/utils/baseQuery";
 import { Payment, SummaryPayment } from "../_types/payment";
 
+interface GetPaymentByIdProps {
+  id: string;
+}
+
 export const paymentsApi = createApi({
   reducerPath: "paymentsApi",
   baseQuery: baseQueryWithReauth,
@@ -30,14 +34,25 @@ export const paymentsApi = createApi({
       invalidatesTags: ["Payment"],
     }),
 
+    //Actualizar pagos
+    updatePayment: build.mutation<Payment, Partial<Payment> & { id: string }>({
+      query: ({ id, ...body }) => ({
+        url: `/payments/${id}`,
+        method: "PATCH",
+        body,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Payment"],
+    }),
+
     //Obtener pago por id
-    getPaymentById: build.query<Payment, string>({
-      query: (id) => ({
+    getPaymentById: build.query<Payment, GetPaymentByIdProps>({
+      query: ({ id }) => ({
         url: `/payments/${id}`,
         method: "GET",
         credentials: "include",
       }),
-      providesTags: (result, error, id) => [{ type: "Payment", id }],
+      providesTags: ["Payment"],
     }),
 
     //Obtener todos los pagos
@@ -55,6 +70,7 @@ export const paymentsApi = createApi({
 export const {
   useCreatePaymentMutation,
   useCreatePaymentDetailsMutation,
+  useUpdatePaymentMutation,
   useGetPaymentByIdQuery,
   useGetAllPaymentsQuery,
 } = paymentsApi;
