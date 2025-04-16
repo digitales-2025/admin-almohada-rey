@@ -105,7 +105,7 @@ export const roomsColumns = (isSuperAdmin: boolean): ColumnDef<Room>[] => [
 
       return (
         <div className="text-xs min-w-28">
-          <Badge variant="default" className={roomStatusConfig.className}>
+          <Badge variant="outline" className={roomStatusConfig.className}>
             <Icon className="size-4 flex-shrink-0 mr-1" aria-hidden="true" />
             {roomStatusConfig.label}
           </Badge>
@@ -151,7 +151,7 @@ export const roomsColumns = (isSuperAdmin: boolean): ColumnDef<Room>[] => [
 
       return (
         <div className="text-xs min-w-28">
-          <Badge variant="default" className={floorTypeConfig.className}>
+          <Badge variant="outline" className={floorTypeConfig.className}>
             <Icon className="size-4 flex-shrink-0 mr-1" aria-hidden="true" />
             {floorTypeConfig.label}
           </Badge>
@@ -190,11 +190,14 @@ export const roomsColumns = (isSuperAdmin: boolean): ColumnDef<Room>[] => [
     cell: ({ row }) => (
       <div>
         {row.getValue("estado") ? (
-          <Badge variant="secondary" className="bg-emerald-100 text-emerald-500 border-emerald-200">
+          <Badge
+            variant="secondary"
+            className="bg-emerald-100 text-emerald-500 border-emerald-200 hover:bg-emerald-200"
+          >
             Activo
           </Badge>
         ) : (
-          <Badge variant="secondary" className="bg-red-100 text-red-500 border-red-200">
+          <Badge variant="secondary" className="bg-red-100 text-red-500 border-red-200 hover:bg-red-200">
             Inactivo
           </Badge>
         )}

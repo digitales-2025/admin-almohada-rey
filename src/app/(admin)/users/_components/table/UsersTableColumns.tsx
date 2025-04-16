@@ -115,7 +115,7 @@ export const usersColumns = (isSuperAdmin: boolean): ColumnDef<User>[] => [
 
       return (
         <div className="text-xs min-w-32">
-          <Badge variant="default" className={roleConfig.className}>
+          <Badge variant="outline" className={roleConfig.className}>
             <Icon className="size-4 flex-shrink-0 mr-1" aria-hidden="true" />
             {roleConfig.label}
           </Badge>

@@ -125,7 +125,7 @@ export const paymentsColumns = (
 
       return (
         <div className="text-xs min-w-32">
-          <Badge variant="default" className={paymentStatusConfig.className}>
+          <Badge variant="outline" className={paymentStatusConfig.className}>
             <Icon className="size-4 flex-shrink-0 mr-1" aria-hidden="true" />
             {paymentStatusConfig.label}
           </Badge>
