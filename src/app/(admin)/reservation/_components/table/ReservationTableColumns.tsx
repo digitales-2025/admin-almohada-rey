@@ -279,11 +279,14 @@ export const reservationColumns = (): ColumnDef<DetailedReservation>[] => [
     cell: ({ row }) => (
       <div>
         {row.original.isActive ? (
-          <Badge variant="secondary" className="bg-emerald-100 text-emerald-500 border-emerald-200">
+          <Badge
+            variant="secondary"
+            className="bg-emerald-100 text-emerald-500 border-emerald-200 hover:bg-emerald-200"
+          >
             Activo
           </Badge>
         ) : (
-          <Badge variant="secondary" className="bg-red-100 text-red-500 border-red-200">
+          <Badge variant="secondary" className="bg-red-100 text-red-500 border-red-200 hover-bg-red-200">
             Archivado
           </Badge>
         )}
