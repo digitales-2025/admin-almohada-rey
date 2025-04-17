@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { ChevronDown, ChevronRight, Ellipsis } from "lucide-react";
+import { ChevronDown, ChevronRight, Ellipsis, RefreshCcwDot, Trash } from "lucide-react";
 import { toast } from "sonner";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
@@ -27,6 +27,8 @@ import {
 import { reservationStatusConfig } from "../../_types/reservation-enum.config";
 import { getAvailableActions } from "../../_utils/reservation-status-validation.utils";
 import { CreatePaymentDialog } from "../create-payment/CreatePaymentsDialog";
+import { DeactivateReservationsDialog } from "../state-management/DeactivateReservationsDialog";
+import { ReactivateReservationsDialog } from "../state-management/ReactivateReservationsDialog";
 import { DIALOG_DICTIONARY } from "../state-management/reservation-status-dialog-config";
 import { TransitionReservationStatusDialog } from "../state-management/TransitionReservationStatusDialog";
 import { UpdateReservationSheet } from "../update/UpdateReservationSheet";
@@ -37,7 +39,7 @@ import { GuestsDetailsDialog } from "./dialogs/GuestDialog";
  * @param isSuperAdmin Valor si el usuario es super administrador
  * @returns Columnas de la tabla de usuarios
  */
-export const reservationColumns = (): ColumnDef<DetailedReservation>[] => [
+export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedReservation>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -348,8 +350,8 @@ export const reservationColumns = (): ColumnDef<DetailedReservation>[] => [
       const [showCheckInDialog, setShowCheckInDialog] = useState(false);
       const [showCheckOutDialog, setShowCheckOutDialog] = useState(false);
       // const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-      //   const [showDeactivateDialog, setShowDeactivateDialog] = useState(false);
-      //   const [showReactivateDialog, setShowReactivateDialog] = useState(false);
+      const [showDeactivateDialog, setShowDeactivateDialog] = useState(false);
+      const [showReactivateDialog, setShowReactivateDialog] = useState(false);
       const { status } = row.original;
       const { isActive } = row.original;
 
@@ -365,15 +367,14 @@ export const reservationColumns = (): ColumnDef<DetailedReservation>[] => [
         canCheckOut,
         canConfirm,
         // canModify,
-        // canDeactivate,
-        // canReactivate,
+        canDeactivate,
+        canReactivate,
       }: ReservationStatusAvailableActions = getAvailableActions(status);
 
       const today = new Date();
       const todayFormatted = today.toISOString().split("T")[0];
       const peruDateFormatted = formDateToPeruISO(todayFormatted, true, formatTimeToHHMMAMPM(new Date()));
       const peruDate = new Date(peruDateFormatted);
-      console.log("checkindate -todayperudate: ", `${row.original.checkInDate} - ${peruDate}`);
       const checkInDateObj = new Date(row.original.checkInDate);
       const hasCheckInDateArrived = checkInDateObj.getDay() <= peruDate.getDay();
       const enableCheckInButton = hasCheckInDateArrived && canCheckIn;
@@ -427,12 +428,12 @@ export const reservationColumns = (): ColumnDef<DetailedReservation>[] => [
                 newStatus="CONFIRMED"
               ></TransitionReservationStatusDialog>
             )} */}
-            {/* 
-            {showDeleteDialog && (
-              <DeleteCustomersDialog
-                open={showDeleteDialog}
-                onOpenChange={setShowDeleteDialog}
-                customers={[row?.original]}
+
+            {showDeactivateDialog && (
+              <DeactivateReservationsDialog
+                open={showDeactivateDialog}
+                onOpenChange={setShowDeactivateDialog}
+                reservations={[row?.original]}
                 showTrigger={false}
                 onSuccess={() => {
                   row.toggleSelected(false);
@@ -440,16 +441,16 @@ export const reservationColumns = (): ColumnDef<DetailedReservation>[] => [
               />
             )}
             {showReactivateDialog && (
-              <ReactivateCustomersDialog
+              <ReactivateReservationsDialog
                 open={showReactivateDialog}
                 onOpenChange={setShowReactivateDialog}
-                customers={[row?.original]}
+                reservations={[row?.original]}
                 showTrigger={false}
                 onSuccess={() => {
                   row.toggleSelected(false);
                 }}
               />
-            )} */}
+            )}
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -498,25 +499,29 @@ export const reservationColumns = (): ColumnDef<DetailedReservation>[] => [
                   </DropdownMenuShortcut>
                 </DropdownMenuItem>
               )}
+              <DropdownMenuSeparator />
 
-              {/*               {isSuperAdmin && (
-                <DropdownMenuItem onSelect={() => setShowReactivateDialog(true)} disabled={isActive}>
-                  Reactivar
+              {isSuperAdmin && (
+                <DropdownMenuItem onSelect={() => setShowReactivateDialog(true)} disabled={isActive || !canReactivate}>
+                  Restaurar
                   <DropdownMenuShortcut>
                     <RefreshCcwDot className="size-4" aria-hidden="true" />
                   </DropdownMenuShortcut>
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem
-                onSelect={() => setShowDeleteDialog(true)}
-                disabled={!isActive}
-                className="text-red-700"
-              >
-                Eliminar
-                <DropdownMenuShortcut>
-                  <Trash className="size-4 text-red-700" aria-hidden="true" />
-                </DropdownMenuShortcut>
-              </DropdownMenuItem> */}
+
+              {
+                <DropdownMenuItem
+                  onSelect={() => setShowDeactivateDialog(true)}
+                  disabled={!isActive || !canDeactivate}
+                  className="text-red-700"
+                >
+                  Archivar
+                  <DropdownMenuShortcut>
+                    <Trash className="size-4 text-red-700" aria-hidden="true" />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              }
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

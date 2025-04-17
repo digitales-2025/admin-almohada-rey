@@ -188,11 +188,11 @@ export default function CreateReservationForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <FormItem className="sm:col-span-1">
+        <FormItem className="w-full col-span-2 sm:col-span-1">
           <FormLabel>{FORMSTATICS.customerId.label}</FormLabel>
           {/* <SearchCustomerCombobox onValueChange={onSearchCustomerFound} /> */}
           <FormControl>
-            <SearchCustomerCombobox onValueChange={onSearchCustomerFound} />
+            <SearchCustomerCombobox onValueChange={onSearchCustomerFound} className="max-w-none" />
           </FormControl>
           <CustomFormDescription
             required={FORMSTATICS.customerId.required}
@@ -209,7 +209,7 @@ export default function CreateReservationForm({
           control={form.control}
           name="roomId"
           render={({ field }) => (
-            <FormItem className="sm:col-span-1 w-full">
+            <FormItem className=" col-span-2 sm:col-span-1 w-full">
               <FormLabel>{FORMSTATICS.roomId.label}</FormLabel>
               <FormControl>
                 <Popover>
@@ -218,7 +218,10 @@ export default function CreateReservationForm({
                       <Button
                         variant="outline"
                         role="combobox"
-                        className={cn("w-full justify-between capitalize", !field.value && "text-muted-foreground")}
+                        className={cn(
+                          "w-full justify-between capitalize truncate",
+                          !field.value && "text-muted-foreground"
+                        )}
                         disabled={roomOptions.length === 0}
                       >
                         {field.value
@@ -264,7 +267,7 @@ export default function CreateReservationForm({
         <Separator className="col-span-2" />
 
         {/* Reemplazar los campos separados de checkIn/checkOut con el nuevo componente */}
-        <div className="sm:col-span-2 space-y-2">
+        <div className="col-span-2 sm:col-span-2 space-y-2">
           <BookingCalendarTime form={form} roomId={roomId} onRoomAvailabilityChange={setIsRoomAvailable} />
           <CustomFormDescription
             required={FORMSTATICS.observations.required}
@@ -378,7 +381,7 @@ export default function CreateReservationForm({
           control={form.control}
           name="status"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="col-span-2 sm:col-span-1">
               <FormLabel htmlFor="city">{FORMSTATICS.status.label}</FormLabel>
               <Select disabled onValueChange={field.onChange} value={field.value}>
                 <FormControl>
@@ -428,7 +431,7 @@ export default function CreateReservationForm({
           control={form.control}
           name={"origin"}
           render={({ field }) => (
-            <FormItem className="sm:col-span-1">
+            <FormItem className="col-span-2 sm:col-span-1">
               <FormLabel>{FORMSTATICS.origin.label}</FormLabel>
               <FormControl>
                 <InputWithIcon {...field} Icon={MapPinHouse} placeholder={FORMSTATICS.origin.placeholder} />
@@ -445,7 +448,7 @@ export default function CreateReservationForm({
         <Separator className="col-span-2" />
 
         {selectedRoom?.RoomTypes?.guests && (
-          <div className="space-y-4 sm:col-span-2">
+          <div className="space-y-4 col-span-2">
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
               <div className="space-y-0.5">
                 <FormLabel>¿Acompañantes?</FormLabel>
@@ -468,7 +471,7 @@ export default function CreateReservationForm({
         )}
 
         {allowGuests && selectedRoom?.RoomTypes?.guests && (
-          <div className="flex flex-col gap-4 sm:col-span-2 animate-ease-in">
+          <div className="flex flex-col gap-4  sm:col-span-2 animate-ease-in">
             <FormLabel>{FORMSTATICS.guests.label}</FormLabel>
             <Table className="w-full overflow-auto">
               <TableHeader>
@@ -741,7 +744,7 @@ export default function CreateReservationForm({
           control={form.control}
           name={"reason"}
           render={({ field }) => (
-            <FormItem className="sm:col-span-2">
+            <FormItem className="col-span-2 sm:col-span-2">
               <FormLabel>{FORMSTATICS.reason.label}</FormLabel>
               <FormControl>
                 <TextareaWithIcon {...field} Icon={UserRoundCheck} placeholder={FORMSTATICS.reason.placeholder} />
@@ -759,7 +762,7 @@ export default function CreateReservationForm({
           control={form.control}
           name={"observations"}
           render={({ field }) => (
-            <FormItem className="sm:col-span-2">
+            <FormItem className="col-span-2 sm:col-span-2">
               <FormLabel>{FORMSTATICS.observations.label}</FormLabel>
               <FormControl>
                 <TextareaWithIcon {...field} Icon={ListCheck} placeholder={FORMSTATICS.observations.placeholder} />

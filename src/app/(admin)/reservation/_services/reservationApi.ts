@@ -12,6 +12,8 @@ import {
   Reservation,
   ReservationStatus,
   RoomAvailabilityDto,
+  UpdateManyDto,
+  UpdateManyResponse,
   UpdateReservationInput,
 } from "../_schemas/reservation.schemas";
 import { AvailabilityParams, GenericAvailabilityParams } from "../_types/room-availability-query-params";
@@ -66,6 +68,27 @@ export const reservationApi = createApi({
         credentials: "include",
       }),
       invalidatesTags: (result, error, { id }) => [{ type: "Reservation", id }],
+    }),
+
+    deactivateReservations: build.mutation<BaseApiResponse<UpdateManyResponse>, UpdateManyDto>({
+      query: (updateManyDto) => {
+        return {
+          url: `/reservation/deactivate`,
+          method: "DELETE",
+          body: updateManyDto,
+          credentials: "include",
+        };
+      },
+      invalidatesTags: ["Reservation"],
+    }),
+    reactivateReservations: build.mutation<BaseApiResponse<UpdateManyResponse>, UpdateManyDto>({
+      query: (updateManyDto) => ({
+        url: `/reservation/reactivate`,
+        method: "PATCH",
+        body: updateManyDto,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Reservation"],
     }),
     //Obtener reservación por id
     getReservationById: build.query<Reservation, string>({
@@ -174,26 +197,6 @@ export const reservationApi = createApi({
         credentials: "include",
       }),
     }),
-    //Eliminar reservaciones
-    deleteReservations: build.mutation<void, { ids: string[] }>({
-      query: (ids) => ({
-        url: `/reservation/remove/all`,
-        method: "DELETE",
-        body: ids,
-        credentials: "include",
-      }),
-      invalidatesTags: ["Reservation"],
-    }),
-    //Activar reservaciones
-    reactivateReservations: build.mutation<void, { ids: string[] }>({
-      query: (ids) => ({
-        url: `/reservation/reactivate/all`,
-        method: "PATCH",
-        body: ids,
-        credentials: "include",
-      }),
-      invalidatesTags: ["Reservation"],
-    }),
   }),
 });
 
@@ -209,4 +212,6 @@ export const {
   useGetAllAvailableRoomsQuery,
   useGetAllAvailableRoomsForUpdateQuery,
   useGetReservationsInTimeIntervalQuery,
+  useDeactivateReservationsMutation,
+  useReactivateReservationsMutation,
 } = reservationApi;

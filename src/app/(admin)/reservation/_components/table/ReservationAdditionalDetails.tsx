@@ -156,15 +156,13 @@ export const ReservationAdditionalDetails = ({ row }: ReservationAddDetailsProps
 
             {row.user?.name ? (
               <div className="space-y-3">
-                {row.observations && (
-                  <div className="flex items-start gap-3">
-                    <Building className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-                    <div>
-                      <p className="text-lg font-semibold capitalize">{row.user.name}</p>
-                      <p className="text-xs font-semibold capitalize">{row.user?.phone ?? "Tel. no disponible"}</p>
-                    </div>
+                <div className="flex items-start gap-3">
+                  <Building className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-lg font-semibold capitalize">{row.user.name}</p>
+                    <p className="text-xs font-semibold capitalize">{row.user?.phone ?? "Tel. no disponible"}</p>
                   </div>
-                )}
+                </div>
               </div>
             ) : (
               <div className="flex items-center justify-center h-24 text-muted-foreground text-sm">

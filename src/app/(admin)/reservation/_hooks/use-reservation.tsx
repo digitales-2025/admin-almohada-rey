@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { ReactElement, useState } from "react";
 import { toast } from "sonner";
 
 import { PaginatedResponse, PaginationParams } from "@/types/api/paginated-response";
@@ -9,13 +9,16 @@ import {
   CreateReservationInput,
   DetailedReservation,
   ReservationStatus,
+  UpdateManyDto,
   UpdateReservationInput,
 } from "../_schemas/reservation.schemas";
 import {
   PaginatedReservationParams,
   useCreateReservationMutation,
+  useDeactivateReservationsMutation,
   useGetPaginatedReservationsQuery,
   useGetReservationByIdQuery,
+  useReactivateReservationsMutation,
   useTransitionReservationStatusMutation,
   useUpdateReservationMutation,
 } from "../_services/reservationApi";
@@ -38,6 +41,8 @@ export const useReservation = () => {
   const [createReservation, createReservationResponse] = useCreateReservationMutation();
   const [updateReservation, updateReservationResponse] = useUpdateReservationMutation();
   const [transitionReservationStatus, transitionReservationStatusResponse] = useTransitionReservationStatusMutation();
+  const [deactivateReservations, deactivateReservationResponse] = useDeactivateReservationsMutation();
+  const [reactivateReservations, reactivateReservationsResponse] = useReactivateReservationsMutation();
   async function onCreateReservation(input: CreateReservationInput) {
     const promise = runAndHandleError(() => createReservation(input).unwrap());
     toast.promise(promise, {
@@ -65,6 +70,90 @@ export const useReservation = () => {
     });
     return await promise;
   }
+  async function onDeactivateReservations(input: UpdateManyDto) {
+    const promise = runAndHandleError(() => deactivateReservations(input).unwrap());
+    toast.promise(promise, {
+      loading: "Desactivando reservaciones...",
+      success: (response) => {
+        const { successful, failed } = response.data;
+        if (failed.length === 0) {
+          return {
+            message: "Reservaciones archivadas con éxito",
+          };
+        }
+        const successMessage: ReactElement = (
+          <div className="w-full flex flex-col gap-3 text-sm">
+            <span>
+              {successful.length} reservaciones archivadas con éxito.
+              <br />
+              {failed.length} reservaciones fallidas.
+            </span>
+            {failed.length > 0 && (
+              <div className="flex flex-col gap-2">
+                <span className="text-sm font-medium">Razones</span>
+                <div className="flex flex-col gap-1">
+                  {failed.map((reservation) => (
+                    <span key={reservation.id} className="text-red-500 text-wrap">
+                      {"- "}
+                      {reservation.reason}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+        return {
+          message: "Algunas o ninguna reservaciones archivadas con éxito",
+          description: successMessage,
+        };
+      },
+      error: (err) => processError(err) ?? "Error desconocido al desactivar reservaciones",
+    });
+    return await promise;
+  }
+  async function onReactivateReservations(input: { ids: string[] }) {
+    const promise = runAndHandleError(() => reactivateReservations(input).unwrap());
+    toast.promise(promise, {
+      loading: "Reactivando reservaciones...",
+      success: (response) => {
+        const { successful, failed } = response.data;
+        if (failed.length === 0) {
+          return {
+            message: "Reservaciones restauradas con éxito",
+          };
+        }
+        const successMessage: ReactElement = (
+          <div className="w-full flex flex-col gap-3 text-sm">
+            <span>
+              {successful.length} reservaciones reactivadas con éxito.
+              <br />
+              {failed.length} reservaciones fallidas.
+            </span>
+            {failed.length > 0 && (
+              <div className="flex flex-col gap-2">
+                <span className="text-sm font-medium">Razones</span>
+                <div className="flex flex-col gap-1">
+                  {failed.map((reservation) => (
+                    <span key={reservation.id} className="text-red-500">
+                      {"- "}
+                      {reservation.reason}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+        return {
+          message: "Algunas o ninguna reservaciones restauradas con éxito",
+          description: successMessage,
+        };
+      },
+      error: (err) => processError(err) ?? "Error desconocido al reactivar reservaciones",
+    });
+    return await promise;
+  }
 
   return {
     usePaginatedReservationQuery,
@@ -75,6 +164,10 @@ export const useReservation = () => {
     updateReservationResponse,
     onTransitionReservationStatus,
     transitionReservationStatusResponse,
+    onDeactivateReservations,
+    deactivateReservationResponse,
+    onReactivateReservations,
+    reactivateReservationsResponse,
   };
 };
 

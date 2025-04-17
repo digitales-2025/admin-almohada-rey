@@ -127,7 +127,7 @@ export function SearchCombobox<T = unknown>({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn("justify-between", className)}
+          className={cn("justify-between w-full truncate", className)}
           disabled={disabled}
         >
           <span className="truncate flex items-center capitalize">{label ?? selectItemMsg}</span>
