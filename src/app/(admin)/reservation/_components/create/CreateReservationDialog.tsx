@@ -199,7 +199,7 @@ export function CreateReservationDialog() {
           <ScrollArea className="h-[40vh] px-0">
             <div className="px-4">
               <CreateReservationForm form={form} onSubmit={onSubmit} controlledFieldArray={fieldArray}>
-                <DrawerFooter className="px-0 pt-2">
+                <DrawerFooter className="col-span-2 px-0 pt-2">
                   <Button disabled={isCreatePending} className="w-full">
                     {isCreatePending && <RefreshCcw className="mr-2 size-4 animate-spin" aria-hidden="true" />}
                     Registrar

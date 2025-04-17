@@ -9,8 +9,8 @@ export function getAvailableActions(currentStatus: ReservationStatus): Reservati
         canCheckOut: false,
         canCancel: true,
         canModify: true,
-        canDeactivate: false,
-        canReactivate: false,
+        canDeactivate: true,
+        canReactivate: true,
       };
     case "CONFIRMED":
       return {
@@ -50,7 +50,7 @@ export function getAvailableActions(currentStatus: ReservationStatus): Reservati
         canCancel: false,
         canModify: false,
         canDeactivate: false,
-        canReactivate: true,
+        canReactivate: false,
       };
     default:
       throw new Error(`Estado de reserva desconocido: ${currentStatus}`);

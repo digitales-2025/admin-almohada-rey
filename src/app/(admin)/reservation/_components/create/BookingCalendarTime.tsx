@@ -279,7 +279,7 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
             </div>
           </div>
           <div className="flex justify-center pt-4">
-            <Button variant="outline" onClick={() => setActiveTab("checkout")} className="w-1/2">
+            <Button variant="outline" onClick={() => setActiveTab("checkout")} className="w-fit text-wrap">
               Siguiente: Seleccionar Check-out
             </Button>
           </div>
@@ -327,7 +327,7 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
             </div>
           </div>
           <div className="flex justify-center pt-4">
-            <Button variant="outline" onClick={() => setActiveTab("checkin")} className="w-1/2">
+            <Button variant="outline" onClick={() => setActiveTab("checkin")} className="w-fit text-wrap">
               Volver a Check-in
             </Button>
           </div>
