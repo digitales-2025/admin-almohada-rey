@@ -6,9 +6,11 @@ import {
   useCreatePaymentMutation,
   useGetAllPaymentsQuery,
   useGetPaymentByIdQuery,
+  useUpdatePaymentDetailMutation,
+  useUpdatePaymentDetailsBatchMutation,
   useUpdatePaymentMutation,
 } from "../_services/paymentsApi";
-import { Payment } from "../_types/payment";
+import { Payment, PaymentDetail, PaymentDetailMethod } from "../_types/payment";
 
 interface UsePaymentsProps {
   id?: string;
@@ -38,6 +40,14 @@ export const usePayments = (options: UsePaymentsProps = {}) => {
 
   const [updatePayment, { isSuccess: isSuccessUpdatePayment, isLoading: isLoadingUpdatePayment }] =
     useUpdatePaymentMutation();
+
+  const [updatePaymentDetail, { isSuccess: isSuccessUpdatePaymentDetail, isLoading: isLoadingUpdatePaymentDetail }] =
+    useUpdatePaymentDetailMutation();
+
+  const [
+    updatePaymentDetailsBatch,
+    { isSuccess: isSuccessUpdatePaymentDetailsBatch, isLoading: isLoadingUpdatePaymentDetailsBatch },
+  ] = useUpdatePaymentDetailsBatchMutation();
 
   async function onCreatePayment(input: Partial<Payment>) {
     const promise = runAndHandleError(() => createPayment(input).unwrap());
@@ -71,6 +81,34 @@ export const usePayments = (options: UsePaymentsProps = {}) => {
     return await promise;
   }
 
+  async function onUpdatePaymentDetail(input: Partial<PaymentDetail> & { id: string }) {
+    const promise = runAndHandleError(() => updatePaymentDetail(input).unwrap());
+    toast.promise(promise, {
+      loading: "Actualizando detalle de pago...",
+      success: "Detalle de pago actualizado exitosamente",
+      error: (error) => {
+        return error.message;
+      },
+    });
+    return await promise;
+  }
+
+  async function onUpdatePaymentDetailsBatch(input: {
+    paymentDetailIds: string[];
+    paymentDate?: string;
+    method?: PaymentDetailMethod;
+  }) {
+    const promise = runAndHandleError(() => updatePaymentDetailsBatch(input).unwrap());
+    toast.promise(promise, {
+      loading: "Actualizando detalles de pago...",
+      success: "Detalles de pago actualizados exitosamente",
+      error: (error) => {
+        return error.message;
+      },
+    });
+    return await promise;
+  }
+
   return {
     dataPaymentsAll,
     error,
@@ -88,5 +126,11 @@ export const usePayments = (options: UsePaymentsProps = {}) => {
     onUpdatePayment,
     isSuccessUpdatePayment,
     isLoadingUpdatePayment,
+    onUpdatePaymentDetail,
+    isSuccessUpdatePaymentDetail,
+    isLoadingUpdatePaymentDetail,
+    onUpdatePaymentDetailsBatch,
+    isSuccessUpdatePaymentDetailsBatch,
+    isLoadingUpdatePaymentDetailsBatch,
   };
 };

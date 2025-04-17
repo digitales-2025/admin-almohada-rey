@@ -1,7 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 import baseQueryWithReauth from "@/utils/baseQuery";
-import { Payment, SummaryPayment } from "../_types/payment";
+import { Payment, PaymentDetail, PaymentDetailMethod, SummaryPayment } from "../_types/payment";
 
 interface GetPaymentByIdProps {
   id: string;
@@ -45,6 +45,35 @@ export const paymentsApi = createApi({
       invalidatesTags: ["Payment"],
     }),
 
+    //Actualizar detalle de pago
+    updatePaymentDetail: build.mutation<PaymentDetail, Partial<PaymentDetail> & { id: string }>({
+      query: ({ id, ...body }) => ({
+        url: `/payments/detail/${id}`,
+        method: "PATCH",
+        body,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Payment"],
+    }),
+
+    //Actualizar múltiples detalles de pago en lote
+    updatePaymentDetailsBatch: build.mutation<
+      PaymentDetail,
+      {
+        paymentDetailIds: string[];
+        paymentDate?: string;
+        method?: PaymentDetailMethod;
+      }
+    >({
+      query: (body) => ({
+        url: `/payments/details/batch`,
+        method: "PATCH",
+        body,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Payment"],
+    }),
+
     //Obtener pago por id
     getPaymentById: build.query<Payment, GetPaymentByIdProps>({
       query: ({ id }) => ({
@@ -71,6 +100,8 @@ export const {
   useCreatePaymentMutation,
   useCreatePaymentDetailsMutation,
   useUpdatePaymentMutation,
+  useUpdatePaymentDetailMutation,
+  useUpdatePaymentDetailsBatchMutation,
   useGetPaymentByIdQuery,
   useGetAllPaymentsQuery,
 } = paymentsApi;
