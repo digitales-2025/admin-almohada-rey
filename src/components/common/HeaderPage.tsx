@@ -10,13 +10,13 @@ interface HeaderPageProps {
 export const HeaderPage = ({ title, description, badgeContent }: HeaderPageProps) => {
   return (
     <div className="mb-4">
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+      <div>
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-start sm:justify-between gap-2">
             <TitleSecction text={title} />
             {badgeContent && (
               <Badge
-                className="rounded-full bg-primary/10 px-2 sm:px-4 py-1 text-[10px] sm:text-xs font-medium text-primary dark:bg-primary/20 border border-primary/20 whitespace-nowrap"
+                className="rounded-full bg-primary/10 px-4 py-1.5 text-xs font-medium text-primary dark:bg-primary/20 border border-primary/20 hover:bg-primary/20"
                 variant="secondary"
               >
                 {badgeContent}
