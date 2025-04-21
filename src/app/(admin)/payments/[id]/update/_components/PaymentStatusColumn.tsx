@@ -306,7 +306,7 @@ export function PaymentStatusColumn({
                     </div>
 
                     {/* Barra de acciones */}
-                    <div className="mt-1 flex items-center justify-between rounded-lg bg-background p-2 shadow-sm">
+                    <div className="mt-1 flex flex-col sm:flex-row gap-2 items-center justify-between rounded-lg bg-background p-2 shadow-sm">
                       <div className="flex items-center space-x-1">
                         <div
                           className={cn(
