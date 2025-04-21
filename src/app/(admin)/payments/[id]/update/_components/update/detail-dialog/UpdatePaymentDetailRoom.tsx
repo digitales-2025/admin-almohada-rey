@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { PaymentDetailFormValues } from "../../_schemas/updatePaymentDetailSchema";
+import { PaymentDetailFormValues } from "../../../_schemas/updatePaymentDetailSchema";
 
 interface UpdatePaymentDetailRoomProps {
   detailForm: UseFormReturn<PaymentDetailFormValues>;

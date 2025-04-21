@@ -7,8 +7,8 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/comp
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Service } from "@/types/services";
-import { PaymentDetailFormValues } from "../../_schemas/updatePaymentDetailSchema";
-import { getPaymentDetailTypesConfigs } from "../../_utils/updatePaymentDetail.utils";
+import { PaymentDetailFormValues } from "../../../_schemas/updatePaymentDetailSchema";
+import { getPaymentDetailTypesConfigs } from "../../../_utils/updatePaymentDetail.utils";
 
 interface UpdatePaymentDetailServiceProps {
   detailForm: UseFormReturn<PaymentDetailFormValues>;

@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { PaymentDetailFormValues } from "../../_schemas/updatePaymentDetailSchema";
+import { PaymentDetailFormValues } from "../../../_schemas/updatePaymentDetailSchema";
 import UpdatePaymentDetailForm from "./UpdatePaymentDetailForm";
 
 interface UpdatePaymentDetailDialogProps {

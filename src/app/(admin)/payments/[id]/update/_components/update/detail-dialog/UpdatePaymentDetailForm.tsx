@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useServices } from "@/hooks/use-services";
 import { cn } from "@/lib/utils";
-import { PaymentDetailFormValues } from "../../_schemas/updatePaymentDetailSchema";
+import { PaymentDetailFormValues } from "../../../_schemas/updatePaymentDetailSchema";
 import PaymentDetailSidebar from "./PaymentDetailSidebar";
 import UpdatePaymentDetailRoom from "./UpdatePaymentDetailRoom";
 import UpdatePaymentDetailService from "./UpdatePaymentDetailService";

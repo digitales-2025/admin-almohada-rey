@@ -4,8 +4,8 @@ import { PaymentDetailMethod } from "@/app/(admin)/payments/_types/payment";
 import { getMethodIcon, getPaymentMethodLabel } from "@/app/(admin)/reservation/_utils/reservationPayment.utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { PaymentDetailFormValues } from "../../_schemas/updatePaymentDetailSchema";
-import { getPaymentDetailTypesConfigs, PaymentDetailTypesConfigs } from "../../_utils/updatePaymentDetail.utils";
+import { PaymentDetailFormValues } from "../../../_schemas/updatePaymentDetailSchema";
+import { getPaymentDetailTypesConfigs, PaymentDetailTypesConfigs } from "../../../_utils/updatePaymentDetail.utils";
 
 interface PaymentDetailSidebarProps {
   detailForm: UseFormReturn<PaymentDetailFormValues>;
