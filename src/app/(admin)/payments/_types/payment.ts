@@ -3,6 +3,8 @@ export type Payment = {
   code: string;
   date: string;
   amount: number;
+  missingDays?: number;
+  paymentDays?: number;
   amountPaid: number;
   status: PaymentStatus;
   observations?: string;
