@@ -3,7 +3,7 @@
 import React from "react";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
-import { ChevronDown, ChevronUp, Edit } from "lucide-react";
+import { ChevronDown, ChevronUp, Edit, Trash2 } from "lucide-react";
 
 import { getPaymentMethodLabel } from "@/app/(admin)/reservation/_utils/reservationPayment.utils";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +19,7 @@ interface PaymentStatusColumnProps {
   expandedCards: string[];
   toggleCardExpand: (id: string) => void;
   handleEditDetail: (detail: PaymentDetail) => void;
+  handleRemoveDetail: (detail: PaymentDetail) => void;
 }
 
 export function PaymentStatusColumn({
@@ -27,6 +28,7 @@ export function PaymentStatusColumn({
   expandedCards,
   toggleCardExpand,
   handleEditDetail,
+  handleRemoveDetail,
 }: PaymentStatusColumnProps) {
   const filteredItems = items.filter((item) => item.status === status);
   const statusLabel = PaymentStatusLabels[status];
@@ -326,18 +328,34 @@ export function PaymentStatusColumn({
                               : "Pago cancelado"}
                         </span>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-7 border-border text-xs text-foreground hover:bg-accent"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditDetail(detail);
-                        }}
-                      >
-                        <Edit className="mr-1 h-3 w-3" />
-                        Editar detalle
-                      </Button>
+                      <div className="flex flex-col sm:flex-row items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 border-border text-xs text-foreground hover:bg-accent"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditDetail(detail);
+                          }}
+                        >
+                          <Edit className="mr-1 h-3 w-3" />
+                          Editar detalle
+                        </Button>
+
+                        <Button
+                          type="button"
+                          variant={"outline"}
+                          size="sm"
+                          className="h-7 border-border text-xs text-foreground hover:bg-accent"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveDetail(detail);
+                          }}
+                        >
+                          <Trash2 className="mr-1 h-3 w-3" />
+                          Eliminar detalle
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>

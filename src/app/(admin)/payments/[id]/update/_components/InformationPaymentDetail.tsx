@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 
 import { PaymentStatus, type PaymentDetail } from "../../../_types/payment";
+import { DeletePaymentDetailDialog } from "./delete/DeletePaymentDetailDialog";
 import { PaymentStatusColumn } from "./PaymentStatusColumn";
 
 interface PaymentDetailGroup {
@@ -26,6 +27,13 @@ export default function InformationPaymentDetail({
   toggleCardExpand,
   handleEditDetail,
 }: InformationPaymentDetailProps) {
+  const [removeDialog, setRemoveDialog] = useState(false);
+  const [selectedDetail, setSelectedDetail] = useState<PaymentDetail | null>(null);
+  const handleRemoveDetail = (detail: PaymentDetail) => {
+    setSelectedDetail(detail);
+    setRemoveDialog(true);
+  };
+
   return (
     <div className="border-t border-border bg-card dark:border-border">
       {/* Diseño tipo Kanban con columnas por estado */}
@@ -37,6 +45,7 @@ export default function InformationPaymentDetail({
           expandedCards={expandedCards}
           toggleCardExpand={toggleCardExpand}
           handleEditDetail={handleEditDetail}
+          handleRemoveDetail={handleRemoveDetail}
         />
 
         {/* Columna de pagos completados */}
@@ -46,8 +55,12 @@ export default function InformationPaymentDetail({
           expandedCards={expandedCards}
           toggleCardExpand={toggleCardExpand}
           handleEditDetail={handleEditDetail}
+          handleRemoveDetail={handleRemoveDetail}
         />
       </div>
+      {removeDialog && (
+        <DeletePaymentDetailDialog paymentDetail={selectedDetail} open={removeDialog} onOpenChange={setRemoveDialog} />
+      )}
     </div>
   );
 }

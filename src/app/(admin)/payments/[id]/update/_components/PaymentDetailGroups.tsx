@@ -11,25 +11,43 @@ import { getPaymentMethodLabel } from "@/app/(admin)/reservation/_utils/reservat
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { paymentDetailSchema, type PaymentDetailFormValues } from "../_schemas/updatePaymentDetailSchema";
+import {
+  GroupPaymentDetailFormValues,
+  groupPaymentDetailSchema,
+  paymentDetailSchema,
+  type PaymentDetailFormValues,
+} from "../_schemas/updatePaymentDetailSchema";
 import { calculateSubtotal, groupPaymentDetails, PaymentDetailTypesConfigs } from "../_utils/updatePaymentDetail.utils";
-import type { PaymentDetail } from "../../../_types/payment";
+import { usePayments } from "../../../_hooks/use-payments";
+import type { PaymentDetail, PaymentDetailMethod } from "../../../_types/payment";
 import InformationPaymentDetail from "./InformationPaymentDetail";
-import UpdateGroupPaymentDetailDialog from "./update/UpdateGroupPaymentDetailDialog";
-import UpdatePaymentDetailDialog from "./update/UpdatePaymentDetailDialog";
+import { UpdateGroupPaymentDetailDialog } from "./update/detail-batch-dialog/UpdateGroupPaymentDetailDialog";
+import UpdatePaymentDetailDialog from "./update/detail-dialog/UpdatePaymentDetailDialog";
 
 interface PaymentDetailGroupsProps {
   paymentDetails: PaymentDetail[];
+  missingDays: number;
+  paymentDays: number;
 }
 
-export default function PaymentDetailGroups({ paymentDetails }: PaymentDetailGroupsProps) {
+export default function PaymentDetailGroups({ paymentDetails, missingDays, paymentDays }: PaymentDetailGroupsProps) {
   const groups = groupPaymentDetails(paymentDetails);
   const [isGroupDialogOpen, setIsGroupDialogOpen] = useState(false);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [selectedDetails, setSelectedDetails] = useState<PaymentDetail[]>([]);
-  const [editingDetail, setEditingDetail] = useState<PaymentDetail | null>(null);
   const [expandedCards, setExpandedCards] = useState<string[]>([]);
   const [expandedGroups, setExpandedGroups] = useState<string[]>(groups.length > 0 ? [groups[0].key] : []);
+  const [selectedDetailDays, setSelectedDetailDays] = useState<number>(1);
+  const [selectedDetailId, setSelectedDetailId] = useState<string | null>(null);
+
+  const {
+    onUpdatePaymentDetail,
+    isSuccessUpdatePaymentDetail,
+    isLoadingUpdatePaymentDetail,
+    onUpdatePaymentDetailsBatch,
+    isSuccessUpdatePaymentDetailsBatch,
+    isLoadingUpdatePaymentDetailsBatch,
+  } = usePayments();
 
   const detailForm = useForm<PaymentDetailFormValues>({
     resolver: zodResolver(paymentDetailSchema),
@@ -48,17 +66,11 @@ export default function PaymentDetailGroups({ paymentDetails }: PaymentDetailGro
     },
   });
 
-  const groupForm = useForm<PaymentDetailFormValues>({
-    resolver: zodResolver(paymentDetailSchema),
+  const groupForm = useForm<GroupPaymentDetailFormValues>({
+    resolver: zodResolver(groupPaymentDetailSchema),
     defaultValues: {
       paymentDate: "",
-      description: "",
       method: "CREDIT_CARD",
-      unitPrice: 0,
-      quantity: null,
-      days: null,
-      subtotal: 0,
-      detailType: "ROOM",
     },
   });
 
@@ -67,7 +79,7 @@ export default function PaymentDetailGroups({ paymentDetails }: PaymentDetailGro
   const watchQuantity = detailForm.watch("quantity");
   const watchDays = detailForm.watch("days");
 
-  const handleEditGroup = (groupKey: string, items: PaymentDetail[]) => {
+  const handleEditGroup = (items: PaymentDetail[]) => {
     setSelectedDetails(items);
 
     // Set form values based on the first item in the group
@@ -81,8 +93,6 @@ export default function PaymentDetailGroups({ paymentDetails }: PaymentDetailGro
   };
 
   const handleEditDetail = (detail: PaymentDetail) => {
-    setEditingDetail(detail);
-
     // Determine detail type
     let type: "ROOM" | "SERVICE" | "PRODUCT" = "ROOM";
     if (detail.type === "ROOM_RESERVATION") {
@@ -92,6 +102,9 @@ export default function PaymentDetailGroups({ paymentDetails }: PaymentDetailGro
     } else if (detail.product) {
       type = "PRODUCT";
     }
+
+    setSelectedDetailDays(detail.days || 1);
+    setSelectedDetailId(detail.id ?? null);
 
     // Set form values based on the detail
     detailForm.setValue("paymentDate", detail.paymentDate);
@@ -118,17 +131,69 @@ export default function PaymentDetailGroups({ paymentDetails }: PaymentDetailGro
     setIsDetailDialogOpen(true);
   };
 
-  const onSubmitGroup = (data: PaymentDetailFormValues) => {
-    console.log("Group form submitted:", data);
-    // Here you would update the payment details
-    setIsGroupDialogOpen(false);
+  const onSubmitGroup = (data: GroupPaymentDetailFormValues) => {
+    const selectedIds = selectedDetails.map((detail) => detail.id).filter((id): id is string => id !== undefined);
+    const updatePayload: {
+      paymentDetailIds: string[];
+      paymentDate?: string;
+      method?: PaymentDetailMethod;
+    } = {
+      paymentDetailIds: selectedIds,
+      paymentDate: data.paymentDate,
+      method: data.method as PaymentDetailMethod,
+    };
+
+    onUpdatePaymentDetailsBatch(updatePayload);
   };
 
+  useEffect(() => {
+    if (isSuccessUpdatePaymentDetailsBatch) {
+      groupForm.reset();
+      setIsGroupDialogOpen(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccessUpdatePaymentDetailsBatch]);
+
   const onSubmitDetail = (data: PaymentDetailFormValues) => {
-    console.log("Detail form submitted:", data);
-    // Here you would update the payment detail
-    setIsDetailDialogOpen(false);
+    // Necesitamos el ID del detalle que se está editando
+    if (!selectedDetailId) {
+      console.error("ID del detalle no encontrado");
+      return;
+    }
+
+    // Preparamos el payload según el DTO esperado
+    const updatePayload: any = {
+      id: selectedDetailId,
+      paymentDate: data.paymentDate,
+      description: data.description,
+      method: data.method,
+      unitPrice: data.unitPrice,
+      subtotal: data.subtotal,
+    };
+
+    // Añadimos campos condicionales según el tipo de detalle
+    if (data.detailType === "ROOM" && data.roomId) {
+      updatePayload.roomId = data.roomId;
+      updatePayload.days = data.days;
+    } else if (data.detailType === "PRODUCT" && data.productId) {
+      updatePayload.productId = data.productId;
+      updatePayload.quantity = data.quantity;
+    } else if (data.detailType === "SERVICE" && data.serviceId) {
+      updatePayload.serviceId = data.serviceId;
+      updatePayload.quantity = data.quantity;
+    }
+
+    // Llamamos a la función onUpdatePaymentDetail con un solo argumento que incluye el ID
+    onUpdatePaymentDetail(updatePayload);
   };
+
+  useEffect(() => {
+    if (isSuccessUpdatePaymentDetail) {
+      detailForm.reset();
+      setIsDetailDialogOpen(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccessUpdatePaymentDetail]);
 
   const toggleCardExpand = (id: string) => {
     setExpandedCards((prev) => (prev.includes(id) ? prev.filter((cardId) => cardId !== id) : [...prev, id]));
@@ -199,10 +264,10 @@ export default function PaymentDetailGroups({ paymentDetails }: PaymentDetailGro
                     </div>
 
                     {/* Payment method section */}
-                    <div className="relative flex flex-1 items-center justify-between p-4">
+                    <div className="relative flex flex-col gap-2 sm:flex-row flex-1 items-center justify-between p-4">
                       <div className="relative flex items-center gap-4">
                         <div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-col sm:flex-row items-center gap-2">
                             <h3 className="text-lg font-semibold text-foreground">
                               {getPaymentMethodLabel(group.method)}
                             </h3>
@@ -221,7 +286,7 @@ export default function PaymentDetailGroups({ paymentDetails }: PaymentDetailGro
                           className="border-border bg-background text-foreground hover:bg-muted"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleEditGroup(group.key, group.items);
+                            handleEditGroup(group.items);
                           }}
                         >
                           <Edit className="mr-1 h-4 w-4" />
@@ -259,16 +324,22 @@ export default function PaymentDetailGroups({ paymentDetails }: PaymentDetailGro
         groupForm={groupForm}
         selectedDetails={selectedDetails}
         onSubmitGroup={onSubmitGroup}
+        isLoadingUpdatePaymentDetailsBatch={isLoadingUpdatePaymentDetailsBatch}
       />
 
-      <UpdatePaymentDetailDialog
-        detailForm={detailForm}
-        isDetailDialogOpen={isDetailDialogOpen}
-        setIsDetailDialogOpen={setIsDetailDialogOpen}
-        onSubmitDetail={onSubmitDetail}
-        getCurrentDetailTypeConfig={getCurrentDetailTypeConfig}
-        editingDetail={editingDetail}
-      />
+      {isDetailDialogOpen && (
+        <UpdatePaymentDetailDialog
+          detailForm={detailForm}
+          isDetailDialogOpen={isDetailDialogOpen}
+          setIsDetailDialogOpen={setIsDetailDialogOpen}
+          onSubmitDetail={onSubmitDetail}
+          getCurrentDetailTypeConfig={getCurrentDetailTypeConfig}
+          missingDays={missingDays}
+          paymentDays={paymentDays}
+          selectedDetailDays={selectedDetailDays}
+          isLoadingUpdatePaymentDetail={isLoadingUpdatePaymentDetail}
+        />
+      )}
     </div>
   );
 }
