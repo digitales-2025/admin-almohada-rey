@@ -22,6 +22,9 @@ interface PaymentManagementProps {
 
 export default function PaymentManagement({ paymentById }: PaymentManagementProps) {
   const [activeTab, setActiveTab] = useState("general");
+
+  const missingDays = paymentById.missingDays ?? 0;
+  const paymentDays = paymentById.paymentDays ?? 0;
   const router = useRouter();
   const { onUpdatePayment, isLoadingUpdatePayment, isSuccessUpdatePayment } = usePayments();
 
@@ -51,7 +54,7 @@ export default function PaymentManagement({ paymentById }: PaymentManagementProp
       <Card className="overflow-hidden border-primary/20 bg-card dark:border-primary/10">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="px-6">
-            <TabsList className="w-full justify-start gap-2 rounded-none bg-transparent p-0">
+            <TabsList className="grid grid-cols-3 w-full justify-start gap-2 rounded-none bg-transparent p-0">
               <TabsTrigger
                 value="general"
                 className={cn(
@@ -59,8 +62,8 @@ export default function PaymentManagement({ paymentById }: PaymentManagementProp
                   activeTab === "general" ? "text-primary" : "text-muted-foreground"
                 )}
               >
-                <FileText className="h-4 w-4" />
-                <span>General</span>
+                <FileText className="h-4 w-4 shrink-0" />
+                <span className="truncate text-ellipsis">General</span>
               </TabsTrigger>
 
               <TabsTrigger
@@ -70,8 +73,8 @@ export default function PaymentManagement({ paymentById }: PaymentManagementProp
                   activeTab === "details" ? "text-primary" : "text-muted-foreground"
                 )}
               >
-                <CreditCard className="h-4 w-4" />
-                <span>Detalles de Pago</span>
+                <CreditCard className="h-4 w-4 shrink-0" />
+                <span className="truncate text-ellipsis">Detalles de Pago</span>
               </TabsTrigger>
 
               <TabsTrigger
@@ -81,8 +84,8 @@ export default function PaymentManagement({ paymentById }: PaymentManagementProp
                   activeTab === "summary" ? "text-primary" : "text-muted-foreground"
                 )}
               >
-                <BarChart3 className="h-4 w-4" />
-                <span>Resumen</span>
+                <BarChart3 className="h-4 w-4 shrink-0" />
+                <span className="truncate text-ellipsis">Resumen</span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -98,7 +101,11 @@ export default function PaymentManagement({ paymentById }: PaymentManagementProp
             </TabsContent>
 
             <TabsContent value="details" className="m-0 border-none p-6">
-              <PaymentDetailGroups paymentDetails={paymentById.paymentDetail} />
+              <PaymentDetailGroups
+                paymentDetails={paymentById.paymentDetail}
+                missingDays={missingDays}
+                paymentDays={paymentDays}
+              />
             </TabsContent>
 
             <TabsContent value="summary" className="m-0 border-none p-6">
