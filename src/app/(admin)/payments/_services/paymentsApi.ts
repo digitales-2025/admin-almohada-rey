@@ -93,6 +93,16 @@ export const paymentsApi = createApi({
       }),
       providesTags: ["Payment"],
     }),
+
+    //Eliminar detalle de pago
+    removePaymentDetail: build.mutation<{ message: string }, string>({
+      query: (id) => ({
+        url: `/payments/detail/${id}`,
+        method: "DELETE",
+        credentials: "include",
+      }),
+      invalidatesTags: ["Payment"],
+    }),
   }),
 });
 
@@ -104,4 +114,5 @@ export const {
   useUpdatePaymentDetailsBatchMutation,
   useGetPaymentByIdQuery,
   useGetAllPaymentsQuery,
+  useRemovePaymentDetailMutation,
 } = paymentsApi;

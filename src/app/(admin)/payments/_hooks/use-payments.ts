@@ -6,6 +6,7 @@ import {
   useCreatePaymentMutation,
   useGetAllPaymentsQuery,
   useGetPaymentByIdQuery,
+  useRemovePaymentDetailMutation,
   useUpdatePaymentDetailMutation,
   useUpdatePaymentDetailsBatchMutation,
   useUpdatePaymentMutation,
@@ -48,6 +49,9 @@ export const usePayments = (options: UsePaymentsProps = {}) => {
     updatePaymentDetailsBatch,
     { isSuccess: isSuccessUpdatePaymentDetailsBatch, isLoading: isLoadingUpdatePaymentDetailsBatch },
   ] = useUpdatePaymentDetailsBatchMutation();
+
+  const [removePaymentDetail, { isSuccess: isSuccessRemovePaymentDetail, isLoading: isLoadingRemovePaymentDetail }] =
+    useRemovePaymentDetailMutation();
 
   async function onCreatePayment(input: Partial<Payment>) {
     const promise = runAndHandleError(() => createPayment(input).unwrap());
@@ -109,6 +113,18 @@ export const usePayments = (options: UsePaymentsProps = {}) => {
     return await promise;
   }
 
+  async function onRemovePaymentDetail(id: string) {
+    const promise = runAndHandleError(() => removePaymentDetail(id).unwrap());
+    toast.promise(promise, {
+      loading: "Eliminando detalle de pago...",
+      success: "Detalle de pago eliminado exitosamente",
+      error: (error) => {
+        return error.message;
+      },
+    });
+    return await promise;
+  }
+
   return {
     dataPaymentsAll,
     error,
@@ -132,5 +148,8 @@ export const usePayments = (options: UsePaymentsProps = {}) => {
     onUpdatePaymentDetailsBatch,
     isSuccessUpdatePaymentDetailsBatch,
     isLoadingUpdatePaymentDetailsBatch,
+    onRemovePaymentDetail,
+    isSuccessRemovePaymentDetail,
+    isLoadingRemovePaymentDetail,
   };
 };
