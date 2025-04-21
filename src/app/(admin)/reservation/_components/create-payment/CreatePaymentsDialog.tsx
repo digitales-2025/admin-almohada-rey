@@ -95,10 +95,13 @@ export function CreatePaymentDialog({ open, setOpen, reservation }: CreatePaymen
   }, [watchExtraServices, form.getValues("subtotal")]);
 
   const onSubmit = async (values: CreatePaymentSchema) => {
+    // Calcular el monto total de la reserva (siempre basado en todas las noches)
+    const totalReservationAmount = nights * reservation.room.RoomTypes.price;
+
     // Transformar datos al formato esperado por la API
     const transformedPaymentData = {
-      amount: values.totalAmount,
-      amountPaid: values.totalAmount,
+      amount: totalReservationAmount, // Monto total de la reserva (todas las noches)
+      amountPaid: values.totalAmount, // Lo que el cliente está pagando ahora
       reservationId: reservation.id,
       observations: values.observations || undefined,
       paymentDetail: [
