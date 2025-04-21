@@ -16,3 +16,11 @@ export const paymentDetailSchema = z.object({
 });
 
 export type PaymentDetailFormValues = z.infer<typeof paymentDetailSchema>;
+
+// Reutilizando el esquema existente y seleccionando solo los campos necesarios
+export const groupPaymentDetailSchema = paymentDetailSchema.pick({
+  paymentDate: true,
+  method: true,
+});
+
+export type GroupPaymentDetailFormValues = z.infer<typeof groupPaymentDetailSchema>;
