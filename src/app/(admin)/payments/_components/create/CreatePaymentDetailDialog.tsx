@@ -146,8 +146,6 @@ export function CreatePaymentDetailDialog({ open, onOpenChange, payment }: Creat
       };
     });
 
-    console.log("paymentDetail", JSON.stringify(paymentDetail, null, 2));
-
     startCreateTransition(() => {
       onCreatePaymentDetails({
         paymentId: payment.id,
