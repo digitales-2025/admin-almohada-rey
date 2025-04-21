@@ -140,7 +140,7 @@ export function DeactivateReservationsDialog({
           <DrawerTitle>¿Estás seguro?</DrawerTitle>
           <DrawerDescription>
             Esta acción archivará a<span className="font-medium">{reservations.length}</span>
-            {reservations.length === 1 ? " cliente" : " clientes"}
+            {reservations.length === 1 ? " reservación" : " reservaciones"}
           </DrawerDescription>
           <DrawerDescription className="text-pretty">
             Algunas reservaciones no se pueden archivar debido a:
