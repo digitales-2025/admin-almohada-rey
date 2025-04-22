@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
-import { Banknote, CalendarDays, Ellipsis } from "lucide-react";
+import { Banknote, BedDouble, CalendarDays, Ellipsis, Utensils } from "lucide-react";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
@@ -16,10 +16,14 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { PaymentStatus, SummaryPayment } from "../../_types/payment";
 import { PaymentStatusLabels } from "../../_utils/payments.utils";
+import { CreatePaymentDetailRoomDialog } from "../create-payment-room/CreatePaymentDetailRoomDialog";
 import { CreatePaymentDetailDialog } from "../create/CreatePaymentDetailDialog";
 
 /**
@@ -149,6 +153,7 @@ export const paymentsColumns = (
     id: "actions",
     cell: function Cell({ row }) {
       const [createDialog, setCreateDialog] = useState(false);
+      const [createPaymentDetailRoom, setCreatePaymentDetailRoom] = useState(false);
       console.log(isSuperAdmin);
 
       return (
@@ -156,6 +161,13 @@ export const paymentsColumns = (
           <div>
             {createDialog && (
               <CreatePaymentDetailDialog open={createDialog} onOpenChange={setCreateDialog} payment={row.original} />
+            )}
+            {createPaymentDetailRoom && (
+              <CreatePaymentDetailRoomDialog
+                open={createPaymentDetailRoom}
+                setOpen={setCreatePaymentDetailRoom}
+                payment={row.original}
+              />
             )}
           </div>
           <DropdownMenu>
@@ -169,12 +181,25 @@ export const paymentsColumns = (
                 Gestionar Pagos
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={() => setCreateDialog(true)}>
-                Agregar Pago
-                <DropdownMenuShortcut>
-                  <Banknote className="size-4" aria-hidden="true" />
-                </DropdownMenuShortcut>
-              </DropdownMenuItem>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>Agregar Pago</DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <>
+                    <DropdownMenuItem onSelect={() => setCreatePaymentDetailRoom(true)}>
+                      Habitación
+                      <DropdownMenuShortcut>
+                        <BedDouble className="size-4" aria-hidden="true" />
+                      </DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setCreateDialog(true)}>
+                      Extras
+                      <DropdownMenuShortcut>
+                        <Utensils className="size-4" aria-hidden="true" />
+                      </DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                  </>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
