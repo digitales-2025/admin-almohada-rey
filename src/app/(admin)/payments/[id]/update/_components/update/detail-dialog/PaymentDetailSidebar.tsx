@@ -57,10 +57,11 @@ export default function PaymentDetailSidebar({ detailForm, watchDetailType, isDe
               detailForm.watch("method") === "CREDIT_CARD" && "border-l-blue-500",
               detailForm.watch("method") === "TRANSFER" && "border-l-violet-500",
               detailForm.watch("method") === "YAPE" && "border-l-purple-500",
-              detailForm.watch("method") === "PLIN" && "border-l-fuchsia-500",
+              detailForm.watch("method") === "PLIN" && "border-l-sky-500",
               detailForm.watch("method") === "PAYPAL" && "border-l-blue-700",
               detailForm.watch("method") === "DEBIT_CARD" && "border-l-cyan-500",
-              detailForm.watch("method") === "IZI_PAY" && "border-l-orange-500"
+              detailForm.watch("method") === "IZI_PAY" && "border-l-red-600",
+              detailForm.watch("method") === "PENDING_PAYMENT" && "border-l-amber-500"
             )}
           >
             <SelectValue placeholder="Seleccionar método">

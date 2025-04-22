@@ -95,38 +95,60 @@ export function CreatePaymentDialog({ open, setOpen, reservation }: CreatePaymen
   }, [watchExtraServices, form.getValues("subtotal")]);
 
   const onSubmit = async (values: CreatePaymentSchema) => {
-    // Calcular el monto total de la reserva (siempre basado en todas las noches)
-    const totalReservationAmount = nights * reservation.room.RoomTypes.price;
+    // Calcular el monto total de la reserva (habitación)
+    const roomAmount = nights * reservation.room.RoomTypes.price;
+
+    // Calcular el monto total de los servicios extra
+    const extraServicesAmount = values.extraServices.reduce(
+      (sum, service) => sum + service.quantity * service.unitPrice,
+      0
+    );
+
+    // Monto total que incluye habitación + servicios extra
+    const totalReservationAmount = roomAmount + extraServicesAmount;
+
+    // Determinar si el método de pago es PENDING_PAYMENT
+    const isPendingPayment = values.method === PaymentDetailMethod.PENDING_PAYMENT;
+
+    // Procesar los detalles de servicios
+    const serviceDetails = values.extraServices.map((service) => ({
+      paymentDate: values.paymentDate,
+      description: `Servicio: ${service.name}`,
+      type: PaymentDetailType.EXTRA_SERVICE,
+      method: values.method,
+      serviceId: service.id,
+      quantity: service.quantity,
+      unitPrice: service.unitPrice,
+      // Si es pago pendiente, el subtotal es 0
+      subtotal: isPendingPayment ? 0 : service.subtotal,
+    }));
+
+    // Detalle de pago para la habitación
+    const roomDetail = {
+      paymentDate: values.paymentDate,
+      description: values.description || "Pago por habitación",
+      type: PaymentDetailType.ROOM_RESERVATION,
+      method: values.method,
+      roomId: values.roomId,
+      days: values.days,
+      unitPrice: values.unitPrice,
+      // Si es pago pendiente, el subtotal es 0
+      subtotal: isPendingPayment ? 0 : values.subtotal,
+    };
 
     // Transformar datos al formato esperado por la API
     const transformedPaymentData = {
-      amount: totalReservationAmount, // Monto total de la reserva (todas las noches)
-      amountPaid: values.totalAmount, // Lo que el cliente está pagando ahora
+      // El amount siempre incluye el monto total (habitación + servicios), independientemente del método de pago
+      amount: totalReservationAmount,
+      // Si es pago pendiente, el amountPaid es 0
+      amountPaid: isPendingPayment ? 0 : values.totalAmount,
       reservationId: reservation.id,
       observations: values.observations || undefined,
       paymentDetail: [
         // Detalles de pago para la habitación
-        {
-          paymentDate: values.paymentDate,
-          description: values.description || "Pago por habitación",
-          type: PaymentDetailType.ROOM_RESERVATION,
-          method: values.method,
-          roomId: values.roomId,
-          days: values.days,
-          unitPrice: values.unitPrice,
-          subtotal: values.subtotal,
-        },
+        roomDetail,
         // Detalles de pago para servicios extra
-        ...values.extraServices.map((service) => ({
-          paymentDate: values.paymentDate,
-          description: `Servicio: ${service.name}`,
-          type: PaymentDetailType.EXTRA_SERVICE,
-          method: values.method,
-          serviceId: service.id,
-          quantity: service.quantity,
-          unitPrice: service.unitPrice,
-          subtotal: service.subtotal,
-        })),
+        ...serviceDetails,
       ],
     };
 
