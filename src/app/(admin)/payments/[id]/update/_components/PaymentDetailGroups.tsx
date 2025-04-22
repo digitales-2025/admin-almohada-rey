@@ -161,6 +161,12 @@ export default function PaymentDetailGroups({ paymentDetails, missingDays, payme
       return;
     }
 
+    // Verificamos si el método de pago es PENDING_PAYMENT
+    const isPendingPayment = data.method === "PENDING_PAYMENT";
+
+    // Determinar si es un servicio o producto (no habitación)
+    const isServiceOrProduct = data.detailType === "SERVICE" || data.detailType === "PRODUCT";
+
     // Preparamos el payload según el DTO esperado
     const updatePayload: any = {
       id: selectedDetailId,
@@ -168,7 +174,8 @@ export default function PaymentDetailGroups({ paymentDetails, missingDays, payme
       description: data.description,
       method: data.method,
       unitPrice: data.unitPrice,
-      subtotal: data.subtotal,
+      // Si es PENDING_PAYMENT y es servicio o producto, subtotal es 0
+      subtotal: isPendingPayment && isServiceOrProduct ? 0 : data.subtotal,
     };
 
     // Añadimos campos condicionales según el tipo de detalle
