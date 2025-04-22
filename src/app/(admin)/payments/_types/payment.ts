@@ -73,6 +73,7 @@ export enum PaymentDetailMethod {
   PLIN = "PLIN",
   PAYPAL = "PAYPAL",
   IZI_PAY = "IZI_PAY",
+  PENDING_PAYMENT = "PENDING_PAYMENT",
 }
 
 export type SummaryPayment = {
@@ -104,4 +105,34 @@ export interface CategoryPayment {
   icon: React.ReactNode;
   color: string;
   items: CategoryItemPayment[];
+}
+
+export interface RoomPaymentDetails {
+  id: string;
+  code: string;
+  date: string;
+  amount: number;
+  amountPaid: number;
+  status: string;
+  observations?: string;
+  missingDays: number;
+  paymentDays: number;
+  reservation: {
+    id: string;
+    checkInDate: Date;
+    checkOutDate: Date;
+    room?: {
+      id: string;
+      number: number;
+      RoomTypes: {
+        id: string;
+        name: string;
+        price: number;
+      };
+    };
+    customer: {
+      id: string;
+      name: string;
+    };
+  };
 }
