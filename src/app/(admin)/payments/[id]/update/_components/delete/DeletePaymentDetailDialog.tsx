@@ -7,6 +7,7 @@ import { AlertTriangle, RefreshCcw } from "lucide-react";
 
 import { usePayments } from "@/app/(admin)/payments/_hooks/use-payments";
 import type { PaymentDetail } from "@/app/(admin)/payments/_types/payment";
+import { getPaymentMethodLabel } from "@/app/(admin)/reservation/_utils/reservationPayment.utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -96,7 +97,7 @@ export function DeletePaymentDetailDialog({ paymentDetail, ...props }: DeletePay
             <div className="flex justify-between">
               <dt className="font-medium text-muted-foreground">Método:</dt>
               <dd>
-                <Badge variant="outline">{paymentDetail.method}</Badge>
+                <Badge variant="outline">{getPaymentMethodLabel(paymentDetail.method)}</Badge>
               </dd>
             </div>
           )}
