@@ -18,7 +18,7 @@ interface PaymentSummaryProps {
 
 export default function PaymentSummary({ payment }: PaymentSummaryProps) {
   // Calculate summary data
-  const totalAmount = payment.paymentDetail.reduce((sum, detail) => sum + detail.subtotal, 0);
+  const totalAmount = payment.amount;
   const paymentProgress = (payment.amountPaid / totalAmount) * 100;
   const pendingAmount = totalAmount - payment.amountPaid;
   const isFullyPaid = paymentProgress >= 100 || pendingAmount <= 0;
@@ -31,10 +31,24 @@ export default function PaymentSummary({ payment }: PaymentSummaryProps) {
   // Group by method
   const paymentsByMethod = payment.paymentDetail.reduce(
     (acc, detail) => {
+      // Calcular el monto real según el tipo de detalle y método
+      let amount = detail.subtotal;
+
+      // Si es PENDING_PAYMENT, calcular el monto según el tipo
+      if (detail.method === "PENDING_PAYMENT") {
+        if (detail.days && detail.unitPrice) {
+          // Para reservas de habitación o servicios con días
+          amount = detail.days * detail.unitPrice;
+        } else if (detail.quantity && detail.unitPrice) {
+          // Para productos o servicios con cantidad
+          amount = detail.quantity * detail.unitPrice;
+        }
+      }
+
       if (!acc[detail.method]) {
         acc[detail.method] = 0;
       }
-      acc[detail.method] += detail.subtotal;
+      acc[detail.method] += amount;
       return acc;
     },
     {} as Record<string, number>
@@ -90,7 +104,7 @@ export default function PaymentSummary({ payment }: PaymentSummaryProps) {
 
             <div className="relative h-3 w-full overflow-hidden rounded-full bg-muted">
               <div
-                className={`h-full rounded-full ${isFullyPaid ? "bg-primary" : "bg-gradient-to-r from-secondary to-primary"}`}
+                className={`h-full rounded-full ${isFullyPaid ? "bg-green-400" : "bg-orange-400"}`}
                 style={{ width: `${Math.min(paymentProgress, 100)}%` }}
               ></div>
             </div>
@@ -108,7 +122,6 @@ export default function PaymentSummary({ payment }: PaymentSummaryProps) {
       <div className="grid gap-6 md:grid-cols-2">
         {/* Breakdown by Type - Using the provided configuration */}
         <Card className="overflow-hidden border border-border/40 bg-card/50 shadow-sm">
-          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary/80 to-primary/30"></div>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-lg">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
@@ -183,7 +196,6 @@ export default function PaymentSummary({ payment }: PaymentSummaryProps) {
 
         {/* Breakdown by Payment Method */}
         <Card className="overflow-hidden border border-border/40 bg-card/50 shadow-sm">
-          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-secondary/80 to-secondary/30"></div>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-lg">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary/10">
@@ -252,7 +264,7 @@ export default function PaymentSummary({ payment }: PaymentSummaryProps) {
                     ) : (
                       <Clock className="h-5 w-5 text-secondary" />
                     )}
-                    <span className="text-sm font-medium">{isFullyPaid ? "Pago Completado" : "Pago Pendiente"}</span>
+                    <span className="text-sm font-medium">Porcentaje de Pago</span>
                   </div>
                   <span className="text-sm font-bold">
                     {isFullyPaid ? (
