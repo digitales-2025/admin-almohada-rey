@@ -1,7 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 import baseQueryWithReauth from "@/utils/baseQuery";
-import { Payment, PaymentDetail, PaymentDetailMethod, SummaryPayment } from "../_types/payment";
+import { Payment, PaymentDetail, PaymentDetailMethod, RoomPaymentDetails, SummaryPayment } from "../_types/payment";
 
 interface GetPaymentByIdProps {
   id: string;
@@ -84,6 +84,16 @@ export const paymentsApi = createApi({
       providesTags: ["Payment"],
     }),
 
+    //Obtener detalles de la habitación por id de pago
+    getRoomPaymentDetails: build.query<RoomPaymentDetails, GetPaymentByIdProps>({
+      query: ({ id }) => ({
+        url: `/payments/room/details/${id}`,
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["Payment"],
+    }),
+
     //Obtener todos los pagos
     getAllPayments: build.query<SummaryPayment[], void>({
       query: () => ({
@@ -114,5 +124,6 @@ export const {
   useUpdatePaymentDetailsBatchMutation,
   useGetPaymentByIdQuery,
   useGetAllPaymentsQuery,
+  useGetRoomPaymentDetailsQuery,
   useRemovePaymentDetailMutation,
 } = paymentsApi;

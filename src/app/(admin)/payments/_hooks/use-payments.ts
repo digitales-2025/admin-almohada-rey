@@ -6,6 +6,7 @@ import {
   useCreatePaymentMutation,
   useGetAllPaymentsQuery,
   useGetPaymentByIdQuery,
+  useGetRoomPaymentDetailsQuery,
   useRemovePaymentDetailMutation,
   useUpdatePaymentDetailMutation,
   useUpdatePaymentDetailsBatchMutation,
@@ -15,10 +16,11 @@ import { Payment, PaymentDetail, PaymentDetailMethod } from "../_types/payment";
 
 interface UsePaymentsProps {
   id?: string;
+  idPaymentRoomDetails?: string;
 }
 
 export const usePayments = (options: UsePaymentsProps = {}) => {
-  const { id } = options;
+  const { id, idPaymentRoomDetails } = options;
 
   const { data: dataPaymentsAll, error, isLoading, isSuccess, refetch } = useGetAllPaymentsQuery();
 
@@ -34,6 +36,17 @@ export const usePayments = (options: UsePaymentsProps = {}) => {
       skip: !id, // Evita hacer la query si no hay id
     }
   );
+
+  const { data: roomPaymentDetailsByPaymentId, refetch: refetchRoomPaymentDetailsByPaymentId } =
+    useGetRoomPaymentDetailsQuery(
+      {
+        id: idPaymentRoomDetails as string,
+      },
+      {
+        skip: !idPaymentRoomDetails, // Evita hacer la query si no hay id
+        refetchOnMountOrArgChange: true,
+      }
+    );
 
   const [createPayment, { isSuccess: isSuccessCreatePayment }] = useCreatePaymentMutation();
   const [createPaymentDetails, { isSuccess: isSuccessCreatePaymentDetails, isLoading: isLoadingCreatePaymentDetails }] =
@@ -134,6 +147,8 @@ export const usePayments = (options: UsePaymentsProps = {}) => {
     paymentById,
     refetchPaymentById,
     isLoadingPaymentById,
+    roomPaymentDetailsByPaymentId,
+    refetchRoomPaymentDetailsByPaymentId,
     onCreatePayment,
     isSuccessCreatePayment,
     onCreatePaymentDetails,
