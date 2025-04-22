@@ -72,7 +72,7 @@ export const roomTypesColumns = (isSuperAdmin: boolean): ColumnDef<RoomType>[] =
     cell: ({ row }) => (
       <div className="min-w-40 truncate font-medium flex items-center gap-2">
         <KeySquare className="h-4 w-4 text-primary" />
-        <span>{row.getValue("nombre")}</span>
+        <span className="capitalize">{row.getValue("nombre")}</span>
       </div>
     ),
   },
@@ -165,11 +165,14 @@ export const roomTypesColumns = (isSuperAdmin: boolean): ColumnDef<RoomType>[] =
     cell: ({ row }) => (
       <div>
         {row.getValue("estado") ? (
-          <Badge variant="secondary" className="bg-emerald-100 text-emerald-600 border-emerald-200 px-3 py-1">
+          <Badge
+            variant="secondary"
+            className="bg-emerald-100 text-emerald-600 border-emerald-200 px-3 py-1 hover:bg-emerald-200"
+          >
             Activo
           </Badge>
         ) : (
-          <Badge variant="secondary" className="bg-red-100 text-red-600 border-red-200 px-3 py-1">
+          <Badge variant="secondary" className="bg-red-100 text-red-600 border-red-200 px-3 py-1 hover:bg-red-200">
             Inactivo
           </Badge>
         )}

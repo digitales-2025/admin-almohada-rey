@@ -100,7 +100,7 @@ export function DeleteProductsDialog({ products, showTrigger = true, onSuccess, 
           <DrawerTitle>¿Estás absolutamente seguro?</DrawerTitle>
           <DrawerDescription>
             Esta acción eliminará a<span className="font-medium">{products.length}</span>
-            {products.length === 1 ? " cliente" : " clientes"}
+            {products.length === 1 ? " producto" : " productos"}
           </DrawerDescription>
         </DrawerHeader>
         <DrawerFooter className="gap-2 sm:space-x-0">

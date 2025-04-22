@@ -61,7 +61,7 @@ export function PasswordForm() {
                 <InputPassword
                   placeholder="********"
                   autoComplete="current-password"
-                  className="border-neutral-200 bg-neutral-50 transition-colors focus:border-neutral-900"
+                  className="border-neutral-200 transition-colors focus:border-neutral-900"
                   icon={<Lock className="h-4 w-4 text-neutral-500" />}
                   {...field}
                 />
@@ -83,7 +83,7 @@ export function PasswordForm() {
                 <InputPassword
                   placeholder="********"
                   autoComplete="new-password"
-                  className="border-neutral-200 bg-neutral-50 transition-colors focus:border-neutral-900"
+                  className="border-neutral-200 transition-colors focus:border-neutral-900"
                   icon={<KeyRound className="h-4 w-4 text-neutral-500" />}
                   onChangeWithCheck={(e) => {
                     checkPasswordRequirements(e.target.value);
@@ -106,7 +106,7 @@ export function PasswordForm() {
                 <InputPassword
                   placeholder="********"
                   autoComplete="confirm-password"
-                  className="border-neutral-200 bg-neutral-50 transition-colors focus:border-neutral-900"
+                  className="border-neutral-200 transition-colors focus:border-neutral-900"
                   icon={<KeyRound className="h-4 w-4 text-neutral-500" />}
                   {...field}
                 />
@@ -116,8 +116,16 @@ export function PasswordForm() {
           )}
         />
 
-        <div className="bg-slate-50 p-3 rounded-lg border text-xs text-slate-700">
-          <p className="font-medium mb-1">Requisitos de seguridad:</p>
+        <div className=" p-3 rounded-lg border text-xs text-slate-700">
+          <p
+            className="font-medium m  --chart-1: oklch(0.82 0.13 84.49);
+  --chart-2: oklch(0.8 0.11 203.6);
+  --chart-3: oklch(0.42 0.17 266.78);
+  --chart-4: oklch(0.92 0.08 125.58);
+  --chart-5: oklch(0.92 0.1 116.19);-1"
+          >
+            Requisitos de seguridad:
+          </p>
           <ul className="space-y-1 pl-5">
             <li className="flex items-center gap-2">
               {passwordRequirements.minLength ? (

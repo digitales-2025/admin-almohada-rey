@@ -82,8 +82,8 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
             <Badge
               className={
                 user.isActive
-                  ? "bg-emerald-100 text-emerald-500 border-emerald-200"
-                  : "bg-red-100 text-red-500 border-red-200"
+                  ? "bg-emerald-100 text-emerald-500 border-emerald-200 hover:bg-emerald-200"
+                  : "bg-red-100 text-red-500 border-red-200 hover:bg-red-200"
               }
               variant="secondary"
             >

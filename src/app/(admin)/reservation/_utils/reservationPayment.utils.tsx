@@ -1,5 +1,6 @@
-import { Banknote, Building, CreditCard, Smartphone } from "lucide-react";
+import { Banknote, Building, Clock, CreditCard, Smartphone } from "lucide-react";
 
+import { cn } from "@/lib/utils";
 import { PaymentDetailMethod } from "../../payments/_types/payment";
 
 export const getPaymentMethodLabel = (method: string): string => {
@@ -12,6 +13,7 @@ export const getPaymentMethodLabel = (method: string): string => {
     PLIN: "Plin",
     PAYPAL: "PayPal",
     IZI_PAY: "Izi Pay",
+    PENDING_PAYMENT: "Pago Pendiente",
   };
 
   return (
@@ -23,22 +25,53 @@ export const getPaymentMethodLabel = (method: string): string => {
   );
 };
 
-export const getMethodIcon = (method: PaymentDetailMethod) => {
+export const getMethodIcon = (method: PaymentDetailMethod, colored?: boolean) => {
+  // Determinar la clase de color basada en el método si colored es true
+  const colorClass = colored ? getMethodIconColor(method) : "";
+
   switch (method) {
     case PaymentDetailMethod.CASH:
-      return <Banknote className="h-6 w-6" />;
+      return <Banknote className={cn("h-6 w-6", colorClass)} />;
     case PaymentDetailMethod.CREDIT_CARD:
     case PaymentDetailMethod.DEBIT_CARD:
-      return <CreditCard className="h-6 w-6" />;
+      return <CreditCard className={cn("h-6 w-6", colorClass)} />;
     case PaymentDetailMethod.TRANSFER:
-      return <Building className="h-6 w-6" />;
+      return <Building className={cn("h-6 w-6", colorClass)} />;
     case PaymentDetailMethod.YAPE:
     case PaymentDetailMethod.PLIN:
     case PaymentDetailMethod.PAYPAL:
     case PaymentDetailMethod.IZI_PAY:
-      return <Smartphone className="h-6 w-6" />;
+      return <Smartphone className={cn("h-6 w-6", colorClass)} />;
+    case PaymentDetailMethod.PENDING_PAYMENT:
+      return <Clock className={cn("h-6 w-6", colorClass)} />;
     default:
-      return <CreditCard className="h-6 w-6" />;
+      return <CreditCard className={cn("h-6 w-6", colorClass)} />;
+  }
+};
+
+// Nueva función auxiliar para obtener sólo la clase de color del icono
+export const getMethodIconColor = (method: PaymentDetailMethod): string => {
+  switch (method) {
+    case PaymentDetailMethod.CASH:
+      return "text-green-500";
+    case PaymentDetailMethod.CREDIT_CARD:
+      return "text-blue-500";
+    case PaymentDetailMethod.DEBIT_CARD:
+      return "text-cyan-500";
+    case PaymentDetailMethod.TRANSFER:
+      return "text-violet-500";
+    case PaymentDetailMethod.YAPE:
+      return "text-purple-500";
+    case PaymentDetailMethod.PLIN:
+      return "text-sky-500";
+    case PaymentDetailMethod.PAYPAL:
+      return "text-blue-700";
+    case PaymentDetailMethod.IZI_PAY:
+      return "text-red-600";
+    case PaymentDetailMethod.PENDING_PAYMENT:
+      return "text-amber-500";
+    default:
+      return "";
   }
 };
 
@@ -55,11 +88,13 @@ export const getMethodColor = (method: PaymentDetailMethod) => {
     case "YAPE":
       return "from-purple-500 to-fuchsia-600";
     case "PLIN":
-      return "from-fuchsia-500 to-pink-600";
+      return "from-sky-400 to-sky-600";
     case "PAYPAL":
       return "from-blue-500 to-blue-700";
     case "IZI_PAY":
-      return "from-orange-500 to-amber-600";
+      return "from-red-500 to-red-700";
+    case "PENDING_PAYMENT":
+      return "from-amber-400 to-yellow-600";
     default:
       return "from-gray-500 to-gray-600";
   }

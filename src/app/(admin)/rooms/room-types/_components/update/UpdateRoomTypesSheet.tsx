@@ -116,7 +116,10 @@ export function UpdateRoomTypeSheet({ roomType, open, onOpenChange }: UpdateRoom
         <SheetHeader className="text-left pb-0">
           <SheetTitle className="flex flex-col items-start">
             {infoSheet.title}
-            <Badge className="bg-emerald-100 capitalize text-emerald-700" variant="secondary">
+            <Badge
+              className="bg-emerald-100 capitalize text-emerald-700 border-emerald-200 hover:bg-emerald-200"
+              variant="secondary"
+            >
               {roomType.name}
             </Badge>
           </SheetTitle>

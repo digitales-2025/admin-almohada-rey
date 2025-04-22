@@ -50,6 +50,11 @@ export default function StepPaymentMethod({ form }: StepPaymentMethodProps) {
                 label: "Izi Pay",
                 description: "Solución de pago digital",
               },
+              {
+                value: PaymentDetailMethod.PENDING_PAYMENT,
+                label: "Pago Pendiente",
+                description: "Pago no realizado",
+              },
             ].map((method) => (
               <div
                 key={method.value}

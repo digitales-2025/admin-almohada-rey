@@ -132,7 +132,7 @@ export const productsColumns = (isSuperAdmin: boolean): ColumnDef<Product>[] => 
 
       return (
         <div className="text-xs min-w-32">
-          <Badge variant="default" className={documentTypeConfig.className}>
+          <Badge variant="outline" className={documentTypeConfig.className}>
             <Icon className="size-4 flex-shrink-0 mr-1" aria-hidden="true" />
             {documentTypeConfig.label}
           </Badge>
@@ -159,11 +159,14 @@ export const productsColumns = (isSuperAdmin: boolean): ColumnDef<Product>[] => 
     cell: ({ row }) => (
       <div>
         {row.getValue("estado") ? (
-          <Badge variant="secondary" className="bg-emerald-100 text-emerald-500 border-emerald-200">
+          <Badge
+            variant="secondary"
+            className="bg-emerald-100 text-emerald-500 border-emerald-200 hover:bg-emerald-200"
+          >
             Activo
           </Badge>
         ) : (
-          <Badge variant="secondary" className="bg-red-100 text-red-500 border-red-200">
+          <Badge variant="secondary" className="bg-red-100 text-red-500 border-red-200 hover:bg-red-200">
             Inactivo
           </Badge>
         )}
