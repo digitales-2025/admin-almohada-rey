@@ -33,37 +33,14 @@ export const store = configureStore({
       serializableCheck: {
         // Ignorar las acciones que no son serializables, específicamente de classApi
         ignoredActions: [
-          "quotationsApi/executeMutation/fulfilled",
-          "quotationsApi/executeMutation/rejected",
-          "observationApi/executeMutation/fulfilled",
-          "observationApi/executeMutation/rejected",
-          "designProjectApi/executeMutation/fulfilled",
-          "designProjectApi/executeMutation/rejected",
-          "budgetsApi/executeMutation/fulfilled",
-          "budgetsApi/executeMutation/rejected",
-          "finishesBudgetsApi/executeMutation/fulfilled",
-          "finishesBudgetsApi/executeMutation/rejected",
-          "finishesApi/executeMutation/fulfilled",
-          "finishesApi/executeMutation/rejected",
-          "reportsApi/executeMutation/rejected",
-          "reportsApi/executeMutation/fulfilled",
-          "purchaseOrderApi/executeMutation/fulfilled",
-          "purchaseOrderApi/executeMutation/rejected",
-          "finishesPurchaseOrderApi/executeMutation/fulfilled",
-          "finishesPurchaseOrderApi/executeMutation/rejected",
+          "customersApi/executeMutation/fulfilled",
+          "customersApi/executeMutation/rejected",
+          "customersApi/executeQuery/fulfilled",
+          "customersApi/executeQuery/rejected",
+          "customersApi/executeQuery/pending",
         ],
         // Ignorar las rutas en el estado que contienen valores no serializables
-        ignoredPaths: [
-          "quotationsApi.mutations",
-          "designProjectApi.mutations",
-          "observationApi.mutations",
-          "budgetsApi.mutations",
-          "finishesBudgetsApi.mutations",
-          "finishesApi.mutations",
-          "reportsApi.mutations",
-          "purchaseOrderApi.mutations",
-          "finishesPurchaseOrderApi.mutations",
-        ],
+        ignoredPaths: ["customersApi.mutations", "customersApi.queries"],
       },
     })
       .concat(authApi.middleware)
