@@ -6,6 +6,8 @@ import {
   useDeleteCustomersMutation,
   useGetAllCustomersQuery,
   useGetHistoryCustomerByIdQuery,
+  useImportCustomersMutation,
+  useLazyDownloadCustomerTemplateQuery,
   useReactivateCustomersMutation,
   useSearchCustomersByDocumentIdQuery,
   useUpdateCustomerMutation,
@@ -54,6 +56,12 @@ export const useCustomers = (options: UseCustomerProps = {}) => {
 
   const [reactivateCustomers, { isSuccess: isSuccessReactivateCustomers, isLoading: isLoadingReactivateCustomers }] =
     useReactivateCustomersMutation();
+
+  // Nuevos hooks para importación y descarga de plantilla
+  const [importCustomers, { isSuccess: isSuccessImportCustomers, isLoading: isLoadingImportCustomers }] =
+    useImportCustomersMutation();
+
+  const [downloadTemplate, { isLoading: isLoadingDownloadTemplate }] = useLazyDownloadCustomerTemplateQuery();
 
   async function onCreateCustomer(input: Partial<Customer>) {
     const promise = runAndHandleError(() => createCustomer(input).unwrap());
@@ -107,6 +115,39 @@ export const useCustomers = (options: UseCustomerProps = {}) => {
     return await promise;
   };
 
+  const onImportCustomers = async (file: File, continueOnError: boolean = false) => {
+    const promise = runAndHandleError(() => importCustomers({ file, continueOnError }).unwrap());
+
+    toast.promise(promise, {
+      loading: "Importando clientes...",
+      success: (data) => data.message || "Importación completada con éxito",
+      error: (err) => err.message,
+    });
+    return await promise;
+  };
+
+  const onDownloadTemplate = async () => {
+    const toastId = toast.loading("Descargando plantilla...");
+
+    try {
+      const blob = await downloadTemplate().unwrap();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "plantilla_clientes.xlsx";
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      a.remove();
+
+      toast.success("Plantilla descargada con éxito", { id: toastId });
+      return true;
+    } catch (error: any) {
+      toast.error(`Error al descargar: ${error.message}`, { id: toastId });
+      return false;
+    }
+  };
+
   return {
     dataCustomersAll,
     error,
@@ -127,6 +168,11 @@ export const useCustomers = (options: UseCustomerProps = {}) => {
     isSuccessReactivateCustomers,
     isLoadingReactivateCustomers,
     searchQuery,
+    onImportCustomers,
+    isSuccessImportCustomers,
+    isLoadingImportCustomers,
+    onDownloadTemplate,
+    isLoadingDownloadTemplate,
   };
 };
 

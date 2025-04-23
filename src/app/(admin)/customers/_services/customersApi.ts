@@ -10,6 +10,28 @@ interface GetHistoryCustomerByIdProps {
   status?: ReservationStatus;
 }
 
+interface ImportCustomersResponse {
+  statusCode: number;
+  message: string;
+  data: {
+    total: number;
+    successful: number;
+    failed: number;
+    skipped: number;
+    errors: Array<{
+      row: number;
+      data: Record<string, unknown>;
+      error: string;
+      type: "error" | "duplicate";
+    }>;
+  };
+}
+
+interface ImportCustomersRequest {
+  file: File;
+  continueOnError?: boolean;
+}
+
 export const customersApi = createApi({
   reducerPath: "customersApi",
   baseQuery: baseQueryWithReauth,
@@ -110,6 +132,33 @@ export const customersApi = createApi({
       }),
       providesTags: (result) => (result ? result.map(({ id }) => ({ type: "Customer", id })) : ["Customer"]),
     }),
+
+    // Importar clientes desde archivo Excel
+    importCustomers: build.mutation<ImportCustomersResponse, ImportCustomersRequest>({
+      query: ({ file, continueOnError = false }) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("continueOnError", String(continueOnError));
+
+        return {
+          url: "/customers/import",
+          method: "POST",
+          body: formData,
+          credentials: "include",
+          // Importante: no establecer Content-Type, lo hará automáticamente para FormData
+        };
+      },
+      invalidatesTags: ["Customer"],
+    }),
+    // Descargar plantilla para importar clientes
+    downloadCustomerTemplate: build.query<Blob, void>({
+      query: () => ({
+        url: "/customers/import/template",
+        method: "GET",
+        responseHandler: async (response: Response) => await response.blob(),
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -122,4 +171,6 @@ export const {
   useDeleteCustomersMutation,
   useReactivateCustomersMutation,
   useSearchCustomersByDocumentIdQuery,
+  useImportCustomersMutation,
+  useLazyDownloadCustomerTemplateQuery,
 } = customersApi;
