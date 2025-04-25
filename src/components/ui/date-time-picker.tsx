@@ -3,24 +3,39 @@
 import * as React from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Clock } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 interface DatePickerProps {
   value: Date | undefined;
   onChange: (date: Date | undefined) => void;
   iconColor?: string;
-  isBirthday?: boolean; // Nuevo prop para indicar si es fecha de nacimiento
+  isBirthday?: boolean;
+  withTime?: boolean; // Nuevo prop para indicar si incluye selección de hora
 }
 
-export default function DatePicker({ value, onChange, iconColor, isBirthday = false }: DatePickerProps) {
+export default function DatePicker({
+  value,
+  onChange,
+  iconColor,
+  isBirthday = false,
+  withTime = false,
+}: DatePickerProps) {
   const [month, setMonth] = React.useState<number>(value ? value.getMonth() : new Date().getMonth());
   const [year, setYear] = React.useState<number>(value ? value.getFullYear() : new Date().getFullYear());
+  const [timeValue, setTimeValue] = React.useState<string>(
+    value
+      ? `${value.getHours().toString().padStart(2, "0")}:${value.getMinutes().toString().padStart(2, "0")}`
+      : "00:00"
+  );
 
   // Creamos el array de años basado en si es fecha de nacimiento o no
   const years = React.useMemo(() => {
@@ -51,27 +66,85 @@ export default function DatePicker({ value, onChange, iconColor, isBirthday = fa
   ];
 
   const handleMonthChange = (value: string) => {
-    setMonth(parseInt(value));
+    setMonth(Number.parseInt(value, 10));
   };
 
   const handleYearChange = (value: string) => {
-    setYear(parseInt(value));
+    setYear(Number.parseInt(value, 10));
   };
 
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTimeValue(e.target.value);
+    updateDateWithTime(e.target.value);
+  };
+
+  const updateDateWithTime = (timeStr: string) => {
+    if (!value) {
+      return;
+    }
+
+    const [hours, minutes] = timeStr.split(":").map((num) => Number.parseInt(num, 10));
+
+    if (isNaN(hours) || isNaN(minutes)) {
+      return;
+    }
+
+    const newDate = new Date(value);
+    newDate.setHours(hours);
+    newDate.setMinutes(minutes);
+    onChange(newDate);
+  };
+
+  const handleDateSelect = (date: Date | undefined) => {
+    if (!date) {
+      onChange(undefined);
+      return;
+    }
+
+    if (withTime && value) {
+      // Mantener la hora seleccionada al cambiar la fecha
+      const [hours, minutes] = timeValue.split(":").map((num) => Number.parseInt(num, 10));
+      date.setHours(hours);
+      date.setMinutes(minutes);
+    }
+
+    onChange(date);
+  };
+
+  // Formatear la fecha para mostrar en el botón
+  const getFormattedDate = () => {
+    if (!value) {
+      return "Selecciona una fecha";
+    }
+
+    if (withTime) {
+      return format(value, "PPP 'a las' HH:mm", { locale: es });
+    } else {
+      return format(value, "PPP", { locale: es });
+    }
+  };
+
+  // Actualizar el timeValue cuando cambia el valor externo
+  React.useEffect(() => {
+    if (value) {
+      setTimeValue(`${value.getHours().toString().padStart(2, "0")}:${value.getMinutes().toString().padStart(2, "0")}`);
+    }
+  }, [value]);
+
   return (
-    <Popover modal={true}>
+    <Popover modal>
       <PopoverTrigger asChild>
         <Button
           variant={"outline"}
           className={cn("w-full justify-start text-left font-normal", !value && "text-muted-foreground")}
           tabIndex={0}
         >
-          <CalendarIcon className={`mr-2 h-4 w-4 ${iconColor ? `${iconColor}` : ""}`} />
-          {value ? (
-            <span className="truncate text-ellipsis">{format(value, "PPP", { locale: es })}</span>
+          {withTime ? (
+            <Clock className={`mr-2 h-4 w-4 ${iconColor ? `${iconColor}` : ""}`} />
           ) : (
-            <span className="truncate">Selecciona una fecha</span>
+            <CalendarIcon className={`mr-2 h-4 w-4 ${iconColor ? `${iconColor}` : ""}`} />
           )}
+          <span className="truncate text-ellipsis">{getFormattedDate()}</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="center" side="bottom" onOpenAutoFocus={(e) => e.preventDefault()}>
@@ -105,7 +178,7 @@ export default function DatePicker({ value, onChange, iconColor, isBirthday = fa
           <Calendar
             mode="single"
             selected={value}
-            onSelect={onChange}
+            onSelect={handleDateSelect}
             month={new Date(year, month)}
             onMonthChange={(newMonth) => {
               setMonth(newMonth.getMonth());
@@ -116,6 +189,30 @@ export default function DatePicker({ value, onChange, iconColor, isBirthday = fa
             className="capitalize"
           />
         </div>
+
+        {withTime && (
+          <>
+            <Separator />
+            <div className="p-4">
+              <div className="flex flex-col space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="time-input" className="text-sm font-medium">
+                    Hora
+                  </Label>
+                  <div className="flex items-center">
+                    <Input
+                      id="time-input"
+                      type="time"
+                      value={timeValue}
+                      onChange={handleTimeChange}
+                      className="w-[120px]"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </PopoverContent>
     </Popover>
   );
