@@ -144,7 +144,7 @@ export default function DatePicker({
           ) : (
             <CalendarIcon className={`mr-2 h-4 w-4 ${iconColor ? `${iconColor}` : ""}`} />
           )}
-          <span className="truncate text-ellipsis">{getFormattedDate()}</span>
+          <span className="max-w-[150px] sm:max-w-full truncate text-ellipsis">{getFormattedDate()}</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="center" side="bottom" onOpenAutoFocus={(e) => e.preventDefault()}>
@@ -195,7 +195,7 @@ export default function DatePicker({
             <Separator />
             <div className="p-4">
               <div className="flex flex-col space-y-2">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row items-center justify-between">
                   <Label htmlFor="time-input" className="text-sm font-medium">
                     Hora
                   </Label>
@@ -205,7 +205,7 @@ export default function DatePicker({
                       type="time"
                       value={timeValue}
                       onChange={handleTimeChange}
-                      className="w-[120px]"
+                      className="w-fit"
                     />
                   </div>
                 </div>
