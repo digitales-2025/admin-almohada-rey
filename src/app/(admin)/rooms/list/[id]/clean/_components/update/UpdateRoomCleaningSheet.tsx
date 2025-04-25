@@ -22,8 +22,8 @@ import { RoomCleaning } from "../../_types/roomCleaning";
 import UpdateRoomCleaningForm from "./UpdateRoomCleaningForm";
 
 const infoSheet = {
-  title: "Actualizar Habitación",
-  description: "Actualiza la información del habitación y guarda los cambios",
+  title: "Actualizar Limpieza de Habitación",
+  description: "Actualiza los detalles de la limpieza de la habitación.",
 };
 
 interface UpdateRoomCleaningSheetProps
