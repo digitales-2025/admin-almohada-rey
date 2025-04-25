@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Table as TableInstance } from "@tanstack/react-table";
 
 import { useProfile } from "@/app/(admin)/profile/_hooks/use-profile";
@@ -12,7 +13,20 @@ import { RoomsTableToolbarActions } from "./RoomsTableToolbarActions";
 
 export function RoomsTable({ data }: { data: Room[] }) {
   const { user } = useProfile();
-  const columns = useMemo(() => roomsColumns(user?.isSuperAdmin || false), [user]);
+
+  const router = useRouter();
+
+  const handleRoomCleaningLog = useCallback(
+    (id: string) => {
+      router.push(`/rooms/list/${id}/clean`);
+    },
+    [router]
+  );
+
+  const columns = useMemo(
+    () => roomsColumns(user?.isSuperAdmin || false, handleRoomCleaningLog),
+    [user, handleRoomCleaningLog]
+  );
 
   return (
     <DataTable
