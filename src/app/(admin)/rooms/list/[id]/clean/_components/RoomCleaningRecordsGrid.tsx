@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { RoomCleaning } from "../_types/roomCleaning";
 import { getRoomTypeKey, RoomTypeLabels } from "../../../_utils/rooms.utils";
-import { EditCleaningSheet } from "./update/UpdateRoomCleaningSheet";
+import { UpdateRoomCleaningSheet } from "./update/UpdateRoomCleaningSheet";
 
 interface RoomCleaningRecordsGridProps {
   records: RoomCleaning[] | undefined;
@@ -143,7 +143,11 @@ export function RoomCleaningRecordsGrid({ records }: RoomCleaningRecordsGridProp
       </div>
 
       {selectedRecord && (
-        <EditCleaningSheet record={selectedRecord} open={isEditSheetOpen} onOpenChange={setIsEditSheetOpen} />
+        <UpdateRoomCleaningSheet
+          roomCleaning={selectedRecord}
+          open={isEditSheetOpen}
+          onOpenChange={setIsEditSheetOpen}
+        />
       )}
     </>
   );
