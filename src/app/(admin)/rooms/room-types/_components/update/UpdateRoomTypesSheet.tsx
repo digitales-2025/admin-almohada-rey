@@ -39,6 +39,7 @@ export function UpdateRoomTypeSheet({ roomType, open, onOpenChange }: UpdateRoom
   const {
     onUpdateRoomType,
     isSuccessUpdateRoomType,
+    refetchDataCreatableTypeRooms,
     onUpdateMainImage, // <-- Añadir esta importación
   } = useRoomTypes();
 
@@ -106,6 +107,7 @@ export function UpdateRoomTypeSheet({ roomType, open, onOpenChange }: UpdateRoom
   useEffect(() => {
     if (isSuccessUpdateRoomType) {
       form.reset();
+      refetchDataCreatableTypeRooms();
       onOpenChange(false);
     }
   }, [isSuccessUpdateRoomType, onOpenChange, form]);
