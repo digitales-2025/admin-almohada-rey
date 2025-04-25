@@ -288,7 +288,7 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
             Activo
           </Badge>
         ) : (
-          <Badge variant="secondary" className="bg-red-100 text-red-500 border-red-200 hover-bg-red-200">
+          <Badge variant="secondary" className="bg-red-100 text-red-500 border-red-200 hover:bg-red-200">
             Archivado
           </Badge>
         )}
