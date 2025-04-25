@@ -1,7 +1,14 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 import baseQueryWithReauth from "@/utils/baseQuery";
-import { RoomCleaning } from "../_types/roomCleaning";
+import { PaginatedRoomCleaningResponse, RoomCleaning } from "../_types/roomCleaning";
+
+interface RoomCleaningParams {
+  roomId: string;
+  page?: number;
+  month?: string;
+  year?: string;
+}
 
 export const roomsCleaningApi = createApi({
   reducerPath: "roomsCleaningApi",
@@ -46,13 +53,21 @@ export const roomsCleaningApi = createApi({
       }),
       providesTags: ["Room Cleaning"],
     }),
-    // Obtener todos los historiales de limpieza de habitaciones por id de habitación
-    getAllRoomsCleaningByRoomId: build.query<RoomCleaning[], string>({
-      query: (roomId) => ({
-        url: `/room-cleaning/room/${roomId}`,
-        method: "GET",
-        credentials: "include",
-      }),
+    // Obtener todos los historiales de limpieza de habitaciones por id de habitación con paginación
+    getAllRoomsCleaningByRoomId: build.query<PaginatedRoomCleaningResponse, RoomCleaningParams>({
+      query: ({ roomId, page, month, year }) => {
+        // Construir parámetros de consulta
+        const params = new URLSearchParams();
+        if (page !== undefined) params.append("page", page.toString());
+        if (month) params.append("month", month);
+        if (year) params.append("year", year);
+
+        return {
+          url: `/room-cleaning/room/${roomId}${params.toString() ? `?${params.toString()}` : ""}`,
+          method: "GET",
+          credentials: "include",
+        };
+      },
       providesTags: ["Room Cleaning"],
     }),
   }),
