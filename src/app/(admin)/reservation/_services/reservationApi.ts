@@ -1,10 +1,11 @@
+// reservationApi.ts
 import { createApi } from "@reduxjs/toolkit/query/react";
 
+import { socketService } from "@/services/socketService";
 import { PaginatedResponse } from "@/types/api/paginated-response";
 import { BaseApiResponse } from "@/types/api/types";
 import { PaginatedQueryParams } from "@/types/query-filters/generic-paginated-query-params";
 import baseQueryWithReauth from "@/utils/baseQuery";
-// import { CreateReservationResponse } from "../_actions/reservation.action";
 import {
   CreateReservationInput,
   DetailedReservation,
@@ -25,9 +26,8 @@ export type PaginatedReservationParams = PaginatedQueryParams<Reservation>;
 export const reservationApi = createApi({
   reducerPath: "reservationApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["Reservation"],
+  tagTypes: ["Reservation", "RoomAvailability"],
   endpoints: (build) => ({
-    //Crear reservación
     createReservation: build.mutation<CreateReservationReduxResponse, CreateReservationInput>({
       query: (body) => ({
         url: "/reservation",
@@ -37,14 +37,8 @@ export const reservationApi = createApi({
       }),
       invalidatesTags: ["Reservation"],
     }),
-    //Actualizar reservación
-    updateReservation: build.mutation<
-      UpdateReservationReduxResponse,
-      {
-        id: string;
-        data: UpdateReservationInput;
-      }
-    >({
+
+    updateReservation: build.mutation<UpdateReservationReduxResponse, { id: string; data: UpdateReservationInput }>({
       query: ({ id, data }) => ({
         url: `/reservation/${id}`,
         method: "PATCH",
@@ -53,13 +47,10 @@ export const reservationApi = createApi({
       }),
       invalidatesTags: ["Reservation"],
     }),
-    //Change transitions status
+
     transitionReservationStatus: build.mutation<
       UpdateReservationReduxResponse,
-      {
-        id: string;
-        status: ReservationStatus;
-      }
+      { id: string; status: ReservationStatus }
     >({
       query: ({ id, status }) => ({
         url: `/reservation/transition-status/${id}`,
@@ -71,26 +62,25 @@ export const reservationApi = createApi({
     }),
 
     deactivateReservations: build.mutation<BaseApiResponse<UpdateManyResponse>, UpdateManyDto>({
-      query: (updateManyDto) => {
-        return {
-          url: `/reservation/deactivate`,
-          method: "DELETE",
-          body: updateManyDto,
-          credentials: "include",
-        };
-      },
-      invalidatesTags: ["Reservation"],
-    }),
-    reactivateReservations: build.mutation<BaseApiResponse<UpdateManyResponse>, UpdateManyDto>({
-      query: (updateManyDto) => ({
-        url: `/reservation/reactivate`,
-        method: "PATCH",
-        body: updateManyDto,
+      query: (dto) => ({
+        url: `/reservation/deactivate`,
+        method: "DELETE",
+        body: dto,
         credentials: "include",
       }),
       invalidatesTags: ["Reservation"],
     }),
-    //Obtener reservación por id
+
+    reactivateReservations: build.mutation<BaseApiResponse<UpdateManyResponse>, UpdateManyDto>({
+      query: (dto) => ({
+        url: `/reservation/reactivate`,
+        method: "PATCH",
+        body: dto,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Reservation"],
+    }),
+
     getReservationById: build.query<Reservation, string>({
       query: (id) => ({
         url: `/reservation/${id}`,
@@ -99,7 +89,7 @@ export const reservationApi = createApi({
       }),
       providesTags: (result, error, id) => [{ type: "Reservation", id }],
     }),
-    //Obtener todas las reservaciones
+
     getAllReservations: build.query<Reservation[], void>({
       query: () => ({
         url: "/reservation",
@@ -108,7 +98,7 @@ export const reservationApi = createApi({
       }),
       providesTags: ["Reservation"],
     }),
-    //Obtener todas las reservaciones paginadas
+
     getPaginatedReservations: build.query<PaginatedResponse<DetailedReservation>, PaginatedReservationParams>({
       query: ({ pagination: { page = 1, pageSize = 10 }, fieldFilters }) => ({
         url: "/reservation/paginated",
@@ -118,10 +108,10 @@ export const reservationApi = createApi({
       }),
       providesTags: (result) => [
         { type: "Reservation", id: result?.meta.page },
-        ...(result?.data?.map(({ id }) => ({ type: "Reservation" as const, id })) ?? []),
+        ...(result?.data.map(({ id }) => ({ type: "Reservation" as const, id })) ?? []),
       ],
     }),
-    //Obtener todas las reservaciones paginadas
+
     getReservationsInTimeInterval: build.query<DetailedReservation[], GenericAvailabilityParams>({
       query: ({ checkInDate, checkOutDate }) => ({
         url: `/reservation/reservations-in-interval`,
@@ -137,68 +127,92 @@ export const reservationApi = createApi({
             ]
           : [{ type: "Reservation", id: "TIME_INTERVAL" }],
     }),
-    //Obtener todas las habitaciones disponibles en reservaciones
+
     getAllAvailableRooms: build.query<DetailedRoom[], GenericAvailabilityParams>({
-      query: ({ checkInDate, checkOutDate }) => {
-        return {
-          url: `/reservation/available-rooms`,
-          method: "GET",
-          params: { checkInDate, checkOutDate },
-          credentials: "include",
-        };
-      },
+      query: ({ checkInDate, checkOutDate }) => ({
+        url: `/reservation/available-rooms`,
+        method: "GET",
+        params: { checkInDate, checkOutDate },
+        credentials: "include",
+      }),
+      providesTags: ["RoomAvailability"],
     }),
-    getAllAvailableRoomsForUpdate: build.query<
-      DetailedRoom[],
-      GenericAvailabilityParams & {
-        reservationId?: string;
-      }
-    >({
-      query: ({ checkInDate, checkOutDate, reservationId }) => {
-        return {
-          url: `/reservation/available-rooms`,
-          method: "GET",
-          params: { checkInDate, checkOutDate, forUpdate: true, reservationId },
-          credentials: "include",
-        };
-      },
+
+    getAllAvailableRoomsForUpdate: build.query<DetailedRoom[], GenericAvailabilityParams & { reservationId?: string }>({
+      query: ({ checkInDate, checkOutDate, reservationId }) => ({
+        url: `/reservation/available-rooms`,
+        method: "GET",
+        params: { checkInDate, checkOutDate, forUpdate: true, reservationId },
+        credentials: "include",
+      }),
+      providesTags: ["RoomAvailability"],
     }),
-    //Check room availability
+
     getRoomAvailability: build.query<RoomAvailabilityDto, AvailabilityParams>({
       query: ({ roomId, checkInDate, checkOutDate }) => ({
         url: "/reservation/check-availability",
         method: "GET",
-        params: {
-          roomId,
-          checkInDate,
-          checkOutDate,
-        },
+        params: { roomId, checkInDate, checkOutDate },
         credentials: "include",
       }),
+      providesTags: (result, error, arg) => [
+        { type: "RoomAvailability", id: `${arg.roomId}-${arg.checkInDate}-${arg.checkOutDate}` },
+      ],
     }),
 
-    //Check room availability
-    getRoomAvailabilityForUpdate: build.query<
-      RoomAvailabilityDto,
-      AvailabilityParams & {
-        reservationId?: string;
-      }
-    >({
+    getRoomAvailabilityForUpdate: build.query<RoomAvailabilityDto, AvailabilityParams & { reservationId?: string }>({
       query: ({ roomId, checkInDate, checkOutDate, reservationId }) => ({
         url: "/reservation/check-availability",
         method: "GET",
-        params: {
-          roomId,
-          checkInDate,
-          checkOutDate,
-          forUpdate: true,
-          reservationId,
-        },
+        params: { roomId, checkInDate, checkOutDate, forUpdate: true, reservationId },
         credentials: "include",
       }),
+      providesTags: (result, error, arg) => [
+        { type: "RoomAvailability", id: `${arg.roomId}-${arg.checkInDate}-${arg.checkOutDate}-${arg.reservationId}` },
+      ],
     }),
   }),
 });
+
+// WebSocket listeners para mantener sincronizado RTK Query en tiempo real
+export const setupReservationWebsockets = (dispatch: any) => {
+  socketService.connect();
+
+  socketService.onNewReservation((reservation) => {
+    console.log("WS: Nueva reservación", reservation);
+    dispatch(reservationApi.util.invalidateTags(["Reservation", "RoomAvailability"]));
+  });
+
+  socketService.onReservationUpdated((reservation) => {
+    console.log("WS: Reservación actualizada", reservation);
+    dispatch(
+      reservationApi.util.invalidateTags([
+        { type: "Reservation", id: reservation.id },
+        "Reservation",
+        "RoomAvailability",
+      ])
+    );
+  });
+
+  socketService.onReservationDeleted(({ id }) => {
+    console.log("WS: Reservación eliminada", id);
+    dispatch(reservationApi.util.invalidateTags([{ type: "Reservation", id }, "Reservation", "RoomAvailability"]));
+  });
+
+  socketService.onAvailabilityChanged(({ checkInDate, checkOutDate }) => {
+    console.log("WS: Disponibilidad cambiada", { checkInDate, checkOutDate });
+    dispatch(reservationApi.util.invalidateTags(["RoomAvailability", { type: "Reservation", id: "TIME_INTERVAL" }]));
+  });
+
+  socketService.onReservationsInInterval(() => {
+    console.log("WS: Reservaciones en intervalo recibidas");
+    dispatch(reservationApi.util.invalidateTags([{ type: "Reservation", id: "TIME_INTERVAL" }]));
+  });
+};
+
+export const requestReservationsInTimeInterval = (checkInDate: string, checkOutDate: string) => {
+  socketService.requestReservationsInInterval(checkInDate, checkOutDate);
+};
 
 export const {
   useCreateReservationMutation,

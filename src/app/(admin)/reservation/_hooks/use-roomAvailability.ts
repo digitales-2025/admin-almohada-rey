@@ -29,7 +29,7 @@ export const useRoomAvailability = () => {
     }
   );
 
-  const isAvailable = data?.isAvailable ? data.isAvailable : false; //lookout this code
+  const isAvailable = data?.isAvailable ? data.isAvailable : false;
 
   const checkAvailability = (newParams: AvailabilityParams) => {
     setParams(newParams);
@@ -66,7 +66,7 @@ export const useRoomAvailabilityForUpdate = ({
     }
   );
 
-  const isAvailable = data?.isAvailable ? data.isAvailable : false; //lookout this code
+  const isAvailable = data?.isAvailable ? data.isAvailable : false;
 
   const checkAvailability = (newParams: AvailabilityFormUpdateParams) => {
     setParams({
