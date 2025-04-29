@@ -131,11 +131,11 @@ export const reservationApi = createApi({
     getAllAvailableRooms: build.query<DetailedRoom[], GenericAvailabilityParams>({
       query: ({ checkInDate, checkOutDate }) => ({
         url: `/reservation/available-rooms`,
-        method: "GET",
         params: { checkInDate, checkOutDate },
-        credentials: "include",
       }),
-      providesTags: ["RoomAvailability"],
+      providesTags: (_, __, { checkInDate, checkOutDate }) => [
+        { type: "RoomAvailability", id: `GLOBAL_${checkInDate}_${checkOutDate}` },
+      ],
     }),
 
     getAllAvailableRoomsForUpdate: build.query<DetailedRoom[], GenericAvailabilityParams & { reservationId?: string }>({
@@ -151,12 +151,10 @@ export const reservationApi = createApi({
     getRoomAvailability: build.query<RoomAvailabilityDto, AvailabilityParams>({
       query: ({ roomId, checkInDate, checkOutDate }) => ({
         url: "/reservation/check-availability",
-        method: "GET",
         params: { roomId, checkInDate, checkOutDate },
-        credentials: "include",
       }),
-      providesTags: (result, error, arg) => [
-        { type: "RoomAvailability", id: `${arg.roomId}-${arg.checkInDate}-${arg.checkOutDate}` },
+      providesTags: (_, __, { roomId, checkInDate, checkOutDate }) => [
+        { type: "RoomAvailability", id: `${roomId}_${checkInDate}_${checkOutDate}` },
       ],
     }),
 
@@ -178,36 +176,73 @@ export const reservationApi = createApi({
 export const setupReservationWebsockets = (dispatch: any) => {
   socketService.connect();
 
-  socketService.onNewReservation((reservation) => {
-    console.log("WS: Nueva reservación", reservation);
-    dispatch(reservationApi.util.invalidateTags(["Reservation", "RoomAvailability"]));
-  });
+  // Definimos los handlers primero para poder referenciarlos después
+  const handleNewReservation = (reservation: DetailedReservation) => {
+    dispatch(
+      reservationApi.util.invalidateTags([
+        { type: "Reservation", id: "ALL" },
+        { type: "Reservation", id: reservation.id },
+        {
+          type: "RoomAvailability",
+          id: `${reservation.roomId}_${reservation.checkInDate}_${reservation.checkOutDate}`,
+        },
+      ])
+    );
+  };
 
-  socketService.onReservationUpdated((reservation) => {
-    console.log("WS: Reservación actualizada", reservation);
+  const handleUpdatedReservation = (reservation: DetailedReservation) => {
     dispatch(
       reservationApi.util.invalidateTags([
         { type: "Reservation", id: reservation.id },
-        "Reservation",
-        "RoomAvailability",
+        {
+          type: "RoomAvailability",
+          id: `${reservation.roomId}_${reservation.checkInDate}_${reservation.checkOutDate}`,
+        },
       ])
     );
-  });
+  };
 
-  socketService.onReservationDeleted(({ id }) => {
-    console.log("WS: Reservación eliminada", id);
-    dispatch(reservationApi.util.invalidateTags([{ type: "Reservation", id }, "Reservation", "RoomAvailability"]));
-  });
+  const handleDeletedReservation = ({ id }: { id: string }) => {
+    dispatch(reservationApi.util.invalidateTags([{ type: "Reservation", id }]));
+  };
 
-  socketService.onAvailabilityChanged(({ checkInDate, checkOutDate }) => {
-    console.log("WS: Disponibilidad cambiada", { checkInDate, checkOutDate });
-    dispatch(reservationApi.util.invalidateTags(["RoomAvailability", { type: "Reservation", id: "TIME_INTERVAL" }]));
-  });
+  const handleAvailabilityChanged = ({ checkInDate, checkOutDate }: { checkInDate: string; checkOutDate: string }) => {
+    dispatch(
+      reservationApi.util.invalidateTags([{ type: "RoomAvailability", id: `GLOBAL_${checkInDate}_${checkOutDate}` }])
+    );
+  };
 
-  socketService.onReservationsInInterval(() => {
-    console.log("WS: Reservaciones en intervalo recibidas");
-    dispatch(reservationApi.util.invalidateTags([{ type: "Reservation", id: "TIME_INTERVAL" }]));
-  });
+  const handleRoomAvailabilityChecked = ({
+    roomId,
+    checkInDate,
+    checkOutDate,
+  }: {
+    roomId: string;
+    checkInDate: string;
+    checkOutDate: string;
+    isAvailable: boolean;
+    timestamp: string;
+  }) => {
+    dispatch(
+      reservationApi.util.invalidateTags([{ type: "RoomAvailability", id: `${roomId}_${checkInDate}_${checkOutDate}` }])
+    );
+  };
+
+  // Registramos los listeners usando tus métodos existentes
+  socketService.onNewReservation(handleNewReservation);
+  socketService.onReservationUpdated(handleUpdatedReservation);
+  socketService.onReservationDeleted(handleDeletedReservation);
+  socketService.onAvailabilityChanged(handleAvailabilityChanged);
+  socketService.onRoomAvailabilityChecked(handleRoomAvailabilityChecked);
+
+  // Limpieza usando el método genérico off
+  return () => {
+    socketService.off("newReservation", handleNewReservation);
+    socketService.off("reservationUpdated", handleUpdatedReservation);
+    socketService.off("reservationDeleted", handleDeletedReservation);
+    socketService.off("availabilityChanged", handleAvailabilityChanged);
+    socketService.off("roomAvailabilityChecked", handleRoomAvailabilityChecked);
+  };
 };
 
 export const requestReservationsInTimeInterval = (checkInDate: string, checkOutDate: string) => {
