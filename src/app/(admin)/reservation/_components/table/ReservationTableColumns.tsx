@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { ChevronDown, ChevronRight, Ellipsis, RefreshCcwDot, Trash } from "lucide-react";
+import { Ellipsis, Pencil, RefreshCcwDot, Trash } from "lucide-react";
 import { toast } from "sonner";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
@@ -32,6 +32,7 @@ import { ReactivateReservationsDialog } from "../state-management/ReactivateRese
 import { DIALOG_DICTIONARY } from "../state-management/reservation-status-dialog-config";
 import { TransitionReservationStatusDialog } from "../state-management/TransitionReservationStatusDialog";
 import { UpdateReservationSheet } from "../update/UpdateReservationSheet";
+import { ReservationDetailsDialog } from "./details/ReservationDetailsDialog";
 import { GuestsDetailsDialog } from "./dialogs/GuestDialog";
 
 /**
@@ -318,40 +319,16 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
   },
 
   {
-    id: "expand", // Nueva columna para expansión
-    header: () => null, // No mostrar un título en el header
-    cell: ({ row }) => (
-      <Button
-        onClick={() => row.toggleExpanded()} // Alternar la expansión de la fila
-        aria-label="Expand row"
-        className="flex items-center justify-center p-2"
-        variant={"ghost"}
-      >
-        {row.getIsExpanded() ? (
-          <ChevronDown className="size-4" /> // Ícono cuando la fila está expandida
-        ) : (
-          <ChevronRight className="size-4" /> // Ícono cuando la fila está colapsada
-        )}
-      </Button>
-    ),
-    enableSorting: false,
-    enableHiding: false,
-    enablePinning: true,
-  },
-
-  {
     id: "actions",
     cell: function Cell({ row }) {
-      //   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-      //   const [showReactivateDialog, setShowReactivateDialog] = useState(false);
       const [showEditDialog, setShowEditDialog] = useState(false);
       const [showCreatePaymentDialog, setShowCreatePaymentDialog] = useState(false);
       const [showCancelDialog, setShowCancelDialog] = useState(false);
       const [showCheckInDialog, setShowCheckInDialog] = useState(false);
       const [showCheckOutDialog, setShowCheckOutDialog] = useState(false);
-      // const [showConfirmDialog, setShowConfirmDialog] = useState(false);
       const [showDeactivateDialog, setShowDeactivateDialog] = useState(false);
       const [showReactivateDialog, setShowReactivateDialog] = useState(false);
+      const [showDetailDialog, setShowDetailDialog] = useState(false);
       const { status } = row.original;
       const { isActive } = row.original;
 
@@ -359,14 +336,12 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
       const cancelConfig = DIALOG_DICTIONARY["CANCELED"];
       const checkInConfig = DIALOG_DICTIONARY["CHECKED_IN"];
       const checkOutConfig = DIALOG_DICTIONARY["CHECKED_OUT"];
-      // const pendingConfig = DIALOG_DICTIONARY['PENDING'];
 
       const {
         canCancel,
         canCheckIn,
         canCheckOut,
         canConfirm,
-        // canModify,
         canDeactivate,
         canReactivate,
       }: ReservationStatusAvailableActions = getAvailableActions(status);
@@ -420,14 +395,6 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
                 newStatus="CHECKED_OUT"
               ></TransitionReservationStatusDialog>
             )}
-            {/* {showConfirmDialog && (
-              <TransitionReservationStatusDialog
-                open={showConfirmDialog}
-                onOpenChange={setShowConfirmDialog}
-                reservation={row.original}
-                newStatus="CONFIRMED"
-              ></TransitionReservationStatusDialog>
-            )} */}
 
             {showDeactivateDialog && (
               <DeactivateReservationsDialog
@@ -451,6 +418,10 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
                 }}
               />
             )}
+
+            {showDetailDialog && (
+              <ReservationDetailsDialog open={showDetailDialog} setOpen={setShowDetailDialog} row={row?.original} />
+            )}
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -459,10 +430,17 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem onSelect={() => setShowEditDialog(true)} disabled={!isActive}>
-                Editar
+              <DropdownMenuItem onSelect={() => setShowDetailDialog(true)} disabled={!isActive}>
+                Ver
               </DropdownMenuItem>
               <DropdownMenuSeparator />
+
+              <DropdownMenuItem onSelect={() => setShowEditDialog(true)} disabled={!isActive}>
+                Editar
+                <DropdownMenuShortcut>
+                  <Pencil className="size-4" aria-hidden="true" />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
 
               {canConfirm && (
                 <DropdownMenuItem onSelect={() => setShowCreatePaymentDialog(true)} disabled={status !== "PENDING"}>
