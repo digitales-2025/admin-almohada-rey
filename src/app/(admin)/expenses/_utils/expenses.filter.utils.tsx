@@ -1,12 +1,5 @@
-import { Calendar } from "lucide-react";
-
 import { cn } from "@/lib/utils";
-import {
-  ExpenseCategoryLabels,
-  ExpenseDateLabel,
-  ExpenseDocumentTypeLabels,
-  ExpensePaymentMethodLabels,
-} from "./expenses.utils";
+import { ExpenseCategoryLabels, ExpenseDocumentTypeLabels, ExpensePaymentMethodLabels } from "./expenses.utils";
 
 // Generar iconos para cada opción de filtro usando los labels
 const CategoryIcons = Object.fromEntries(
@@ -67,18 +60,5 @@ export const facetedFilters = [
       value: key,
       icon: DocumentTypeIcons[key],
     })),
-  },
-  {
-    column: "date",
-    title: ExpenseDateLabel.label,
-    options: [
-      {
-        label: "Por fecha",
-        value: "date",
-        icon: ({ className }: { className?: string }) => (
-          <Calendar className={cn(className, ExpenseDateLabel.className)} />
-        ),
-      },
-    ],
   },
 ];

@@ -1,4 +1,4 @@
-import { Calendar, CreditCard, DollarSign, File, FileText, Receipt, Tag } from "lucide-react";
+import { CreditCard, DollarSign, File, FileText, Receipt, Tag } from "lucide-react";
 
 import { ExpenseCategoryEnum, ExpenseDocumentTypeEnum, ExpensePaymentMethodEnum } from "../_types/expenses";
 
@@ -66,11 +66,4 @@ export const ExpenseDocumentTypeLabels: Record<
     icon: File,
     className: "text-gray-700 border-gray-200",
   },
-};
-
-// Label y estilos para filtro de fecha
-export const ExpenseDateLabel = {
-  label: "Fecha",
-  icon: Calendar,
-  className: "text-indigo-700 border-indigo-200",
 };
