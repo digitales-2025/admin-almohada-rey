@@ -15,7 +15,6 @@ export const createExpenseSchema = z.object({
   date: z.string().min(8, { message: "La fecha es obligatoria" }),
   documentType: z.nativeEnum(ExpenseDocumentTypeEnum).optional(),
   documentNumber: z.string().max(50, { message: "Máximo 50 caracteres" }).optional(),
-  dataDocument: z.boolean().optional(),
 });
 export type CreateExpenseSchema = z.infer<typeof createExpenseSchema>;
 

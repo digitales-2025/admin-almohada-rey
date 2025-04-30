@@ -35,6 +35,8 @@ export type ExpenseDocumentTypeType = keyof typeof ExpenseDocumentTypeEnum; // "
 // Entidad de gasto (respuesta de la API)
 export type HotelExpense = components["schemas"]["HotelExpenseEntity"];
 
+export type HotelExpenseWithDataDocument = HotelExpense & { dataDocument?: boolean };
+
 // DTO generado por OpenAPI
 type CreateHotelExpenseDtoApi = components["schemas"]["CreateHotelExpenseDto"];
 

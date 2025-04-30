@@ -28,7 +28,7 @@ import {
   ExpenseCategoryEnum,
   ExpenseDocumentTypeEnum,
   ExpensePaymentMethodEnum,
-  HotelExpense,
+  HotelExpenseWithDataDocument,
 } from "../../_types/expenses";
 import {
   ExpenseCategoryLabels,
@@ -42,7 +42,7 @@ const infoSheet = {
 };
 
 interface UpdateExpensesSheetProps extends React.ComponentPropsWithRef<typeof Sheet> {
-  expense: HotelExpense;
+  expense: HotelExpenseWithDataDocument;
 }
 
 export function UpdateExpensesSheet({ expense, ...props }: UpdateExpensesSheetProps) {
