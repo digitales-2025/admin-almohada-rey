@@ -21,7 +21,7 @@ import {
 import { useProducts } from "../../_hooks/use-products";
 import { CreateProductsSchema, productsSchema } from "../../_schema/createProductsSchema";
 import { Product } from "../../_types/products";
-import UpdateCustomersForm from "./UpdateProductsForm";
+import UpdateProductsForm from "./UpdateProductsForm";
 
 const infoSheet = {
   title: "Actualizar Producto",
@@ -88,7 +88,7 @@ export function UpdateProductSheet({ product, open, onOpenChange }: UpdateProduc
           <SheetDescription>{infoSheet.description}</SheetDescription>
         </SheetHeader>
         <ScrollArea className="w-full h-[calc(100vh-150px)] p-0">
-          <UpdateCustomersForm form={form} onSubmit={onSubmit}>
+          <UpdateProductsForm form={form} onSubmit={onSubmit}>
             <SheetFooter className="gap-2 pt-2 sm:space-x-0">
               <div className="flex flex-row-reverse gap-2">
                 <Button type="submit" disabled={isLoadingUpdateProduct}>
@@ -102,7 +102,7 @@ export function UpdateProductSheet({ product, open, onOpenChange }: UpdateProduc
                 </SheetClose>
               </div>
             </SheetFooter>
-          </UpdateCustomersForm>
+          </UpdateProductsForm>
         </ScrollArea>
       </SheetContent>
     </Sheet>
