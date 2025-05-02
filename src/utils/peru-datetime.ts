@@ -496,3 +496,99 @@ export function getPeruStartOfToday(): Date {
   const peruToday = new Date(getCurrentPeruDateTime("iso") as string);
   return new Date(peruToday.getFullYear(), peruToday.getMonth(), peruToday.getDate(), 0, 0, 0, 0);
 }
+
+// Para el TimeInput de check-in
+export const getFormattedCheckInTimeValue = (checkInTime: string) => {
+  const [timeStr, period] = checkInTime.split(" ");
+  const [hours, minutes] = timeStr.split(":");
+  let hoursInt = parseInt(hours, 10);
+
+  // Ajustar las horas según AM/PM
+  if (period === "PM" && hoursInt < 12) {
+    hoursInt += 12;
+  } else if (period === "AM" && hoursInt === 12) {
+    hoursInt = 0;
+  }
+
+  return `${String(hoursInt).padStart(2, "0")}:${minutes}`;
+};
+
+export const getFormattedCheckOutTimeValue = (checkOutTime: string) => {
+  const [timeStr, period] = checkOutTime.split(" ");
+  const [hours, minutes] = timeStr.split(":");
+  let hoursInt = parseInt(hours, 10);
+
+  // Ajustar las horas según AM/PM
+  if (period === "PM" && hoursInt < 12) {
+    hoursInt += 12;
+  } else if (period === "AM" && hoursInt === 12) {
+    hoursInt = 0;
+  }
+
+  return `${String(hoursInt).padStart(2, "0")}:${minutes}`;
+};
+
+// Función para obtener la fecha y hora actuales en Perú (UTC-5)
+export const getPeruCurrentDatetime = () => {
+  const now = new Date();
+  const utcHours = now.getUTCHours();
+  const utcMinutes = now.getUTCMinutes();
+  const utcSeconds = now.getUTCSeconds();
+
+  // Calculamos la hora de Perú (UTC-5)
+  let peruHours = utcHours - 5;
+  if (peruHours < 0) {
+    peruHours += 24;
+  }
+
+  // Creamos una fecha en hora peruana
+  const peruDate = new Date(now);
+  peruDate.setHours(peruHours, utcMinutes, utcSeconds);
+
+  return {
+    date: peruDate,
+    hour: peruHours,
+    minute: utcMinutes,
+  };
+};
+
+// Función para obtener la fecha de check-in adecuada
+export const getAppropriateCheckInDate = (): Date => {
+  const peru = getPeruCurrentDatetime();
+  const currentHour = peru.hour;
+
+  // Si es después de las 21:00, sugerir el día siguiente
+  if (currentHour >= 21) {
+    const tomorrow = new Date(peru.date);
+    tomorrow.setDate(peru.date.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    return tomorrow;
+  }
+
+  const today = new Date(peru.date);
+  today.setHours(0, 0, 0, 0);
+  return today;
+};
+
+// Función para obtener la hora de check-in adecuada
+export const getAppropriateCheckInTime = (): string => {
+  const peru = getPeruCurrentDatetime();
+  const currentHour = peru.hour;
+  const currentMinute = peru.minute;
+
+  // Si es antes de las 15:00, usar el DEFAULT_CHECKIN_TIME
+  if (currentHour < 15) {
+    return DEFAULT_CHECKIN_TIME;
+  }
+
+  // Si es después de las 3:00 PM, encontrar la próxima hora disponible
+  let nextHour = currentHour;
+  if (currentMinute > 0) {
+    nextHour += 1;
+  }
+
+  // Formatear la hora (formato 12 horas con AM/PM)
+  const hourForFormat = nextHour > 12 ? nextHour - 12 : nextHour;
+  const amPm = nextHour >= 12 ? "PM" : "AM";
+  return `${String(hourForFormat === 0 ? 12 : hourForFormat).padStart(2, "0")}:00 ${amPm}`;
+};
