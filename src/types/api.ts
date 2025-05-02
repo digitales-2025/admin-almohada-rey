@@ -1327,13 +1327,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-30T13:57:07.104Z
+       * @example 2025-04-30T18:17:41.130Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-30T13:57:07.104Z
+       * @example 2025-04-30T18:17:41.131Z
        */
       updatedAt: string;
       /** @description Customer name */
@@ -1390,13 +1390,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-30T13:57:07.104Z
+       * @example 2025-04-30T18:17:41.130Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-30T13:57:07.104Z
+       * @example 2025-04-30T18:17:41.131Z
        */
       updatedAt: string;
       /** @description User name */
@@ -1439,13 +1439,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-30T13:57:07.104Z
+       * @example 2025-04-30T18:17:41.130Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-30T13:57:07.104Z
+       * @example 2025-04-30T18:17:41.131Z
        */
       updatedAt: string;
       /**
@@ -1488,13 +1488,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-30T13:57:07.104Z
+       * @example 2025-04-30T18:17:41.130Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-30T13:57:07.104Z
+       * @example 2025-04-30T18:17:41.131Z
        */
       updatedAt: string;
       /**
@@ -1583,13 +1583,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-04-30T13:57:07.104Z
+       * @example 2025-04-30T18:17:41.130Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-04-30T13:57:07.104Z
+       * @example 2025-04-30T18:17:41.131Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -1629,6 +1629,11 @@ export interface components {
       guests?: string;
       /** @description Additional notes or observations */
       observations?: string;
+      /**
+       * @description Whether the reservation is pending payment deletion
+       * @default false
+       */
+      isPendingDeletePayment: boolean;
       /** @description Customer associated with the reservation */
       customer: components["schemas"]["Customer"];
       /** @description User associated with the reservation */
@@ -1752,13 +1757,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-04-30T13:57:07.104Z
+       * @example 2025-04-30T18:17:41.130Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-04-30T13:57:07.104Z
+       * @example 2025-04-30T18:17:41.131Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -1798,6 +1803,11 @@ export interface components {
       guests?: string;
       /** @description Additional notes or observations */
       observations?: string;
+      /**
+       * @description Whether the reservation is pending payment deletion
+       * @default false
+       */
+      isPendingDeletePayment: boolean;
     };
     UpdateManyDto: {
       /**
@@ -1996,13 +2006,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-30T13:57:07.104Z
+       * @example 2025-04-30T18:17:41.130Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-30T13:57:07.104Z
+       * @example 2025-04-30T18:17:41.131Z
        */
       updatedAt: string;
       /**
@@ -2467,13 +2477,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-30T13:57:07.104Z
+       * @example 2025-04-30T18:17:41.130Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-30T13:57:07.104Z
+       * @example 2025-04-30T18:17:41.131Z
        */
       updatedAt: string;
       name: string;
@@ -2636,13 +2646,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-30T13:57:07.104Z
+       * @example 2025-04-30T18:17:41.130Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-30T13:57:07.104Z
+       * @example 2025-04-30T18:17:41.131Z
        */
       updatedAt: string;
       /**
