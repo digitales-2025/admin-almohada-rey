@@ -40,6 +40,8 @@ export default function ExpensesPage() {
   const handleShowAll = () => {
     setIsFiltering(false);
     setFilteredData(null);
+    setSelectedMonth(undefined); // <-- Selecciona "Todos los meses"
+    setSelectedYear(undefined); // <-- Selecciona "Todos los años"
     refetchExpenses();
   };
 

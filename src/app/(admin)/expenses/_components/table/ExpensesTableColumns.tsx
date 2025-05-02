@@ -62,7 +62,7 @@ export const expensesColumns = (): ColumnDef<HotelExpense>[] => [
   {
     id: "description",
     accessorKey: "description",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Descripción" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Descripción de Gasto" />,
     cell: ({ row }) => <div className="min-w-40 truncate">{row.original.description || "Sin dato"}</div>,
   },
   {
