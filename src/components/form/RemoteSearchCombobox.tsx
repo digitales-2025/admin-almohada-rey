@@ -23,16 +23,6 @@ export type ComboBoxItemType<V> = {
   entity?: V;
 };
 
-// RTK Query API slice (would go in a separate file)
-// export const api = createApi({
-//   baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
-//   endpoints: (builder) => ({
-//     getItems: builder.query<T[], string>({
-//       query: (searchTerm) => `items?search=${searchTerm}`,
-//     }),
-//   }),
-// });
-
 export type RTKUseQueryHookResult<T, E> = {
   data?: T;
   error?: E;
@@ -58,10 +48,11 @@ type ComboboxProps<T> = {
   disabled?: boolean;
   selected?: string[];
   popoverSameWidthAsTrigger?: boolean;
-  align?: "start" | "center" | "end"; //(typeof ALIGN_OPTIONS)[number];
+  align?: "start" | "center" | "end";
   popoverContentClassName?: string;
   total?: number;
   regexInput?: RegExp;
+  notFoundAction?: React.ReactNode; // Nuevo prop para el componente de acción
 };
 
 const popOverStyles = {
@@ -88,6 +79,7 @@ export function SearchCombobox<T = unknown>({
   popoverContentClassName,
   total,
   regexInput,
+  notFoundAction, // Nuevo prop utilizado
 }: ComboboxProps<T>) {
   const [open, setOpenState] = React.useState(false);
   const defaultError = new Error("Algo salió mal");
@@ -164,7 +156,7 @@ export function SearchCombobox<T = unknown>({
             )}
             {!isLoading && !isError && items.length === 0 && (
               <CommandGroup>
-                <NotFoundSearchResults></NotFoundSearchResults>
+                <NotFoundSearchResults>{notFoundAction}</NotFoundSearchResults>
               </CommandGroup>
             )}
             {data && (
