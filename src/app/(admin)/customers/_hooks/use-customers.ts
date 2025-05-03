@@ -2,10 +2,12 @@ import { toast } from "sonner";
 
 import { runAndHandleError } from "@/utils/baseQuery";
 import {
+  PaginateCustomerParams,
   useCreateCustomerMutation,
   useDeleteCustomersMutation,
   useGetAllCustomersQuery,
   useGetHistoryCustomerByIdQuery,
+  useGetPaginatedCustomersQuery,
   useImportCustomersMutation,
   useLazyDownloadCustomerTemplateQuery,
   useReactivateCustomersMutation,
@@ -178,3 +180,31 @@ export const useCustomers = (options: UseCustomerProps = {}) => {
 
 // export const useSearchCustomerByDocId = (docNumber: string) => useSearchCustomersByDocumentIdQuery(docNumber);
 export const useSearchCustomerByDocId = (docNumber: string) => useSearchCustomersByDocumentIdQuery(docNumber);
+
+interface UsePaginatedCustomersProps {
+  page?: number;
+  pageSize?: number;
+}
+
+export const usePaginatedCustomers = (options: UsePaginatedCustomersProps = {}) => {
+  const { page = 1, pageSize = 10 } = options;
+
+  const paginationParams: PaginateCustomerParams = {
+    pagination: { page, pageSize },
+  };
+
+  const {
+    data: paginatedCustomers,
+    isLoading: isLoadingPaginatedCustomers,
+    refetch: refetchPaginatedCustomers,
+  } = useGetPaginatedCustomersQuery(paginationParams, {
+    skip: !paginationParams,
+    refetchOnMountOrArgChange: true,
+  });
+
+  return {
+    paginatedCustomers,
+    isLoadingPaginatedCustomers,
+    refetchPaginatedCustomers,
+  };
+};
