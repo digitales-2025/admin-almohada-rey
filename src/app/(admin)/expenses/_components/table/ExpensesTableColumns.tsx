@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 "use client";
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 import { format, parseISO } from "date-fns";
-import { Ellipsis, Trash } from "lucide-react";
+import { Ellipsis, Pencil, Trash } from "lucide-react";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
@@ -64,7 +65,22 @@ export const expensesColumns = (): ColumnDef<HotelExpense>[] => [
     id: "description",
     accessorKey: "description",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Descripción de Gasto" />,
-    cell: ({ row }) => <div className="min-w-40 truncate">{row.original.description || "Sin dato"}</div>,
+    cell: ({ row }) => (
+      <div className="min-w-40 truncate flex items-center">{row.original.description || "Sin dato"}</div>
+    ),
+  },
+  // Columna de acciones SOLO visible en móvil (segunda columna)
+  {
+    id: "actions-mobile",
+    header: () => null,
+    cell: ({ row }) => (
+      <div className="flex justify-center md:hidden">
+        <ActionsMenu row={row} />
+      </div>
+    ),
+    enableSorting: false,
+    enableHiding: false,
+    enablePinning: false,
   },
   {
     id: "category",
@@ -150,53 +166,63 @@ export const expensesColumns = (): ColumnDef<HotelExpense>[] => [
   {
     id: "actions",
     cell: function Cell({ row }) {
-      const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-      const [showEditDialog, setShowEditDialog] = useState(false);
-      const [showViewDialog, setShowViewDialog] = useState(false);
-
       return (
-        <div>
-          {/* Ver detalles */}
-          {showViewDialog && (
-            <ViewExpenses open={showViewDialog} onOpenChange={setShowViewDialog} expense={row.original} />
-          )}
-          {/* Editar */}
-          {showEditDialog && (
-            <UpdateExpensesSheet open={showEditDialog} onOpenChange={setShowEditDialog} expense={row.original} />
-          )}
-          {/* Eliminar */}
-          {showDeleteDialog && (
-            <DeleteExpensesDialog
-              open={showDeleteDialog}
-              onOpenChange={setShowDeleteDialog}
-              expenses={[row.original]}
-              showTrigger={false}
-              onSuccess={() => {
-                row.toggleSelected(false);
-              }}
-            />
-          )}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button aria-label="Abrir menú" variant="ghost" className="flex size-8 p-0 data-[state=open]:bg-muted">
-                <Ellipsis className="size-4" aria-hidden="true" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem onSelect={() => setShowViewDialog(true)}>Ver detalles</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setShowEditDialog(true)}>Editar</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={() => setShowDeleteDialog(true)} className="text-red-700">
-                Eliminar
-                <DropdownMenuShortcut>
-                  <Trash className="size-4 text-red-700" aria-hidden="true" />
-                </DropdownMenuShortcut>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="hidden md:block">
+          {/* Solo visible en escritorio */}
+          <ActionsMenu row={row} />
         </div>
       );
     },
     enablePinning: true,
   },
 ];
+
+// Extrae el menú de acciones a un componente reutilizable:
+function ActionsMenu({ row }: { row: any }) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showViewDialog, setShowViewDialog] = useState(false);
+
+  return (
+    <div>
+      {showViewDialog && <ViewExpenses open={showViewDialog} onOpenChange={setShowViewDialog} expense={row.original} />}
+      {showEditDialog && (
+        <UpdateExpensesSheet open={showEditDialog} onOpenChange={setShowEditDialog} expense={row.original} />
+      )}
+      {showDeleteDialog && (
+        <DeleteExpensesDialog
+          open={showDeleteDialog}
+          onOpenChange={setShowDeleteDialog}
+          expenses={[row.original]}
+          showTrigger={false}
+          onSuccess={() => {
+            row.toggleSelected(false);
+          }}
+        />
+      )}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button aria-label="Abrir menú" variant="ghost" className="flex size-8 p-0 data-[state=open]:bg-muted">
+            <Ellipsis className="size-4" aria-hidden="true" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-40">
+          <DropdownMenuItem onSelect={() => setShowViewDialog(true)}>Ver detalles</DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={() => setShowEditDialog(true)}>
+            Editar
+            <DropdownMenuShortcut>
+              <Pencil className="size-4" aria-hidden="true" />
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setShowDeleteDialog(true)} className="text-red-700">
+            Eliminar
+            <DropdownMenuShortcut>
+              <Trash className="size-4 text-red-700" aria-hidden="true" />
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+}
