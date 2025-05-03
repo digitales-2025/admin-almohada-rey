@@ -1,12 +1,14 @@
 import {
   BedDouble,
   CalendarCheck,
+  Clipboard,
   CreditCard,
   Hotel,
   LayoutDashboard,
   Package,
   PackageMinus,
   PackagePlus,
+  ShoppingBag,
   Tag,
   UserCircle,
   Users,
@@ -59,8 +61,19 @@ export const sidebarData: SidebarData = {
         },
         {
           title: "Productos",
-          url: "/inventory/products",
           icon: Package,
+          items: [
+            {
+              title: "Comercial",
+              url: "/inventory/products/commercial",
+              icon: ShoppingBag,
+            },
+            {
+              title: "Uso Interno",
+              url: "/inventory/products/internal_use",
+              icon: Clipboard,
+            },
+          ],
         },
       ],
     },
