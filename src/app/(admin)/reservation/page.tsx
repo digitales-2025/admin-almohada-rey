@@ -56,10 +56,6 @@ export default function ReservationPage() {
     [currentFilterConfig, updateFilters]
   );
 
-  /*   useEffect(()=>{
-    console.log('Current filter config', currentFilterConfig)
-  }) */
-
   if (isLoading) {
     return <Loading></Loading>;
   }
