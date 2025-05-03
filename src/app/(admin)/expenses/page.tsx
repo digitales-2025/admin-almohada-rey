@@ -36,7 +36,7 @@ export default function ExpensesPage() {
         pagination: { page: 1, pageSize: 10 },
         fieldFilters,
       };
-      console.log("Filtro inicial enviado al backend:", newConfig);
+
       setFilterConfig(newConfig);
       updateFilters(newConfig);
     }
@@ -63,7 +63,7 @@ export default function ExpensesPage() {
       pagination: { page: 1, pageSize: 10 },
       fieldFilters,
     };
-    console.log("Filtro aplicado enviado al backend:", newConfig);
+
     setFilterConfig(newConfig);
     updateFilters(newConfig);
   };
@@ -72,7 +72,7 @@ export default function ExpensesPage() {
   const handleShowAll = () => {
     setSelectedMonth(undefined);
     setSelectedYear(undefined);
-    console.log("Mostrar todo enviado al backend:", defaultParamConfig);
+
     setFilterConfig(defaultParamConfig);
     updateFilters(defaultParamConfig);
   };
@@ -87,7 +87,7 @@ export default function ExpensesPage() {
         pageSize,
       },
     };
-    console.log("Cambio de paginación enviado al backend:", newConfig);
+
     setFilterConfig(newConfig);
     updateFilters(newConfig);
   };
