@@ -1,6 +1,8 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
+import { PaginatedResponse } from "@/types/api/paginated-response";
 import { BaseApiResponse } from "@/types/api/types";
+import { PaginatedQueryParams } from "@/types/query-filters/generic-paginated-query-params";
 import baseQueryWithReauth from "@/utils/baseQuery";
 import {
   CreateRoomTypeWithImagesDto,
@@ -15,6 +17,7 @@ import {
 // Tipos de respuesta base
 type RoomTypeResponse = BaseApiResponse<RoomType>;
 type RoomTypesResponse = BaseApiResponse<RoomType[]>;
+export type PaginatedRoomTypeParams = PaginatedQueryParams<RoomType>;
 
 export const roomTypeApi = createApi({
   reducerPath: "roomTypeApi",
@@ -31,6 +34,19 @@ export const roomTypeApi = createApi({
         result
           ? [...result.map(({ id }) => ({ type: "RoomType" as const, id })), { type: "RoomType", id: "LIST" }]
           : [{ type: "RoomType", id: "LIST" }],
+    }),
+
+    getPaginatedRoomTypes: build.query<PaginatedResponse<RoomType>, PaginatedRoomTypeParams>({
+      query: ({ pagination: { page = 1, pageSize = 10 } }) => ({
+        url: "/room-types/paginated",
+        method: "GET",
+        params: { page, pageSize },
+        credentials: "include",
+      }),
+      providesTags: (result) => [
+        { type: "RoomType", id: result?.meta.page },
+        ...(result?.data.map(({ id }) => ({ type: "RoomType" as const, id })) ?? []),
+      ],
     }),
 
     getAllSummaryRoomType: build.query<SummaryRoomType[], void>({
@@ -128,6 +144,7 @@ export const roomTypeApi = createApi({
 
 export const {
   useGetAllRoomTypesQuery,
+  useGetPaginatedRoomTypesQuery,
   useGetAllSummaryRoomTypeQuery,
   useGetRoomTypeByIdQuery,
   useGetRoomTypeWithImagesByIdQuery,
