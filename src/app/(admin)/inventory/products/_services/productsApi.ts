@@ -1,11 +1,15 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
+import { PaginatedResponse } from "@/types/api/paginated-response";
+import { PaginatedQueryParams } from "@/types/query-filters/generic-paginated-query-params";
 import baseQueryWithReauth from "@/utils/baseQuery";
 import { Product, ProductType } from "../_types/products";
 
 interface GetProductsByTypeProps {
   type: ProductType;
 }
+
+export type PaginatedProductParams = PaginatedQueryParams<Product>;
 
 export const productsApi = createApi({
   reducerPath: "productsApi",
@@ -50,6 +54,29 @@ export const productsApi = createApi({
       }),
       providesTags: ["Product"],
     }),
+
+    getPaginatedProducts: build.query<PaginatedResponse<Product>, PaginatedProductParams>({
+      query: ({ pagination: { page = 1, pageSize = 10 }, fieldFilters }) => {
+        const params: Record<string, any> = { page, pageSize };
+
+        // Añadir el filtro de tipo si existe
+        if (fieldFilters?.type) {
+          params.type = fieldFilters.type;
+        }
+
+        return {
+          url: "/product/paginated",
+          method: "GET",
+          params,
+          credentials: "include",
+        };
+      },
+      providesTags: (result) => [
+        { type: "Product", id: result?.meta.page },
+        ...(result?.data.map(({ id }) => ({ type: "Product" as const, id })) ?? []),
+      ],
+    }),
+
     //Obtener productos por tipo
     getProductsByType: build.query<Product[], GetProductsByTypeProps>({
       query: ({ type }) => ({
@@ -88,6 +115,7 @@ export const {
   useUpdateProductMutation,
   useGetProductByIdQuery,
   useGetAllProductsQuery,
+  useGetPaginatedProductsQuery,
   useGetProductsByTypeQuery,
   useDeleteProductsMutation,
   useReactivateProductsMutation,
