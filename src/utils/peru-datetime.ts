@@ -7,6 +7,33 @@ export const LIMA_TIME_ZONE = "America/Lima";
 export const LIMA_TO_UTC_OFFSET = 5; // Diferencia horaria entre Lima y UTC
 
 /**
+ * Hora estándar para check-in y check-out en hoteles peruanos
+ * Falta definir segun las necesidades de la empresa
+ */
+export const DEFAULT_CHECKIN_TIME = "03:00 PM"; // 15:00
+export const DEFAULT_CHECKOUT_TIME = "12:00 PM"; // 12:00
+
+// Constantes para el calendario
+// Variable para almacenar valores persistentes (fuera de React)
+export const persistentData = {
+  initialized: false,
+  initialValues: {
+    checkInDate: new Date(),
+    checkOutDate: new Date(),
+    checkInTime: DEFAULT_CHECKIN_TIME,
+    checkOutTime: DEFAULT_CHECKOUT_TIME,
+  },
+  currentValues: {
+    activeTab: "checkin" as "checkin" | "checkout",
+    checkInDate: new Date(),
+    checkOutDate: new Date(),
+    checkInTime: DEFAULT_CHECKIN_TIME,
+    checkOutTime: DEFAULT_CHECKOUT_TIME,
+  },
+  renderCount: 0,
+};
+
+/**
  * Convierte una hora en formato "hh:mm AM/PM" a un objeto con hora y minutos en formato 24h
  */
 export function parsePeruTimeString(timeString: string): { hour: number; minutes: number } {
@@ -140,13 +167,6 @@ export function getPeruAppointmentDebugInfo(
     Duración: `${durationMinutes} minutos`,
   };
 }
-
-/**
- * Hora estándar para check-in y check-out en hoteles peruanos
- * Falta definir segun las necesidades de la empresa
- */
-export const DEFAULT_CHECKIN_TIME = "03:00 PM"; // 15:00
-export const DEFAULT_CHECKOUT_TIME = "12:00 PM"; // 12:00
 
 /**
  * Crea un objeto de reserva para fechas de check-in y check-out en Perú
