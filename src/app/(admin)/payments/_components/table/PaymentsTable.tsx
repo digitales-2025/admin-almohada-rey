@@ -6,12 +6,22 @@ import { Table as TableInstance } from "@tanstack/react-table";
 
 import { useProfile } from "@/app/(admin)/profile/_hooks/use-profile";
 import { DataTable } from "@/components/datatable/data-table";
+import {
+  CustomPaginationTableParams,
+  ServerPaginationChangeEventCallback,
+} from "@/types/tanstack-table/CustomPagination";
 import { SummaryPayment } from "../../_types/payment";
 import { facetedFilters } from "../../_utils/payments.filter.utils";
 import { paymentsColumns } from "./PaymentsTableColumns";
 import { PaymentsTableToolbarActions } from "./PaymentsTableToolbarActions";
 
-export function PaymentsTable({ data }: { data: SummaryPayment[] }) {
+interface PaymentsTableProps {
+  data: SummaryPayment[];
+  pagination: CustomPaginationTableParams;
+  onPaginationChange: ServerPaginationChangeEventCallback;
+}
+
+export function PaymentsTable({ data, pagination, onPaginationChange }: PaymentsTableProps) {
   const { user } = useProfile();
   const router = useRouter();
 
@@ -33,6 +43,16 @@ export function PaymentsTable({ data }: { data: SummaryPayment[] }) {
       toolbarActions={(table: TableInstance<SummaryPayment>) => <PaymentsTableToolbarActions table={table} />}
       filterPlaceholder="Buscar pagos..."
       facetedFilters={facetedFilters}
+      serverPagination={{
+        pageIndex: pagination.page - 1,
+        pageSize: pagination.pageSize,
+        pageCount: pagination.totalPages,
+        total: pagination.total,
+        onPaginationChange: (pageIndex, pageSize) => {
+          // Convertir de 0-indexed a 1-indexed para el API
+          onPaginationChange(pageIndex + 1, pageSize);
+        },
+      }}
     />
   );
 }
