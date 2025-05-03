@@ -42,19 +42,6 @@ export type DetailedRoom = components["schemas"]["DetailedRoom"];
 export type ReservationStatusAvailableActions = components["schemas"]["ReservationStatusAvailableActions"];
 export type UpdateManyDto = components["schemas"]["UpdateManyDto"];
 export type UpdateManyResponse = components["schemas"]["UpdateManyResponseDto"];
-// {
-//     customerId: string;
-//     roomId: string;
-//     userId: string;
-//     reservationDate: string;
-//     checkInDate: string;
-//     checkOutDate: string;
-//     status: "PENDING" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELED";
-//     origin: string;
-//     reason: string;
-//     guests?: components["schemas"]["GuestDto"][];
-//     observations?: string;
-// }
 export const createReservationSchema = z.object({
   customerId: z.string({
     required_error: "El cliente es requerido",
