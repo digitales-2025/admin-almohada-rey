@@ -1,15 +1,24 @@
 "use client";
 
+import { useCallback, useState } from "react";
+
 import { HeaderPage } from "@/components/common/HeaderPage";
 import { DataTableSkeleton } from "@/components/datatable/data-table-skeleton";
 import ErrorGeneral from "@/components/errors/general-error";
 import { RoomTypesTable } from "./_components/table/RoomTypesTable";
-import { useRoomTypes } from "./_hooks/use-room-types";
+import { usePaginatedRoomTypes } from "./_hooks/use-room-types";
 
 export default function RoomTypesPage() {
-  const { roomTypesList, roomTypesError, isLoadingRoomTypes } = useRoomTypes();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
-  if (isLoadingRoomTypes) {
+  const { paginatedRoomTypes, isLoadingPaginatedRoomTypes } = usePaginatedRoomTypes({ page, pageSize });
+
+  const handlePaginationChange = useCallback((newPage: number, newPageSize: number) => {
+    setPage(newPage);
+    setPageSize(newPageSize);
+  }, []);
+  if (isLoadingPaginatedRoomTypes) {
     return (
       <div>
         <HeaderPage title="Tipos de Habitación" description="Administración de tipos de habitación del hotel." />
@@ -18,7 +27,7 @@ export default function RoomTypesPage() {
     );
   }
 
-  if (roomTypesError || !roomTypesList) {
+  if (!paginatedRoomTypes) {
     return (
       <div>
         <HeaderPage title="Tipos de Habitación" description="Administración de tipos de habitación del hotel." />
@@ -31,7 +40,16 @@ export default function RoomTypesPage() {
     <div>
       <HeaderPage title="Tipos de Habitación" description="Administración de tipos de habitación del hotel." />
       <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0">
-        <RoomTypesTable data={roomTypesList} />
+        <RoomTypesTable
+          data={paginatedRoomTypes.data}
+          pagination={{
+            page: paginatedRoomTypes.meta.page,
+            pageSize: paginatedRoomTypes.meta.pageSize,
+            total: paginatedRoomTypes.meta.total,
+            totalPages: paginatedRoomTypes.meta.totalPages,
+          }}
+          onPaginationChange={handlePaginationChange}
+        />
       </div>
     </div>
   );
