@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { HeaderPage } from "@/components/common/HeaderPage";
 import { DataTableSkeleton } from "@/components/datatable/data-table-skeleton";
@@ -11,28 +11,59 @@ import { ExpensesTable } from "./_components/table/ExpensesTable";
 import { defaultParamConfig, usePaginatedExpenses } from "./_hooks/use-expenses";
 import { PaginatedExpenseParams } from "./_services/expensesApi";
 
+// Utilidades para la fecha actual
+const today = new Date();
+const currentYear = today.getFullYear().toString();
+const currentMonth = (today.getMonth() + 1).toString().padStart(2, "0");
+
 export default function ExpensesPage() {
-  // Estados para filtros
-  const [selectedYear, setSelectedYear] = useState<string | undefined>(undefined);
-  const [selectedMonth, setSelectedMonth] = useState<string | undefined>(undefined);
+  // Estados para filtros (inicializan con la fecha actual)
+  const [selectedYear, setSelectedYear] = useState<string | undefined>(currentYear);
+  const [selectedMonth, setSelectedMonth] = useState<string | undefined>(currentMonth);
   const [filterConfig, setFilterConfig] = useState<PaginatedExpenseParams>(defaultParamConfig);
 
   // Hook paginado
   const { queryResponse, updateFilters } = usePaginatedExpenses();
   const { data: response, isLoading, isError } = queryResponse;
 
+  // Al montar, aplica el filtro de la fecha actual
+  useEffect(() => {
+    if (selectedYear && selectedMonth) {
+      const fieldFilters: Record<string, string> = {
+        date: `${selectedYear}-${selectedMonth}`,
+      };
+      const newConfig: PaginatedExpenseParams = {
+        pagination: { page: 1, pageSize: 10 },
+        fieldFilters,
+      };
+      console.log("Filtro inicial enviado al backend:", newConfig);
+      setFilterConfig(newConfig);
+      updateFilters(newConfig);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Función para filtrar
   const handleFilter = () => {
-    const fieldFilters: Record<string, string> = {};
+    let date = "";
     if (selectedYear && selectedMonth) {
-      fieldFilters.date = `${selectedYear}-${selectedMonth}`;
-    } else if (selectedYear) {
-      fieldFilters.date = `${selectedYear}`;
+      date = `${selectedYear}-${selectedMonth}`;
+    } else if (selectedYear && !selectedMonth) {
+      date = `${selectedYear}-00`;
+    } else if (!selectedYear && selectedMonth) {
+      date = `0000-${selectedMonth}`;
     }
+
+    const fieldFilters: Record<string, string> = {};
+    if (date) {
+      fieldFilters.date = date;
+    }
+
     const newConfig: PaginatedExpenseParams = {
       pagination: { page: 1, pageSize: 10 },
       fieldFilters,
     };
+    console.log("Filtro aplicado enviado al backend:", newConfig);
     setFilterConfig(newConfig);
     updateFilters(newConfig);
   };
@@ -41,6 +72,7 @@ export default function ExpensesPage() {
   const handleShowAll = () => {
     setSelectedMonth(undefined);
     setSelectedYear(undefined);
+    console.log("Mostrar todo enviado al backend:", defaultParamConfig);
     setFilterConfig(defaultParamConfig);
     updateFilters(defaultParamConfig);
   };
@@ -55,6 +87,7 @@ export default function ExpensesPage() {
         pageSize,
       },
     };
+    console.log("Cambio de paginación enviado al backend:", newConfig);
     setFilterConfig(newConfig);
     updateFilters(newConfig);
   };
