@@ -1,111 +1,29 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { addDays, format, isBefore, isSameDay, startOfDay } from "date-fns";
 import { es } from "date-fns/locale";
 import { UseFormReturn } from "react-hook-form";
-import { toast } from "sonner";
 
 import { CalendarBig } from "@/components/form/CalendarBig";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TimeInput } from "@/components/ui/time-input";
 import { cn } from "@/lib/utils";
 import {
   DEFAULT_CHECKIN_TIME,
   DEFAULT_CHECKOUT_TIME,
   formDateToPeruISO,
+  getAppropriateCheckInDate,
+  getAppropriateCheckInTime,
+  getFormattedCheckInTimeValue,
+  getFormattedCheckOutTimeValue,
   getPeruStartOfToday,
-  getTimeOptionsForDay,
+  persistentData,
   peruDateTimeToUTC,
 } from "@/utils/peru-datetime";
-import { processError } from "@/utils/process-error";
 import { useRoomAvailability } from "../../_hooks/use-roomAvailability";
 import { CreateReservationInput } from "../../_schemas/reservation.schemas";
-
-// Función para obtener la fecha y hora actuales en Perú (UTC-5)
-const getPeruCurrentDatetime = () => {
-  const now = new Date();
-  const utcHours = now.getUTCHours();
-  const utcMinutes = now.getUTCMinutes();
-  const utcSeconds = now.getUTCSeconds();
-
-  // Calculamos la hora de Perú (UTC-5)
-  let peruHours = utcHours - 5;
-  if (peruHours < 0) {
-    peruHours += 24;
-  }
-
-  // Creamos una fecha en hora peruana
-  const peruDate = new Date(now);
-  peruDate.setHours(peruHours, utcMinutes, utcSeconds);
-
-  return {
-    date: peruDate,
-    hour: peruHours,
-    minute: utcMinutes,
-  };
-};
-
-// Función para obtener la fecha de check-in adecuada
-const getAppropriateCheckInDate = (): Date => {
-  const peru = getPeruCurrentDatetime();
-  const currentHour = peru.hour;
-
-  // Si es después de las 21:00, sugerir el día siguiente
-  if (currentHour >= 21) {
-    const tomorrow = new Date(peru.date);
-    tomorrow.setDate(peru.date.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-    return tomorrow;
-  }
-
-  const today = new Date(peru.date);
-  today.setHours(0, 0, 0, 0);
-  return today;
-};
-
-// Función para obtener la hora de check-in adecuada
-const getAppropriateCheckInTime = (): string => {
-  const peru = getPeruCurrentDatetime();
-  const currentHour = peru.hour;
-  const currentMinute = peru.minute;
-
-  // Si es antes de las 15:00, usar el DEFAULT_CHECKIN_TIME
-  if (currentHour < 15) {
-    return DEFAULT_CHECKIN_TIME;
-  }
-
-  // Si es después de las 3:00 PM, encontrar la próxima hora disponible
-  let nextHour = currentHour;
-  if (currentMinute > 0) {
-    nextHour += 1;
-  }
-
-  // Formatear la hora (formato 12 horas con AM/PM)
-  const hourForFormat = nextHour > 12 ? nextHour - 12 : nextHour;
-  const amPm = nextHour >= 12 ? "PM" : "AM";
-  return `${String(hourForFormat === 0 ? 12 : hourForFormat).padStart(2, "0")}:00 ${amPm}`;
-};
-
-// Variable para almacenar valores persistentes (fuera de React)
-const persistentData = {
-  initialized: false,
-  initialValues: {
-    checkInDate: new Date(),
-    checkOutDate: new Date(),
-    checkInTime: DEFAULT_CHECKIN_TIME,
-    checkOutTime: DEFAULT_CHECKOUT_TIME,
-  },
-  currentValues: {
-    activeTab: "checkin" as "checkin" | "checkout",
-    checkInDate: new Date(),
-    checkOutDate: new Date(),
-    checkInTime: DEFAULT_CHECKIN_TIME,
-    checkOutTime: DEFAULT_CHECKOUT_TIME,
-  },
-  renderCount: 0,
-};
 
 export type BookingFormData = {
   checkInDate: string;
@@ -123,11 +41,7 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
   // Referencia para bloquear actualizaciones mientras están en progreso
   const isUpdating = useRef(false);
 
-  // ====== INICIALIZACIÓN DE DATOS PERSISTENTES ======
   if (!persistentData.initialized) {
-    // Solo calculamos estos valores una vez, no importa cuántas veces se renderice el componente
-    console.log("🔄 Inicializando datos persistentes");
-
     const initialCheckInDate = getAppropriateCheckInDate();
     const initialCheckOutDate = addDays(initialCheckInDate, 1);
     const initialCheckInTime = getAppropriateCheckInTime();
@@ -146,11 +60,9 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
       checkInTime: initialCheckInTime,
       checkOutTime: DEFAULT_CHECKOUT_TIME,
     };
-
     persistentData.initialized = true;
   }
 
-  // ====== ESTADOS DE REACT (SINCRONIZADOS CON DATOS PERSISTENTES) ======
   // Usamos la función de inicialización de useState para evitar recálculos
   const [calendarState, setCalendarState] = useState(() => ({
     activeTab: persistentData.currentValues.activeTab,
@@ -162,19 +74,12 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
     renderCount: persistentData.renderCount,
   }));
 
-  // ====== HOOKS Y MEMORIZACIÓN ======
   // Hook para verificar disponibilidad
-  const { isAvailable, isLoading, checkAvailability, isError, error } = useRoomAvailability();
-
-  // Horarios disponibles (memoizados)
-  const checkInTimes = useMemo(() => getTimeOptionsForDay("checkin"), []);
-  const checkOutTimes = useMemo(() => getTimeOptionsForDay("checkout"), []);
+  const { isAvailable, isLoading, checkAvailability } = useRoomAvailability();
 
   // ====== INICIALIZACIÓN DEL FORMULARIO ======
   useEffect(() => {
     if (!calendarState.formInitialized) {
-      console.log("📋 Inicializando formulario - SOLO UNA VEZ");
-
       // Preparar valores para el formulario
       const checkInISO = formDateToPeruISO(
         format(calendarState.checkInDate, "yyyy-MM-dd"),
@@ -202,7 +107,6 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
     }
   }, []);
 
-  // ====== VERIFICAR DISPONIBILIDAD ======
   useEffect(() => {
     if (!calendarState.formInitialized || !roomId || isUpdating.current) return;
 
@@ -226,22 +130,11 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
     roomId,
   ]);
 
-  // ====== NOTIFICAR DISPONIBILIDAD ======
   useEffect(() => {
     if (onRoomAvailabilityChange) {
       onRoomAvailabilityChange(isAvailable);
     }
   }, [isAvailable, onRoomAvailabilityChange]);
-
-  // ====== MOSTRAR ERRORES ======
-  useEffect(() => {
-    if (isError && error) {
-      const errorMessage = processError(error);
-      toast.error(`Error al verificar disponibilidad: ${errorMessage}`);
-    }
-  }, [isError, error]);
-
-  // ====== HANDLERS PARA CAMBIOS ======
 
   // Cambio de pestaña
   const handleTabChange = (tab: string) => {
@@ -259,7 +152,6 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
   const handleCheckInDateChange = useCallback(
     (date: Date | undefined) => {
       if (!date || isUpdating.current) return;
-      console.log("⭐ Seleccionando check-in:", format(date, "yyyy-MM-dd"));
 
       isUpdating.current = true;
 
@@ -320,7 +212,6 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
   const handleCheckOutDateChange = useCallback(
     (date: Date | undefined) => {
       if (!date || isUpdating.current) return;
-      console.log("⭐ Seleccionando check-out:", format(date, "yyyy-MM-dd"));
 
       isUpdating.current = true;
 
@@ -360,7 +251,6 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
   const handleCheckInTimeChange = useCallback(
     (timeStr: string) => {
       if (timeStr === calendarState.checkInTime || isUpdating.current) return;
-      console.log("⏰ Seleccionando hora check-in:", timeStr);
 
       isUpdating.current = true;
 
@@ -400,7 +290,6 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
   const handleCheckOutTimeChange = useCallback(
     (timeStr: string) => {
       if (timeStr === calendarState.checkOutTime || isUpdating.current) return;
-      console.log("⏰ Seleccionando hora check-out:", timeStr);
 
       isUpdating.current = true;
 
@@ -452,7 +341,6 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
     [calendarState.checkInDate]
   );
 
-  // ====== RENDER DEL COMPONENTE ======
   return (
     <div className="w-full space-y-4">
       <Tabs defaultValue="checkin" value={calendarState.activeTab} onValueChange={handleTabChange} className="w-full">
@@ -463,43 +351,52 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
           </TabsList>
         </div>
 
-        <TabsContent value="checkin" className="space-y-4">
-          <div className="w-auto space-x-10 flex-wrap flex items-start h-fit">
-            <div className="space-y-4">
-              <h3 className="font-semibold">Fecha de Check-in</h3>
-              <CalendarBig
-                key={`checkin-calendar-${calendarState.renderCount}`}
-                locale={es}
-                selected={calendarState.checkInDate}
-                mode="single"
-                disabled={(date) => isDateDisabled(date, true)}
-                defaultMonth={calendarState.checkInDate}
-                onSelect={handleCheckInDateChange}
-              />
-            </div>
-            <div className="space-y-4">
-              <h3 className="font-semibold">Hora de Check-in</h3>
-              <p className="text-sm text-muted-foreground">
-                {format(calendarState.checkInDate, "EEEE, d 'de' MMMM, yyyy", {
-                  locale: es,
-                })}
-              </p>
-              <p className="text-xs text-muted-foreground font-semibold">Horario de Lima (GMT-5)</p>
-              <ScrollArea className="h-[22rem] w-[250px]">
-                <div className="grid gap-2 pr-4">
-                  {checkInTimes.map((timeStr) => (
-                    <Button
-                      key={`${timeStr}-${calendarState.renderCount}`}
-                      type="button"
-                      variant={timeStr === calendarState.checkInTime ? "default" : "outline"}
-                      className="w-full justify-start"
-                      onClick={() => handleCheckInTimeChange(timeStr)}
-                    >
-                      {timeStr}
-                    </Button>
-                  ))}
-                </div>
-              </ScrollArea>
+        <TabsContent value="checkin" className="space-y-4 w-full items-center">
+          <div className="items-center flex flex-col sm:flex-row justify-center">
+            <div className="gap-8 flex flex-col sm:flex-row items-center h-fit">
+              <div className="space-y-4">
+                <h3 className="font-semibold text-sm">Fecha de Check-in</h3>
+                <CalendarBig
+                  key={`checkin-calendar-${calendarState.renderCount}`}
+                  locale={es}
+                  selected={calendarState.checkInDate}
+                  mode="single"
+                  disabled={(date) => isDateDisabled(date, true)}
+                  defaultMonth={calendarState.checkInDate}
+                  onSelect={handleCheckInDateChange}
+                />
+              </div>
+              <div className="space-y-4">
+                <h3 className="font-semibold">Hora de Check-in</h3>
+                <p className="text-sm text-muted-foreground">
+                  {format(calendarState.checkInDate, "EEEE, d 'de' MMMM, yyyy", {
+                    locale: es,
+                  })}
+                </p>
+                <p className="text-xs text-muted-foreground font-semibold">Horario de Lima (GMT-5)</p>
+
+                <TimeInput
+                  value={getFormattedCheckInTimeValue(calendarState.checkInTime)}
+                  onTimeChange={(timeStr) => {
+                    // Convertir el formato 24h del input al formato 12h con AM/PM
+                    const [hours, minutes] = timeStr.split(":");
+                    const hoursInt = parseInt(hours, 10);
+                    const minutesInt = parseInt(minutes, 10);
+
+                    // Formato de 12 horas para AM/PM
+                    const is12HourFormat = hoursInt >= 12;
+                    const hours12 = hoursInt % 12 || 12;
+                    const amPm = is12HourFormat ? "PM" : "AM";
+
+                    // Formato final: "HH:MM AM/PM" (formato 12h)
+                    const formattedTime = `${String(hours12).padStart(2, "0")}:${String(minutesInt).padStart(2, "0")} ${amPm}`;
+
+                    // Enviar al handler
+                    handleCheckInTimeChange(formattedTime);
+                  }}
+                  className="w-full"
+                />
+              </div>
             </div>
           </div>
           <div className="flex justify-center pt-4">
@@ -509,42 +406,53 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
           </div>
         </TabsContent>
 
-        <TabsContent value="checkout" className="space-y-4">
-          <div className="w-auto space-x-10 flex-wrap flex items-start h-fit">
-            <div className="space-y-4">
-              <h3 className="font-semibold">Fecha de Check-out</h3>
-              <CalendarBig
-                key={`checkout-calendar-${calendarState.renderCount}`}
-                locale={es}
-                selected={calendarState.checkOutDate}
-                mode="single"
-                disabled={(date) => isDateDisabled(date, false)}
-                defaultMonth={calendarState.checkOutDate}
-                onSelect={handleCheckOutDateChange}
-              />
-            </div>
-            <div className="space-y-4">
-              <h3 className="font-semibold">Hora de Check-out</h3>
-              <p className="text-sm text-muted-foreground">
-                {format(calendarState.checkOutDate, "EEEE, d 'de' MMMM, yyyy", {
-                  locale: es,
-                })}
-              </p>
-              <p className="text-xs text-muted-foreground font-semibold">Horario de Lima (GMT-5)</p>
-              <ScrollArea className="h-[22rem] w-[250px]">
-                <div className="grid gap-2 pr-4">
-                  {checkOutTimes.map((timeStr) => (
-                    <Button
-                      key={`${timeStr}-${calendarState.renderCount}`}
-                      variant={timeStr === calendarState.checkOutTime ? "default" : "outline"}
-                      className="w-full justify-start"
-                      onClick={() => handleCheckOutTimeChange(timeStr)}
-                    >
-                      {timeStr}
-                    </Button>
-                  ))}
-                </div>
-              </ScrollArea>
+        <TabsContent value="checkout" className="space-y-4 w-full items-center">
+          <div className="items-center flex flex-col sm:flex-row justify-center">
+            <div className="gap-8 flex flex-col sm:flex-row items-center h-fit">
+              <div className="space-y-4">
+                <h3 className="font-semibold text-sm">Fecha de Check-out</h3>
+                <CalendarBig
+                  key={`checkout-calendar-${calendarState.renderCount}`}
+                  locale={es}
+                  selected={calendarState.checkOutDate}
+                  mode="single"
+                  disabled={(date) => isDateDisabled(date, false)}
+                  defaultMonth={calendarState.checkOutDate}
+                  onSelect={handleCheckOutDateChange}
+                />
+              </div>
+              <div className="space-y-4">
+                <h3 className="font-semibold">Hora de Check-out</h3>
+                <p className="text-sm text-muted-foreground">
+                  {format(calendarState.checkOutDate, "EEEE, d 'de' MMMM, yyyy", {
+                    locale: es,
+                  })}
+                </p>
+                <p className="text-xs text-muted-foreground font-semibold">Horario de Lima (GMT-5)</p>
+
+                <TimeInput
+                  value={getFormattedCheckOutTimeValue(calendarState.checkOutTime)}
+                  onTimeChange={(timeStr) => {
+                    // Convertir el formato 24h del input al formato 12h con AM/PM
+                    // Usamos la hora local del navegador pero ajustamos la lógica para representar hora peruana
+                    const [hours, minutes] = timeStr.split(":");
+                    const hoursInt = parseInt(hours, 10);
+                    const minutesInt = parseInt(minutes, 10);
+
+                    // Formato de 12 horas para AM/PM
+                    const is12HourFormat = hoursInt >= 12;
+                    const hours12 = hoursInt % 12 || 12;
+                    const amPm = is12HourFormat ? "PM" : "AM";
+
+                    // Formato final: "HH:MM AM/PM" (formato 12h)
+                    const formattedTime = `${String(hours12).padStart(2, "0")}:${String(minutesInt).padStart(2, "0")} ${amPm}`;
+
+                    // Enviar al handler
+                    handleCheckOutTimeChange(formattedTime);
+                  }}
+                  className="w-full"
+                />
+              </div>
             </div>
           </div>
           <div className="flex justify-center pt-4">
