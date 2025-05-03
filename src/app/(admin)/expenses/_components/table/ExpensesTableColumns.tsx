@@ -30,6 +30,7 @@ import {
 } from "../../_utils/expenses.utils";
 import { DeleteExpensesDialog } from "../state-management/DeleteExpensesDialog";
 import { UpdateExpensesSheet } from "../update/UpdateExpensesSheet";
+import { ViewExpenses } from "../view/ViewExpenses";
 
 // Columnas para la tabla de gastos
 export const expensesColumns = (): ColumnDef<HotelExpense>[] => [
@@ -151,9 +152,14 @@ export const expensesColumns = (): ColumnDef<HotelExpense>[] => [
     cell: function Cell({ row }) {
       const [showDeleteDialog, setShowDeleteDialog] = useState(false);
       const [showEditDialog, setShowEditDialog] = useState(false);
+      const [showViewDialog, setShowViewDialog] = useState(false);
 
       return (
         <div>
+          {/* Ver detalles */}
+          {showViewDialog && (
+            <ViewExpenses open={showViewDialog} onOpenChange={setShowViewDialog} expense={row.original} />
+          )}
           {/* Editar */}
           {showEditDialog && (
             <UpdateExpensesSheet open={showEditDialog} onOpenChange={setShowEditDialog} expense={row.original} />
@@ -177,6 +183,7 @@ export const expensesColumns = (): ColumnDef<HotelExpense>[] => [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuItem onSelect={() => setShowViewDialog(true)}>Ver detalles</DropdownMenuItem>
               <DropdownMenuItem onSelect={() => setShowEditDialog(true)}>Editar</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={() => setShowDeleteDialog(true)} className="text-red-700">
