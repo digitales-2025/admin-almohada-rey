@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { runAndHandleError } from "@/utils/baseQuery";
 import {
+  PaginatedExpenseParams,
   useCreateExpenseMutation,
   useDeleteExpensesMutation,
   useGetAllExpensesQuery,
@@ -10,6 +12,16 @@ import {
   useUpdateExpenseMutation,
 } from "../_services/expensesApi";
 import { CreateHotelExpenseDto, DeleteHotelExpenseDto, UpdateHotelExpenseDto } from "../_types/expenses";
+
+// Configuración por defecto para la paginación
+export const defaultPaginationConfig = {
+  page: 1,
+  pageSize: 10,
+};
+
+export const defaultParamConfig: PaginatedExpenseParams = {
+  pagination: defaultPaginationConfig,
+};
 
 // Hook personalizado para gastos
 export const useExpenses = () => {
@@ -31,10 +43,10 @@ export const useExpenses = () => {
   };
 
   // Consulta los gastos por una fecha específica
-  const useGetExpensesByDate = (date: string) => {
+  /*   const useGetExpensesByDate = (date: string) => {
     const { data, isLoading, error } = useGetExpensesByDateQuery(date);
     return { expenses: data, isLoading, error };
-  };
+  }; */
 
   // MUTACIONES
 
@@ -119,7 +131,7 @@ export const useExpenses = () => {
     isSuccessExpenses,
     refetchExpenses,
     useGetExpenseById,
-    useGetExpensesByDate,
+    /*   useGetExpensesByDate, */
 
     // Acciones
     onCreateExpense, // Crear gasto
@@ -133,5 +145,23 @@ export const useExpenses = () => {
     isLoadingUpdateExpense,
     isSuccessDeleteExpenses,
     isLoadingDeleteExpenses,
+  };
+};
+
+// Hook personalizado para gastos paginados
+export const usePaginatedExpenses = () => {
+  const [params, setParams] = useState<PaginatedExpenseParams>(defaultParamConfig);
+
+  const queryResponse = useGetExpensesByDateQuery(params, {
+    refetchOnMountOrArgChange: true,
+  });
+
+  const updateFilters = (newParams: PaginatedExpenseParams) => {
+    setParams(newParams);
+  };
+
+  return {
+    queryResponse,
+    updateFilters,
   };
 };

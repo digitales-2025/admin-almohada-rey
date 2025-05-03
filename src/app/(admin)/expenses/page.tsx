@@ -8,45 +8,59 @@ import ErrorGeneral from "@/components/errors/general-error";
 import { Button } from "@/components/ui/button";
 import { DateFilterRoomCleaning } from "./_components/calendar/calendar-date-picker";
 import { ExpensesTable } from "./_components/table/ExpensesTable";
-import { useExpenses } from "./_hooks/use-expenses";
+import { defaultParamConfig, usePaginatedExpenses } from "./_hooks/use-expenses";
+import { PaginatedExpenseParams } from "./_services/expensesApi";
 
 export default function ExpensesPage() {
-  const { expensesList, isLoadingExpenses, useGetExpensesByDate, refetchExpenses } = useExpenses();
-
-  // Fecha actual
-  const today = new Date();
-  const currentYear = today.getFullYear().toString();
-  const currentMonth = (today.getMonth() + 1).toString().padStart(2, "0");
-  const currentDay = today.getDate().toString().padStart(2, "0");
-
   // Estados para filtros
-  const [selectedYear, setSelectedYear] = useState<string | undefined>(currentYear);
-  const [selectedMonth, setSelectedMonth] = useState<string | undefined>(currentMonth);
-  const [filteredData, setFilteredData] = useState<any[] | null>(null);
-  const [isFiltering, setIsFiltering] = useState(false);
+  const [selectedYear, setSelectedYear] = useState<string | undefined>(undefined);
+  const [selectedMonth, setSelectedMonth] = useState<string | undefined>(undefined);
+  const [filterConfig, setFilterConfig] = useState<PaginatedExpenseParams>(defaultParamConfig);
 
-  // Hook para obtener gastos por fecha
-  const { expenses: filteredExpenses, isLoading: isLoadingFiltered } = useGetExpensesByDate(
-    `${selectedYear}-${selectedMonth}-${currentDay}`
-  );
+  // Hook paginado
+  const { queryResponse, updateFilters } = usePaginatedExpenses();
+  const { data: response, isLoading, isError } = queryResponse;
 
   // Función para filtrar
   const handleFilter = () => {
-    setIsFiltering(true);
-    setFilteredData(filteredExpenses ?? []);
+    const fieldFilters: Record<string, string> = {};
+    if (selectedYear && selectedMonth) {
+      fieldFilters.date = `${selectedYear}-${selectedMonth}`;
+    } else if (selectedYear) {
+      fieldFilters.date = `${selectedYear}`;
+    }
+    const newConfig: PaginatedExpenseParams = {
+      pagination: { page: 1, pageSize: 10 },
+      fieldFilters,
+    };
+    setFilterConfig(newConfig);
+    updateFilters(newConfig);
   };
 
   // Función para mostrar todos
   const handleShowAll = () => {
-    setIsFiltering(false);
-    setFilteredData(null);
-    setSelectedMonth(undefined); // <-- Selecciona "Todos los meses"
-    setSelectedYear(undefined); // <-- Selecciona "Todos los años"
-    refetchExpenses();
+    setSelectedMonth(undefined);
+    setSelectedYear(undefined);
+    setFilterConfig(defaultParamConfig);
+    updateFilters(defaultParamConfig);
+  };
+
+  // Manejar cambios de paginación
+  const handlePaginationChange = (page: number, pageSize: number) => {
+    const newConfig: PaginatedExpenseParams = {
+      ...filterConfig,
+      pagination: {
+        ...filterConfig.pagination,
+        page,
+        pageSize,
+      },
+    };
+    setFilterConfig(newConfig);
+    updateFilters(newConfig);
   };
 
   // Loading
-  if (isLoadingExpenses || (isFiltering && isLoadingFiltered)) {
+  if (isLoading) {
     return (
       <div>
         <HeaderPage title="Gastos" description="Gastos registrados en el sistema." />
@@ -56,7 +70,7 @@ export default function ExpensesPage() {
   }
 
   // Error
-  if (!expensesList && !filteredData) {
+  if (isError || !response) {
     return (
       <div>
         <HeaderPage title="Gastos" description="Gastos registrados en el sistema." />
@@ -79,13 +93,22 @@ export default function ExpensesPage() {
           <Button onClick={handleFilter} className="w-full sm:w-auto">
             Filtrar fecha
           </Button>
-          <Button onClick={handleShowAll} variant="secondary" disabled={!isFiltering} className="w-full sm:w-auto">
+          <Button onClick={handleShowAll} variant="secondary" className="w-full sm:w-auto">
             Mostrar todo
           </Button>
         </div>
       </div>
       <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0">
-        <ExpensesTable data={isFiltering ? (filteredData ?? []) : (expensesList ?? [])} />
+        <ExpensesTable
+          data={response.data}
+          pagination={{
+            page: response.meta.page,
+            pageSize: response.meta.pageSize,
+            total: response.meta.total,
+            totalPages: response.meta.totalPages,
+          }}
+          onPaginationChange={handlePaginationChange}
+        />
       </div>
     </div>
   );

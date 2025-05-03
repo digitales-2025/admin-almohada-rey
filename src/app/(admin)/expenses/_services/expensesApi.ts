@@ -1,12 +1,15 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
+import { PaginatedResponse } from "@/types/api/paginated-response";
 import { BaseApiResponse } from "@/types/api/types";
+import { PaginatedQueryParams } from "@/types/query-filters/generic-paginated-query-params";
 import baseQueryWithReauth from "@/utils/baseQuery";
 import { CreateHotelExpenseDto, DeleteHotelExpenseDto, HotelExpense, UpdateHotelExpenseDto } from "../_types/expenses";
 
 // Tipos de respuesta base
 type ExpenseResponse = BaseApiResponse<HotelExpense>;
 type ExpensesResponse = BaseApiResponse<HotelExpense[]>;
+export type PaginatedExpenseParams = PaginatedQueryParams<HotelExpense>;
 
 export const expensesApi = createApi({
   reducerPath: "expensesApi",
@@ -37,13 +40,17 @@ export const expensesApi = createApi({
     }),
 
     // Obtener gastos por fecha
-    getExpensesByDate: build.query<HotelExpense[], string>({
-      query: (date) => ({
-        url: `/expenses/filter/date?date=${date}`,
+    getExpensesByDate: build.query<PaginatedResponse<HotelExpense>, PaginatedExpenseParams>({
+      query: ({ pagination: { page = 1, pageSize = 10 }, fieldFilters }) => ({
+        url: "/expenses/filter/date",
         method: "GET",
+        params: { page, pageSize, ...fieldFilters },
         credentials: "include",
       }),
-      providesTags: [{ type: "Expense", id: "LIST" }],
+      providesTags: (result) => [
+        { type: "Expense", id: result?.meta?.page },
+        ...(result?.data?.map(({ id }) => ({ type: "Expense" as const, id })) ?? []),
+      ],
     }),
 
     // Crear gasto

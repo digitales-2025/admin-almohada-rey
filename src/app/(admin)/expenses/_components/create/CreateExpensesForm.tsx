@@ -46,7 +46,7 @@ export default function CreateExpensesForm({ children, form, onSubmit }: CreateE
               <FormLabel>Categoría</FormLabel>
               <Select onValueChange={field.onChange} value={field.value ?? ""}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Selecciona una categoría" />
                   </SelectTrigger>
                 </FormControl>
@@ -79,7 +79,7 @@ export default function CreateExpensesForm({ children, form, onSubmit }: CreateE
               <FormLabel>Método de pago</FormLabel>
               <Select onValueChange={field.onChange} value={field.value ?? ""}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Selecciona un método de pago" />
                   </SelectTrigger>
                 </FormControl>
@@ -148,7 +148,7 @@ export default function CreateExpensesForm({ children, form, onSubmit }: CreateE
               <FormLabel>Tipo de documento</FormLabel>
               <Select onValueChange={field.onChange} value={field.value ?? ""}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Selecciona un tipo de documento" />
                   </SelectTrigger>
                 </FormControl>
