@@ -35,7 +35,7 @@ const DocumentTypeIcons = Object.fromEntries(
 // Filtros configurados para gastos
 export const facetedFilters = [
   {
-    column: "category",
+    column: "categoría",
     title: "Categoría",
     options: Object.entries(ExpenseCategoryLabels).map(([key, config]) => ({
       label: config.label,
@@ -44,7 +44,7 @@ export const facetedFilters = [
     })),
   },
   {
-    column: "paymentMethod",
+    column: "Método de pago",
     title: "Método de pago",
     options: Object.entries(ExpensePaymentMethodLabels).map(([key, config]) => ({
       label: config.label,
@@ -53,7 +53,7 @@ export const facetedFilters = [
     })),
   },
   {
-    column: "documentType",
+    column: "Tipo de documento",
     title: "Tipo de documento",
     options: Object.entries(ExpenseDocumentTypeLabels).map(([key, config]) => ({
       label: config.label,
