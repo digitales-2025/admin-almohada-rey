@@ -132,6 +132,23 @@ export interface paths {
     patch: operations["UsersController_reactivate_v1"];
     trace?: never;
   };
+  "/v1/users/paginated": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get paginated users */
+    get: operations["UsersController_findAllPaginated_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v1/users/generate-password": {
     parameters: {
       query?: never;
@@ -260,6 +277,23 @@ export interface paths {
     put?: never;
     /** Create a new product */
     post: operations["ProductController_create_v1"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/product/paginated": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get paginated products */
+    get: operations["ProductController_findAllPaginated_v1"];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -526,6 +560,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/rooms/paginated": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Obtener habitaciones paginadas con información detallada
+     * @description Devuelve una lista paginada de habitaciones con sus tipos e imagen principal
+     */
+    get: operations["RoomController_findAllPaginated_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v1/rooms/{id}": {
     parameters: {
       query?: never;
@@ -638,6 +692,26 @@ export interface paths {
     };
     /** Obtener todos los tipos de habitaciones con sus imágenes */
     get: operations["RoomTypeController_findAll_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/room-types/paginated": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Obtener tipos de habitaciones paginados con sus imágenes
+     * @description Devuelve una lista paginada de tipos de habitaciones con sus imágenes asociadas
+     */
+    get: operations["RoomTypeController_findAllPaginated_v1"];
     put?: never;
     post?: never;
     delete?: never;
@@ -822,6 +896,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/payments/paginated/all": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get paginated payments */
+    get: operations["PaymentsController_findAllPaginated_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v1/payments/{id}": {
     parameters: {
       query?: never;
@@ -995,6 +1086,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/customers/paginated": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get paginated customers */
+    get: operations["CustomersController_findAllPaginated_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v1/customers/searchByDocNumber": {
     parameters: {
       query?: never;
@@ -1130,7 +1238,8 @@ export interface paths {
     delete?: never;
     options?: never;
     head?: never;
-    patch?: never;
+    /** Actualizar registro de limpieza */
+    patch: operations["CleaningChecklistController_update_v1"];
     trace?: never;
   };
   "/v1/room-cleaning/room/{roomId}": {
@@ -1250,7 +1359,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Obtener gastos por fecha */
+    /** Obtener gastos por fecha (paginado y filtrado) */
     get: operations["ExpenseController_findByDate_v1"];
     put?: never;
     post?: never;
@@ -1396,13 +1505,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-30T14:35:51.921Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-30T14:35:51.921Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       updatedAt: string;
       /** @description Customer name */
@@ -1411,6 +1520,8 @@ export interface components {
       address: string;
       /** @description Customer birth place */
       birthPlace: string;
+      /** @description Customer birth date */
+      birthDate?: string;
       /** @description Customer country */
       country: string;
       /** @description Customer department */
@@ -1457,13 +1568,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-30T14:35:51.921Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-30T14:35:51.921Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       updatedAt: string;
       /** @description User name */
@@ -1506,13 +1617,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-30T14:35:51.921Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-30T14:35:51.921Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       updatedAt: string;
       /**
@@ -1555,13 +1666,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-30T14:35:51.921Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-30T14:35:51.921Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       updatedAt: string;
       /**
@@ -1650,13 +1761,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-04-30T14:35:51.921Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-04-30T14:35:51.921Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -1696,6 +1807,11 @@ export interface components {
       guests?: string;
       /** @description Additional notes or observations */
       observations?: string;
+      /**
+       * @description Whether the reservation is pending payment deletion
+       * @default false
+       */
+      isPendingDeletePayment: boolean;
       /** @description Customer associated with the reservation */
       customer: components["schemas"]["Customer"];
       /** @description User associated with the reservation */
@@ -1819,13 +1935,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-04-30T14:35:51.921Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-04-30T14:35:51.921Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -1865,6 +1981,11 @@ export interface components {
       guests?: string;
       /** @description Additional notes or observations */
       observations?: string;
+      /**
+       * @description Whether the reservation is pending payment deletion
+       * @default false
+       */
+      isPendingDeletePayment: boolean;
     };
     UpdateManyDto: {
       /**
@@ -2063,13 +2184,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-30T14:35:51.921Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-30T14:35:51.921Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       updatedAt: string;
       /**
@@ -2534,13 +2655,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-30T14:35:51.921Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-30T14:35:51.921Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       updatedAt: string;
       name: string;
@@ -2703,13 +2824,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-04-30T14:35:51.921Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-04-30T14:35:51.921Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       updatedAt: string;
       /**
@@ -2737,6 +2858,33 @@ export interface components {
        * @example Se reemplazaron las toallas y se repuso el jabón
        */
       observations?: string | null;
+    };
+    UpdateCleaningChecklistDto: {
+      /**
+       * @description Fecha de la limpieza
+       * @example 2025-03-24
+       */
+      date?: string;
+      /**
+       * @description ID de la habitación
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      roomId?: string;
+      /**
+       * @description Nombre del personal de limpieza
+       * @example Ana García
+       */
+      staffName?: string;
+      /**
+       * @description ID del usuario verificador
+       * @example 123e4567-e89b-12d3-a456-426614174001
+       */
+      userCheckId?: string;
+      /**
+       * @description Observaciones o comentarios
+       * @example Se reemplazó jabón y toallas
+       */
+      observations?: string;
     };
     LandRoomTypeMainImg: {
       id: string;
@@ -2803,11 +2951,11 @@ export interface components {
     HotelExpenseEntity: {
       id: string;
       description: string;
-      category: string;
-      paymentMethod: string;
+      category: Record<string, never>;
+      paymentMethod: Record<string, never>;
       amount: number;
       date: string;
-      documentType?: string;
+      documentType?: Record<string, never>;
       documentNumber?: string;
       /** Format: date-time */
       createdAt: string;
@@ -3300,6 +3448,74 @@ export interface operations {
       };
     };
   };
+  UsersController_findAllPaginated_v1: {
+    parameters: {
+      query?: {
+        /** @description Page number */
+        page?: number;
+        /** @description Number of items per page */
+        pageSize?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Paginated list of users */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data?: {
+              id?: string;
+              name?: string;
+              email?: string;
+              phone?: string;
+              /** Format: date-time */
+              lastLogin?: string;
+              isActive?: boolean;
+              isSuperAdmin?: boolean;
+              mustChangePassword?: boolean;
+              /** @enum {string} */
+              userRol?: "ADMIN" | "RECEPCIONIST";
+            }[];
+            meta?: {
+              total?: number;
+              page?: number;
+              pageSize?: number;
+              totalPages?: number;
+              hasNext?: boolean;
+              hasPrevious?: boolean;
+            };
+          };
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   UsersController_generatePassword_v1: {
     parameters: {
       query?: never;
@@ -3573,6 +3789,51 @@ export interface operations {
     responses: {
       /** @description Product created successfully */
       201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ProductController_findAllPaginated_v1: {
+    parameters: {
+      query?: {
+        /** @description Page number */
+        page?: number;
+        /** @description Number of items per page */
+        pageSize?: number;
+        /** @description Product type filter */
+        type?: "COMMERCIAL" | "INTERNAL_USE";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
         headers: {
           [name: string]: unknown;
         };
@@ -4398,6 +4659,79 @@ export interface operations {
       };
     };
   };
+  RoomController_findAllPaginated_v1: {
+    parameters: {
+      query?: {
+        /** @description Número de página */
+        page?: number;
+        /** @description Cantidad de elementos por página */
+        pageSize?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Lista paginada de habitaciones */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data?: {
+              id?: string;
+              number?: number;
+              /** @enum {string} */
+              status?: "AVAILABLE" | "OCCUPIED" | "CLEANING" | "MAINTENANCE";
+              tv?: boolean;
+              area?: number;
+              floorType?: string;
+              isActive?: boolean;
+              RoomTypes?: {
+                id?: string;
+                name?: string;
+                ImageRoomType?: {
+                  id?: string;
+                  imageUrl?: string;
+                  isMain?: boolean;
+                };
+              };
+              trashBin?: boolean;
+              towel?: boolean;
+              toiletPaper?: boolean;
+              showerSoap?: boolean;
+              handSoap?: boolean;
+              lamp?: boolean;
+            }[];
+            meta?: {
+              total?: number;
+              page?: number;
+              pageSize?: number;
+              totalPages?: number;
+              hasNext?: boolean;
+              hasPrevious?: boolean;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   RoomController_findOne_v1: {
     parameters: {
       query?: never;
@@ -4703,6 +5037,61 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["RoomType"][];
+        };
+      };
+      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  RoomTypeController_findAllPaginated_v1: {
+    parameters: {
+      query?: {
+        /** @description Número de página */
+        page?: number;
+        /** @description Cantidad de elementos por página */
+        pageSize?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Lista paginada de tipos de habitaciones con sus imágenes */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data?: (components["schemas"]["RoomType"] & {
+              imagesRoomType?: {
+                id?: string;
+                url?: string;
+                isMain?: boolean;
+              }[];
+            })[];
+            meta?: {
+              total?: number;
+              page?: number;
+              pageSize?: number;
+              totalPages?: number;
+              hasNext?: boolean;
+              hasPrevious?: boolean;
+            };
+          };
         };
       };
       /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
@@ -5131,6 +5520,50 @@ export interface operations {
     responses: {
       /** @description Payment detail created successfully */
       201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  PaymentsController_findAllPaginated_v1: {
+    parameters: {
+      query?: {
+        /** @description Page number */
+        page?: number;
+        /** @description Number of items per page */
+        pageSize?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Payments paginated retrieved successfully */
+      200: {
         headers: {
           [name: string]: unknown;
         };
@@ -5714,6 +6147,50 @@ export interface operations {
       };
     };
   };
+  CustomersController_findAllPaginated_v1: {
+    parameters: {
+      query?: {
+        /** @description Page number */
+        page?: number;
+        /** @description Number of items per page */
+        pageSize?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Customers found paginated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   CustomersController_searchByDocNumber_v1: {
     parameters: {
       query: {
@@ -6132,9 +6609,64 @@ export interface operations {
       };
     };
   };
-  CleaningChecklistController_findByRoom_v1: {
+  CleaningChecklistController_update_v1: {
     parameters: {
       query?: never;
+      header?: never;
+      path: {
+        /** @description ID del registro de limpieza a actualizar */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateCleaningChecklistDto"];
+      };
+    };
+    responses: {
+      /** @description Registro de limpieza actualizado exitosamente */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BaseApiResponse"];
+        };
+      };
+      /** @description Datos de entrada inválidos */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Registro de limpieza no encontrado */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  CleaningChecklistController_findByRoom_v1: {
+    parameters: {
+      query?: {
+        /** @description Número de página para paginación */
+        page?: number;
+        /** @description Mes para filtrar (ejemplo: enero, febrero, etc.) */
+        month?: string;
+        /** @description Año para filtrar (ejemplo: 2023, 2024, etc.) */
+        year?: string;
+      };
       header?: never;
       path: {
         /** @description ID de la habitación */
@@ -6144,14 +6676,11 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Registros de limpieza encontrados */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content: {
-          "application/json": components["schemas"]["CleaningChecklist"][];
-        };
+        content?: never;
       };
       /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
       400: {
@@ -6408,9 +6937,13 @@ export interface operations {
   };
   ExpenseController_findByDate_v1: {
     parameters: {
-      query: {
-        /** @description Fecha del gasto (formato YYYY-MM-DD) */
-        date: string;
+      query?: {
+        /** @description Fecha del gasto (formato YYYY-MM-DD, opcional) */
+        date?: string;
+        /** @description Número de página */
+        page?: number;
+        /** @description Cantidad de elementos por página */
+        pageSize?: number;
       };
       header?: never;
       path?: never;
@@ -6418,13 +6951,16 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Gastos encontrados para la fecha especificada */
+      /** @description Lista paginada de gastos */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["HotelExpenseEntity"][];
+          "application/json": {
+            data?: components["schemas"]["HotelExpenseEntity"][];
+            meta?: components["schemas"]["PaginationMetadata"];
+          };
         };
       };
       /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */

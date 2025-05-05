@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
 "use client";
 
 import React, { useState } from "react";
@@ -34,7 +33,7 @@ import { UpdateExpensesSheet } from "../update/UpdateExpensesSheet";
 import { ViewExpenses } from "../view/ViewExpenses";
 
 // Columnas para la tabla de gastos
-export const expensesColumns = (): ColumnDef<HotelExpense>[] => [
+export const expensesColumns = (refetchPaginatedExpenses: () => void): ColumnDef<HotelExpense>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -62,32 +61,19 @@ export const expensesColumns = (): ColumnDef<HotelExpense>[] => [
     enablePinning: true,
   },
   {
-    id: "description",
+    id: "descripción",
     accessorKey: "description",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Descripción de Gasto" />,
     cell: ({ row }) => (
       <div className="min-w-40 truncate flex items-center">{row.original.description || "Sin dato"}</div>
     ),
   },
-  // Columna de acciones SOLO visible en móvil (segunda columna)
   {
-    id: "actions-mobile",
-    header: () => null,
-    cell: ({ row }) => (
-      <div className="flex justify-center md:hidden">
-        <ActionsMenu row={row} />
-      </div>
-    ),
-    enableSorting: false,
-    enableHiding: false,
-    enablePinning: false,
-  },
-  {
-    id: "category",
+    id: "categoría",
     accessorKey: "category",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Categoría" />,
     cell: ({ row }) => {
-      const value = row.original.category as ExpenseCategoryEnum;
+      const value = row.original.category as unknown as ExpenseCategoryEnum;
       const config = ExpenseCategoryLabels[value];
       if (!config) return "Sin dato";
       const Icon = config.icon;
@@ -101,11 +87,11 @@ export const expensesColumns = (): ColumnDef<HotelExpense>[] => [
     enableColumnFilter: true,
   },
   {
-    id: "paymentMethod",
+    id: "Método de pago",
     accessorKey: "paymentMethod",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Método de pago" />,
     cell: ({ row }) => {
-      const value = row.original.paymentMethod as ExpensePaymentMethodEnum;
+      const value = row.original.paymentMethod as unknown as ExpensePaymentMethodEnum;
       const config = ExpensePaymentMethodLabels[value];
       if (!config) return "Sin dato";
       const Icon = config.icon;
@@ -119,13 +105,13 @@ export const expensesColumns = (): ColumnDef<HotelExpense>[] => [
     enableColumnFilter: true,
   },
   {
-    id: "amount",
+    id: "monto",
     accessorKey: "amount",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Monto" />,
     cell: ({ row }) => (row.original.amount != null ? `S/ ${row.original.amount}` : "Sin dato"),
   },
   {
-    id: "date",
+    id: "fecha",
     accessorKey: "date",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Fecha" />,
     cell: ({ row }) => {
@@ -139,11 +125,11 @@ export const expensesColumns = (): ColumnDef<HotelExpense>[] => [
     },
   },
   {
-    id: "documentType",
+    id: "Tipo de documento",
     accessorKey: "documentType",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Tipo de documento" />,
     cell: ({ row }) => {
-      const value = row.original.documentType as ExpenseDocumentTypeEnum | null;
+      const value = row.original.documentType as unknown as ExpenseDocumentTypeEnum | null;
       if (!value) return "Sin dato";
       const config = ExpenseDocumentTypeLabels[value];
       if (!config) return "Sin dato";
@@ -158,7 +144,7 @@ export const expensesColumns = (): ColumnDef<HotelExpense>[] => [
     enableColumnFilter: true,
   },
   {
-    id: "documentNumber",
+    id: "N° Documento",
     accessorKey: "documentNumber",
     header: ({ column }) => <DataTableColumnHeader column={column} title="N° Documento" />,
     cell: ({ row }) => row.original.documentNumber || "Sin dato",
@@ -166,63 +152,56 @@ export const expensesColumns = (): ColumnDef<HotelExpense>[] => [
   {
     id: "actions",
     cell: function Cell({ row }) {
+      const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+      const [showEditDialog, setShowEditDialog] = useState(false);
+      const [showViewDialog, setShowViewDialog] = useState(false);
+
       return (
-        <div className="hidden md:block">
-          {/* Solo visible en escritorio */}
-          <ActionsMenu row={row} />
+        <div>
+          {showViewDialog && (
+            <ViewExpenses open={showViewDialog} onOpenChange={setShowViewDialog} expense={row.original} />
+          )}
+          {showEditDialog && (
+            <UpdateExpensesSheet open={showEditDialog} onOpenChange={setShowEditDialog} expense={row.original} />
+          )}
+          {showDeleteDialog && (
+            <DeleteExpensesDialog
+              open={showDeleteDialog}
+              onOpenChange={setShowDeleteDialog}
+              expenses={[row.original]}
+              showTrigger={false}
+              onSuccess={() => {
+                row.toggleSelected(false);
+                refetchPaginatedExpenses();
+              }}
+            />
+          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button aria-label="Abrir menú" variant="ghost" className="flex size-8 p-0 data-[state=open]:bg-muted">
+                <Ellipsis className="size-4" aria-hidden="true" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuItem onSelect={() => setShowViewDialog(true)}>Ver detalles</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => setShowEditDialog(true)}>
+                Editar
+                <DropdownMenuShortcut>
+                  <Pencil className="size-4" aria-hidden="true" />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setShowDeleteDialog(true)} className="text-red-700">
+                Eliminar
+                <DropdownMenuShortcut>
+                  <Trash className="size-4 text-red-700" aria-hidden="true" />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       );
     },
     enablePinning: true,
   },
 ];
-
-// Extrae el menú de acciones a un componente reutilizable:
-function ActionsMenu({ row }: { row: any }) {
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [showEditDialog, setShowEditDialog] = useState(false);
-  const [showViewDialog, setShowViewDialog] = useState(false);
-
-  return (
-    <div>
-      {showViewDialog && <ViewExpenses open={showViewDialog} onOpenChange={setShowViewDialog} expense={row.original} />}
-      {showEditDialog && (
-        <UpdateExpensesSheet open={showEditDialog} onOpenChange={setShowEditDialog} expense={row.original} />
-      )}
-      {showDeleteDialog && (
-        <DeleteExpensesDialog
-          open={showDeleteDialog}
-          onOpenChange={setShowDeleteDialog}
-          expenses={[row.original]}
-          showTrigger={false}
-          onSuccess={() => {
-            row.toggleSelected(false);
-          }}
-        />
-      )}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button aria-label="Abrir menú" variant="ghost" className="flex size-8 p-0 data-[state=open]:bg-muted">
-            <Ellipsis className="size-4" aria-hidden="true" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-40">
-          <DropdownMenuItem onSelect={() => setShowViewDialog(true)}>Ver detalles</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onSelect={() => setShowEditDialog(true)}>
-            Editar
-            <DropdownMenuShortcut>
-              <Pencil className="size-4" aria-hidden="true" />
-            </DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setShowDeleteDialog(true)} className="text-red-700">
-            Eliminar
-            <DropdownMenuShortcut>
-              <Trash className="size-4 text-red-700" aria-hidden="true" />
-            </DropdownMenuShortcut>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
-  );
-}

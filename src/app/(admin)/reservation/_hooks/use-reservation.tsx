@@ -38,7 +38,8 @@ export const useReservation = () => {
       },
     });
   const useOneReservationQuery = (id: string) => useGetReservationByIdQuery(id);
-  const [createReservation, createReservationResponse] = useCreateReservationMutation();
+  const [createReservation, { isSuccess: isSuccessCreateReservation, reset: resetCreateReservation }] =
+    useCreateReservationMutation();
   const [updateReservation, updateReservationResponse] = useUpdateReservationMutation();
   const [transitionReservationStatus, transitionReservationStatusResponse] = useTransitionReservationStatusMutation();
   const [deactivateReservations, deactivateReservationResponse] = useDeactivateReservationsMutation();
@@ -159,7 +160,8 @@ export const useReservation = () => {
     usePaginatedReservationQuery,
     useOneReservationQuery,
     onCreateReservation,
-    createReservationResponse,
+    isSuccessCreateReservation,
+    resetCreateReservation,
     onUpdateReservation,
     updateReservationResponse,
     onTransitionReservationStatus,

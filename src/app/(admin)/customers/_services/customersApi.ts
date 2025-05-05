@@ -1,5 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
+import { PaginatedResponse } from "@/types/api/paginated-response";
+import { PaginatedQueryParams } from "@/types/query-filters/generic-paginated-query-params";
 import baseQueryWithReauth from "@/utils/baseQuery";
 import { ApiCustomer, Customer, HistoryCustomer } from "../_types/customer";
 import { ReservationStatus } from "../../reservation/_schemas/reservation.schemas";
@@ -26,6 +28,8 @@ interface ImportCustomersResponse {
     }>;
   };
 }
+
+export type PaginateCustomerParams = PaginatedQueryParams<Customer>;
 
 interface ImportCustomersRequest {
   file: File;
@@ -103,6 +107,20 @@ export const customersApi = createApi({
       }),
       providesTags: ["Customer"],
     }),
+
+    getPaginatedCustomers: build.query<PaginatedResponse<Customer>, PaginateCustomerParams>({
+      query: ({ pagination: { page = 1, pageSize = 10 } }) => ({
+        url: "/customers/paginated",
+        method: "GET",
+        params: { page, pageSize },
+        credentials: "include",
+      }),
+      providesTags: (result) => [
+        { type: "Customer", id: result?.meta.page },
+        ...(result?.data.map(({ id }) => ({ type: "Customer" as const, id })) ?? []),
+      ],
+    }),
+
     //Eliminar clientes
     deleteCustomers: build.mutation<void, { ids: string[] }>({
       query: (ids) => ({
@@ -168,6 +186,7 @@ export const {
   useGetCustomerByIdQuery,
   useGetHistoryCustomerByIdQuery,
   useGetAllCustomersQuery,
+  useGetPaginatedCustomersQuery,
   useDeleteCustomersMutation,
   useReactivateCustomersMutation,
   useSearchCustomersByDocumentIdQuery,

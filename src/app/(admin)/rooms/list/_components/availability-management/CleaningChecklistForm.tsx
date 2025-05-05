@@ -114,10 +114,11 @@ export default function CleaningChecklistForm({
                       </div>
                       <FormControl>
                         <DatePicker
-                          value={field.value ? parse(field.value, "yyyy-MM-dd", new Date()) : undefined}
+                          value={field.value ? parse(field.value, "yyyy-MM-dd'T'HH:mm:ss", new Date()) : undefined}
+                          withTime
                           onChange={(date) => {
                             if (date) {
-                              const formattedDate = format(date, "yyyy-MM-dd");
+                              const formattedDate = format(date, "yyyy-MM-dd'T'HH:mm:ss");
                               field.onChange(formattedDate);
                             } else {
                               field.onChange("");
@@ -126,7 +127,7 @@ export default function CleaningChecklistForm({
                         />
                       </FormControl>
                       <FormDescription className="text-xs mt-1 ml-1">
-                        Fecha en la que se realizó la limpieza
+                        Fecha y hora en la que se realizó la limpieza
                       </FormDescription>
                       <FormMessage />
                     </CardContent>

@@ -1,11 +1,15 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
+import { PaginatedResponse } from "@/types/api/paginated-response";
+import { PaginatedQueryParams } from "@/types/query-filters/generic-paginated-query-params";
 import baseQueryWithReauth from "@/utils/baseQuery";
 import { Room, RoomStatus } from "../_types/room";
 
 export interface StatusRoomDto {
   status: RoomStatus;
 }
+
+export type PaginatedRoomParams = PaginatedQueryParams<Room>;
 
 export const roomsApi = createApi({
   reducerPath: "roomsApi",
@@ -60,6 +64,19 @@ export const roomsApi = createApi({
       }),
       providesTags: ["Rooms"],
     }),
+
+    getPaginatedRooms: build.query<PaginatedResponse<Room>, PaginatedRoomParams>({
+      query: ({ pagination: { page = 1, pageSize = 10 } }) => ({
+        url: "/rooms/paginated",
+        method: "GET",
+        params: { page, pageSize },
+        credentials: "include",
+      }),
+      providesTags: (result) => [
+        { type: "Rooms", id: result?.meta.page },
+        ...(result?.data.map(({ id }) => ({ type: "Rooms" as const, id })) ?? []),
+      ],
+    }),
     //Eliminar habitaciones
     deleteRooms: build.mutation<void, { ids: string[] }>({
       query: (ids) => ({
@@ -89,6 +106,7 @@ export const {
   useUpdateRoomStatusMutation,
   useGetRoomByIdQuery,
   useGetAllRoomsQuery,
+  useGetPaginatedRoomsQuery,
   useDeleteRoomsMutation,
   useReactivateRoomsMutation,
 } = roomsApi;

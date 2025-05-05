@@ -23,6 +23,7 @@ type GeneralEnvVars = {
   // MAIL_PASS: string;
   NEXT_PUBLIC_BACKEND_URL: string;
   INTERNAL_BACKEND_URL: string;
+  NEXT_PUBLIC_SOCKET_URL: string;
 };
 
 const schema = z
@@ -43,6 +44,7 @@ const schema = z
     // MAIL_PASS: z.string(),
     NEXT_PUBLIC_BACKEND_URL: z.string(),
     INTERNAL_BACKEND_URL: z.string(),
+    NEXT_PUBLIC_SOCKET_URL: z.string(),
   })
   .passthrough() satisfies z.ZodType<Partial<GeneralEnvVars>>;
 
@@ -69,4 +71,5 @@ export const generalEnvs: GeneralEnvVars = {
   // MAIL_PASS: envVars.MAIL_PASS,
   NEXT_PUBLIC_BACKEND_URL: envVars.NEXT_PUBLIC_BACKEND_URL,
   INTERNAL_BACKEND_URL: envVars.INTERNAL_BACKEND_URL,
+  NEXT_PUBLIC_SOCKET_URL: envVars.NEXT_PUBLIC_SOCKET_URL,
 };

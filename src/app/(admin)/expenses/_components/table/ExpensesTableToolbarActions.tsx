@@ -8,18 +8,22 @@ import { DeleteExpensesDialog } from "../state-management/DeleteExpensesDialog";
 
 export interface ExpensesTableToolbarActionsProps {
   table?: Table<HotelExpense>;
+  refetchPaginatedExpenses: () => void;
 }
 
-export function ExpensesTableToolbarActions({ table }: ExpensesTableToolbarActionsProps) {
+export function ExpensesTableToolbarActions({ table, refetchPaginatedExpenses }: ExpensesTableToolbarActionsProps) {
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
       {table && table.getFilteredSelectedRowModel().rows.length > 0 ? (
         <DeleteExpensesDialog
           expenses={table.getFilteredSelectedRowModel().rows.map((row) => row.original)}
-          onSuccess={() => table.toggleAllRowsSelected(false)}
+          onSuccess={() => {
+            table.toggleAllRowsSelected(false);
+            refetchPaginatedExpenses();
+          }}
         />
       ) : null}
-      <CreateExpensesDialog />
+      <CreateExpensesDialog refetchPaginatedExpenses={refetchPaginatedExpenses} />
     </div>
   );
 }

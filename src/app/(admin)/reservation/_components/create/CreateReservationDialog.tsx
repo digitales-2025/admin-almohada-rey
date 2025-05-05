@@ -60,26 +60,14 @@ export function CreateReservationDialog() {
   // Para la fecha de reservación (ahora)
   const reservationDateISO = formDateToPeruISO(todayFormatted, true, formatTimeToHHMMAMPM(new Date()));
 
-  const isDesktop = useMediaQuery("(min-width: 640px)");
+  const isDesktop = useMediaQuery("(min-width: 810px)");
   const [open, setOpen] = useState(false);
   const [isCreatePending, startCreateTransition] = useTransition();
-  const { onCreateReservation, createReservationResponse } = useReservation();
+
+  const { onCreateReservation, isSuccessCreateReservation, resetCreateReservation } = useReservation();
   const router = useRouter();
   const { user } = useProfile();
 
-  //   {
-  //     status: "PENDING" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELED";
-  //     customerId: string;
-  //     roomId: string;
-  //     userId: string;
-  //     reservationDate: string;
-  //     checkInDate: string;
-  //     checkOutDate: string;
-  //     guests?: {
-  //         ...;
-  //     }[] | undefined;
-  //     observations?: string | undefined;
-  // }
   const form = useForm<CreateReservationInput>({
     resolver: zodResolver(createReservationSchema, undefined, {
       raw: true,
@@ -108,7 +96,6 @@ export function CreateReservationDialog() {
       minLength: 1,
     },
   });
-  // const { remove } = fieldArray;
 
   const handleClose = () => {
     form.reset();
@@ -117,11 +104,14 @@ export function CreateReservationDialog() {
   };
 
   useEffect(() => {
-    if (createReservationResponse.isSuccess) {
-      handleClose();
+    if (isSuccessCreateReservation) {
+      form.reset();
+      fieldArray.remove();
+      setOpen(false);
+      resetCreateReservation();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [createReservationResponse.isSuccess]);
+  }, [isSuccessCreateReservation]);
 
   if (!user) {
     router.push("/log-in");
@@ -196,7 +186,7 @@ export function CreateReservationDialog() {
 
         {/* The key fix is in this ScrollArea configuration */}
         <div className="flex-1 overflow-hidden">
-          <ScrollArea className="h-[40vh] px-0">
+          <ScrollArea className="h-[60vh] px-0">
             <div className="px-4">
               <CreateReservationForm form={form} onSubmit={onSubmit} controlledFieldArray={fieldArray}>
                 <DrawerFooter className="col-span-2 px-0 pt-2">

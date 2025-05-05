@@ -2,10 +2,12 @@ import { toast } from "sonner";
 
 import { runAndHandleError } from "@/utils/baseQuery";
 import {
+  PaginatedRoomParams,
   StatusRoomDto,
   useCreateRoomMutation,
   useDeleteRoomsMutation,
   useGetAllRoomsQuery,
+  useGetPaginatedRoomsQuery,
   useReactivateRoomsMutation,
   useUpdateRoomMutation,
   useUpdateRoomStatusMutation,
@@ -115,5 +117,33 @@ export const useRooms = () => {
     onReactivateRooms,
     isSuccessReactivateRooms,
     isLoadingReactivateRooms,
+  };
+};
+
+interface UsePaginatedRoomsProps {
+  page?: number;
+  pageSize?: number;
+}
+
+export const usePaginatedRooms = (options: UsePaginatedRoomsProps = {}) => {
+  const { page = 1, pageSize = 10 } = options;
+
+  const paginationParams: PaginatedRoomParams = {
+    pagination: { page, pageSize },
+  };
+
+  const {
+    data: paginatedRooms,
+    isLoading: isLoadingPaginatedRooms,
+    refetch: refetchPaginatedRooms,
+  } = useGetPaginatedRoomsQuery(paginationParams, {
+    skip: !paginationParams,
+    refetchOnMountOrArgChange: true,
+  });
+
+  return {
+    paginatedRooms,
+    isLoadingPaginatedRooms,
+    refetchPaginatedRooms,
   };
 };

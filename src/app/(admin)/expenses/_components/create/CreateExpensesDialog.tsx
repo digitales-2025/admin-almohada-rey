@@ -38,7 +38,11 @@ const dataForm = {
   description: "Complete los detalles a continuación para registrar un nuevo gasto.",
 };
 
-export function CreateExpensesDialog() {
+interface CreateExpensesDialogProps {
+  refetchPaginatedExpenses: () => void;
+}
+
+export function CreateExpensesDialog({ refetchPaginatedExpenses }: CreateExpensesDialogProps) {
   const isDesktop = useMediaQuery("(min-width: 640px)");
   const [open, setOpen] = useState(false);
   const [isCreatePending, startCreateTransition] = useTransition();
@@ -54,12 +58,23 @@ export function CreateExpensesDialog() {
       date: "",
       documentType: undefined,
       documentNumber: "",
+      dataDocument: true,
     },
   });
 
   const onSubmit = async (input: CreateExpenseSchema) => {
+    const { dataDocument, ...rest } = input;
+
     startCreateTransition(() => {
-      onCreateExpense(input);
+      if (dataDocument) {
+        onCreateExpense({
+          ...rest,
+          documentType: input.documentType,
+          documentNumber: input.documentNumber,
+        });
+      } else {
+        onCreateExpense(rest);
+      }
     });
   };
 
@@ -70,6 +85,7 @@ export function CreateExpensesDialog() {
   useEffect(() => {
     if (isSuccessCreateExpense) {
       form.reset();
+      refetchPaginatedExpenses();
       setOpen(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -84,13 +100,13 @@ export function CreateExpensesDialog() {
             {dataForm.button}
           </Button>
         </DialogTrigger>
-        <DialogContent tabIndex={undefined}>
-          <DialogHeader>
+        <DialogContent tabIndex={undefined} className="px-0">
+          <DialogHeader className="px-4">
             <DialogTitle>{dataForm.title}</DialogTitle>
             <DialogDescription>{dataForm.description}</DialogDescription>
           </DialogHeader>
-          <ScrollArea className="h-full max-h-[80vh] w-full justify-center gap-4 p-0">
-            <div className="p-1">
+          <ScrollArea className="h-full max-h-[80vh] w-full justify-center gap-4 px-0">
+            <div className="px-6">
               <CreateExpensesForm form={form} onSubmit={onSubmit}>
                 <DialogFooter className="w-full">
                   <div className="grid grid-cols-2 gap-2 w-full">
@@ -127,7 +143,7 @@ export function CreateExpensesDialog() {
           <DrawerDescription>{dataForm.description}</DrawerDescription>
         </DrawerHeader>
         <div className="flex-1 overflow-hidden">
-          <ScrollArea className="h-[40vh] px-0">
+          <ScrollArea className="h-[60vh] px-0">
             <div className="px-4">
               <CreateExpensesForm form={form} onSubmit={onSubmit}>
                 <DrawerFooter className="px-0 pt-2">

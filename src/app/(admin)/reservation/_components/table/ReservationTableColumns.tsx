@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { ChevronDown, ChevronRight, Ellipsis, RefreshCcwDot, Trash } from "lucide-react";
+import { Ellipsis, Pencil, RefreshCcwDot, Trash } from "lucide-react";
 import { toast } from "sonner";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
@@ -32,6 +32,7 @@ import { ReactivateReservationsDialog } from "../state-management/ReactivateRese
 import { DIALOG_DICTIONARY } from "../state-management/reservation-status-dialog-config";
 import { TransitionReservationStatusDialog } from "../state-management/TransitionReservationStatusDialog";
 import { UpdateReservationSheet } from "../update/UpdateReservationSheet";
+import { ReservationDetailsDialog } from "./details/ReservationDetailsDialog";
 import { GuestsDetailsDialog } from "./dialogs/GuestDialog";
 
 /**
@@ -87,39 +88,6 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
     header: ({ column }) => <DataTableColumnHeader column={column} title="Habitación" />,
     cell: ({ row }) => <div>{row.original.room.number}</div>,
   },
-  //   {
-  //     accessorKey: "reservationDate",
-  //     meta: {
-  //       title: "Fecha de reservación",
-  //     },
-  //     header: ({ column }) => <DataTableColumnHeader column={column} title="Reservado en" />,
-  //     cell: ({ row }) => {
-  //       const phone = row.getValue("teléfono") as string;
-  //       if (!phone) return <div>-</div>;
-
-  //       try {
-  //         // Obtener el país del número de teléfono
-  //         const country = RPNInput.parsePhoneNumber(phone)?.country;
-
-  //         // Formatear el número para mejor legibilidad
-  //         const formattedPhone = RPNInput.formatPhoneNumberIntl(phone);
-
-  //         return (
-  //           <div className="flex items-center gap-2">
-  //             {country && (
-  //               <span className="flex h-4 w-6 overflow-hidden rounded-sm">
-  //                 {flags[country] && React.createElement(flags[country], { title: country })}
-  //               </span>
-  //             )}
-  //             <span>{formattedPhone || phone}</span>
-  //           </div>
-  //         );
-  //       } catch {
-  //         // Si hay algún error al parsear el número, mostramos el número original
-  //         return <div>{phone}</div>;
-  //       }
-  //     },
-  //   },
   {
     accessorKey: "checkInDate",
     meta: {
@@ -186,56 +154,6 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
     },
     enableColumnFilter: true,
   },
-  //   {
-  //     id: "tipo",
-  //     accessorKey: "documentType",
-  //     header: ({ column }) => <DataTableColumnHeader column={column} title="Tipo" />,
-  //     cell: ({ row }) => {
-  //       const documentType = row.getValue("tipo") as CustomerDocumentType;
-  //       const documentTypeConfig = CustomerDocumentTypeLabels[documentType];
-
-  //       if (!documentTypeConfig) return <div>Rol no definido</div>;
-
-  //       const Icon = documentTypeConfig.icon;
-
-  //       return (
-  //         <div className="text-xs min-w-32">
-  //           <Badge variant="default" className={documentTypeConfig.className}>
-  //             <Icon className="size-4 flex-shrink-0 mr-1" aria-hidden="true" />
-  //             {documentTypeConfig.label}
-  //           </Badge>
-  //         </div>
-  //       );
-  //     },
-  //     filterFn: (row, id, value) => {
-  //       const rowValue = row.getValue(id);
-
-  //       if (Array.isArray(value)) {
-  //         if (value.length === 0) return true;
-  //         return value.includes(rowValue);
-  //       }
-
-  //       return rowValue === value;
-  //     },
-  //     enableColumnFilter: true,
-  //   },
-
-  //   {
-  //     id: "N° Doc.",
-  //     accessorKey: "documentNumber",
-  //     header: ({ column }) => <DataTableColumnHeader column={column} title="N° Doc." />,
-  //     cell: ({ row }) => {
-  //       const documentNumber = row.getValue("N° Doc.") as string;
-
-  //       if (!documentNumber) return <div className="text-muted-foreground text-sm italic">No disponible</div>;
-
-  //       return (
-  //         <div className="font-mono text-sm py-1 px-2 mx-auto bg-slate-50 rounded-md border border-slate-200 inline-block">
-  //           {documentNumber}
-  //         </div>
-  //       );
-  //     },
-  //   },
   {
     accessorKey: "guests",
     meta: {
@@ -250,7 +168,7 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
         const parsedGuests = JSON.parse(row.original.guests) as ReservationGuest[];
         if (parsedGuests.length > 0) {
           return (
-            <div>
+            <div className="items-center flex justify-center">
               {row.original.guests?.length > 0 ? (
                 <GuestsDetailsDialog
                   customer={row.original.customer}
@@ -288,7 +206,7 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
             Activo
           </Badge>
         ) : (
-          <Badge variant="secondary" className="bg-red-100 text-red-500 border-red-200 hover-bg-red-200">
+          <Badge variant="secondary" className="bg-red-100 text-red-500 border-red-200 hover:bg-red-200">
             Archivado
           </Badge>
         )}
@@ -318,55 +236,29 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
   },
 
   {
-    id: "expand", // Nueva columna para expansión
-    header: () => null, // No mostrar un título en el header
-    cell: ({ row }) => (
-      <Button
-        onClick={() => row.toggleExpanded()} // Alternar la expansión de la fila
-        aria-label="Expand row"
-        className="flex items-center justify-center p-2"
-        variant={"ghost"}
-      >
-        {row.getIsExpanded() ? (
-          <ChevronDown className="size-4" /> // Ícono cuando la fila está expandida
-        ) : (
-          <ChevronRight className="size-4" /> // Ícono cuando la fila está colapsada
-        )}
-      </Button>
-    ),
-    enableSorting: false,
-    enableHiding: false,
-    enablePinning: true,
-  },
-
-  {
     id: "actions",
     cell: function Cell({ row }) {
-      //   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-      //   const [showReactivateDialog, setShowReactivateDialog] = useState(false);
       const [showEditDialog, setShowEditDialog] = useState(false);
       const [showCreatePaymentDialog, setShowCreatePaymentDialog] = useState(false);
       const [showCancelDialog, setShowCancelDialog] = useState(false);
       const [showCheckInDialog, setShowCheckInDialog] = useState(false);
       const [showCheckOutDialog, setShowCheckOutDialog] = useState(false);
-      // const [showConfirmDialog, setShowConfirmDialog] = useState(false);
       const [showDeactivateDialog, setShowDeactivateDialog] = useState(false);
       const [showReactivateDialog, setShowReactivateDialog] = useState(false);
-      const { status } = row.original;
+      const [showDetailDialog, setShowDetailDialog] = useState(false);
+      const { status, isPendingDeletePayment } = row.original;
       const { isActive } = row.original;
 
       const confirmConfig = DIALOG_DICTIONARY["CONFIRMED"];
       const cancelConfig = DIALOG_DICTIONARY["CANCELED"];
       const checkInConfig = DIALOG_DICTIONARY["CHECKED_IN"];
       const checkOutConfig = DIALOG_DICTIONARY["CHECKED_OUT"];
-      // const pendingConfig = DIALOG_DICTIONARY['PENDING'];
 
       const {
         canCancel,
         canCheckIn,
         canCheckOut,
         canConfirm,
-        // canModify,
         canDeactivate,
         canReactivate,
       }: ReservationStatusAvailableActions = getAvailableActions(status);
@@ -420,14 +312,6 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
                 newStatus="CHECKED_OUT"
               ></TransitionReservationStatusDialog>
             )}
-            {/* {showConfirmDialog && (
-              <TransitionReservationStatusDialog
-                open={showConfirmDialog}
-                onOpenChange={setShowConfirmDialog}
-                reservation={row.original}
-                newStatus="CONFIRMED"
-              ></TransitionReservationStatusDialog>
-            )} */}
 
             {showDeactivateDialog && (
               <DeactivateReservationsDialog
@@ -451,6 +335,10 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
                 }}
               />
             )}
+
+            {showDetailDialog && (
+              <ReservationDetailsDialog open={showDetailDialog} setOpen={setShowDetailDialog} row={row?.original} />
+            )}
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -459,10 +347,17 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem onSelect={() => setShowEditDialog(true)} disabled={!isActive}>
-                Editar
+              <DropdownMenuItem onSelect={() => setShowDetailDialog(true)} disabled={!isActive}>
+                Ver
               </DropdownMenuItem>
               <DropdownMenuSeparator />
+
+              <DropdownMenuItem onSelect={() => setShowEditDialog(true)} disabled={!isActive}>
+                Editar
+                <DropdownMenuShortcut>
+                  <Pencil className="size-4" aria-hidden="true" />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
 
               {canConfirm && (
                 <DropdownMenuItem onSelect={() => setShowCreatePaymentDialog(true)} disabled={status !== "PENDING"}>
@@ -510,10 +405,11 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
                 </DropdownMenuItem>
               )}
 
-              {
+              {isSuperAdmin && (
                 <DropdownMenuItem
                   onSelect={() => setShowDeactivateDialog(true)}
-                  disabled={!isActive || !canDeactivate}
+                  /* Habilitado si: está activo y se puede desactivar, O si hay un pago pendiente de eliminar */
+                  disabled={!(isActive && canDeactivate) && !isPendingDeletePayment}
                   className="text-red-700"
                 >
                   Archivar
@@ -521,7 +417,7 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
                     <Trash className="size-4 text-red-700" aria-hidden="true" />
                   </DropdownMenuShortcut>
                 </DropdownMenuItem>
-              }
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

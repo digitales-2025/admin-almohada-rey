@@ -1,15 +1,25 @@
 "use client";
 
+import { useCallback, useState } from "react";
+
 import { HeaderPage } from "@/components/common/HeaderPage";
 import { DataTableSkeleton } from "@/components/datatable/data-table-skeleton";
 import ErrorGeneral from "@/components/errors/general-error";
 import { RoomsTable } from "./_components/table/RoomsTable";
-import { useRooms } from "./_hooks/use-rooms";
+import { usePaginatedRooms } from "./_hooks/use-rooms";
 
 export default function RoomsPage() {
-  const { dataRoomsAll, isLoading } = useRooms();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
-  if (isLoading) {
+  const { paginatedRooms, isLoadingPaginatedRooms } = usePaginatedRooms({ page, pageSize });
+
+  const handlePaginationChange = useCallback((newPage: number, newPageSize: number) => {
+    setPage(newPage);
+    setPageSize(newPageSize);
+  }, []);
+
+  if (isLoadingPaginatedRooms) {
     return (
       <div>
         <HeaderPage title="Habitaciones" description="Habitaciones registrados en el sistema." />
@@ -18,7 +28,7 @@ export default function RoomsPage() {
     );
   }
 
-  if (!dataRoomsAll) {
+  if (!paginatedRooms) {
     return (
       <div>
         <HeaderPage title="Habitaciones" description="Habitaciones registrados en el sistema." />
@@ -31,7 +41,16 @@ export default function RoomsPage() {
     <div>
       <HeaderPage title="Habitaciones" description="Habitaciones registrados en el sistema." />
       <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0">
-        <RoomsTable data={dataRoomsAll} />
+        <RoomsTable
+          data={paginatedRooms.data}
+          pagination={{
+            page: paginatedRooms.meta.page,
+            pageSize: paginatedRooms.meta.pageSize,
+            total: paginatedRooms.meta.total,
+            totalPages: paginatedRooms.meta.totalPages,
+          }}
+          onPaginationChange={handlePaginationChange}
+        />
       </div>
     </div>
   );

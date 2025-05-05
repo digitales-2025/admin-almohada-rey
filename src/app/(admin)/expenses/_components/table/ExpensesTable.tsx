@@ -17,25 +17,29 @@ interface ExpensesTableProps {
   data: HotelExpense[];
   pagination: CustomPaginationTableParams;
   onPaginationChange: ServerPaginationChangeEventCallback;
+  refetchPaginatedExpenses: () => void;
 }
 
-export function ExpensesTable({ data, pagination, onPaginationChange }: ExpensesTableProps) {
-  const columns = useMemo(() => expensesColumns(), []);
+export function ExpensesTable({ data, pagination, onPaginationChange, refetchPaginatedExpenses }: ExpensesTableProps) {
+  const columns = useMemo(() => expensesColumns(refetchPaginatedExpenses), [refetchPaginatedExpenses]);
 
   return (
     <DataTable
       data={data}
       columns={columns}
-      toolbarActions={(table: TableInstance<HotelExpense>) => <ExpensesTableToolbarActions table={table} />}
+      toolbarActions={(table: TableInstance<HotelExpense>) => (
+        <ExpensesTableToolbarActions table={table} refetchPaginatedExpenses={refetchPaginatedExpenses} />
+      )}
       filterPlaceholder="Buscar gastos..."
       facetedFilters={facetedFilters}
       serverPagination={{
-        pageIndex: pagination.page - 1, // TanStack Table usa 0-indexed, tu API usa 1-indexed
+        pageIndex: pagination.page - 1,
         pageSize: pagination.pageSize,
         pageCount: pagination.totalPages,
         total: pagination.total,
         onPaginationChange: (pageIndex, pageSize) => {
-          onPaginationChange(pageIndex + 1, pageSize); // Convierte a 1-indexed para el API
+          // Convertir de 0-indexed a 1-indexed para el API
+          onPaginationChange(pageIndex + 1, pageSize);
         },
       }}
     />
