@@ -23,7 +23,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useMediaQuery } from "@/hooks/use-media-query"; // Asegúrate de tener este hook
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { HotelExpense } from "../../_types/expenses";
 import {
   ExpenseCategoryLabels,
@@ -39,6 +39,11 @@ interface ViewExpensesProps {
 
 export function ViewExpenses({ open, onOpenChange, expense }: ViewExpensesProps) {
   const isDesktop = useMediaQuery("(min-width: 640px)");
+
+  // Función de ayuda para verificar si una clave existe en un objeto
+  const isValidKey = <T extends object>(obj: T, key: any): key is keyof T => {
+    return key != null && Object.prototype.hasOwnProperty.call(obj, key);
+  };
 
   const content = (
     <div className="space-y-4 py-2">
@@ -61,20 +66,16 @@ export function ViewExpenses({ open, onOpenChange, expense }: ViewExpensesProps)
               Categoría:
             </span>
             <div>
-              {expense.category ? (
-                <Badge
-                  variant="outline"
-                  className={ExpenseCategoryLabels[expense.category as keyof typeof ExpenseCategoryLabels]?.className}
-                >
+              {expense.category && isValidKey(ExpenseCategoryLabels, expense.category) ? (
+                <Badge variant="outline" className={ExpenseCategoryLabels[expense.category]?.className}>
                   {(() => {
-                    const Icon = ExpenseCategoryLabels[expense.category as keyof typeof ExpenseCategoryLabels]?.icon;
+                    const Icon = ExpenseCategoryLabels[expense.category]?.icon;
                     return Icon ? <Icon className="size-4 mr-1" /> : null;
                   })()}
-                  {ExpenseCategoryLabels[expense.category as keyof typeof ExpenseCategoryLabels]?.label ||
-                    expense.category}
+                  {ExpenseCategoryLabels[expense.category]?.label || String(expense.category)}
                 </Badge>
               ) : (
-                "Sin dato"
+                <span>{expense.category ? String(expense.category) : "Sin dato"}</span>
               )}
             </div>
           </div>
@@ -93,23 +94,16 @@ export function ViewExpenses({ open, onOpenChange, expense }: ViewExpensesProps)
               Tipo de documento:
             </span>
             <div>
-              {expense.documentType ? (
-                <Badge
-                  variant="outline"
-                  className={
-                    ExpenseDocumentTypeLabels[expense.documentType as keyof typeof ExpenseDocumentTypeLabels]?.className
-                  }
-                >
+              {expense.documentType && isValidKey(ExpenseDocumentTypeLabels, String(expense.documentType)) ? (
+                <Badge variant="outline" className={ExpenseDocumentTypeLabels[String(expense.documentType)]?.className}>
                   {(() => {
-                    const Icon =
-                      ExpenseDocumentTypeLabels[expense.documentType as keyof typeof ExpenseDocumentTypeLabels]?.icon;
+                    const Icon = ExpenseDocumentTypeLabels[String(expense.documentType)]?.icon;
                     return Icon ? <Icon className="size-4 mr-1" /> : null;
                   })()}
-                  {ExpenseDocumentTypeLabels[expense.documentType as keyof typeof ExpenseDocumentTypeLabels]?.label ||
-                    expense.documentType}
+                  {ExpenseDocumentTypeLabels[String(expense.documentType)]?.label || String(expense.documentType)}
                 </Badge>
               ) : (
-                "Sin dato"
+                <span>{expense.documentType ? String(expense.documentType) : "Sin dato"}</span>
               )}
             </div>
           </div>
@@ -123,25 +117,16 @@ export function ViewExpenses({ open, onOpenChange, expense }: ViewExpensesProps)
               Método de pago:
             </span>
             <div>
-              {expense.paymentMethod ? (
-                <Badge
-                  variant="outline"
-                  className={
-                    ExpensePaymentMethodLabels[expense.paymentMethod as keyof typeof ExpensePaymentMethodLabels]
-                      ?.className
-                  }
-                >
+              {expense.paymentMethod && isValidKey(ExpensePaymentMethodLabels, expense.paymentMethod) ? (
+                <Badge variant="outline" className={ExpensePaymentMethodLabels[expense.paymentMethod]?.className}>
                   {(() => {
-                    const Icon =
-                      ExpensePaymentMethodLabels[expense.paymentMethod as keyof typeof ExpensePaymentMethodLabels]
-                        ?.icon;
+                    const Icon = ExpensePaymentMethodLabels[expense.paymentMethod]?.icon;
                     return Icon ? <Icon className="size-4 mr-1" /> : null;
                   })()}
-                  {ExpensePaymentMethodLabels[expense.paymentMethod as keyof typeof ExpensePaymentMethodLabels]
-                    ?.label || expense.paymentMethod}
+                  {ExpensePaymentMethodLabels[expense.paymentMethod]?.label || String(expense.paymentMethod)}
                 </Badge>
               ) : (
-                "Sin dato"
+                <span>{expense.paymentMethod ? String(expense.paymentMethod) : "Sin dato"}</span>
               )}
             </div>
           </div>
