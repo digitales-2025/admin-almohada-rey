@@ -9,7 +9,10 @@ import { CreateHotelExpenseDto, DeleteHotelExpenseDto, HotelExpense, UpdateHotel
 // Tipos de respuesta base
 type ExpenseResponse = BaseApiResponse<HotelExpense>;
 type ExpensesResponse = BaseApiResponse<HotelExpense[]>;
-export type PaginatedExpenseParams = PaginatedQueryParams<HotelExpense>;
+export type PaginatedExpenseParams = PaginatedQueryParams<HotelExpense> & {
+  year?: string;
+  month?: string;
+};
 
 export const expensesApi = createApi({
   reducerPath: "expensesApi",
@@ -41,10 +44,15 @@ export const expensesApi = createApi({
 
     // Obtener gastos por fecha
     getExpensesByDate: build.query<PaginatedResponse<HotelExpense>, PaginatedExpenseParams>({
-      query: ({ pagination: { page = 1, pageSize = 10 }, fieldFilters }) => ({
+      query: ({ pagination: { page = 1, pageSize = 10 }, year, month }) => ({
         url: "/expenses/filter/date",
         method: "GET",
-        params: { page, pageSize, ...fieldFilters },
+        params: {
+          page,
+          pageSize,
+          ...(year ? { year } : {}),
+          ...(month ? { month } : {}),
+        },
         credentials: "include",
       }),
       providesTags: (result) => [

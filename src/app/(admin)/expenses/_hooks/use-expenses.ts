@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { toast } from "sonner";
 
 import { runAndHandleError } from "@/utils/baseQuery";
@@ -12,16 +11,6 @@ import {
   useUpdateExpenseMutation,
 } from "../_services/expensesApi";
 import { CreateHotelExpenseDto, DeleteHotelExpenseDto, UpdateHotelExpenseDto } from "../_types/expenses";
-
-// Configuración por defecto para la paginación
-export const defaultPaginationConfig = {
-  page: 1,
-  pageSize: 10,
-};
-
-export const defaultParamConfig: PaginatedExpenseParams = {
-  pagination: defaultPaginationConfig,
-};
 
 // Hook personalizado para gastos
 export const useExpenses = () => {
@@ -148,20 +137,35 @@ export const useExpenses = () => {
   };
 };
 
-// Hook personalizado para gastos paginados
-export const usePaginatedExpenses = () => {
-  const [params, setParams] = useState<PaginatedExpenseParams>(defaultParamConfig);
+interface UsePaginatedExpensesProps {
+  page?: number;
+  pageSize?: number;
+  year?: string;
+  month?: string;
+}
 
-  const queryResponse = useGetExpensesByDateQuery(params, {
+export const usePaginatedExpenses = (options: UsePaginatedExpensesProps = {}) => {
+  const { page = 1, pageSize = 10, year, month } = options;
+
+  // Construimos los parámetros de paginación sin incluir year/month en fieldFilters
+  const paginationParams: PaginatedExpenseParams = {
+    pagination: { page, pageSize },
+    // No incluimos year/month en fieldFilters ya que no son campos de HotelExpense
+    year,
+    month,
+  };
+
+  const {
+    data: paginatedExpenses,
+    isLoading: isLoadingPaginatedExpenses,
+    refetch: refetchPaginatedExpenses,
+  } = useGetExpensesByDateQuery(paginationParams, {
     refetchOnMountOrArgChange: true,
   });
 
-  const updateFilters = (newParams: PaginatedExpenseParams) => {
-    setParams(newParams);
-  };
-
   return {
-    queryResponse,
-    updateFilters,
+    paginatedExpenses,
+    isLoadingPaginatedExpenses,
+    refetchPaginatedExpenses,
   };
 };
