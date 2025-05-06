@@ -136,7 +136,10 @@ export default function DatePicker({
       <PopoverTrigger asChild>
         <Button
           variant={"outline"}
-          className={cn("w-full justify-start text-left font-normal", !value && "text-muted-foreground")}
+          className={cn(
+            "w-full justify-start text-left font-normal bg-transparent border-input",
+            !value && "text-muted-foreground"
+          )}
           tabIndex={0}
         >
           {withTime ? (
@@ -147,7 +150,12 @@ export default function DatePicker({
           <span className="max-w-[150px] sm:max-w-full truncate text-ellipsis">{getFormattedDate()}</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="center" side="bottom" onOpenAutoFocus={(e) => e.preventDefault()}>
+      <PopoverContent
+        className="w-auto p-0 bg-card border-input"
+        align="center"
+        side="bottom"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <div className="flex items-center justify-between p-3 gap-3">
           <Select value={month.toString()} onValueChange={handleMonthChange}>
             <SelectTrigger className="w-[140px]">
