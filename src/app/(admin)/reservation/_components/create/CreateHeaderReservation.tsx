@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
@@ -12,7 +12,6 @@ import { socketService } from "@/services/socketService";
 import { SelectOption } from "@/types/form/select-option";
 import { CreateReservationInput, DetailedRoom } from "../../_schemas/reservation.schemas";
 import { FORMSTATICS } from "../../_statics/forms";
-import { CreateCustomersReservationsSheet } from "../create-customers/CreateCustomersReservationsSheet";
 import { SearchCustomerCombobox } from "../search/SearchCustomerCombobox";
 
 interface CreateHeaderReservationProps {
@@ -75,11 +74,7 @@ export default function CreateHeaderReservation({
       <FormItem className="w-full col-span-2 sm:col-span-1">
         <FormLabel>{FORMSTATICS.customerId.label}</FormLabel>
         <FormControl>
-          <SearchCustomerCombobox
-            onValueChange={onSearchCustomerFound}
-            className="max-w-none"
-            notFoundAction={<CreateCustomersReservationsSheet />}
-          />
+          <SearchCustomerCombobox onValueChange={onSearchCustomerFound} className="max-w-none" notFoundAction={true} />
         </FormControl>
         <CustomFormDescription
           required={FORMSTATICS.customerId.required}
