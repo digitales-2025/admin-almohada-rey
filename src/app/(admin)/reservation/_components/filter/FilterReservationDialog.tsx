@@ -146,29 +146,6 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
     pageSize: 10,
   };
 
-  // const onSubmitAllReservations = useCallback(
-  //   ({ pagination = defaultPaginationConfig }: PaginatedReservationParams) => {
-  //     const localFilters: PaginatedReservationParams = {
-  //       pagination,
-  //     };
-  //     if (onSaveFilter) {
-  //       onSaveFilter(localFilters);
-  //       if (isSuccess && data) handleClose();
-  //     } else {
-  //       updateFilters(localFilters);
-  //       if (isError) {
-  //         toast.error("Error al filtrar reservaciones");
-  //       }
-  //       if (data) {
-  //         toast.success("Reservas filtrado correctamente");
-  //         handleClose();
-  //       }
-  //     }
-  //   },
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   [updateFilters]
-  // );
-
   const onSubmitCustomer = useCallback(
     (input: FilterByCustomerInput) => {
       const localFilters: PaginatedReservationParams = {
@@ -301,48 +278,21 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
         onValueChange={setActiveTab}
         className="w-full flex flex-col space-y-4"
       >
-        <TabsList className="grid w-full grid-cols-2 h-fit">
+        <TabsList className="grid w-full grid-cols-3 h-fit">
           {/* <TabsTrigger value={TAB_OPTIONS.ALL_BOOKINGS.value}>{TAB_OPTIONS.ALL_BOOKINGS.label}</TabsTrigger> */}
           <TabsTrigger value={TAB_OPTIONS.BY_CUSTOMER.value}>
-            <User className="size-4"></User>
-            {TAB_OPTIONS.BY_CUSTOMER.label}
+            <User className="size-4 shrink-0"></User>
+            <span className="truncate text-ellipsis">{TAB_OPTIONS.BY_CUSTOMER.label}</span>
           </TabsTrigger>
           <TabsTrigger value={TAB_OPTIONS.BY_CHECK_INOUT.value}>
-            <CalendarPlus className="size-4"></CalendarPlus>
-            {TAB_OPTIONS.BY_CHECK_INOUT.label}
+            <CalendarPlus className="size-4 shrink-0"></CalendarPlus>
+            <span className="truncate text-ellipsis">{TAB_OPTIONS.BY_CHECK_INOUT.label}</span>
           </TabsTrigger>
           <TabsTrigger value={TAB_OPTIONS.BY_CUSTOMER_N_CHECK_INOUT.value} className="truncate sm:text-ellipsis">
-            <Users className="size-4"></Users>
-            {TAB_OPTIONS.BY_CUSTOMER_N_CHECK_INOUT.label}
+            <Users className="size-4 shrink-0"></Users>
+            <span className="truncate text-ellipsis">{TAB_OPTIONS.BY_CUSTOMER_N_CHECK_INOUT.label}</span>
           </TabsTrigger>
         </TabsList>
-
-        {/* <FilterReservationTabCardContent
-          value={TAB_OPTIONS.ALL_BOOKINGS.value}
-          title={TAB_OPTIONS.ALL_BOOKINGS.label}
-          description={TAB_OPTIONS.ALL_BOOKINGS.description}
-        >
-          <section className="space-y-4">
-            <header className="flex flex-col space-y-2 justify-center items-center">
-              <Info className="size-8"></Info>
-              <CardDescription className="text-center">Este es el filtro por defecto</CardDescription>
-            </header>
-            <SubmitButton
-              type="button"
-              onClick={() =>
-                onSubmitAllReservations({
-                  pagination: {
-                    page: 1,
-                    pageSize: 10,
-                  },
-                })
-              }
-              className="w-full"
-            >
-              {FILTER_DIALOG_MESSAGES.submitButton}
-            </SubmitButton>
-          </section>
-        </FilterReservationTabCardContent> */}
 
         <FilterReservationTabCardContent
           value={TAB_OPTIONS.BY_CUSTOMER.value}
