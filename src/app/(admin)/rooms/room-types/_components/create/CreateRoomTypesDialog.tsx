@@ -48,10 +48,13 @@ export function CreateRoomTypeDialog() {
     resolver: zodResolver(createRoomTypeSchema),
     defaultValues: {
       name: "",
+      nameEn: "",
       guests: 0,
       price: 0,
       description: "",
+      descriptionEn: "",
       bed: "",
+      bedEn: "",
       images: [],
     },
   });

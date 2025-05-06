@@ -45,10 +45,13 @@ export interface RoomType extends RoomTypePrototype {
   createdAt: string;
   updatedAt: string;
   name: string;
+  nameEn: string;
   guests: number;
   price: number;
   description: string;
+  descriptionEn: string;
   bed: string;
+  bedEn: string;
   imagesRoomType: imagesRoomType[];
 }
 /**

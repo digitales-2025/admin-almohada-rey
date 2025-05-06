@@ -128,10 +128,13 @@ export const useRoomTypes = () => {
 
     // Agregar campos básicos de texto
     if (data.name) requestData.append("name", data.name);
+    if (data.nameEn) requestData.append("nameEn", data.nameEn);
     if (data.guests) requestData.append("guests", String(data.guests));
     if (data.price) requestData.append("price", String(data.price));
     if (data.description) requestData.append("description", data.description);
+    if (data.descriptionEn) requestData.append("descriptionEn", data.descriptionEn);
     if (data.bed) requestData.append("bed", data.bed);
+    if (data.bedEn) requestData.append("bedEn", data.bedEn);
 
     // Manejar imagen nueva si existe
     if (data.newImage && data.newImage instanceof File) {
