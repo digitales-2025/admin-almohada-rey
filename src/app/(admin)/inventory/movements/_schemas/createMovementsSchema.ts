@@ -3,7 +3,7 @@ import { z } from "zod";
 import { ExpenseDocumentType } from "../_types/movements";
 import { ProductType } from "../../products/_types/products";
 
-// Schema para un recurso individual
+// Schema para un producto individual
 const productMovementsSchema = z.object({
   productId: z.string().nonempty("El ID del producto es requerido"),
   quantity: z
@@ -32,7 +32,7 @@ const baseSchema = {
       invalid_type_error: "Tipo de producto inválido",
     })
     .optional(),
-  movementDetail: z.array(productMovementsSchema).min(1, "Debe seleccionar al menos un recurso"),
+  movementDetail: z.array(productMovementsSchema).min(1, "Debe seleccionar al menos un producto"),
 };
 
 // Schema principal para el movimiento de inventario
