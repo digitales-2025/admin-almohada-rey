@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { ImageIcon, Pencil, Settings, X } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
@@ -105,10 +105,43 @@ export function RoomTypeImagesManager({
     form.setValue("newImage", undefined, { shouldValidate: true });
   };
 
+  // Efecto para asegurar que imageUpdate se actualice cuando cambia editingImageId
+  useEffect(() => {
+    if (editingImageId) {
+      const selectedImage = roomType.imagesRoomType?.find((img) => img.id === editingImageId);
+      if (selectedImage) {
+        // Forzar la actualización del valor en el formulario
+        form.setValue(
+          "imageUpdate",
+          {
+            id: selectedImage.id,
+            url: selectedImage.url,
+            isMain: selectedImage.isMain,
+          },
+          { shouldValidate: true }
+        );
+      }
+    } else {
+      // Limpiar el valor cuando no hay imagen editándose
+      form.setValue(
+        "imageUpdate",
+        {
+          id: "",
+          url: "",
+          isMain: false,
+        },
+        { shouldValidate: true }
+      );
+    }
+  }, [editingImageId, roomType.imagesRoomType, form]);
+
   // Mostrar opciones de edición
   const handleToggleEdit = (imageId: string, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevenir que se seleccione la imagen
+
+    // Simplemente cambiar el estado - el useEffect se encargará de actualizar el formulario
     setEditingImageId(editingImageId === imageId ? null : imageId);
+
     setConfigImageId(null); // Cerrar menú de configuración si está abierto
     setShowConfirmation(false);
     setSwitchValue(false);
