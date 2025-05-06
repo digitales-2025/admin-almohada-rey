@@ -2,7 +2,7 @@ import { format, parse } from "date-fns";
 import { Package } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
-import { ExpenseCategoryLabels } from "@/app/(admin)/expenses/_utils/expenses.utils";
+import { ExpenseDocumentTypeLabels } from "@/app/(admin)/expenses/_utils/expenses.utils";
 import { InputWithIcon } from "@/components/input-with-icon";
 import { Card, CardContent } from "@/components/ui/card";
 import DatePicker from "@/components/ui/date-time-picker";
@@ -101,7 +101,7 @@ export default function CreateHeaderMovements({ form, type }: CreateHeaderMoveme
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {Object.entries(ExpenseCategoryLabels).map(([value, { label, icon: Icon, className }]) => (
+                        {Object.entries(ExpenseDocumentTypeLabels).map(([value, { label, icon: Icon, className }]) => (
                           <SelectItem key={value} value={value} className="flex items-center gap-2">
                             <div className="flex items-center gap-2">
                               <Icon size={14} className={`flex-shrink-0 ${className}`} />
