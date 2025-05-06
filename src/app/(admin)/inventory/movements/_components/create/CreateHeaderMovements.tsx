@@ -1,7 +1,9 @@
 import { format, parse } from "date-fns";
+import { Package } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
 import { ExpenseCategoryLabels } from "@/app/(admin)/expenses/_utils/expenses.utils";
+import { InputWithIcon } from "@/components/input-with-icon";
 import { Card, CardContent } from "@/components/ui/card";
 import DatePicker from "@/components/ui/date-time-picker";
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -30,7 +32,7 @@ export default function CreateHeaderMovements({ form, type }: CreateHeaderMoveme
               <FormItem>
                 <FormLabel htmlFor="name">Descripción del Movimiento</FormLabel>
                 <FormControl>
-                  <Input id="description" placeholder="Ej: Compra de productos" {...field} />
+                  <InputWithIcon Icon={Package} id="description" placeholder="Ej: Compra de productos" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
