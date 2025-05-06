@@ -50,7 +50,7 @@ export const sidebarData: SidebarData = {
             },
             {
               title: "Salidas",
-              url: "/inventory/outputs",
+              url: "/inventory/output",
               icon: PackageMinus,
             },
           ],
