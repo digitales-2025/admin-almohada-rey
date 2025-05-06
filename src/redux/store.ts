@@ -3,7 +3,9 @@ import { setupListeners } from "@reduxjs/toolkit/query";
 
 import { customersApi } from "@/app/(admin)/customers/_services/customersApi";
 import { expensesApi } from "@/app/(admin)/expenses/_services/expensesApi";
+import { movementsApi } from "@/app/(admin)/inventory/movements/_services/movementsApi";
 import { productsApi } from "@/app/(admin)/inventory/products/_services/productsApi";
+import { warehouseApi } from "@/app/(admin)/inventory/warehouse/_services/warehouseApi";
 import { paymentsApi } from "@/app/(admin)/payments/_services/paymentsApi";
 import { adminApi } from "@/app/(admin)/profile/_services/adminApi";
 import { reservationApi } from "@/app/(admin)/reservation/_services/reservationApi";
@@ -28,6 +30,8 @@ export const store = configureStore({
     [servicesApi.reducerPath]: servicesApi.reducer,
     [paymentsApi.reducerPath]: paymentsApi.reducer,
     [expensesApi.reducerPath]: expensesApi.reducer,
+    [movementsApi.reducerPath]: movementsApi.reducer,
+    [warehouseApi.reducerPath]: warehouseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -56,7 +60,9 @@ export const store = configureStore({
       .concat(roomsCleaningApi.middleware)
       .concat(servicesApi.middleware)
       .concat(paymentsApi.middleware)
-      .concat(expensesApi.middleware),
+      .concat(expensesApi.middleware)
+      .concat(movementsApi.middleware)
+      .concat(warehouseApi.middleware),
 });
 setupListeners(store.dispatch);
 
