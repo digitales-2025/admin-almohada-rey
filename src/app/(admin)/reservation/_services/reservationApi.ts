@@ -26,7 +26,7 @@ export type PaginatedReservationParams = PaginatedQueryParams<Reservation>;
 export const reservationApi = createApi({
   reducerPath: "reservationApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["Reservation", "RoomAvailability"],
+  tagTypes: ["Reservation", "RoomAvailability", "Rooms", "Payment"],
   endpoints: (build) => ({
     createReservation: build.mutation<CreateReservationReduxResponse, CreateReservationInput>({
       query: (body) => ({
@@ -58,9 +58,11 @@ export const reservationApi = createApi({
         body: { status },
         credentials: "include",
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: "Reservation", id }],
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Reservation", id },
+        "Rooms", // Añadir este tag para invalidar todas las consultas con providesTags: ["Rooms"]
+      ],
     }),
-
     deactivateReservations: build.mutation<BaseApiResponse<UpdateManyResponse>, UpdateManyDto>({
       query: (dto) => ({
         url: `/reservation/deactivate`,
@@ -68,7 +70,7 @@ export const reservationApi = createApi({
         body: dto,
         credentials: "include",
       }),
-      invalidatesTags: ["Reservation"],
+      invalidatesTags: ["Reservation", "Payment"],
     }),
 
     reactivateReservations: build.mutation<BaseApiResponse<UpdateManyResponse>, UpdateManyDto>({
