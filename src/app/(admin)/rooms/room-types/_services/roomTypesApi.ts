@@ -84,7 +84,7 @@ export const roomTypeApi = createApi({
         body: formData,
         credentials: "include",
       }),
-      invalidatesTags: [{ type: "RoomType", id: "LIST" }],
+      invalidatesTags: ["RoomType"],
     }),
 
     // MUTACIÓN: Actualizar tipo de habitación existente con posibles cambios en imágenes
@@ -111,7 +111,7 @@ export const roomTypeApi = createApi({
         body,
         credentials: "include",
       }),
-      invalidatesTags: [{ type: "RoomType", id: "LIST" }],
+      invalidatesTags: ["RoomType"],
     }),
 
     reactivateRoomTypes: build.mutation<RoomTypesResponse, ReactivateRoomTypeDto>({
@@ -121,7 +121,7 @@ export const roomTypeApi = createApi({
         body,
         credentials: "include",
       }),
-      invalidatesTags: [{ type: "RoomType", id: "LIST" }],
+      invalidatesTags: ["RoomType"],
     }),
 
     updateMainImage: build.mutation<
