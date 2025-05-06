@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { Ellipsis, Pencil, RefreshCcwDot, Trash } from "lucide-react";
+import { Ellipsis, Pencil, Trash } from "lucide-react";
 import { toast } from "sonner";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
@@ -28,7 +28,6 @@ import { reservationStatusConfig } from "../../_types/reservation-enum.config";
 import { getAvailableActions } from "../../_utils/reservation-status-validation.utils";
 import { CreatePaymentDialog } from "../create-payment/CreatePaymentsDialog";
 import { DeactivateReservationsDialog } from "../state-management/DeactivateReservationsDialog";
-import { ReactivateReservationsDialog } from "../state-management/ReactivateReservationsDialog";
 import { DIALOG_DICTIONARY } from "../state-management/reservation-status-dialog-config";
 import { TransitionReservationStatusDialog } from "../state-management/TransitionReservationStatusDialog";
 import { UpdateReservationSheet } from "../update/UpdateReservationSheet";
@@ -244,7 +243,6 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
       const [showCheckInDialog, setShowCheckInDialog] = useState(false);
       const [showCheckOutDialog, setShowCheckOutDialog] = useState(false);
       const [showDeactivateDialog, setShowDeactivateDialog] = useState(false);
-      const [showReactivateDialog, setShowReactivateDialog] = useState(false);
       const [showDetailDialog, setShowDetailDialog] = useState(false);
       const { status, isPendingDeletePayment } = row.original;
       const { isActive } = row.original;
@@ -254,14 +252,8 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
       const checkInConfig = DIALOG_DICTIONARY["CHECKED_IN"];
       const checkOutConfig = DIALOG_DICTIONARY["CHECKED_OUT"];
 
-      const {
-        canCancel,
-        canCheckIn,
-        canCheckOut,
-        canConfirm,
-        canDeactivate,
-        canReactivate,
-      }: ReservationStatusAvailableActions = getAvailableActions(status);
+      const { canCancel, canCheckIn, canCheckOut, canConfirm, canDeactivate }: ReservationStatusAvailableActions =
+        getAvailableActions(status);
 
       const today = new Date();
       const todayFormatted = today.toISOString().split("T")[0];
@@ -317,17 +309,6 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
               <DeactivateReservationsDialog
                 open={showDeactivateDialog}
                 onOpenChange={setShowDeactivateDialog}
-                reservations={[row?.original]}
-                showTrigger={false}
-                onSuccess={() => {
-                  row.toggleSelected(false);
-                }}
-              />
-            )}
-            {showReactivateDialog && (
-              <ReactivateReservationsDialog
-                open={showReactivateDialog}
-                onOpenChange={setShowReactivateDialog}
                 reservations={[row?.original]}
                 showTrigger={false}
                 onSuccess={() => {
@@ -395,15 +376,6 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />
-
-              {isSuperAdmin && (
-                <DropdownMenuItem onSelect={() => setShowReactivateDialog(true)} disabled={isActive || !canReactivate}>
-                  Restaurar
-                  <DropdownMenuShortcut>
-                    <RefreshCcwDot className="size-4" aria-hidden="true" />
-                  </DropdownMenuShortcut>
-                </DropdownMenuItem>
-              )}
 
               {isSuperAdmin && (
                 <DropdownMenuItem
