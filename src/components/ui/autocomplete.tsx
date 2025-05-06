@@ -144,7 +144,7 @@ const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
       <CommandPrimitive onKeyDown={handleKeyDown}>
         <div className="relative" onClick={handleCommandClick}>
           {selected && renderSelectedValue ? (
-            <div className="flex items-center border rounded-md pl-3 pr-8 py-2 h-10 bg-white dark:bg-slate-800 relative capitalize">
+            <div className="flex items-center border rounded-md pl-3 pr-8 py-2 h-10 bg-card dark:bg-slate-800 relative capitalize">
               <SelectedValueDisplay />
               {showClearButton && (
                 <Button
