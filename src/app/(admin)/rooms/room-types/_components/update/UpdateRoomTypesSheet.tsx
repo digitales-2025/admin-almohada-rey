@@ -135,7 +135,7 @@ export function UpdateRoomTypeSheet({ roomType, open, onOpenChange }: UpdateRoom
               roomType={roomType}
               selectedImageId={selectedImageId}
               setSelectedImageId={setSelectedImageId}
-              onUpdateMainImage={onUpdateMainImage} // <-- Pasar la nueva función aquí
+              onUpdateMainImage={onUpdateMainImage}
             >
               <SheetFooter className="gap-2 pt-2 sm:space-x-0">
                 <div className="flex flex-row-reverse gap-2">

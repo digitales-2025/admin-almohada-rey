@@ -137,7 +137,7 @@ export default function DatePicker({
         <Button
           variant={"outline"}
           className={cn(
-            "w-full justify-start text-left font-normal bg-transparent border-input",
+            "w-full justify-start text-left font-normal bg-transparent border border-input",
             !value && "text-muted-foreground"
           )}
           tabIndex={0}

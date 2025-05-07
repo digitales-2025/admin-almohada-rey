@@ -69,7 +69,6 @@ export function GuestsDetailsDialog({
   customer: ReservationCustomer;
   user: ReservationUser;
 }) {
-  console.log("GuestsDetailsDialog", JSON.stringify(guests, null, 2));
   const DIALOG_MESSAGES = {
     button: "Mostrar Acompañantes",
     title: "Detalles de venta de productos",

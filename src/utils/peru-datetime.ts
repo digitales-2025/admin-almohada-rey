@@ -38,7 +38,6 @@ export const persistentData = {
  */
 export function parsePeruTimeString(timeString: string): { hour: number; minutes: number } {
   const [time, period] = timeString.split(/(?=[AaPp][Mm])/);
-  // console.log(`parsePeruTimeString: ${timeString} -> ${time}, ${period}`);
   const [hours, minutes] = time.split(":");
   let hour24 = parseInt(hours);
 

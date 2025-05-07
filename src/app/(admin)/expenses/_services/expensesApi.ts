@@ -69,7 +69,7 @@ export const expensesApi = createApi({
         body,
         credentials: "include",
       }),
-      invalidatesTags: [{ type: "Expense", id: "LIST" }],
+      invalidatesTags: ["Expense"],
     }),
 
     // Actualizar gasto
@@ -94,7 +94,7 @@ export const expensesApi = createApi({
         body,
         credentials: "include",
       }),
-      invalidatesTags: [{ type: "Expense", id: "LIST" }],
+      invalidatesTags: ["Expense"],
     }),
   }),
 });

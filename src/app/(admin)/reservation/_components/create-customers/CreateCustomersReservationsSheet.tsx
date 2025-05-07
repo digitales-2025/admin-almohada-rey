@@ -33,7 +33,12 @@ const dataForm = {
   title: "Crear Cliente",
   description: "Complete los detalles a continuación para crear nuevos clientes.",
 };
-export function CreateCustomersReservationsSheet() {
+
+interface CreateCustomersReservationsSheetProps {
+  refetch: () => void;
+}
+
+export function CreateCustomersReservationsSheet({ refetch }: CreateCustomersReservationsSheetProps) {
   const [open, setOpen] = useState(false);
   const [isCreatePending, startCreateTransition] = useTransition();
   const { onCreateCustomer, isSuccessCreateCustomer } = useCustomers();
@@ -78,6 +83,7 @@ export function CreateCustomersReservationsSheet() {
   useEffect(() => {
     if (isSuccessCreateCustomer) {
       form.reset();
+      refetch();
       setOpen(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

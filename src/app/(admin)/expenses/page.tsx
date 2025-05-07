@@ -23,7 +23,7 @@ export default function ExpensesPage() {
   const [selectedMonth, setSelectedMonth] = useState<string | undefined>(currentMonth);
 
   // Obtener datos paginados usando el hook
-  const { paginatedExpenses, isLoadingPaginatedExpenses, refetchPaginatedExpenses } = usePaginatedExpenses({
+  const { paginatedExpenses, isLoadingPaginatedExpenses } = usePaginatedExpenses({
     page,
     pageSize,
     year: selectedYear,
@@ -82,7 +82,6 @@ export default function ExpensesPage() {
       <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0">
         <ExpensesTable
           data={paginatedExpenses.data}
-          refetchPaginatedExpenses={refetchPaginatedExpenses}
           pagination={{
             page: paginatedExpenses.meta.page,
             pageSize: paginatedExpenses.meta.pageSize,

@@ -17,19 +17,16 @@ interface ExpensesTableProps {
   data: HotelExpense[];
   pagination: CustomPaginationTableParams;
   onPaginationChange: ServerPaginationChangeEventCallback;
-  refetchPaginatedExpenses: () => void;
 }
 
-export function ExpensesTable({ data, pagination, onPaginationChange, refetchPaginatedExpenses }: ExpensesTableProps) {
-  const columns = useMemo(() => expensesColumns(refetchPaginatedExpenses), [refetchPaginatedExpenses]);
+export function ExpensesTable({ data, pagination, onPaginationChange }: ExpensesTableProps) {
+  const columns = useMemo(() => expensesColumns(), []);
 
   return (
     <DataTable
       data={data}
       columns={columns}
-      toolbarActions={(table: TableInstance<HotelExpense>) => (
-        <ExpensesTableToolbarActions table={table} refetchPaginatedExpenses={refetchPaginatedExpenses} />
-      )}
+      toolbarActions={(table: TableInstance<HotelExpense>) => <ExpensesTableToolbarActions table={table} />}
       filterPlaceholder="Buscar gastos..."
       facetedFilters={facetedFilters}
       serverPagination={{

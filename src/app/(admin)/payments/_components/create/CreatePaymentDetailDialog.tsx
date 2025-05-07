@@ -5,8 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronLeft, Receipt, RefreshCcw, ShoppingBag, Utensils, X } from "lucide-react";
 import { useFieldArray, useForm } from "react-hook-form";
 
-import { useProducts } from "@/app/(admin)/inventory/products/_hooks/use-products";
 import { ProductType } from "@/app/(admin)/inventory/products/_types/products";
+import { useWarehouse } from "@/app/(admin)/inventory/warehouse/_hooks/use-warehouse";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
@@ -33,7 +33,7 @@ export function CreatePaymentDetailDialog({ open, onOpenChange, payment }: Creat
   const isDesktop = useMediaQuery("(min-width: 800px)");
   const [searchTerm, setSearchTerm] = useState("");
   const { dataServicesAll } = useServices();
-  const { productByType } = useProducts({ type: ProductType.COMMERCIAL });
+  const { productsStockByType } = useWarehouse({ typeStockProduct: ProductType.COMMERCIAL });
   const [isCreatePending, startCreateTransition] = useTransition();
   const { onCreatePaymentDetails, isSuccessCreatePaymentDetails } = usePayments();
 
@@ -58,12 +58,15 @@ export function CreatePaymentDetailDialog({ open, onOpenChange, payment }: Creat
       icon: <ShoppingBag className="h-5 w-5" />,
       color: "#f59e0b",
       items:
-        productByType?.map((product) => ({
-          id: product.id,
-          name: product.name,
-          price: product.unitCost,
-          code: product.code,
-        })) || [],
+        productsStockByType
+          ?.filter((stock) => stock.quantity > 0)
+          .map((stock) => ({
+            id: stock.product.id,
+            name: stock.product.name,
+            price: stock.product.unitCost ?? 0,
+            code: stock.product.code ?? "",
+            quantity: stock.quantity,
+          })) || [],
     },
   ];
 

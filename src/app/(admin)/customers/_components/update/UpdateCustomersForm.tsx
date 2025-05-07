@@ -125,7 +125,7 @@ export default function UpdateCustomersForm({
                   <FormLabel htmlFor="city">Provincia</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value} disabled={!isDepartmentSelected}>
                     <FormControl>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger className="w-full border border-input">
                         <SelectValue placeholder="Seleccione una provincia" />
                       </SelectTrigger>
                     </FormControl>

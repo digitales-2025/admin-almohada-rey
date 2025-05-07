@@ -38,11 +38,7 @@ const dataForm = {
   description: "Complete los detalles a continuación para registrar un nuevo gasto.",
 };
 
-interface CreateExpensesDialogProps {
-  refetchPaginatedExpenses: () => void;
-}
-
-export function CreateExpensesDialog({ refetchPaginatedExpenses }: CreateExpensesDialogProps) {
+export function CreateExpensesDialog() {
   const isDesktop = useMediaQuery("(min-width: 640px)");
   const [open, setOpen] = useState(false);
   const [isCreatePending, startCreateTransition] = useTransition();
@@ -85,7 +81,6 @@ export function CreateExpensesDialog({ refetchPaginatedExpenses }: CreateExpense
   useEffect(() => {
     if (isSuccessCreateExpense) {
       form.reset();
-      refetchPaginatedExpenses();
       setOpen(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

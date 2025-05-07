@@ -15,6 +15,8 @@ export type StockWarehouse = {
     id: string;
     name: string;
     type: ProductType;
+    code?: string;
+    unitCost?: number;
   };
 };
 

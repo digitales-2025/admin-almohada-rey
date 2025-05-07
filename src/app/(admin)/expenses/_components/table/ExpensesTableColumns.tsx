@@ -33,7 +33,7 @@ import { UpdateExpensesSheet } from "../update/UpdateExpensesSheet";
 import { ViewExpenses } from "../view/ViewExpenses";
 
 // Columnas para la tabla de gastos
-export const expensesColumns = (refetchPaginatedExpenses: () => void): ColumnDef<HotelExpense>[] => [
+export const expensesColumns = (): ColumnDef<HotelExpense>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -172,7 +172,6 @@ export const expensesColumns = (refetchPaginatedExpenses: () => void): ColumnDef
               showTrigger={false}
               onSuccess={() => {
                 row.toggleSelected(false);
-                refetchPaginatedExpenses();
               }}
             />
           )}

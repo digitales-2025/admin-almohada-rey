@@ -144,7 +144,7 @@ const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
       <CommandPrimitive onKeyDown={handleKeyDown}>
         <div className="relative" onClick={handleCommandClick}>
           {selected && renderSelectedValue ? (
-            <div className="flex items-center border rounded-md pl-3 pr-8 py-2 h-10 bg-white dark:bg-slate-800 relative capitalize">
+            <div className="flex items-center border rounded-md pl-3 pr-8 py-2 h-10 bg-card dark:bg-slate-800 relative capitalize">
               <SelectedValueDisplay />
               {showClearButton && (
                 <Button
@@ -197,14 +197,14 @@ const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
           )}
           <div
             className={cn(
-              "absolute top-0 z-50 w-full rounded-xl border border-input bg-white dark:bg-slate-800 shadow outline-none animate-in fade-in-0 zoom-in-95",
+              "absolute top-0 z-50 w-full rounded-xl border border-input bg-card dark:bg-slate-800 shadow outline-none animate-in fade-in-0 zoom-in-95",
               isOpen ? "block" : "hidden"
             )}
             onMouseDown={(e) => e.stopPropagation()}
           >
             <div className="max-h-[300px] overflow-y-auto" onScrollCapture={handleScrollCapture}>
               <CommandList
-                className="h-full rounded-lg capitalize bg-white dark:bg-slate-800"
+                className="h-full rounded-lg capitalize bg-card dark:bg-slate-800"
                 onMouseDown={(e) => {
                   e.preventDefault();
                 }}

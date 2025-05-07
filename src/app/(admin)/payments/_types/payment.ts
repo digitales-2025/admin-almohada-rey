@@ -97,6 +97,7 @@ export interface CategoryItemPayment {
   price: number;
   code: string;
   description?: string;
+  quantity?: number;
 }
 
 export interface CategoryPayment {
