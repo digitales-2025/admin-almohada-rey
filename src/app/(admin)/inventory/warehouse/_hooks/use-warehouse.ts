@@ -2,6 +2,7 @@ import {
   PaginatedWarehouseParams,
   useGetAllWarehousesQuery,
   useGetPaginatedWarehousesQuery,
+  useGetProductsStockByTypeQuery,
   useGetWarehouseByIdQuery,
   useGetWarehousesByTypeQuery,
 } from "../_services/warehouseApi";
@@ -9,11 +10,12 @@ import { ProductType } from "../../products/_types/products";
 
 interface UseProductProps {
   type?: ProductType;
+  typeStockProduct?: ProductType;
   id?: string;
 }
 
 export const useWarehouse = (options: UseProductProps = {}) => {
-  const { type, id } = options;
+  const { type, id, typeStockProduct } = options;
   const { data: dataProductsAll, error, isLoading, isSuccess, refetch } = useGetAllWarehousesQuery();
 
   const { data: warehouseByType, refetch: refetchWarehouseByType } = useGetWarehousesByTypeQuery(
@@ -22,6 +24,15 @@ export const useWarehouse = (options: UseProductProps = {}) => {
     },
     {
       skip: !type,
+    }
+  );
+
+  const { data: productsStockByType, refetch: refetchProductsStockByType } = useGetProductsStockByTypeQuery(
+    {
+      type: typeStockProduct as ProductType,
+    },
+    {
+      skip: !typeStockProduct,
     }
   );
 
@@ -42,6 +53,8 @@ export const useWarehouse = (options: UseProductProps = {}) => {
     refetch,
     warehouseByType,
     refetchWarehouseByType,
+    productsStockByType,
+    refetchProductsStockByType,
     warehouseById,
     refetchWarehouseById,
   };

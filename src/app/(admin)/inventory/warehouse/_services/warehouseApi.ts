@@ -3,7 +3,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { PaginatedResponse } from "@/types/api/paginated-response";
 import { PaginatedQueryParams } from "@/types/query-filters/generic-paginated-query-params";
 import baseQueryWithReauth from "@/utils/baseQuery";
-import { SummaryWarehouse, Warehouse } from "../_types/warehouse";
+import { StockWarehouse, SummaryWarehouse, Warehouse } from "../_types/warehouse";
 
 export type PaginatedWarehouseParams = PaginatedQueryParams<SummaryWarehouse>;
 
@@ -53,6 +53,16 @@ export const warehouseApi = createApi({
       }),
       providesTags: ["Warehouse"],
     }),
+
+    // Endpint para obtener el stock de productos por tipo
+    getProductsStockByType: build.query<StockWarehouse[], { type: string }>({
+      query: ({ type }) => ({
+        url: `/warehouse/stock/product/${type}`,
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["Warehouse"],
+    }),
   }),
 });
 
@@ -61,4 +71,5 @@ export const {
   useGetWarehouseByIdQuery,
   useGetPaginatedWarehousesQuery,
   useGetWarehousesByTypeQuery,
+  useGetProductsStockByTypeQuery,
 } = warehouseApi;
