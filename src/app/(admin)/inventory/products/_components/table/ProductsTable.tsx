@@ -12,7 +12,7 @@ import {
 import { Product } from "../../_types/products";
 import { facetedFilters } from "../../_utils/products.filter.utils";
 import { productsColumns } from "./ProductsTableColumns";
-import { CustomersTableToolbarActions } from "./ProductsTableToolbarActions";
+import { ProductsTableToolbarActions } from "./ProductsTableToolbarActions";
 
 interface ProductsTableProps {
   data: Product[];
@@ -28,7 +28,7 @@ export function ProductsTable({ data, pagination, onPaginationChange }: Products
     <DataTable
       data={data}
       columns={columns}
-      toolbarActions={(table: TableInstance<Product>) => <CustomersTableToolbarActions table={table} />}
+      toolbarActions={(table: TableInstance<Product>) => <ProductsTableToolbarActions table={table} />}
       filterPlaceholder="Buscar productos..."
       facetedFilters={facetedFilters}
       serverPagination={{
