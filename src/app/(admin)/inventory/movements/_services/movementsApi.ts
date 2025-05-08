@@ -14,7 +14,7 @@ export type PaginatedMovementParams = PaginatedQueryParams<SummaryMovements>;
 export const movementsApi = createApi({
   reducerPath: "movementsApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["Movements"],
+  tagTypes: ["Movements", "Warehouse"],
   endpoints: (build) => ({
     //Crear movimientos
     createMovements: build.mutation<Movements, Partial<MovementCreate>>({
@@ -24,7 +24,7 @@ export const movementsApi = createApi({
         body,
         credentials: "include",
       }),
-      invalidatesTags: ["Movements"],
+      invalidatesTags: ["Movements", "Warehouse"],
     }),
     //Actualizar movimientos
     updateMovements: build.mutation<Movements, Partial<Movements> & { id: string }>({
@@ -34,7 +34,7 @@ export const movementsApi = createApi({
         body,
         credentials: "include",
       }),
-      invalidatesTags: ["Movements"],
+      invalidatesTags: ["Movements", "Warehouse"],
     }),
     //Obtener movimiento por su id
     getMovementsById: build.query<Movements, GetMovementsByIdProps>({
@@ -84,7 +84,7 @@ export const movementsApi = createApi({
         method: "DELETE",
         credentials: "include",
       }),
-      invalidatesTags: ["Movements"],
+      invalidatesTags: ["Movements", "Warehouse"],
     }),
   }),
 });

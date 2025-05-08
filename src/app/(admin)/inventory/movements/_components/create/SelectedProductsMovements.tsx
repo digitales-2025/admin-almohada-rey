@@ -44,7 +44,7 @@ export default function SelectedProductsMovements({
               </div>
             </div>
           ) : (
-            <div className="grid gap-3 px-0-4">
+            <div className="grid gap-3">
               {selectedProducts.map((product, index) => {
                 const productInfo = Array.isArray(productsAvailible)
                   ? productsAvailible?.find((r) => r.id === product.productId)
@@ -72,9 +72,9 @@ export default function SelectedProductsMovements({
                             }`}
                           >
                             {type === MovementsType.INPUT ? (
-                              <PackagePlus className="h-4 w-4" />
+                              <PackagePlus className="h-4 w-4 shrink-0" />
                             ) : (
-                              <PackageMinus className="h-4 w-4" />
+                              <PackageMinus className="h-4 w-4 shrink-0" />
                             )}
                           </div>
                           <div>
@@ -103,7 +103,7 @@ export default function SelectedProductsMovements({
                       {/* Controles de cantidad y costo */}
                       <div className="mt-3 grid grid-cols-1 px-6 gap-3">
                         <div
-                          className={`rounded-lg p-2 ${
+                          className={`rounded-lg px-4 pt-3 ${
                             type === MovementsType.INPUT
                               ? "bg-emerald-50 dark:bg-emerald-950"
                               : "bg-red-50 dark:bg-red-950"
@@ -112,7 +112,7 @@ export default function SelectedProductsMovements({
                           <Label htmlFor={`quantity-${product.productId}`} className="mb-1 block text-xs font-medium">
                             Cantidad
                           </Label>
-                          <div className="flex h-8 items-center rounded-md border bg-white">
+                          <div className="flex h-8 items-center rounded-md border border-input bg-white dark:bg-input/30 mx-auto my-2">
                             <Button
                               type="button"
                               size="sm"
@@ -124,7 +124,7 @@ export default function SelectedProductsMovements({
                                   updateProductQuantity(product.productId, product.quantity - 1);
                                 }
                               }}
-                              className="h-full rounded-l-md px-2 hover:bg-transparent"
+                              className="h-full rounded-l-md px-2 bg-white dark:bg-input/30"
                             >
                               <Minus className="h-3 w-3" />
                             </Button>
@@ -169,7 +169,7 @@ export default function SelectedProductsMovements({
                                   updateProductQuantity(product.productId, product.quantity + 1);
                                 }
                               }}
-                              className="h-full rounded-r-md px-2 hover:bg-transparent"
+                              className="h-full rounded-r-md px-2 bg-white dark:bg-input/30"
                             >
                               <Plus className="h-3 w-3" />
                             </Button>
@@ -186,7 +186,7 @@ export default function SelectedProductsMovements({
                         </div>
 
                         <div
-                          className={`rounded-lg p-2 ${
+                          className={`rounded-lg px-4 pt-3 ${
                             type === MovementsType.INPUT
                               ? "bg-emerald-50 dark:bg-emerald-950"
                               : "bg-red-50 dark:bg-red-950"
@@ -195,29 +195,31 @@ export default function SelectedProductsMovements({
                           <Label htmlFor={`cost-${product.productId}`} className="mb-1 block text-xs font-medium">
                             Costo por unidad
                           </Label>
-                          <Input
-                            id={`cost-${product.productId}`}
-                            type="number"
-                            value={product.unitCost}
-                            onChange={(e) => {
-                              const rawValue = e.target.value;
-                              const numericValue = Number.parseFloat(rawValue);
+                          <div className="bg-white dark:bg-input/30 rounded-md border mx-auto my-2">
+                            <Input
+                              id={`cost-${product.productId}`}
+                              type="number"
+                              value={product.unitCost}
+                              onChange={(e) => {
+                                const rawValue = e.target.value;
+                                const numericValue = Number.parseFloat(rawValue);
 
-                              if (isNaN(numericValue)) {
-                                return;
-                              }
+                                if (isNaN(numericValue)) {
+                                  return;
+                                }
 
-                              const roundedValue = Math.round(numericValue * 100) / 100;
-                              // Eliminamos la restricción de mínimo 1
-                              const inputValue = roundedValue;
+                                const roundedValue = Math.round(numericValue * 100) / 100;
+                                // Eliminamos la restricción de mínimo 1
+                                const inputValue = roundedValue;
 
-                              updateProductUnitCost(product.productId, inputValue);
-                            }}
-                            placeholder="Costo unitario"
-                            className="h-8 border-0 bg-white"
-                            step="0.01"
-                            min="0.01"
-                          />
+                                updateProductUnitCost(product.productId, inputValue);
+                              }}
+                              placeholder="Costo unitario"
+                              className="h-8 border"
+                              step="0.01"
+                              min="0.01"
+                            />
+                          </div>
                           {form.formState.errors.movementDetail?.[index]?.unitCost && (
                             <p className="mt-1 text-xs text-red-500">
                               {form.formState.errors.movementDetail[index]?.unitCost?.message}

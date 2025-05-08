@@ -3,33 +3,31 @@
 import { useMemo } from "react";
 import { Table as TableInstance } from "@tanstack/react-table";
 
-import { useProfile } from "@/app/(admin)/profile/_hooks/use-profile";
 import { DataTable } from "@/components/datatable/data-table";
 import {
   CustomPaginationTableParams,
   ServerPaginationChangeEventCallback,
 } from "@/types/tanstack-table/CustomPagination";
-import { Product } from "../../_types/products";
-import { facetedFilters } from "../../_utils/products.filter.utils";
-import { productsColumns } from "./ProductsTableColumns";
-import { ProductsTableToolbarActions } from "./ProductsTableToolbarActions";
+import { SummaryWarehouse } from "../../_types/warehouse";
+import { facetedFilters } from "../../_utils/warehouses.filter.utils";
+import { warehousesColumns } from "./WarehousesColumns";
+import { WarehousesTableToolbarActions } from "./WarehousesTableToolbarActions";
 
-interface ProductsTableProps {
-  data: Product[];
+interface WarehousesTableProps {
+  data: SummaryWarehouse[];
   pagination: CustomPaginationTableParams;
   onPaginationChange: ServerPaginationChangeEventCallback;
 }
 
-export function ProductsTable({ data, pagination, onPaginationChange }: ProductsTableProps) {
-  const { user } = useProfile();
-  const columns = useMemo(() => productsColumns(user?.isSuperAdmin || false), [user]);
+export function WarehousesTable({ data, pagination, onPaginationChange }: WarehousesTableProps) {
+  const columns = useMemo(() => warehousesColumns(), []);
 
   return (
     <DataTable
       data={data}
       columns={columns}
-      toolbarActions={(table: TableInstance<Product>) => <ProductsTableToolbarActions table={table} />}
-      filterPlaceholder="Buscar productos..."
+      toolbarActions={(table: TableInstance<SummaryWarehouse>) => <WarehousesTableToolbarActions table={table} />}
+      filterPlaceholder="Buscar almacenes..."
       facetedFilters={facetedFilters}
       serverPagination={{
         pageIndex: pagination.page - 1,
