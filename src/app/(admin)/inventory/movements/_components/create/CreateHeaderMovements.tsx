@@ -66,7 +66,7 @@ export default function CreateHeaderMovements({ form, type }: CreateHeaderMoveme
               control={form.control}
               name="hasPaymentReceipt"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border border-input p-4">
                   <div className="space-y-0.5">
                     <FormLabel htmlFor="hasPaymentReceipt">Comprobante de Pago</FormLabel>
                     <FormDescription>
