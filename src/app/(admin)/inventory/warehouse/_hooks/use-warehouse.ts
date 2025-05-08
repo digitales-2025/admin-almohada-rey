@@ -41,7 +41,7 @@ export const useWarehouse = (options: UseProductProps = {}) => {
       id: id as string,
     },
     {
-      skip: !options.id,
+      skip: !id,
     }
   );
 
