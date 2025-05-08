@@ -6,7 +6,6 @@ import { Loader2, Lock, Mail } from "lucide-react";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
 
-// @ts-ignore
 import ImagePlaceholder from "@/assets/images/placeholder.webp";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
