@@ -57,13 +57,10 @@ export default [
       parser: tsParser,
     },
     rules: {
-      "@typescript-eslint/no-unused-vars": [
-				"error",
-				{ argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
-			],
+      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
       "@typescript-eslint/explicit-function-return-type": "off",
       "@typescript-eslint/explicit-module-boundary-types": "off",
-      "no-use-before-define": [0],
+      "no-use-before-define": "off",
       "@typescript-eslint/no-use-before-define": [1],
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-var-requires": "off",
