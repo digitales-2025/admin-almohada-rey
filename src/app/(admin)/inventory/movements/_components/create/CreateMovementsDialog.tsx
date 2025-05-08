@@ -75,8 +75,6 @@ export function CreateMovementsDialog({ diferentPage, type }: CreateMovementsDia
 
   const onSubmit = async (input: CreateInventoryMovement) => {
     const { hasPaymentReceipt, ...rest } = input;
-    console.log("input", input);
-    console.log("hasPaymentReceipt", hasPaymentReceipt);
 
     try {
       startCreateTransition(() => {
