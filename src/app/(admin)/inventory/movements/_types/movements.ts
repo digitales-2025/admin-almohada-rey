@@ -53,6 +53,7 @@ export type SummaryMovements = {
   typePurchaseOrder?: ExpenseDocumentType;
   documentNumber?: string;
   typeProduct?: ProductType;
+  hasPaymentAssigned?: boolean;
 };
 
 export type MovementCreate = {
