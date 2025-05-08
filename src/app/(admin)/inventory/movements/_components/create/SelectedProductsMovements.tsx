@@ -112,7 +112,14 @@ export default function SelectedProductsMovements({
                           <Label htmlFor={`quantity-${product.productId}`} className="mb-1 block text-xs font-medium">
                             Cantidad
                           </Label>
-                          <div className="flex h-8 items-center rounded-md border border-input bg-white dark:bg-input/30 mx-auto my-2">
+                          <div
+                            className={`flex h-8 items-center rounded-md border border-input bg-white dark:bg-input/30 mx-auto my-2 overflow-hidden 
+                              focus-within:ring-2 focus-within:ring-offset-2 ${
+                                type === MovementsType.INPUT
+                                  ? "focus-within:ring-emerald-500/50 focus-within:border-emerald-500"
+                                  : "focus-within:ring-red-500/50 focus-within:border-red-500"
+                              }`}
+                          >
                             <Button
                               type="button"
                               size="sm"
@@ -124,7 +131,7 @@ export default function SelectedProductsMovements({
                                   updateProductQuantity(product.productId, product.quantity - 1);
                                 }
                               }}
-                              className="h-full rounded-l-md px-2 bg-white dark:bg-input/30"
+                              className="h-full rounded-l-md px-2 bg-white dark:bg-input/30 focus:outline-none"
                             >
                               <Minus className="h-3 w-3" />
                             </Button>
@@ -155,7 +162,7 @@ export default function SelectedProductsMovements({
 
                                 updateProductQuantity(product.productId, numericValue);
                               }}
-                              className="h-full border-0 text-center"
+                              className="h-full border-0 text-center focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:outline-none"
                               min="0.01"
                             />
                             <Button
@@ -169,7 +176,7 @@ export default function SelectedProductsMovements({
                                   updateProductQuantity(product.productId, product.quantity + 1);
                                 }
                               }}
-                              className="h-full rounded-r-md px-2 bg-white dark:bg-input/30"
+                              className="h-full rounded-r-md px-2 bg-white dark:bg-input/30 focus:outline-none"
                             >
                               <Plus className="h-3 w-3" />
                             </Button>
@@ -195,7 +202,13 @@ export default function SelectedProductsMovements({
                           <Label htmlFor={`cost-${product.productId}`} className="mb-1 block text-xs font-medium">
                             Costo por unidad
                           </Label>
-                          <div className="bg-white dark:bg-input/30 rounded-md border mx-auto my-2">
+                          <div
+                            className={`bg-white dark:bg-input/30 rounded-md border mx-auto my-2 focus-within:ring-2 focus-within:ring-offset-2 ${
+                              type === MovementsType.INPUT
+                                ? "focus-within:ring-emerald-500/50 focus-within:border-emerald-500"
+                                : "focus-within:ring-red-500/50 focus-within:border-red-500"
+                            }`}
+                          >
                             <Input
                               id={`cost-${product.productId}`}
                               type="number"
@@ -215,7 +228,7 @@ export default function SelectedProductsMovements({
                                 updateProductUnitCost(product.productId, inputValue);
                               }}
                               placeholder="Costo unitario"
-                              className="h-8 border"
+                              className="h-8 border-0 focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:outline-none"
                               step="0.01"
                               min="0.01"
                             />
