@@ -186,7 +186,7 @@ export const movementsColumns = (isSuperAdmin: boolean): ColumnDef<SummaryMoveme
              const [showDeleteDialog, setShowDeleteDialog] = useState(false);
         const [showViewMovementDialog, setShowViewMovementDialog] = useState(false); */
 
-        const { type, id, hasPaymentAssigned } = row.original;
+        const { type, hasPaymentAssigned } = row.original;
 
         return (
           <div>
@@ -206,7 +206,6 @@ export const movementsColumns = (isSuperAdmin: boolean): ColumnDef<SummaryMoveme
                   open={showEditDialog}
                   onOpenChange={setShowEditDialog}
                   movements={row?.original}
-                  id={id}
                   type={type}
                 />
               )}
