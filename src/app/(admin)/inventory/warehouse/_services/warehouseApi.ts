@@ -7,15 +7,20 @@ import { StockWarehouse, SummaryWarehouse, Warehouse } from "../_types/warehouse
 
 export type PaginatedWarehouseParams = PaginatedQueryParams<SummaryWarehouse>;
 
+interface GetWarehouseByIdProps {
+  id: string;
+  movementId?: string;
+}
+
 export const warehouseApi = createApi({
   reducerPath: "warehouseApi",
   baseQuery: baseQueryWithReauth,
   tagTypes: ["Warehouse"],
   endpoints: (build) => ({
     //Obtener producto por id
-    getWarehouseById: build.query<Warehouse, { id: string }>({
-      query: ({ id }) => ({
-        url: `/warehouse/${id}`,
+    getWarehouseById: build.query<Warehouse, GetWarehouseByIdProps>({
+      query: ({ id, movementId }) => ({
+        url: `/warehouse/${id}${movementId ? `?movementId=${movementId}` : ""}`,
         method: "GET",
         credentials: "include",
       }),
