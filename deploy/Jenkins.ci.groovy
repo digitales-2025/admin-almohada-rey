@@ -3,7 +3,7 @@ pipeline {
 		docker {
 			image 'guergeiro/pnpm:22-10-alpine'
 			reuseNode true
-			args '-u 0:0 -v ~/pnpm-store:/root/.pnpm-store'
+			args '-u 0:0 -v pnpm-store:/root/.pnpm-store'
 		}
 	}
 	environment {
