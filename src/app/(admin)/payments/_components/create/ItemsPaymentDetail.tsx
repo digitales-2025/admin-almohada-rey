@@ -77,10 +77,10 @@ export default function ItemsPaymentDetail({
           )}
         </div>
       </div>
-      <ScrollArea className="h-[300px] w-full">
+      <ScrollArea className="h-[300px]">
         <div className="p-4">
           {fields.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {fields.map((service, index) => {
                 const category = getCategoryById(service.category);
                 return (
@@ -227,7 +227,7 @@ export default function ItemsPaymentDetail({
               <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
                 <ShoppingBag className="h-8 w-8 text-muted-foreground" />
               </div>
-              <p className="text-foreground font-medium text-lg">No hay servicios seleccionados</p>
+              <p className="text-foreground font-medium text-lg text-center">No hay servicios seleccionados</p>
               <p className="text-muted-foreground text-sm mt-2 text-center max-w-md">
                 Explore las categorías disponibles y seleccione servicios para añadirlos a su reserva
               </p>
