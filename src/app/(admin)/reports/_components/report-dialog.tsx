@@ -26,11 +26,14 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useToast } from "@/hooks/use-toast";
+import { useDownloadReport } from "../_hooks/use-report-query";
+import { DownloadReportParams } from "../interfaces/dowloadParams";
+import { ReportType } from "../interfaces/report-type";
 
 interface ReporteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  tipoReporte: string;
+  tipoReporte: ReportType;
   tituloReporte: string;
 }
 
@@ -40,6 +43,7 @@ export default function ReporteDialog({ open, onOpenChange, tipoReporte, tituloR
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const isDesktop = useMediaQuery("(min-width: 640px)");
+  const { onDownloadReport } = useDownloadReport();
 
   const handleGenerarReporte = async () => {
     if (mesSeleccionado === null || añoSeleccionado === null) {
@@ -54,36 +58,19 @@ export default function ReporteDialog({ open, onOpenChange, tipoReporte, tituloR
     setIsLoading(true);
 
     try {
-      // Formatear mes y año para la API
-      const mes = String(mesSeleccionado + 1).padStart(2, "0"); // +1 porque los meses van de 0-11 en JS
-      const año = String(añoSeleccionado);
+      const params: DownloadReportParams = {
+        month: mesSeleccionado + 1, // +1 porque los meses van de 0-11
+        year: añoSeleccionado,
+      };
 
-      const response = await fetch(`/api/reportes?tipo=${tipoReporte}&mes=${mes}&año=${año}`, {
-        method: "GET",
-      });
-
-      if (!response.ok) {
-        throw new Error("Error al generar el reporte");
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `Reporte-${tipoReporte}-${mes}-${año}.xlsx`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
+      await onDownloadReport(tipoReporte, params);
 
       toast({
         title: "Éxito",
         description: `Reporte de ${tituloReporte} generado correctamente`,
       });
 
-      // Cerrar el diálogo después de generar exitosamente
       onOpenChange(false);
-
-      // Limpiar selección
       setMesSeleccionado(null);
       setAñoSeleccionado(null);
     } catch (error) {
@@ -103,7 +90,6 @@ export default function ReporteDialog({ open, onOpenChange, tipoReporte, tituloR
     setAñoSeleccionado(null);
   };
 
-  // Contenido del formulario que se reutiliza en ambos componentes (Dialog y Drawer)
   const FormContent = () => (
     <div className="flex flex-col space-y-6 py-4">
       <SelectorFechas
@@ -115,7 +101,6 @@ export default function ReporteDialog({ open, onOpenChange, tipoReporte, tituloR
     </div>
   );
 
-  // Renderizado condicional basado en el tamaño de la pantalla
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>

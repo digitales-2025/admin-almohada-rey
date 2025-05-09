@@ -1,21 +1,42 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar, DollarSign, FileText, LogOut, ShoppingCart, TrendingUp, Truck, Users } from "lucide-react";
+import { DollarSign, FileText, TrendingUp } from "lucide-react";
 
 import ReporteDialog from "@/app/(admin)/reports/_components/report-dialog";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { ReportType } from "../interfaces/report-type";
 
 // Definición de tipos de reportes
-const tiposReportes = [
+const tiposReportes: {
+  id: ReportType;
+  titulo: string;
+  descripcion: string;
+  icono: any;
+  color: string;
+}[] = [
   {
-    id: "gastos",
+    id: "profit",
+    titulo: "Ganancias",
+    descripcion: "Reporte detallado de todas las ganancias del período",
+    icono: TrendingUp,
+    color: "bg-emerald-100 text-emerald-600",
+  },
+  {
+    id: "expense",
     titulo: "Gastos",
     descripcion: "Reporte detallado de todos los gastos del período",
     icono: DollarSign,
     color: "bg-red-100 text-red-600",
   },
   {
+    id: "balance",
+    titulo: "Balance",
+    descripcion: "Reporte combinado de ganancias y gastos",
+    icono: FileText,
+    color: "bg-blue-100 text-blue-600",
+  },
+  /*  {
     id: "salidas",
     titulo: "Salidas",
     descripcion: "Registro de salidas de inventario y productos",
@@ -63,14 +84,14 @@ const tiposReportes = [
     descripcion: "Reporte completo de todas las operaciones",
     icono: FileText,
     color: "bg-gray-100 text-gray-600",
-  },
+  }, */
 ];
 
 export default function ReportesGrid() {
-  const [reporteSeleccionado, setReporteSeleccionado] = useState<string | null>(null);
+  const [reporteSeleccionado, setReporteSeleccionado] = useState<ReportType | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const handleReporteClick = (id: string) => {
+  const handleReporteClick = (id: ReportType) => {
     setReporteSeleccionado(id);
     setDialogOpen(true);
   };

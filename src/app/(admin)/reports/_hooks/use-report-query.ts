@@ -1,31 +1,53 @@
-"use client";
+import { toast } from "sonner";
 
-import { useEffect, useState } from "react";
+import {
+  useLazyDownloadBalanceReportQuery,
+  useLazyDownloadExpenseReportQuery,
+  useLazyDownloadProfitReportQuery,
+} from "../_services/reportsApi";
+import { DownloadReportParams } from "../interfaces/dowloadParams";
+import { ReportType } from "../interfaces/report-type";
 
-export function useReportQuery(query: string): boolean {
-  const [matches, setMatches] = useState(false);
+export function useDownloadReport() {
+  const [downloadProfit] = useLazyDownloadProfitReportQuery();
+  const [downloadExpense] = useLazyDownloadExpenseReportQuery();
+  const [downloadBalance] = useLazyDownloadBalanceReportQuery();
 
-  useEffect(() => {
-    const media = window.matchMedia(query);
+  // Función para descargar el reporte según el tipo
+  const onDownloadReport = async (type: ReportType, params: DownloadReportParams) => {
+    const toastId = toast.loading("Descargando reporte...");
+    try {
+      let blob: Blob;
+      let filename = "";
 
-    // Actualizar el estado inicialmente
-    if (media.matches !== matches) {
-      setMatches(media.matches);
+      if (type === "profit") {
+        blob = await downloadProfit(params).unwrap();
+        filename = `profit_${params.year}_${params.month}.xlsx`;
+      } else if (type === "expense") {
+        blob = await downloadExpense(params).unwrap();
+        filename = `expense_${params.year}_${params.month}.xlsx`;
+      } else {
+        blob = await downloadBalance(params).unwrap();
+        filename = `balance_${params.year}_${params.month}.xlsx`;
+      }
+
+      // Crear enlace de descarga
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      a.remove();
+
+      toast.success("Reporte descargado con éxito", { id: toastId });
+      return true;
+    } catch (error: any) {
+      toast.error(`Error al descargar: ${error.message}`, { id: toastId });
+      return false;
     }
+  };
 
-    // Callback para cuando cambia el estado
-    const listener = () => {
-      setMatches(media.matches);
-    };
-
-    // Agregar listener
-    media.addEventListener("change", listener);
-
-    // Limpiar listener
-    return () => {
-      media.removeEventListener("change", listener);
-    };
-  }, [matches, query]);
-
-  return matches;
+  return { onDownloadReport };
 }
