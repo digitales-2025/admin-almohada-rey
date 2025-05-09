@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { format, parse } from "date-fns";
 import { UseFormReturn } from "react-hook-form";
 
-import { useProducts } from "@/app/(admin)/inventory/products/_hooks/use-products";
 import { ProductType } from "@/app/(admin)/inventory/products/_types/products";
+import { useWarehouse } from "@/app/(admin)/inventory/warehouse/_hooks/use-warehouse";
 import { useRooms } from "@/app/(admin)/rooms/list/_hooks/use-rooms";
 import DatePicker from "@/components/ui/date-time-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -17,6 +17,7 @@ import UpdatePaymentDetailRoom from "./UpdatePaymentDetailRoom";
 import UpdatePaymentDetailService from "./UpdatePaymentDetailService";
 
 interface UpdatePaymentDetailFormProps extends Omit<React.ComponentPropsWithRef<"form">, "onSubmit"> {
+  detailId: string | null;
   children: React.ReactNode;
   detailForm: UseFormReturn<PaymentDetailFormValues>;
   onSubmitDetail: (data: PaymentDetailFormValues) => void;
@@ -30,6 +31,7 @@ interface UpdatePaymentDetailFormProps extends Omit<React.ComponentPropsWithRef<
 }
 
 export default function UpdatePaymentDetailForm({
+  detailId,
   children,
   detailForm,
   onSubmitDetail,
@@ -42,13 +44,30 @@ export default function UpdatePaymentDetailForm({
   const watchDetailType = detailForm.watch("detailType");
   const [searchTerm, setSearchTerm] = useState("");
   const { dataServicesAll } = useServices();
-  const { productByType } = useProducts({ type: ProductType.COMMERCIAL });
+  const { productsStockByType } = useWarehouse({
+    typeStockProduct: ProductType.COMMERCIAL,
+    paymentDetailId: detailId ?? undefined,
+  });
+
+  // Efecto para asignar stockQuantity cuando se selecciona un productId
+  useEffect(() => {
+    const detailType = detailForm.watch("detailType");
+    const productId = detailForm.watch("productId");
+
+    if (detailType === "PRODUCT" && productId && productsStockByType) {
+      const selectedProductStock = productsStockByType.find((stock) => stock.product.id === productId);
+
+      if (selectedProductStock) {
+        detailForm.setValue("stockQuantity", selectedProductStock.quantity);
+      }
+    }
+  }, [detailForm.watch("productId"), detailForm.watch("detailType"), productsStockByType]);
   const { dataRoomsAll } = useRooms();
 
   // Filtrar productos o servicios según el término de búsqueda
   const filteredProducts = searchTerm
-    ? productByType?.filter((product) => product.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    : productByType;
+    ? productsStockByType?.filter((stock) => stock.product.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    : productsStockByType;
 
   const filteredServices = searchTerm
     ? dataServicesAll?.filter((service) => service.name.toLowerCase().includes(searchTerm.toLowerCase()))
