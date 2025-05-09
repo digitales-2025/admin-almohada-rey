@@ -13,6 +13,7 @@ export const paymentDetailSchema = z.object({
   productId: z.string().optional(),
   serviceId: z.string().optional(),
   roomId: z.string().optional(),
+  stockQuantity: z.number().optional(),
 });
 
 export type PaymentDetailFormValues = z.infer<typeof paymentDetailSchema>;
