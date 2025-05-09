@@ -23,6 +23,7 @@ import { MovementsType, SummaryMovements } from "../../_types/movements";
 import { ProductType } from "../../../products/_types/products";
 import { ProductTypeLabels } from "../../../products/_utils/products.utils";
 import { UpdateMovementsSheet } from "../update/UpdateMovementsSheet";
+import ViewMovementsDialog from "../view/ViewMovementsDialog";
 
 export const movementsColumns = (isSuperAdmin: boolean): ColumnDef<SummaryMovements>[] => {
   const columns: ColumnDef<SummaryMovements>[] = [
@@ -184,22 +185,17 @@ export const movementsColumns = (isSuperAdmin: boolean): ColumnDef<SummaryMoveme
 
         /*
              const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-        const [showViewMovementDialog, setShowViewMovementDialog] = useState(false); */
+        */
+        const [showViewMovementDialog, setShowViewMovementDialog] = useState(false);
 
-        const { type, hasPaymentAssigned } = row.original;
+        const { type, hasPaymentAssigned, id } = row.original;
 
         return (
           <div>
             <div>
-              {/*               {showViewMovementDialog && (
-                <MovementsDetailsDialog
-                  open={showViewMovementDialog}
-                  onOpenChange={setShowViewMovementDialog}
-                  movements={row?.original}
-                  id={id}
-                />
+              {showViewMovementDialog && (
+                <ViewMovementsDialog open={showViewMovementDialog} onOpenChange={setShowViewMovementDialog} id={id} />
               )}
-                */}
 
               {showEditDialog && (
                 <UpdateMovementsSheet
@@ -227,9 +223,7 @@ export const movementsColumns = (isSuperAdmin: boolean): ColumnDef<SummaryMoveme
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
-                {/* 
                 <DropdownMenuItem onSelect={() => setShowViewMovementDialog(true)}>Ver</DropdownMenuItem>
-                */}
 
                 <DropdownMenuSeparator />
 

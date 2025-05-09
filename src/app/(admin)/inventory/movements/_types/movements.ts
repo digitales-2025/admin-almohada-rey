@@ -25,6 +25,7 @@ export type MovementsDetail = {
   product?: {
     id: string;
     name: string;
+    code?: string;
   };
   productId?: string;
 };
