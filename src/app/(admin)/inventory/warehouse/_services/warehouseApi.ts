@@ -12,6 +12,11 @@ interface GetWarehouseByIdProps {
   movementId?: string;
 }
 
+interface GetProductsStockByTypeProps {
+  type: string;
+  paymentDetailId?: string;
+}
+
 export const warehouseApi = createApi({
   reducerPath: "warehouseApi",
   baseQuery: baseQueryWithReauth,
@@ -60,9 +65,9 @@ export const warehouseApi = createApi({
     }),
 
     // Endpint para obtener el stock de productos por tipo
-    getProductsStockByType: build.query<StockWarehouse[], { type: string }>({
-      query: ({ type }) => ({
-        url: `/warehouse/stock/product/${type}`,
+    getProductsStockByType: build.query<StockWarehouse[], GetProductsStockByTypeProps>({
+      query: ({ type, paymentDetailId }) => ({
+        url: `/warehouse/stock/product/${type}${paymentDetailId ? `?paymentDetailId=${paymentDetailId}` : ""}`,
         method: "GET",
         credentials: "include",
       }),

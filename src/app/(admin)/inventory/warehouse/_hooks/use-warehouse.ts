@@ -13,10 +13,11 @@ interface UseProductProps {
   typeStockProduct?: ProductType;
   id?: string;
   movementId?: string;
+  paymentDetailId?: string;
 }
 
 export const useWarehouse = (options: UseProductProps = {}) => {
-  const { type, id, typeStockProduct, movementId } = options;
+  const { type, id, typeStockProduct, movementId, paymentDetailId } = options;
   const { data: dataProductsAll, error, isLoading, isSuccess, refetch } = useGetAllWarehousesQuery();
 
   const { data: warehouseByType, refetch: refetchWarehouseByType } = useGetWarehousesByTypeQuery(
@@ -31,6 +32,7 @@ export const useWarehouse = (options: UseProductProps = {}) => {
   const { data: productsStockByType, refetch: refetchProductsStockByType } = useGetProductsStockByTypeQuery(
     {
       type: typeStockProduct as ProductType,
+      ...(paymentDetailId && { paymentDetailId }),
     },
     {
       skip: !typeStockProduct,
