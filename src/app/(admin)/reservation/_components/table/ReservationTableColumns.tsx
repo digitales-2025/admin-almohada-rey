@@ -204,6 +204,10 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
           >
             Activo
           </Badge>
+        ) : row.original.isPendingDeletePayment ? (
+          <Badge variant="secondary" className="bg-amber-100 text-amber-600 border-amber-200 hover:bg-amber-200">
+            Pago por anular
+          </Badge>
         ) : (
           <Badge variant="secondary" className="bg-red-100 text-red-500 border-red-200 hover:bg-red-200">
             Archivado
@@ -213,6 +217,7 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
     ),
     filterFn: (row, id, value) => {
       const rowValue = row.getValue(id);
+      const hasPaymentToDelete = row.original.isPendingDeletePayment;
 
       // Si value es un array, comprobamos si contiene el valor de la fila
       if (Array.isArray(value)) {
@@ -221,12 +226,17 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
 
         // Convertimos cada elemento del array según sea necesario
         return value.some((v) => {
+          // Caso especial para "payment_to_delete"
+          if (v === "payment_to_delete") return !rowValue && hasPaymentToDelete;
           // Si es string "true"/"false", convertimos a booleano
           if (typeof v === "string") return v === String(rowValue);
           // Si ya es booleano, comparamos directamente
           return v === rowValue;
         });
       }
+
+      // Para el caso de valor único "payment_to_delete"
+      if (value === "payment_to_delete") return !rowValue && hasPaymentToDelete;
 
       // Si es un valor único, hacemos la comparación directa
       return rowValue === value;
