@@ -7,7 +7,7 @@ import ReporteDialog from "@/app/(admin)/reports/_components/report-dialog";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReportType } from "../interfaces/report-type";
 
-// Definición de tipos de reportes
+// Definición de los tipos de reportes disponibles en el sistema
 const tiposReportes: {
   id: ReportType;
   titulo: string;
@@ -36,6 +36,7 @@ const tiposReportes: {
     icono: FileText,
     color: "bg-blue-100 text-blue-600",
   },
+  // Otros reportes pueden agregarse aquí en el futuro
   /*  {
     id: "salidas",
     titulo: "Salidas",
@@ -88,16 +89,20 @@ const tiposReportes: {
 ];
 
 export default function ReportesGrid() {
+  // Estado para saber qué tipo de reporte fue seleccionado
   const [reporteSeleccionado, setReporteSeleccionado] = useState<ReportType | null>(null);
+  // Estado para controlar la apertura del diálogo/modal
   const [dialogOpen, setDialogOpen] = useState(false);
 
+  // Maneja el clic en una tarjeta de reporte
   const handleReporteClick = (id: ReportType) => {
-    setReporteSeleccionado(id);
-    setDialogOpen(true);
+    setReporteSeleccionado(id); // Guarda el tipo de reporte seleccionado
+    setDialogOpen(true); // Abre el diálogo/modal
   };
 
   return (
     <>
+      {/* Grid de tarjetas de reportes */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
         {tiposReportes.map((reporte) => (
           <Card
@@ -124,6 +129,7 @@ export default function ReportesGrid() {
         ))}
       </div>
 
+      {/* Diálogo para seleccionar mes/año y descargar el reporte */}
       {reporteSeleccionado && (
         <ReporteDialog
           open={dialogOpen}

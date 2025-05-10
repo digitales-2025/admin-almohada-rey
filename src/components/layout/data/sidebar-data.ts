@@ -3,7 +3,7 @@ import {
   CalendarCheck,
   Clipboard,
   CreditCard,
-  FileSpreadsheet,
+  Files,
   HandCoins,
   Hotel,
   LayoutDashboard,
@@ -131,7 +131,7 @@ export const sidebarData: SidebarData = {
         {
           title: "Reportes",
           url: "/reports",
-          icon: FileSpreadsheet,
+          icon: Files,
         },
       ],
     },

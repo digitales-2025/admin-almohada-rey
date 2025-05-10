@@ -1,5 +1,6 @@
 "use client";
 
+// Importaciones de React, iconos, componentes UI y hooks personalizados
 import { useState } from "react";
 import { Download, RefreshCcw } from "lucide-react";
 
@@ -30,6 +31,7 @@ import { useDownloadReport } from "../_hooks/use-report-query";
 import { DownloadReportParams } from "../interfaces/dowloadParams";
 import { ReportType } from "../interfaces/report-type";
 
+// Props que recibe el componente
 interface ReporteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -37,15 +39,23 @@ interface ReporteDialogProps {
   tituloReporte: string;
 }
 
+// Componente principal para el diálogo de generación de reportes
 export default function ReporteDialog({ open, onOpenChange, tipoReporte, tituloReporte }: ReporteDialogProps) {
+  // Estados locales para mes, año y loading
   const [mesSeleccionado, setMesSeleccionado] = useState<number | null>(null);
   const [añoSeleccionado, setAñoSeleccionado] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Hooks para notificaciones y media query (responsive)
   const { toast } = useToast();
   const isDesktop = useMediaQuery("(min-width: 640px)");
+
+  // Hook personalizado para descargar reportes
   const { onDownloadReport } = useDownloadReport();
 
+  // Maneja la generación y descarga del reporte
   const handleGenerarReporte = async () => {
+    // Validación de selección de mes y año
     if (mesSeleccionado === null || añoSeleccionado === null) {
       toast({
         title: "Error",
@@ -58,18 +68,21 @@ export default function ReporteDialog({ open, onOpenChange, tipoReporte, tituloR
     setIsLoading(true);
 
     try {
+      // Construye los parámetros para la descarga
       const params: DownloadReportParams = {
         month: mesSeleccionado + 1, // +1 porque los meses van de 0-11
         year: añoSeleccionado,
       };
 
-      await onDownloadReport(tipoReporte, params);
+      // Llama al hook para descargar el reporte
+      await onDownloadReport(tipoReporte, params, tituloReporte);
 
       toast({
         title: "Éxito",
         description: `Reporte de ${tituloReporte} generado correctamente`,
       });
 
+      // Cierra el diálogo y resetea la selección
       onOpenChange(false);
       setMesSeleccionado(null);
       setAñoSeleccionado(null);
@@ -85,11 +98,13 @@ export default function ReporteDialog({ open, onOpenChange, tipoReporte, tituloR
     }
   };
 
+  // Limpia la selección al cerrar el diálogo
   const handleClose = () => {
     setMesSeleccionado(null);
     setAñoSeleccionado(null);
   };
 
+  // Contenido del formulario: selector de fechas
   const FormContent = () => (
     <div className="flex flex-col space-y-6 py-4">
       <SelectorFechas
@@ -101,6 +116,7 @@ export default function ReporteDialog({ open, onOpenChange, tipoReporte, tituloR
     </div>
   );
 
+  // Renderiza el diálogo para escritorio
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -144,6 +160,7 @@ export default function ReporteDialog({ open, onOpenChange, tipoReporte, tituloR
     );
   }
 
+  // Renderiza el drawer para móvil/tablet
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent>
