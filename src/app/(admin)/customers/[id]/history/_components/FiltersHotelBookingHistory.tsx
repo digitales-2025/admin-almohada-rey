@@ -1,5 +1,7 @@
 import { ArrowDownWideNarrow, ArrowUpWideNarrow, CalendarDays, Filter, LayoutGrid, Search, X } from "lucide-react";
 
+import { reservationStatusConfig } from "@/app/(admin)/reservation/_types/reservation-enum.config";
+import { getRoomTypeKey, RoomTypeLabels } from "@/app/(admin)/rooms/list/_utils/rooms.utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -127,11 +129,20 @@ export default function FiltersHotelBookingHistory({
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="all">Todos los tipos</SelectItem>
-                            {roomTypes.map((type) => (
-                              <SelectItem className="capitalize" key={type} value={type}>
-                                {type}
-                              </SelectItem>
-                            ))}
+                            {roomTypes.map((type) => {
+                              const typeKey = getRoomTypeKey(type);
+                              const roomTypeConfig = RoomTypeLabels[typeKey];
+                              const Icon = roomTypeConfig.icon;
+
+                              return (
+                                <SelectItem className="capitalize" key={type} value={type}>
+                                  <div className="flex items-center">
+                                    <Icon className={`h-4 w-4 mr-2 ${roomTypeConfig.className}`} />
+                                    <span>{type}</span>
+                                  </div>
+                                </SelectItem>
+                              );
+                            })}
                           </SelectContent>
                         </Select>
                       </div>
@@ -144,11 +155,56 @@ export default function FiltersHotelBookingHistory({
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="all">Todas las Reservas</SelectItem>
-                            <SelectItem value="PENDING">Pendiente</SelectItem>
-                            <SelectItem value="CONFIRMED">Confirmado</SelectItem>
-                            <SelectItem value="CHECKED_IN">Registrado</SelectItem>
-                            <SelectItem value="CHECKED_OUT">Finalizado</SelectItem>
-                            <SelectItem value="CANCELED">Cancelado</SelectItem>
+                            <SelectItem value="PENDING">
+                              <div className="flex items-center">
+                                {reservationStatusConfig.PENDING.icon && (
+                                  <reservationStatusConfig.PENDING.icon
+                                    className={`h-4 w-4 mr-2 ${reservationStatusConfig.PENDING.textColor}`}
+                                  />
+                                )}
+                                <span>{reservationStatusConfig.PENDING.name}</span>
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="CONFIRMED">
+                              <div className="flex items-center">
+                                {reservationStatusConfig.CONFIRMED.icon && (
+                                  <reservationStatusConfig.CONFIRMED.icon
+                                    className={`h-4 w-4 mr-2 ${reservationStatusConfig.CONFIRMED.textColor}`}
+                                  />
+                                )}
+                                <span>{reservationStatusConfig.CONFIRMED.name}</span>
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="CHECKED_IN">
+                              <div className="flex items-center">
+                                {reservationStatusConfig.CHECKED_IN.icon && (
+                                  <reservationStatusConfig.CHECKED_IN.icon
+                                    className={`h-4 w-4 mr-2 ${reservationStatusConfig.CHECKED_IN.textColor}`}
+                                  />
+                                )}
+                                <span>{reservationStatusConfig.CHECKED_IN.name}</span>
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="CHECKED_OUT">
+                              <div className="flex items-center">
+                                {reservationStatusConfig.CHECKED_OUT.icon && (
+                                  <reservationStatusConfig.CHECKED_OUT.icon
+                                    className={`h-4 w-4 mr-2 ${reservationStatusConfig.CHECKED_OUT.textColor}`}
+                                  />
+                                )}
+                                <span>{reservationStatusConfig.CHECKED_OUT.name}</span>
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="CANCELED">
+                              <div className="flex items-center">
+                                {reservationStatusConfig.CANCELED.icon && (
+                                  <reservationStatusConfig.CANCELED.icon
+                                    className={`h-4 w-4 mr-2 ${reservationStatusConfig.CANCELED.textColor}`}
+                                  />
+                                )}
+                                <span>{reservationStatusConfig.CANCELED.name}</span>
+                              </div>
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
