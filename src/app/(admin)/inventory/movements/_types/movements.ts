@@ -25,6 +25,7 @@ export type MovementsDetail = {
   product?: {
     id: string;
     name: string;
+    code?: string;
   };
   productId?: string;
 };
@@ -53,6 +54,7 @@ export type SummaryMovements = {
   typePurchaseOrder?: ExpenseDocumentType;
   documentNumber?: string;
   typeProduct?: ProductType;
+  hasPaymentAssigned?: boolean;
 };
 
 export type MovementCreate = {

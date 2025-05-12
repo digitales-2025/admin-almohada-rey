@@ -44,7 +44,7 @@ export function WarehouseStockDialog({ id, open, setOpen, currentWarehouseType }
   const filteredItems = warehouseById?.stock.filter((item) => {
     const matchesSearch =
       item.product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.code.toLowerCase().includes(searchTerm.toLowerCase());
+      (item.product.code ?? "").toLowerCase().includes(searchTerm.toLowerCase());
 
     const threshold = getMinStockThreshold(currentWarehouseType);
 

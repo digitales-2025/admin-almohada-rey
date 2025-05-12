@@ -26,6 +26,7 @@ import { PaymentDetailFormValues } from "../../../_schemas/updatePaymentDetailSc
 import UpdatePaymentDetailForm from "./UpdatePaymentDetailForm";
 
 interface UpdatePaymentDetailDialogProps {
+  selectedDetailId: string | null;
   isDetailDialogOpen: boolean;
   setIsDetailDialogOpen: (open: boolean) => void;
   detailForm: UseFormReturn<PaymentDetailFormValues>;
@@ -41,6 +42,7 @@ interface UpdatePaymentDetailDialogProps {
 }
 
 export default function UpdatePaymentDetailDialog({
+  selectedDetailId,
   isDetailDialogOpen,
   setIsDetailDialogOpen,
   detailForm,
@@ -58,6 +60,7 @@ export default function UpdatePaymentDetailDialog({
 
   const formContent = (
     <UpdatePaymentDetailForm
+      detailId={selectedDetailId}
       detailForm={detailForm}
       onSubmitDetail={onSubmitDetail}
       getCurrentDetailTypeConfig={getCurrentDetailTypeConfig}

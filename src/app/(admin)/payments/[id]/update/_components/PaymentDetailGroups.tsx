@@ -336,6 +336,7 @@ export default function PaymentDetailGroups({ paymentDetails, missingDays, payme
 
       {isDetailDialogOpen && (
         <UpdatePaymentDetailDialog
+          selectedDetailId={selectedDetailId}
           detailForm={detailForm}
           isDetailDialogOpen={isDetailDialogOpen}
           setIsDetailDialogOpen={setIsDetailDialogOpen}

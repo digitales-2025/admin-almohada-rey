@@ -12,6 +12,7 @@ interface AvailableProductsMovementsProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   filteredProducts: ProductAvailable[];
+  update?: boolean;
 }
 
 export default function AvailableProductsMovements({
@@ -21,11 +22,12 @@ export default function AvailableProductsMovements({
   searchTerm,
   setSearchTerm,
   filteredProducts,
+  update = false,
 }: AvailableProductsMovementsProps) {
   return (
     <Card className="overflow-hidden pt-0">
       <div className="bg-gradient-to-r from-card to-accent p-4 border-b border-border">
-        <h3 className="text-lg font-medium">Productos Disponibles</h3>
+        <h3 className={`text-lg font-medium ${update ? "text-center" : ""}`}>Productos Disponibles</h3>
         <div className="mt-4 relative">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <Search className="h-4 w-4 text-slate-400" />

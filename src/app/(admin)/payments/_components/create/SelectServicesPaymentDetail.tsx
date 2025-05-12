@@ -54,7 +54,7 @@ export default function SelectServicesPaymentDetail({
   return (
     <div className="rounded-lg">
       <TabsContent value="services" className="flex flex-col h-[calc(90vh-190px)]">
-        <div className="grid grid-cols-1 sm:grid-cols-[280px_1fr] h-full rounded-lg overflow-hidden">
+        <div className="grid grid-cols-1 sm:grid-cols-[280px_1fr] h-full rounded-lg">
           {/* Left sidebar - Categories and search */}
           <div className="border-r p-4 flex flex-col bg-card">
             <div className="relative mb-4">
@@ -77,32 +77,33 @@ export default function SelectServicesPaymentDetail({
               )}
             </div>
 
-            <h3 className="font-medium text-sm mb-2 text-foreground flex items-center justify-center">Categorias</h3>
-            <div className="space-y-1 mb-4">
-              {categories.map((category) => (
-                <Button
-                  key={category.id}
-                  variant="ghost"
-                  type="button"
-                  className={cn(
-                    "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-all",
-                    activeCategory === category.id
-                      ? "bg-primary/10 border-l-4 border-l-primary text-primary font-medium"
-                      : "border-l-4 border-l-transparent text-foreground hover:bg-muted hover:border-l-primary/30"
-                  )}
-                  onClick={() => setActiveCategory(category.id)}
-                >
-                  <div
+            <div className="mb-4">
+              <div className="space-y-1 pr-3">
+                {categories.map((category) => (
+                  <Button
+                    key={category.id}
+                    variant="ghost"
+                    type="button"
                     className={cn(
-                      "flex items-center justify-center w-6 h-6 rounded-md transition-all",
-                      activeCategory === category.id ? "" : "bg-muted text-muted-foreground"
+                      "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-all",
+                      activeCategory === category.id
+                        ? "bg-primary/10 border-l-4 border-l-primary text-primary font-medium"
+                        : "border-l-4 border-l-transparent text-foreground hover:bg-muted hover:border-l-primary/30"
                     )}
+                    onClick={() => setActiveCategory(category.id)}
                   >
-                    {category.icon}
-                  </div>
-                  <span>{category.name}</span>
-                </Button>
-              ))}
+                    <div
+                      className={cn(
+                        "flex items-center justify-center w-6 h-6 rounded-md transition-all",
+                        activeCategory === category.id ? "" : "bg-muted text-muted-foreground"
+                      )}
+                    >
+                      {category.icon}
+                    </div>
+                    <span>{category.name}</span>
+                  </Button>
+                ))}
+              </div>
             </div>
 
             {/* Selected items summary */}
@@ -135,18 +136,18 @@ export default function SelectServicesPaymentDetail({
           </div>
 
           {/* Main content - Service items */}
-          <div className="flex flex-col bg-background">
-            <div>
+          <div className="flex flex-col bg-background h-full">
+            <div className="flex-1 overflow-hidden">
               {searchTerm ? (
-                <ScrollArea className="h-full">
-                  <div className="p-4">
-                    <div className="flex items-center gap-2 mb-4 text-sm text-muted-foreground bg-card p-2 rounded-md">
-                      <Search className="h-3.5 w-3.5" />
-                      <span>Resultados de búsqueda para "{searchTerm}"</span>
-                    </div>
+                <div className="h-full flex flex-col">
+                  <div className="flex items-center gap-2 p-4 text-sm text-muted-foreground bg-card rounded-md mx-4 mt-4">
+                    <Search className="h-3.5 w-3.5" />
+                    <span>Resultados de búsqueda para "{searchTerm}"</span>
+                  </div>
 
+                  <ScrollArea className="flex-1 px-4">
                     {filteredItems.length > 0 ? (
-                      <div className="space-y-6">
+                      <div className="space-y-6 py-4">
                         {filteredItems.map((category) => (
                           <div key={category.id}>
                             <div className="flex items-center gap-2 mb-3">
@@ -173,23 +174,23 @@ export default function SelectServicesPaymentDetail({
                         ))}
                       </div>
                     ) : (
-                      <div className="flex flex-col items-center justify-center h-[300px] bg-card rounded-lg p-8">
+                      <div className="flex flex-col items-center justify-center h-[300px] bg-card rounded-lg p-8 my-4">
                         <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
                           <Search className="h-8 w-8 text-muted-foreground" />
                         </div>
-                        <p className="text-lg font-medium text-foreground">No services found</p>
-                        <p className="text-muted-foreground mt-1">Try a different search term</p>
+                        <p className="text-lg font-medium text-foreground">Servicio no encontrado</p>
+                        <p className="text-muted-foreground mt-1">Intenta con otro termino diferente</p>
                       </div>
                     )}
-                  </div>
-                </ScrollArea>
+                  </ScrollArea>
+                </div>
               ) : (
                 // Category view
                 <div className="flex flex-col h-full">
                   {categories
                     .filter((c) => c.id === activeCategory)
                     .map((category) => (
-                      <div key={category.id} className="flex-1 flex flex-col">
+                      <div key={category.id} className="flex-1 flex flex-col h-full">
                         <div className="p-4 border-b bg-card">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
@@ -209,7 +210,7 @@ export default function SelectServicesPaymentDetail({
                           </div>
                         </div>
 
-                        <ScrollArea className="flex-1">
+                        <ScrollArea className="h-[200px]">
                           <div className="p-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                               {category.items.map((item) => (
@@ -229,22 +230,19 @@ export default function SelectServicesPaymentDetail({
               )}
             </div>
 
-            {/* Selected items */}
-            {fields.length > 0 && (
-              <ItemsPaymentDetail
-                categories={categories}
-                editMode={editMode}
-                setEditMode={setEditMode}
-                fields={fields}
-                form={form}
-                remove={remove}
-                update={update}
-                watchExtraServices={watchExtraServices}
-                setSelectedItems={setSelectedItems}
-                selectedItems={selectedItems}
-                getCategoryById={getCategoryById}
-              />
-            )}
+            <ItemsPaymentDetail
+              categories={categories}
+              editMode={editMode}
+              setEditMode={setEditMode}
+              fields={fields}
+              form={form}
+              remove={remove}
+              update={update}
+              watchExtraServices={watchExtraServices}
+              setSelectedItems={setSelectedItems}
+              selectedItems={selectedItems}
+              getCategoryById={getCategoryById}
+            />
           </div>
         </div>
       </TabsContent>

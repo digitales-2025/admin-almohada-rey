@@ -1,19 +1,29 @@
 "use client";
 
+import { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 import { format, parseISO as parse } from "date-fns";
 import { es } from "date-fns/locale";
-import { Ellipsis, Hash, PackageMinus, PackagePlus } from "lucide-react";
+import { Ellipsis, Hash, PackageMinus, PackagePlus, Pencil } from "lucide-react";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { DropdownMenu, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { MovementsType, SummaryMovements } from "../../_types/movements";
 import { ProductType } from "../../../products/_types/products";
 import { ProductTypeLabels } from "../../../products/_utils/products.utils";
+import { UpdateMovementsSheet } from "../update/UpdateMovementsSheet";
+import ViewMovementsDialog from "../view/ViewMovementsDialog";
 
 export const movementsColumns = (isSuperAdmin: boolean): ColumnDef<SummaryMovements>[] => {
   const columns: ColumnDef<SummaryMovements>[] = [
@@ -171,23 +181,20 @@ export const movementsColumns = (isSuperAdmin: boolean): ColumnDef<SummaryMoveme
       size: 5,
       cell: function Cell({ row }) {
         console.log("isSuperAdmin", isSuperAdmin);
-        /*         const [showDeleteDialog, setShowDeleteDialog] = useState(false);
         const [showEditDialog, setShowEditDialog] = useState(false);
-        const [showViewMovementDialog, setShowViewMovementDialog] = useState(false); */
 
-        const type = row?.original.type;
-        console.log("type", type);
+        /*
+             const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+        */
+        const [showViewMovementDialog, setShowViewMovementDialog] = useState(false);
+
+        const { type, hasPaymentAssigned, id } = row.original;
 
         return (
           <div>
             <div>
-              {/*               {showViewMovementDialog && (
-                <MovementsDetailsDialog
-                  open={showViewMovementDialog}
-                  onOpenChange={setShowViewMovementDialog}
-                  movements={row?.original}
-                  id={id}
-                />
+              {showViewMovementDialog && (
+                <ViewMovementsDialog open={showViewMovementDialog} onOpenChange={setShowViewMovementDialog} id={id} />
               )}
 
               {showEditDialog && (
@@ -195,10 +202,10 @@ export const movementsColumns = (isSuperAdmin: boolean): ColumnDef<SummaryMoveme
                   open={showEditDialog}
                   onOpenChange={setShowEditDialog}
                   movements={row?.original}
-                  id={id}
                   type={type}
                 />
               )}
+              {/* 
 
               <DeleteMovementsDialog
                 open={showDeleteDialog}
@@ -215,17 +222,18 @@ export const movementsColumns = (isSuperAdmin: boolean): ColumnDef<SummaryMoveme
                   <Ellipsis className="size-4" aria-hidden="true" />
                 </Button>
               </DropdownMenuTrigger>
-              {/*               <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuContent align="end" className="w-40">
                 <DropdownMenuItem onSelect={() => setShowViewMovementDialog(true)}>Ver</DropdownMenuItem>
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem onSelect={() => setShowEditDialog(true)}>
+                <DropdownMenuItem onSelect={() => setShowEditDialog(true)} disabled={hasPaymentAssigned}>
                   Editar
                   <DropdownMenuShortcut>
                     <Pencil className="size-4" aria-hidden="true" />
                   </DropdownMenuShortcut>
                 </DropdownMenuItem>
+                {/* 
 
                 {isSuperAdmin && (
                   <DropdownMenuItem className="text-red-700" onSelect={() => setShowDeleteDialog(true)}>
@@ -234,8 +242,8 @@ export const movementsColumns = (isSuperAdmin: boolean): ColumnDef<SummaryMoveme
                       <Trash className="size-4" aria-hidden="true" />
                     </DropdownMenuShortcut>
                   </DropdownMenuItem>
-                )}
-              </DropdownMenuContent> */}
+                )} */}
+              </DropdownMenuContent>
             </DropdownMenu>
           </div>
         );

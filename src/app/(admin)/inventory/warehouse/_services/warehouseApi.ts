@@ -7,15 +7,25 @@ import { StockWarehouse, SummaryWarehouse, Warehouse } from "../_types/warehouse
 
 export type PaginatedWarehouseParams = PaginatedQueryParams<SummaryWarehouse>;
 
+interface GetWarehouseByIdProps {
+  id: string;
+  movementId?: string;
+}
+
+interface GetProductsStockByTypeProps {
+  type: string;
+  paymentDetailId?: string;
+}
+
 export const warehouseApi = createApi({
   reducerPath: "warehouseApi",
   baseQuery: baseQueryWithReauth,
   tagTypes: ["Warehouse"],
   endpoints: (build) => ({
     //Obtener producto por id
-    getWarehouseById: build.query<Warehouse, { id: string }>({
-      query: ({ id }) => ({
-        url: `/warehouse/${id}`,
+    getWarehouseById: build.query<Warehouse, GetWarehouseByIdProps>({
+      query: ({ id, movementId }) => ({
+        url: `/warehouse/${id}${movementId ? `?movementId=${movementId}` : ""}`,
         method: "GET",
         credentials: "include",
       }),
@@ -55,9 +65,9 @@ export const warehouseApi = createApi({
     }),
 
     // Endpint para obtener el stock de productos por tipo
-    getProductsStockByType: build.query<StockWarehouse[], { type: string }>({
-      query: ({ type }) => ({
-        url: `/warehouse/stock/product/${type}`,
+    getProductsStockByType: build.query<StockWarehouse[], GetProductsStockByTypeProps>({
+      query: ({ type, paymentDetailId }) => ({
+        url: `/warehouse/stock/product/${type}${paymentDetailId ? `?paymentDetailId=${paymentDetailId}` : ""}`,
         method: "GET",
         credentials: "include",
       }),
