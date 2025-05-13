@@ -1,1 +1,1 @@
-export type ReportType = "profit" | "expense" | "balance";
+export type ReportType = "profit" | "expense" | "balance" | "typeRoom";

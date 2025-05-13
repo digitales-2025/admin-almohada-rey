@@ -4,6 +4,7 @@ import {
   useLazyDownloadBalanceReportQuery,
   useLazyDownloadExpenseReportQuery,
   useLazyDownloadProfitReportQuery,
+  useLazyDownloadProfitTypeRoomReportQuery,
 } from "../_services/reportsApi";
 import { DownloadReportParams } from "../interfaces/dowloadParams";
 import { ReportType } from "../interfaces/report-type";
@@ -14,6 +15,7 @@ export function useDownloadReport() {
   const [downloadProfit] = useLazyDownloadProfitReportQuery();
   const [downloadExpense] = useLazyDownloadExpenseReportQuery();
   const [downloadBalance] = useLazyDownloadBalanceReportQuery();
+  const [downloadProfitTypeRoom] = useLazyDownloadProfitTypeRoomReportQuery();
 
   // Ahora recibe también el título del reporte
   const onDownloadReport = async (
@@ -35,6 +37,9 @@ export function useDownloadReport() {
           break;
         case "balance":
           blob = await downloadBalance(params).unwrap();
+          break;
+        case "typeRoom":
+          blob = await downloadProfitTypeRoom(params).unwrap();
           break;
         default:
           throw new Error("Tipo de reporte no soportado");

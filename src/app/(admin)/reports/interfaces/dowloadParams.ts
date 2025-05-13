@@ -4,3 +4,10 @@ export interface DownloadReportParams {
   year: number;
   // filtroOpcional?: string;
 }
+
+export interface DownloadReportTypeRoomParams {
+  month: number;
+  year: number;
+  typeRoomId?: string;
+  // filtroOpcional?: string;
+}

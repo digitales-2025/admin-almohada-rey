@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Download, RefreshCcw } from "lucide-react";
 
 import SelectorFechas from "@/app/(admin)/reports/_components/select-date";
+import { AutoComplete, Option } from "@/components/ui/autocomplete";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -28,7 +29,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useToast } from "@/hooks/use-toast";
 import { useDownloadReport } from "../_hooks/use-report-query";
-import { DownloadReportParams } from "../interfaces/dowloadParams";
+import { RoomTypeOption } from "../../rooms/list/_utils/rooms.filter.utils";
+import { useRoomTypes } from "../../rooms/room-types/_hooks/use-room-types";
+import { DownloadReportParams, DownloadReportTypeRoomParams } from "../interfaces/dowloadParams";
 import { ReportType } from "../interfaces/report-type";
 
 // Props que recibe el componente
@@ -45,6 +48,7 @@ export default function ReporteDialog({ open, onOpenChange, tipoReporte, tituloR
   const [mesSeleccionado, setMesSeleccionado] = useState<number | null>(null);
   const [añoSeleccionado, setAñoSeleccionado] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [roomTypeId, setRoomTypeId] = useState<string | null>(null);
 
   // Hooks para notificaciones y media query (responsive)
   const { toast } = useToast();
@@ -53,9 +57,15 @@ export default function ReporteDialog({ open, onOpenChange, tipoReporte, tituloR
   // Hook personalizado para descargar reportes
   const { onDownloadReport } = useDownloadReport();
 
+  const { dataCreatableTypeRooms } = useRoomTypes();
+  const typeRoomsOptions: Option[] =
+    dataCreatableTypeRooms?.map((typeRoom) => ({
+      value: typeRoom.id,
+      label: String(typeRoom.name),
+    })) ?? [];
+
   // Maneja la generación y descarga del reporte
   const handleGenerarReporte = async () => {
-    // Validación de selección de mes y año
     if (mesSeleccionado === null || añoSeleccionado === null) {
       toast({
         title: "Error",
@@ -64,17 +74,31 @@ export default function ReporteDialog({ open, onOpenChange, tipoReporte, tituloR
       });
       return;
     }
+    if (tipoReporte === "typeRoom" && !roomTypeId) {
+      toast({
+        title: "Error",
+        description: "Por favor selecciona un tipo de habitación",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsLoading(true);
 
     try {
-      // Construye los parámetros para la descarga
-      const params: DownloadReportParams = {
-        month: mesSeleccionado + 1, // +1 porque los meses van de 0-11
-        year: añoSeleccionado,
-      };
+      // Construye los parámetros de forma condicional según el tipo de reporte
+      const params: DownloadReportParams | DownloadReportTypeRoomParams =
+        tipoReporte === "typeRoom"
+          ? {
+              month: mesSeleccionado + 1,
+              year: añoSeleccionado,
+              typeRoomId: roomTypeId!,
+            }
+          : {
+              month: mesSeleccionado + 1,
+              year: añoSeleccionado,
+            };
 
-      // Llama al hook para descargar el reporte
       await onDownloadReport(tipoReporte, params, tituloReporte);
 
       toast({
@@ -82,10 +106,10 @@ export default function ReporteDialog({ open, onOpenChange, tipoReporte, tituloR
         description: `Reporte de ${tituloReporte} generado correctamente`,
       });
 
-      // Cierra el diálogo y resetea la selección
       onOpenChange(false);
       setMesSeleccionado(null);
       setAñoSeleccionado(null);
+      setRoomTypeId(null);
     } catch (error) {
       toast({
         title: "Error",
@@ -107,6 +131,17 @@ export default function ReporteDialog({ open, onOpenChange, tipoReporte, tituloR
   // Contenido del formulario: selector de fechas
   const FormContent = () => (
     <div className="flex flex-col space-y-6 py-4">
+      {tipoReporte === "typeRoom" && (
+        <AutoComplete
+          options={typeRoomsOptions}
+          emptyMessage="No se encontró el tipo de habitación."
+          placeholder="Seleccione un tipo de habitación"
+          onValueChange={(selectedOption) => setRoomTypeId(selectedOption?.value || null)}
+          value={typeRoomsOptions.find((option) => option.value === roomTypeId) || undefined}
+          renderOption={(option) => <RoomTypeOption label={option.label} />}
+          renderSelectedValue={(option) => <RoomTypeOption label={option.label} />}
+        />
+      )}
       <SelectorFechas
         mesSeleccionado={mesSeleccionado}
         añoSeleccionado={añoSeleccionado}
@@ -139,7 +174,12 @@ export default function ReporteDialog({ open, onOpenChange, tipoReporte, tituloR
             <Button
               type="submit"
               onClick={handleGenerarReporte}
-              disabled={isLoading || mesSeleccionado === null || añoSeleccionado === null}
+              disabled={
+                isLoading ||
+                mesSeleccionado === null ||
+                añoSeleccionado === null ||
+                (tipoReporte === "typeRoom" && !roomTypeId)
+              }
               className="w-full sm:w-auto"
             >
               {isLoading ? (
@@ -174,7 +214,12 @@ export default function ReporteDialog({ open, onOpenChange, tipoReporte, tituloR
         <DrawerFooter className="pt-2">
           <Button
             onClick={handleGenerarReporte}
-            disabled={isLoading || mesSeleccionado === null || añoSeleccionado === null}
+            disabled={
+              isLoading ||
+              mesSeleccionado === null ||
+              añoSeleccionado === null ||
+              (tipoReporte === "typeRoom" && !roomTypeId)
+            }
             className="w-full"
           >
             {isLoading ? (

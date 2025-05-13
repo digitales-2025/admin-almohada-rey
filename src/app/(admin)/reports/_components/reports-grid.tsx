@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { DollarSign, FileText, TrendingUp } from "lucide-react";
+import { DollarSign, FileText, HouseWifi, TrendingUp } from "lucide-react";
 
 import ReporteDialog from "@/app/(admin)/reports/_components/report-dialog";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,6 +35,13 @@ const tiposReportes: {
     descripcion: "Reporte combinado de ganancias y gastos",
     icono: FileText,
     color: "bg-blue-100 text-blue-600",
+  },
+  {
+    id: "typeRoom",
+    titulo: "Tipo de habitación",
+    descripcion: "Reporte de ganancias por tipo de habitación",
+    icono: HouseWifi,
+    color: "bg-emerald-100 text-emerald-600",
   },
   // Otros reportes pueden agregarse aquí en el futuro
   /*  {

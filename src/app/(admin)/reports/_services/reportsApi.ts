@@ -1,7 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 import baseQueryWithReauth from "@/utils/baseQuery";
-import { DownloadReportParams } from "../../reports/interfaces/dowloadParams";
+import { DownloadReportParams, DownloadReportTypeRoomParams } from "../../reports/interfaces/dowloadParams";
 
 // API para reportes de Excel (profit, expense, balance)
 export const reportsApi = createApi({
@@ -37,6 +37,16 @@ export const reportsApi = createApi({
         credentials: "include",
       }),
     }),
+
+    // Endpoint para descargar el reporte de profit por tipo de habitación
+    downloadProfitTypeRoomReport: build.query<Blob, DownloadReportTypeRoomParams>({
+      query: ({ month, year, typeRoomId }) => ({
+        url: `/reports/profitRoomType?month=${month}&year=${year}&typeRoomId=${typeRoomId}`,
+        method: "GET",
+        responseHandler: async (response: Response) => await response.blob(),
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -45,4 +55,5 @@ export const {
   useLazyDownloadProfitReportQuery,
   useLazyDownloadExpenseReportQuery,
   useLazyDownloadBalanceReportQuery,
+  useLazyDownloadProfitTypeRoomReportQuery,
 } = reportsApi;
