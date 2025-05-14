@@ -83,8 +83,6 @@ export function CreatePaymentDetailRoomDialog({ open, setOpen, payment }: Create
     }
   };
 
-  console.log("form", JSON.stringify(form.getValues(), null, 2));
-
   // Update calculations when values change
   useEffect(() => {
     calculateRoomSubtotal();

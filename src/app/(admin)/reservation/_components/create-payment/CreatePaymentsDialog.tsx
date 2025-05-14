@@ -29,6 +29,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useServices } from "@/hooks/use-services";
 import { calculateStayNights } from "@/utils/peru-datetime";
+import { usePaginatedReservation } from "../../_hooks/use-reservation";
 import { DetailedReservation } from "../../_schemas/reservation.schemas";
 import CreatePaymentsForm from "./CreatePaymentsForm";
 import { PaymentHeader } from "./PaymentHeader";
@@ -45,6 +46,9 @@ export function CreatePaymentDialog({ open, setOpen, reservation }: CreatePaymen
   const { dataServicesAll } = useServices();
   const [isCreatePending, startCreateTransition] = useTransition();
   const { onCreatePayment, isSuccessCreatePayment } = usePayments();
+  const { queryResponse } = usePaginatedReservation();
+
+  const { refetch } = queryResponse;
   const [step, setStep] = useState(1);
 
   const nights = calculateStayNights(reservation.checkInDate, reservation.checkOutDate);
@@ -160,6 +164,7 @@ export function CreatePaymentDialog({ open, setOpen, reservation }: CreatePaymen
   useEffect(() => {
     if (isSuccessCreatePayment) {
       setOpen(false);
+      refetch();
       // Reset form and step
       form.reset();
       setStep(1);

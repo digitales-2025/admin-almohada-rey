@@ -3,13 +3,39 @@ import { toast } from "sonner";
 import { runAndHandleError } from "@/utils/baseQuery";
 import {
   useCreateRoomCleaningMutation,
+  useGetAllRoomsCleaningByRoomIdQuery,
   useGetAllRoomsCleaningQuery,
   useUpdateRoomCleaningMutation,
 } from "../_service/RoomsCleaningApi";
 import { RoomCleaning } from "../_types/roomCleaning";
 
-export const useRoomsCleaning = () => {
+interface UseRoomCleaningProps {
+  roomId?: string;
+  page?: string;
+  month?: string;
+  year?: string;
+}
+
+export const useRoomsCleaning = (options: UseRoomCleaningProps = {}) => {
+  const { roomId, page, month, year } = options;
   const { data: dataRoomsCleaningAll, error, isLoading, isSuccess, refetch } = useGetAllRoomsCleaningQuery();
+
+  const {
+    data: roomsCleaningByRoomId,
+    refetch: refetchRoomsCleaningByRoomId,
+    isLoading: isLoadingRoomsCleaningByRoomId,
+  } = useGetAllRoomsCleaningByRoomIdQuery(
+    {
+      roomId: roomId as string,
+      page: page ? parseInt(page, 10) : undefined,
+      month: month,
+      year: year,
+    },
+    {
+      skip: !roomId, // Evita hacer la query si no hay id
+      refetchOnMountOrArgChange: true,
+    }
+  );
 
   const [createRoomCleaning, { isSuccess: isSuccessCreateRoomCleaning }] = useCreateRoomCleaningMutation();
 
@@ -44,6 +70,9 @@ export const useRoomsCleaning = () => {
     isLoading,
     isSuccess,
     refetch,
+    roomsCleaningByRoomId,
+    refetchRoomsCleaningByRoomId,
+    isLoadingRoomsCleaningByRoomId,
     onCreateRoomCleaning,
     isSuccessCreateRoomCleaning,
     onUpdateRoomCleaning,

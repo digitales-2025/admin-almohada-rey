@@ -1,6 +1,8 @@
+"use client";
+
 import { useState } from "react";
-import { Check, ChevronRight, Minus, Plus, Search, ShoppingBag, Trash2, X } from "lucide-react";
-import { UseFormReturn } from "react-hook-form";
+import { ChevronRight, Search, X } from "lucide-react";
+import type { UseFormReturn } from "react-hook-form";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,14 +10,10 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import { CreateExtraServiceItem, CreatePaymentDetailSchema } from "../../_schema/createPaymentDetailsSchema";
-import { CategoryPayment } from "../../_types/payment";
-import {
-  addService,
-  removeSelectedItems,
-  toggleItemSelection,
-  updateServiceQuantity,
-} from "../../_utils/createPaymentDetails.utils";
+import type { CreateExtraServiceItem, CreatePaymentDetailSchema } from "../../_schema/createPaymentDetailsSchema";
+import type { CategoryPayment } from "../../_types/payment";
+import { addService } from "../../_utils/createPaymentDetails.utils";
+import ItemsPaymentDetail from "./ItemsPaymentDetail";
 import PaymentServiceCard from "./PaymentServiceCard";
 
 interface SelectServicesPaymentDetailProps {
@@ -54,16 +52,16 @@ export default function SelectServicesPaymentDetail({
   const watchExtraServices = form.watch("extraServices");
 
   return (
-    <div>
+    <div className="rounded-lg">
       <TabsContent value="services" className="flex flex-col h-[calc(90vh-190px)]">
-        <div className="grid grid-cols-1 sm:grid-cols-[280px_1fr] h-full">
+        <div className="grid grid-cols-1 sm:grid-cols-[280px_1fr] h-full rounded-lg">
           {/* Left sidebar - Categories and search */}
-          <div className="border-r p-4 flex flex-col">
+          <div className="border-r p-4 flex flex-col bg-card">
             <div className="relative mb-4">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Buscar servicios..."
-                className="pl-9 pr-9"
+                className="pl-9 pr-9 border-border focus:border-primary focus:ring-1 focus:ring-primary"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -71,7 +69,7 @@ export default function SelectServicesPaymentDetail({
                 <Button
                   type="button"
                   size={"icon"}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-muted flex items-center justify-center hover:bg-muted-foreground/20"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80"
                   onClick={() => setSearchTerm("")}
                 >
                   <X className="h-3 w-3 text-muted-foreground" />
@@ -79,36 +77,51 @@ export default function SelectServicesPaymentDetail({
               )}
             </div>
 
-            <h3 className="font-medium text-sm mb-2">Categorias</h3>
-            <div className="space-y-1 mb-4">
-              {categories.map((category) => (
-                <Button
-                  key={category.id}
-                  variant={"outline"}
-                  type="button"
-                  className={cn(
-                    "w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-left",
-                    activeCategory === category.id
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "text-muted-foreground"
-                  )}
-                  onClick={() => setActiveCategory(category.id)}
-                >
-                  {category.icon}
-                  <span>{category.name}</span>
-                </Button>
-              ))}
+            <div className="mb-4">
+              <div className="space-y-1 pr-3">
+                {categories.map((category) => (
+                  <Button
+                    key={category.id}
+                    variant="ghost"
+                    type="button"
+                    className={cn(
+                      "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-all",
+                      activeCategory === category.id
+                        ? "bg-primary/10 border-l-4 border-l-primary text-primary font-medium"
+                        : "border-l-4 border-l-transparent text-foreground hover:bg-muted hover:border-l-primary/30"
+                    )}
+                    onClick={() => setActiveCategory(category.id)}
+                  >
+                    <div
+                      className={cn(
+                        "flex items-center justify-center w-6 h-6 rounded-md transition-all",
+                        activeCategory === category.id ? "" : "bg-muted text-muted-foreground"
+                      )}
+                    >
+                      {category.icon}
+                    </div>
+                    <span>{category.name}</span>
+                  </Button>
+                ))}
+              </div>
             </div>
 
             {/* Selected items summary */}
             {fields.length > 0 && (
-              <div className="mt-auto pt-4 border-t">
+              <div className="mt-auto pt-4 border-t border-border">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-medium text-sm">Items seleccionados</h3>
-                  <Badge variant="outline">{fields.length}</Badge>
+                  <h3 className="font-medium text-sm flex items-center">
+                    <span className="inline-block w-1 h-4 bg-primary rounded-full mr-2"></span>
+                    Items seleccionados
+                  </h3>
+                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
+                    {fields.length}
+                  </Badge>
                 </div>
                 <div className="text-sm text-muted-foreground mb-1">Monto Total</div>
-                <div className="text-xl font-bold">S/. {form.getValues("totalAmount").toFixed(2)}</div>
+                <div className="text-sm font-bold text-foreground bg-muted p-2 rounded-md border border-border">
+                  S/. {form.getValues("totalAmount").toFixed(2)}
+                </div>
                 <Button
                   type="button"
                   className="w-full mt-3"
@@ -123,49 +136,23 @@ export default function SelectServicesPaymentDetail({
           </div>
 
           {/* Main content - Service items */}
-          <div className="flex flex-col">
-            {/* Selected items toolbar */}
-            {editMode && selectedItems.length > 0 && (
-              <div className="p-3 border-b bg-muted/30 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="bg-primary/10">
-                    {selectedItems.length} selected
-                  </Badge>
-                  <Button variant="ghost" size="sm" className="h-8" type="button" onClick={() => setSelectedItems([])}>
-                    <X className="h-3.5 w-3.5 mr-1" />
-                    Limpiar
-                  </Button>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    className="h-8"
-                    onClick={() => removeSelectedItems(remove, selectedItems, setSelectedItems)}
-                  >
-                    <Trash2 className="h-3.5 w-3.5 mr-1" />
-                    Eliminar
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            <div>
+          <div className="flex flex-col bg-background h-full">
+            <div className="flex-1 overflow-hidden">
               {searchTerm ? (
-                <ScrollArea className="h-full">
-                  <div className="p-4">
-                    <div className="flex items-center gap-2 mb-4 text-sm text-muted-foreground">
-                      <Search className="h-3.5 w-3.5" />
-                      <span>Resultados de búsqueda para "{searchTerm}"</span>
-                    </div>
+                <div className="h-full flex flex-col">
+                  <div className="flex items-center gap-2 p-4 text-sm text-muted-foreground bg-card rounded-md mx-4 mt-4">
+                    <Search className="h-3.5 w-3.5" />
+                    <span>Resultados de búsqueda para "{searchTerm}"</span>
+                  </div>
 
+                  <ScrollArea className="flex-1 px-4">
                     {filteredItems.length > 0 ? (
-                      <div className="space-y-6">
+                      <div className="space-y-6 py-4">
                         {filteredItems.map((category) => (
                           <div key={category.id}>
                             <div className="flex items-center gap-2 mb-3">
                               <div
-                                className="h-8 w-8 rounded-md flex items-center justify-center text-white"
+                                className="h-8 w-8 rounded-md flex items-center justify-center text-primary-foreground"
                                 style={{ backgroundColor: category.color }}
                               >
                                 {category.icon}
@@ -187,34 +174,34 @@ export default function SelectServicesPaymentDetail({
                         ))}
                       </div>
                     ) : (
-                      <div className="flex flex-col items-center justify-center h-[300px]">
+                      <div className="flex flex-col items-center justify-center h-[300px] bg-card rounded-lg p-8 my-4">
                         <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
                           <Search className="h-8 w-8 text-muted-foreground" />
                         </div>
-                        <p className="text-lg font-medium">No services found</p>
-                        <p className="text-muted-foreground mt-1">Try a different search term</p>
+                        <p className="text-lg font-medium text-foreground">Servicio no encontrado</p>
+                        <p className="text-muted-foreground mt-1">Intenta con otro termino diferente</p>
                       </div>
                     )}
-                  </div>
-                </ScrollArea>
+                  </ScrollArea>
+                </div>
               ) : (
                 // Category view
                 <div className="flex flex-col h-full">
                   {categories
                     .filter((c) => c.id === activeCategory)
                     .map((category) => (
-                      <div key={category.id} className="flex-1 flex flex-col">
-                        <div className="p-4 border-b">
+                      <div key={category.id} className="flex-1 flex flex-col h-full">
+                        <div className="p-4 border-b bg-card">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               <div
-                                className="h-10 w-10 rounded-md flex items-center justify-center text-white"
+                                className="h-10 w-10 rounded-md flex items-center justify-center text-primary-foreground"
                                 style={{ backgroundColor: category.color }}
                               >
                                 {category.icon}
                               </div>
                               <div>
-                                <h3 className="font-bold text-lg">{category.name}</h3>
+                                <h3 className="font-bold text-lg text-foreground">{category.name}</h3>
                                 <p className="text-xs text-muted-foreground">
                                   {category.items.length} servicios disponibles
                                 </p>
@@ -223,7 +210,7 @@ export default function SelectServicesPaymentDetail({
                           </div>
                         </div>
 
-                        <ScrollArea className="flex-1">
+                        <ScrollArea className="h-[200px]">
                           <div className="p-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                               {category.items.map((item) => (
@@ -243,144 +230,19 @@ export default function SelectServicesPaymentDetail({
               )}
             </div>
 
-            {/* Selected items */}
-            {fields.length > 0 && (
-              <div className="border-t">
-                <div className="p-3 flex items-center justify-between bg-muted/30">
-                  <h3 className="font-medium text-sm flex items-center gap-1.5">
-                    <ShoppingBag className="h-4 w-4" />
-                    Servicios Seleccionados
-                  </h3>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 text-xs"
-                      onClick={() => setEditMode(!editMode)}
-                    >
-                      {editMode ? "Listo" : "Editar"}
-                    </Button>
-                    {editMode && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 text-xs text-destructive hover:text-destructive"
-                        onClick={() => form.setValue("extraServices", [])}
-                      >
-                        Limpiar Todo
-                      </Button>
-                    )}
-                  </div>
-                </div>
-                <ScrollArea className="max-h-[150px]">
-                  <div className="p-2">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {fields.map((service, index) => {
-                        const category = getCategoryById(service.category);
-                        return (
-                          <div
-                            key={service.id + index}
-                            className={cn(
-                              "relative overflow-hidden rounded-md border p-2 bg-card",
-                              editMode && "cursor-pointer hover:bg-muted/50",
-                              editMode && selectedItems.includes(index) && "ring-2 ring-primary bg-primary/5"
-                            )}
-                            onClick={() => editMode && toggleItemSelection(index, selectedItems, setSelectedItems)}
-                          >
-                            <div className="flex items-center">
-                              {editMode && (
-                                <div className="mr-2">
-                                  <div
-                                    className={cn(
-                                      "h-4 w-4 rounded-sm border flex items-center justify-center",
-                                      selectedItems.includes(index) && "bg-primary border-primary"
-                                    )}
-                                  >
-                                    {selectedItems.includes(index) && (
-                                      <Check className="h-3 w-3 text-primary-foreground" />
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-                              <div
-                                className="h-8 w-8 rounded-md flex items-center justify-center text-white mr-2 flex-shrink-0"
-                                style={{ backgroundColor: category.color }}
-                              >
-                                {category.icon}
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center justify-between">
-                                  <div className="font-medium truncate">{service.name}</div>
-                                  <div className="font-bold ml-2">S/. {service.subtotal.toFixed(2)}</div>
-                                </div>
-                                <div className="flex items-center justify-between mt-1">
-                                  <div className="text-xs text-muted-foreground">
-                                    S/. {service.unitPrice.toFixed(2)} c/u
-                                  </div>
-                                  {!editMode && (
-                                    <div className="flex items-center">
-                                      <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="icon"
-                                        className="h-5 w-5 rounded-full"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          updateServiceQuantity(
-                                            index,
-                                            service.quantity - 1,
-                                            watchExtraServices,
-                                            update
-                                          );
-                                        }}
-                                        disabled={service.quantity <= 1}
-                                      >
-                                        <Minus className="h-2.5 w-2.5" />
-                                      </Button>
-                                      <span className="w-6 text-center text-xs">{service.quantity}</span>
-                                      <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="icon"
-                                        className="h-5 w-5 rounded-full"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          updateServiceQuantity(
-                                            index,
-                                            service.quantity + 1,
-                                            watchExtraServices,
-                                            update
-                                          );
-                                        }}
-                                      >
-                                        <Plus className="h-2.5 w-2.5" />
-                                      </Button>
-                                      <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-6 w-6 text-destructive ml-1"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          remove(index);
-                                        }}
-                                      >
-                                        <Trash2 className="h-3 w-3" />
-                                      </Button>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </ScrollArea>
-              </div>
-            )}
+            <ItemsPaymentDetail
+              categories={categories}
+              editMode={editMode}
+              setEditMode={setEditMode}
+              fields={fields}
+              form={form}
+              remove={remove}
+              update={update}
+              watchExtraServices={watchExtraServices}
+              setSelectedItems={setSelectedItems}
+              selectedItems={selectedItems}
+              getCategoryById={getCategoryById}
+            />
           </div>
         </div>
       </TabsContent>

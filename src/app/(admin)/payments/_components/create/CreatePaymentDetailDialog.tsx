@@ -5,12 +5,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronLeft, Receipt, RefreshCcw, ShoppingBag, Utensils, X } from "lucide-react";
 import { useFieldArray, useForm } from "react-hook-form";
 
-import { useProducts } from "@/app/(admin)/inventory/products/_hooks/use-products";
 import { ProductType } from "@/app/(admin)/inventory/products/_types/products";
+import { useWarehouse } from "@/app/(admin)/inventory/warehouse/_hooks/use-warehouse";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useServices } from "@/hooks/use-services";
 import { usePayments } from "../../_hooks/use-payments";
@@ -30,10 +29,10 @@ interface CreatePaymentDetailDialogProps {
 }
 
 export function CreatePaymentDetailDialog({ open, onOpenChange, payment }: CreatePaymentDetailDialogProps) {
-  const isDesktop = useMediaQuery("(min-width: 800px)");
+  const isDesktop = useMediaQuery("(min-width: 950px)");
   const [searchTerm, setSearchTerm] = useState("");
   const { dataServicesAll } = useServices();
-  const { productByType } = useProducts({ type: ProductType.COMMERCIAL });
+  const { productsStockByType } = useWarehouse({ typeStockProduct: ProductType.COMMERCIAL });
   const [isCreatePending, startCreateTransition] = useTransition();
   const { onCreatePaymentDetails, isSuccessCreatePaymentDetails } = usePayments();
 
@@ -42,7 +41,7 @@ export function CreatePaymentDetailDialog({ open, onOpenChange, payment }: Creat
       id: "services",
       name: "Servicios",
       icon: <Utensils className="h-5 w-5" />,
-      color: "#6366f1",
+      color: "#0891b2", // Color cyan-600 en hexadecimal
       items:
         dataServicesAll?.map((service) => ({
           id: service.id,
@@ -56,17 +55,19 @@ export function CreatePaymentDetailDialog({ open, onOpenChange, payment }: Creat
       id: "products",
       name: "Productos Comerciales",
       icon: <ShoppingBag className="h-5 w-5" />,
-      color: "#f59e0b",
+      color: "#db2777", // Color pink-600 en hexadecimal
       items:
-        productByType?.map((product) => ({
-          id: product.id,
-          name: product.name,
-          price: product.unitCost,
-          code: product.code,
-        })) || [],
+        productsStockByType
+          ?.filter((stock) => stock.quantity > 0)
+          .map((stock) => ({
+            id: stock.product.id,
+            name: stock.product.name,
+            price: stock.product.unitCost ?? 0,
+            code: stock.product.code ?? "",
+            quantity: stock.quantity,
+          })) || [],
     },
   ];
-
   const [filteredItems, setFilteredItems] = useState<CategoryPayment[]>([]);
   const [activeTab, setActiveTab] = useState("services");
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
@@ -215,17 +216,13 @@ export function CreatePaymentDetailDialog({ open, onOpenChange, payment }: Creat
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="p-0 rounded-xl sm:max-w-[900px] max-h-[90vh] flex flex-col">
-          <DialogHeader className="px-6 pt-6 pb-2 flex-shrink-0">
+        <DialogContent className="p-0 rounded-xl sm:max-w-[950px] flex flex-col">
+          <DialogHeader className="px-6 pt-6 flex-shrink-0">
             <DialogTitle className="sr-only">Agregar Pago</DialogTitle>
-            <div className="flex items-center justify-between mb-4">{headerContent}</div>
+            <div className="flex items-center justify-between">{headerContent}</div>
           </DialogHeader>
 
-          <div className="flex-1 overflow-hidden">
-            <ScrollArea className="h-[calc(90vh-120px)]">
-              <div className="px-6 pb-6 h-full">{renderContent()}</div>
-            </ScrollArea>
-          </div>
+          <div className="px-0 h-full">{renderContent()}</div>
         </DialogContent>
       </Dialog>
     );
@@ -239,11 +236,7 @@ export function CreatePaymentDetailDialog({ open, onOpenChange, payment }: Creat
           <div className="text-left">{headerContent}</div>
         </DrawerHeader>
 
-        <div className="flex-1 overflow-hidden">
-          <ScrollArea className="h-full">
-            <div className="px-4 pb-4">{renderContent()}</div>
-          </ScrollArea>
-        </div>
+        <div className="px-0">{renderContent()}</div>
       </DrawerContent>
     </Drawer>
   );

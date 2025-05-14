@@ -42,7 +42,7 @@ export function CreateRoomTypeDialog() {
   const isDesktop = useMediaQuery("(min-width: 800px)");
   const [open, setOpen] = useState(false);
   const [isCreatePending, startCreateTransition] = useTransition();
-  const { onCreateRoomType, isSuccessCreateRoomType } = useRoomTypes();
+  const { onCreateRoomType, isSuccessCreateRoomType, refetchDataCreatableTypeRooms } = useRoomTypes();
 
   const form = useForm<CreateRoomTypeSchema>({
     resolver: zodResolver(createRoomTypeSchema),
@@ -72,6 +72,7 @@ export function CreateRoomTypeDialog() {
   useEffect(() => {
     if (isSuccessCreateRoomType) {
       form.reset();
+      refetchDataCreatableTypeRooms();
       setOpen(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

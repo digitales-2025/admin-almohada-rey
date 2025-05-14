@@ -8,11 +8,13 @@ import { ApiCustomer } from "@/app/(admin)/customers/_types/customer";
 import { RTKUseQueryHookResult, SearchCombobox } from "@/components/form/RemoteSearchCombobox";
 import { cn } from "@/lib/utils";
 import { documentTypeStatusConfig } from "../../_types/document-type.enum.config";
+import { CreateCustomersReservationsSheet } from "../create-customers/CreateCustomersReservationsSheet";
 
 type SearchOrderComoBoxProps = {
   onValueChange: (value: string, entity?: unknown) => void;
   defaultValue?: string;
   className?: string;
+  notFoundAction?: boolean;
 };
 
 type ComboboxItem<T> = {
@@ -21,7 +23,12 @@ type ComboboxItem<T> = {
   entity: T;
 };
 
-export function SearchCustomerCombobox({ onValueChange, defaultValue, className }: SearchOrderComoBoxProps) {
+export function SearchCustomerCombobox({
+  onValueChange,
+  defaultValue,
+  className,
+  notFoundAction,
+}: SearchOrderComoBoxProps) {
   const DefaultSearchValue = "None"; //IMPORTANT: This value is used to SEND a request to the backend when the search input is empty
   const [value, setValue] = useState(defaultValue);
   const [label, setLabel] = useState("Buscar Cliente por Nro. de Documento");
@@ -80,6 +87,7 @@ export function SearchCustomerCombobox({ onValueChange, defaultValue, className 
       searchPlaceholder="Busca por Nro. de Identidad..."
       noResultsMsg="No se encontro resultados"
       selectItemMsg="Selecciona una cliente"
+      notFoundAction={notFoundAction ? <CreateCustomersReservationsSheet refetch={refetch} /> : undefined}
     />
   );
 }

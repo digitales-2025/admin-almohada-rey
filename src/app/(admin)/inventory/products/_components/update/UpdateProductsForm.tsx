@@ -9,13 +9,13 @@ import { CreateProductsSchema } from "../../_schema/createProductsSchema";
 import { ProductType } from "../../_types/products";
 import { ProductTypeLabels } from "../../_utils/products.utils";
 
-interface UpdateCustomerFormProps extends Omit<React.ComponentPropsWithRef<typeof Sheet>, "open" | "onOpenChange"> {
+interface UpdateProductsFormProps extends Omit<React.ComponentPropsWithRef<typeof Sheet>, "open" | "onOpenChange"> {
   children: React.ReactNode;
   form: UseFormReturn<CreateProductsSchema>;
   onSubmit: (data: CreateProductsSchema) => void;
 }
 
-export default function UpdateCustomersForm({ children, form, onSubmit }: UpdateCustomerFormProps) {
+export default function UpdateProductsForm({ children, form, onSubmit }: UpdateProductsFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4 px-6">

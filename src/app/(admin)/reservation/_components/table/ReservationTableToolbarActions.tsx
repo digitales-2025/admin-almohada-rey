@@ -5,7 +5,6 @@ import { type Table } from "@tanstack/react-table";
 import { DetailedReservation } from "../../_schemas/reservation.schemas";
 import { CreateReservationDialog } from "../create/CreateReservationDialog";
 import { DeactivateReservationsDialog } from "../state-management/DeactivateReservationsDialog";
-import { ReactivateReservationsDialog } from "../state-management/ReactivateReservationsDialog";
 
 export interface ReservationTableToolbarActionsProps {
   table?: Table<DetailedReservation>;
@@ -18,11 +17,9 @@ export function ReservationTableToolbarActions({ table }: ReservationTableToolba
         <>
           <DeactivateReservationsDialog
             reservations={table.getFilteredSelectedRowModel().rows.map((row) => row.original)}
-            onSuccess={() => table.toggleAllRowsSelected(false)}
-          />
-          <ReactivateReservationsDialog
-            reservations={table.getFilteredSelectedRowModel().rows.map((row) => row.original)}
-            onSuccess={() => table.toggleAllRowsSelected(false)}
+            onSuccess={() => {
+              table.toggleAllRowsSelected(false);
+            }}
           />
         </>
       ) : null}

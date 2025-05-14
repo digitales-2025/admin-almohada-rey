@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { LucideIcon, Users } from "lucide-react";
+import { Users, type LucideIcon } from "lucide-react";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -15,8 +16,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Drawer, DrawerContent, DrawerFooter, DrawerTrigger } from "@/components/ui/drawer";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { ReservationCustomer, ReservationGuest, ReservationUser } from "../../../_schemas/reservation.schemas";
+import type { ReservationCustomer, ReservationGuest, ReservationUser } from "../../../_schemas/reservation.schemas";
 import { CustomerMetadata } from "./CustomerMetadata";
 import { GuestsTable } from "./GuestCardTable";
 import { CustomerMetadataMobile } from "./GuestMobileCommonMetadata";
@@ -38,12 +40,6 @@ function AddInfoCard({ guests }: { guests: ReservationGuest[] }) {
   }
   const hasAdditionalInfo = guests.some((guest) => guest.additionalInfo !== undefined);
   if (!hasAdditionalInfo) return null;
-  // const hasAdditionalInfoWithValue = guests.some((guest) => guest.additionalInfo !== undefined && guest.additionalInfo !== "" && Object.keys(guest.additionalInfo).length > 0);
-  // if (!hasAdditionalInfoWithValue) return null;
-  // const hasAdditionalInfoWithValueAndKeys = guests.some((guest) => guest.additionalInfo !== undefined && guest.additionalInfo !== "" && Object.keys(guest.additionalInfo).length > 0 && Object.keys(guest.additionalInfo).some((key) => guest.additionalInfo[key] !== undefined && guest.additionalInfo[key] !== "")
-  // if (!hasAdditionalInfoWithValueAndKeys) return null;
-  // const hasAdditionalInfoWithValueAndKeysAndValues = guests.some((guest) => guest.additionalInfo !== undefined && guest.additionalInfo !== "" && Object.keys(guest.additionalInfo).length > 0 && Object.keys(guest.additionalInfo).some((key) => guest.additionalInfo[key] !== undefined && guest.additionalInfo[key] !== "" && Object.keys(guest.additionalInfo[key]).length > 0)
-  // )
   return (
     <Card className="w-full mt-4">
       <CardHeader>
@@ -82,23 +78,6 @@ export function GuestsDetailsDialog({
   const [open, setOpen] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 640px)");
 
-  //   if (branchQuery.isLoading) {
-  //     return (
-  //       <Button type="button" disabled className="w-full flex items-center gap-2">
-  //         <Skeleton className="h-4 w-4 rounded-full" />
-  //         <Skeleton className="h-4 w-24" />
-  //       </Button>
-  //     );
-  //   }
-
-  //   if (branchQuery.isError) {
-  //     return (
-  //       <Button type="button" disabled className="w-full flex items-center gap-2">
-  //         Error
-  //       </Button>
-  //     );
-  //   }
-
   const handleClose = () => {
     setOpen(false);
   };
@@ -111,18 +90,62 @@ export function GuestsDetailsDialog({
     </div>
   );
 
-  const TriggerButton = () => (
-    <Button
-      onClick={() => setOpen(true)}
-      variant="ghost"
-      size="sm"
-      aria-label="Open menu"
-      className="flex p-2 data-[state=open]:bg-muted text-sm bg-primary/10 hover:scale-105 hover:transition-all"
-    >
-      <Users className="text-primary !size-5" />
-      {DIALOG_MESSAGES.button}
-    </Button>
-  );
+  const TriggerButton = () => {
+    // Función para determinar el color según la cantidad de acompañantes
+    const getAvatarColor = (guestCount: number) => {
+      // Colores que varían según la cantidad de acompañantes - solo bg
+      if (guestCount === 1) return "bg-blue-500";
+      if (guestCount === 2) return "bg-green-500";
+      if (guestCount === 3) return "bg-amber-500";
+      if (guestCount === 4) return "bg-orange-500";
+      if (guestCount >= 5) return "bg-red-500";
+      return "bg-gray-400"; // Color por defecto
+    };
+
+    // Color para el avatar de +N según la cantidad total
+    const extraAvatarColor = getAvatarColor(guests.length);
+
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={() => setOpen(true)}
+              variant="ghost"
+              size="sm"
+              aria-label="Mostrar Acompañantes"
+              className="flex items-center gap-2 p-2 hover:scale-105 hover:transition-all"
+            >
+              <div className="flex -space-x-1 mr-1">
+                {guests.slice(0, 3).map((guest, index) => (
+                  <Avatar
+                    key={guest?.documentId ?? index}
+                    className={`border-2 border-background w-9 h-9 ${getAvatarColor(index + 1)} text-white`}
+                  >
+                    <AvatarImage src={`/placeholder.svg?height=24&width=24`} alt={guest.name} />
+                    <AvatarFallback className={`text-xs text-white ${extraAvatarColor}`}>
+                      {guest.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                ))}
+                {guests.length > 3 && (
+                  <Avatar className={`border-2 border-background w-9 h-9  text-white`}>
+                    <AvatarFallback className={`text-xs text-white ${extraAvatarColor}`}>
+                      +{guests.length - 3}
+                    </AvatarFallback>
+                  </Avatar>
+                )}
+              </div>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{DIALOG_MESSAGES.button}</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  };
 
   if (isDesktop) {
     return (

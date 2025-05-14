@@ -1,5 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
+import { PaginatedResponse } from "@/types/api/paginated-response";
+import { PaginatedQueryParams } from "@/types/query-filters/generic-paginated-query-params";
 import baseQueryWithReauth from "@/utils/baseQuery";
 import { CreateUsersSchema, UpdateUsersSchema } from "../_schema/createUsersSchema";
 import { SendNewPasswordSchema } from "../_schema/sendNewPasswordSchema";
@@ -10,6 +12,8 @@ interface UserUpdate {
   message: string;
   statusCode: number;
 }
+
+export type PaginatedUserParams = PaginatedQueryParams<User>;
 
 export const usersApi = createApi({
   reducerPath: "usersApi",
@@ -70,6 +74,19 @@ export const usersApi = createApi({
       providesTags: ["Users"],
     }),
 
+    getPaginatedUsers: build.query<PaginatedResponse<User>, PaginatedUserParams>({
+      query: ({ pagination: { page = 1, pageSize = 10 } }) => ({
+        url: "/users/paginated",
+        method: "GET",
+        params: { page, pageSize },
+        credentials: "include",
+      }),
+      providesTags: (result) => [
+        { type: "Users", id: result?.meta.page },
+        ...(result?.data.map(({ id }) => ({ type: "Users" as const, id })) ?? []),
+      ],
+    }),
+
     // Generar una constraseña
     generatePassword: build.mutation({
       query: () => ({
@@ -99,6 +116,7 @@ export const usersApi = createApi({
 export const {
   useUpdateUserMutation,
   useGetUsersQuery,
+  useGetPaginatedUsersQuery,
   useGeneratePasswordMutation,
   useCreateUserMutation,
   useDeleteUsersMutation,

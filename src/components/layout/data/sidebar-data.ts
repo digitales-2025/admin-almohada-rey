@@ -1,12 +1,15 @@
 import {
   BedDouble,
   CalendarCheck,
+  Clipboard,
   CreditCard,
+  HandCoins,
   Hotel,
   LayoutDashboard,
   Package,
   PackageMinus,
   PackagePlus,
+  ShoppingBag,
   Tag,
   UserCircle,
   Users,
@@ -47,7 +50,7 @@ export const sidebarData: SidebarData = {
             },
             {
               title: "Salidas",
-              url: "/inventory/outputs",
+              url: "/inventory/output",
               icon: PackageMinus,
             },
           ],
@@ -59,8 +62,19 @@ export const sidebarData: SidebarData = {
         },
         {
           title: "Productos",
-          url: "/inventory/products",
           icon: Package,
+          items: [
+            {
+              title: "Comercial",
+              url: "/inventory/products/commercial",
+              icon: ShoppingBag,
+            },
+            {
+              title: "Uso Interno",
+              url: "/inventory/products/internal_use",
+              icon: Clipboard,
+            },
+          ],
         },
       ],
     },
@@ -97,6 +111,11 @@ export const sidebarData: SidebarData = {
           title: "Pagos",
           url: "/payments",
           icon: CreditCard,
+        },
+        {
+          title: "Gastos",
+          url: "/expenses",
+          icon: HandCoins,
         },
       ],
     },

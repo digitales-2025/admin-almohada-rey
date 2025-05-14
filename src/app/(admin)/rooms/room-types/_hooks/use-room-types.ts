@@ -2,10 +2,12 @@ import { toast } from "sonner";
 
 import { runAndHandleError } from "@/utils/baseQuery";
 import {
+  PaginatedRoomTypeParams,
   useCreateRoomTypeWithImagesMutation,
   useDeleteRoomTypesMutation,
   useGetAllRoomTypesQuery,
   useGetAllSummaryRoomTypeQuery,
+  useGetPaginatedRoomTypesQuery,
   useGetRoomTypeByIdQuery,
   useGetRoomTypeWithImagesByIdQuery,
   useReactivateRoomTypesMutation,
@@ -294,5 +296,33 @@ export const useRoomTypes = () => {
     // Datos de tipos habitaciones activas
     dataCreatableTypeRooms,
     refetchDataCreatableTypeRooms,
+  };
+};
+
+interface UsePaginatedRoomTypesProps {
+  page?: number;
+  pageSize?: number;
+}
+
+export const usePaginatedRoomTypes = (options: UsePaginatedRoomTypesProps = {}) => {
+  const { page = 1, pageSize = 10 } = options;
+
+  const paginationParams: PaginatedRoomTypeParams = {
+    pagination: { page, pageSize },
+  };
+
+  const {
+    data: paginatedRoomTypes,
+    isLoading: isLoadingPaginatedRoomTypes,
+    refetch: refetchPaginatedRoomTypes,
+  } = useGetPaginatedRoomTypesQuery(paginationParams, {
+    skip: !paginationParams,
+    refetchOnMountOrArgChange: true,
+  });
+
+  return {
+    paginatedRoomTypes,
+    isLoadingPaginatedRoomTypes,
+    refetchPaginatedRoomTypes,
   };
 };

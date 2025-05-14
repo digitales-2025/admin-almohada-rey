@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { Ellipsis, Monitor, RefreshCcwDot, Ruler, Settings, Trash } from "lucide-react";
+import { ClipboardCheck, Ellipsis, Monitor, RefreshCcwDot, Ruler, Settings, Trash } from "lucide-react";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +30,7 @@ import { RoomImageCell } from "./view-image/RoomImageViewer";
  * @param isSuperAdmin Valor si el usuario es super administrador
  * @returns Columnas de la tabla de usuarios
  */
-export const roomsColumns = (isSuperAdmin: boolean): ColumnDef<Room>[] => [
+export const roomsColumns = (isSuperAdmin: boolean, handleRoomCleaningLog: (id: string) => void): ColumnDef<Room>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -287,6 +287,12 @@ export const roomsColumns = (isSuperAdmin: boolean): ColumnDef<Room>[] => [
                 Disponibilidad
                 <DropdownMenuShortcut>
                   <Settings className="size-4" aria-hidden="true" />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => handleRoomCleaningLog(row.original.id)} disabled={!isActive}>
+                Registro de limpieza
+                <DropdownMenuShortcut>
+                  <ClipboardCheck className="size-4" aria-hidden="true" />
                 </DropdownMenuShortcut>
               </DropdownMenuItem>
               {isSuperAdmin && (

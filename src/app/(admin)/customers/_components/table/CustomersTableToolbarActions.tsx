@@ -4,6 +4,7 @@ import { type Table } from "@tanstack/react-table";
 
 import { Customer } from "../../_types/customer";
 import { CreateCustomersDialog } from "../create/CreateCustomersDialog";
+import { ImportCustomersDialog } from "../import/ImportCustomersDialog";
 import { DeleteCustomersDialog } from "../state-management/DeleteCustomersDialog";
 import { ReactivateCustomersDialog } from "../state-management/ReactivateCustomersDialog";
 
@@ -26,6 +27,7 @@ export function CustomersTableToolbarActions({ table }: CustomersTableToolbarAct
           />
         </>
       ) : null}
+      <ImportCustomersDialog />
       <CreateCustomersDialog />
     </div>
   );

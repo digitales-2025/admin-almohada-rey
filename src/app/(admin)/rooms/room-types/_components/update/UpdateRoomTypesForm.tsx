@@ -35,11 +35,12 @@ export default function UpdateRoomTypeForm({
     // Crear una copia para no modificar el objeto original
     const formData = { ...data };
 
-    // 1. Manejar el caso de una imagen seleccionada para hacerla principal
-    if (selectedImageId) {
+    // Solo establecer imageUpdate si no existe ya un valor (de una edición de imagen)
+    // O si hay un selectedImageId diferente al de imageUpdate
+    if ((!formData.imageUpdate || !formData.imageUpdate.id) && selectedImageId) {
       const selectedImage = roomType.imagesRoomType?.find((img) => img.id === selectedImageId);
+
       if (selectedImage) {
-        // Importante: Usar 'id' en lugar de 'imageId' como espera el backend
         formData.imageUpdate = {
           id: selectedImage.id,
           url: selectedImage.url,
@@ -49,7 +50,7 @@ export default function UpdateRoomTypeForm({
     }
 
     // Validación: si el esquema requiere imageUpdate y no lo tenemos, usar la imagen principal actual
-    if (!formData.imageUpdate) {
+    if (!formData.imageUpdate || !formData.imageUpdate.id) {
       const mainImage = roomType.imagesRoomType?.find((img) => img.isMain);
       if (mainImage) {
         formData.imageUpdate = {
@@ -206,58 +207,6 @@ export default function UpdateRoomTypeForm({
             )}
           />
         </div>
-
-        {/* Tercera fila: TV y Cama */}
-        {/* <div className="grid grid-cols-2 gap-4">
-         <FormField
-            control={form.control}
-            name="tv"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>TV / Entretenimiento</FormLabel>
-                <FormControl>
-                  <InputWithIcon Icon={MonitorDot} placeholder="Ej: TV 50 pulgadas con Netflix" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-        </div>*/}
-
-        {/* Tipo de piso (campo único) */}
-        {/*       <FormField
-          control={form.control}
-          name="floorType"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tipo de Piso</FormLabel>
-              <Select onValueChange={(value) => field.onChange(value as FloorTypeEnum)} value={field.value}>
-                <FormControl>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecciona un tipo de piso" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectGroup>
-                    {Object.entries(FloorTypeLabels).map(([floorType, config]) => {
-                      const Icon = config.icon;
-                      return (
-                        <SelectItem key={floorType} value={floorType} className="flex items-center gap-2">
-                          <div className="flex items-center gap-2">
-                            <Icon className={`size-4 ${config.className}`} />
-                            <span>{config.label}</span>
-                          </div>
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        /> */}
 
         {/* Descripción (campo que ocupa todo el ancho) */}
         <FormField

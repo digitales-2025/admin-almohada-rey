@@ -361,7 +361,7 @@ export default function UpdateReservationForm({
               </FormDescription>
             </div>
             <FormControl>
-              <UserRoundCheck className="text-primary" />
+              <UserRoundCheck className="text-primary shrink-0" />
             </FormControl>
           </FormItem>
         )}

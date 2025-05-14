@@ -2,7 +2,10 @@ import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 
 import { customersApi } from "@/app/(admin)/customers/_services/customersApi";
+import { expensesApi } from "@/app/(admin)/expenses/_services/expensesApi";
+import { movementsApi } from "@/app/(admin)/inventory/movements/_services/movementsApi";
 import { productsApi } from "@/app/(admin)/inventory/products/_services/productsApi";
+import { warehouseApi } from "@/app/(admin)/inventory/warehouse/_services/warehouseApi";
 import { paymentsApi } from "@/app/(admin)/payments/_services/paymentsApi";
 import { adminApi } from "@/app/(admin)/profile/_services/adminApi";
 import { reservationApi } from "@/app/(admin)/reservation/_services/reservationApi";
@@ -26,6 +29,9 @@ export const store = configureStore({
     [roomsCleaningApi.reducerPath]: roomsCleaningApi.reducer,
     [servicesApi.reducerPath]: servicesApi.reducer,
     [paymentsApi.reducerPath]: paymentsApi.reducer,
+    [expensesApi.reducerPath]: expensesApi.reducer,
+    [movementsApi.reducerPath]: movementsApi.reducer,
+    [warehouseApi.reducerPath]: warehouseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -33,37 +39,14 @@ export const store = configureStore({
       serializableCheck: {
         // Ignorar las acciones que no son serializables, específicamente de classApi
         ignoredActions: [
-          "quotationsApi/executeMutation/fulfilled",
-          "quotationsApi/executeMutation/rejected",
-          "observationApi/executeMutation/fulfilled",
-          "observationApi/executeMutation/rejected",
-          "designProjectApi/executeMutation/fulfilled",
-          "designProjectApi/executeMutation/rejected",
-          "budgetsApi/executeMutation/fulfilled",
-          "budgetsApi/executeMutation/rejected",
-          "finishesBudgetsApi/executeMutation/fulfilled",
-          "finishesBudgetsApi/executeMutation/rejected",
-          "finishesApi/executeMutation/fulfilled",
-          "finishesApi/executeMutation/rejected",
-          "reportsApi/executeMutation/rejected",
-          "reportsApi/executeMutation/fulfilled",
-          "purchaseOrderApi/executeMutation/fulfilled",
-          "purchaseOrderApi/executeMutation/rejected",
-          "finishesPurchaseOrderApi/executeMutation/fulfilled",
-          "finishesPurchaseOrderApi/executeMutation/rejected",
+          "customersApi/executeMutation/fulfilled",
+          "customersApi/executeMutation/rejected",
+          "customersApi/executeQuery/fulfilled",
+          "customersApi/executeQuery/rejected",
+          "customersApi/executeQuery/pending",
         ],
         // Ignorar las rutas en el estado que contienen valores no serializables
-        ignoredPaths: [
-          "quotationsApi.mutations",
-          "designProjectApi.mutations",
-          "observationApi.mutations",
-          "budgetsApi.mutations",
-          "finishesBudgetsApi.mutations",
-          "finishesApi.mutations",
-          "reportsApi.mutations",
-          "purchaseOrderApi.mutations",
-          "finishesPurchaseOrderApi.mutations",
-        ],
+        ignoredPaths: ["customersApi.mutations", "customersApi.queries"],
       },
     })
       .concat(authApi.middleware)
@@ -76,7 +59,10 @@ export const store = configureStore({
       .concat(roomsApi.middleware)
       .concat(roomsCleaningApi.middleware)
       .concat(servicesApi.middleware)
-      .concat(paymentsApi.middleware),
+      .concat(paymentsApi.middleware)
+      .concat(expensesApi.middleware)
+      .concat(movementsApi.middleware)
+      .concat(warehouseApi.middleware),
 });
 setupListeners(store.dispatch);
 

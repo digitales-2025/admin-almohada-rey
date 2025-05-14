@@ -1,5 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
+import { PaginatedResponse } from "@/types/api/paginated-response";
+import { PaginatedQueryParams } from "@/types/query-filters/generic-paginated-query-params";
 import baseQueryWithReauth from "@/utils/baseQuery";
 import { ApiCustomer, Customer, HistoryCustomer } from "../_types/customer";
 import { ReservationStatus } from "../../reservation/_schemas/reservation.schemas";
@@ -8,6 +10,30 @@ interface GetHistoryCustomerByIdProps {
   id: string;
   year?: string;
   status?: ReservationStatus;
+}
+
+interface ImportCustomersResponse {
+  statusCode: number;
+  message: string;
+  data: {
+    total: number;
+    successful: number;
+    failed: number;
+    skipped: number;
+    errors: Array<{
+      row: number;
+      data: Record<string, unknown>;
+      error: string;
+      type: "error" | "duplicate";
+    }>;
+  };
+}
+
+export type PaginateCustomerParams = PaginatedQueryParams<Customer>;
+
+interface ImportCustomersRequest {
+  file: File;
+  continueOnError?: boolean;
 }
 
 export const customersApi = createApi({
@@ -81,6 +107,20 @@ export const customersApi = createApi({
       }),
       providesTags: ["Customer"],
     }),
+
+    getPaginatedCustomers: build.query<PaginatedResponse<Customer>, PaginateCustomerParams>({
+      query: ({ pagination: { page = 1, pageSize = 10 } }) => ({
+        url: "/customers/paginated",
+        method: "GET",
+        params: { page, pageSize },
+        credentials: "include",
+      }),
+      providesTags: (result) => [
+        { type: "Customer", id: result?.meta.page },
+        ...(result?.data.map(({ id }) => ({ type: "Customer" as const, id })) ?? []),
+      ],
+    }),
+
     //Eliminar clientes
     deleteCustomers: build.mutation<void, { ids: string[] }>({
       query: (ids) => ({
@@ -110,6 +150,33 @@ export const customersApi = createApi({
       }),
       providesTags: (result) => (result ? result.map(({ id }) => ({ type: "Customer", id })) : ["Customer"]),
     }),
+
+    // Importar clientes desde archivo Excel
+    importCustomers: build.mutation<ImportCustomersResponse, ImportCustomersRequest>({
+      query: ({ file, continueOnError = false }) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("continueOnError", String(continueOnError));
+
+        return {
+          url: "/customers/import",
+          method: "POST",
+          body: formData,
+          credentials: "include",
+          // Importante: no establecer Content-Type, lo hará automáticamente para FormData
+        };
+      },
+      invalidatesTags: ["Customer"],
+    }),
+    // Descargar plantilla para importar clientes
+    downloadCustomerTemplate: build.query<Blob, void>({
+      query: () => ({
+        url: "/customers/import/template",
+        method: "GET",
+        responseHandler: async (response: Response) => await response.blob(),
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -119,7 +186,10 @@ export const {
   useGetCustomerByIdQuery,
   useGetHistoryCustomerByIdQuery,
   useGetAllCustomersQuery,
+  useGetPaginatedCustomersQuery,
   useDeleteCustomersMutation,
   useReactivateCustomersMutation,
   useSearchCustomersByDocumentIdQuery,
+  useImportCustomersMutation,
+  useLazyDownloadCustomerTemplateQuery,
 } = customersApi;

@@ -1,4 +1,4 @@
-import { IdCard } from "lucide-react";
+import { Globe2, Plane, UserSquare2 } from "lucide-react";
 
 import { EnumConfig, TypedEnumConfig } from "@/types/enum/enum-ui.config";
 import { DocumentType } from "../_schemas/reservation.schemas";
@@ -7,32 +7,32 @@ export const documentTypeStatusConfig: Record<DocumentType, TypedEnumConfig<Docu
   DNI: {
     value: "DNI",
     name: "DNI",
-    backgroundColor: "bg-[#E0F2FE]",
-    textColor: "text-[#0284C7]",
-    hoverBgColor: "hover:bg-[#BAE6FD]",
-    borderColor: "border-[#0284C7]",
-    hoverBorderColor: "hover:border-[#0284C7]",
-    icon: IdCard,
+    backgroundColor: "bg-blue-50",
+    textColor: "text-blue-600",
+    hoverBgColor: "hover:bg-blue-100",
+    borderColor: "border-blue-600",
+    hoverBorderColor: "hover:border-blue-600",
+    icon: UserSquare2,
   },
   FOREIGNER_CARD: {
     value: "FOREIGNER_CARD",
     name: "CE",
-    backgroundColor: "bg-[#FFE1E6]",
-    textColor: "text-[#E11D48]",
-    hoverBgColor: "hover:bg-[#FFC2CC]",
-    borderColor: "border-[#E11D48]",
-    hoverBorderColor: "hover:border-[#E11D48]",
-    icon: IdCard,
+    backgroundColor: "bg-indigo-50",
+    textColor: "text-indigo-600",
+    hoverBgColor: "hover:bg-indigo-100",
+    borderColor: "border-indigo-600",
+    hoverBorderColor: "hover:border-indigo-600",
+    icon: Plane,
   },
   PASSPORT: {
     value: "PASSPORT",
     name: "Pasaporte",
-    backgroundColor: "bg-[#DCFCE7]",
-    textColor: "text-[#16A34A]",
-    hoverBgColor: "hover:bg-[#BBF7D0]",
-    borderColor: "border-[#16A34A]",
-    hoverBorderColor: "hover:border-[#16A34A]",
-    icon: IdCard,
+    backgroundColor: "bg-emerald-50",
+    textColor: "text-emerald-600",
+    hoverBgColor: "hover:bg-emerald-100",
+    borderColor: "border-emerald-600",
+    hoverBorderColor: "hover:border-emerald-600",
+    icon: Globe2,
   },
 };
 
