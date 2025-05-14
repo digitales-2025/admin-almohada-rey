@@ -8,6 +8,7 @@ import { productsApi } from "@/app/(admin)/inventory/products/_services/products
 import { warehouseApi } from "@/app/(admin)/inventory/warehouse/_services/warehouseApi";
 import { paymentsApi } from "@/app/(admin)/payments/_services/paymentsApi";
 import { adminApi } from "@/app/(admin)/profile/_services/adminApi";
+import { reportsApi } from "@/app/(admin)/reports/_services/reportsApi";
 import { reservationApi } from "@/app/(admin)/reservation/_services/reservationApi";
 import { roomsApi } from "@/app/(admin)/rooms/list/_services/roomsApi";
 import { roomsCleaningApi } from "@/app/(admin)/rooms/list/[id]/clean/_service/RoomsCleaningApi";
@@ -32,6 +33,7 @@ export const store = configureStore({
     [expensesApi.reducerPath]: expensesApi.reducer,
     [movementsApi.reducerPath]: movementsApi.reducer,
     [warehouseApi.reducerPath]: warehouseApi.reducer,
+    [reportsApi.reducerPath]: reportsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -44,9 +46,13 @@ export const store = configureStore({
           "customersApi/executeQuery/fulfilled",
           "customersApi/executeQuery/rejected",
           "customersApi/executeQuery/pending",
+          //
+          "reportsApi/executeQuery/fulfilled",
+          "reportsApi/executeQuery/rejected",
+          "reportsApi/executeQuery/pending",
         ],
         // Ignorar las rutas en el estado que contienen valores no serializables
-        ignoredPaths: ["customersApi.mutations", "customersApi.queries"],
+        ignoredPaths: ["customersApi.mutations", "customersApi.queries", "reportsApi.queries"],
       },
     })
       .concat(authApi.middleware)
@@ -62,7 +68,8 @@ export const store = configureStore({
       .concat(paymentsApi.middleware)
       .concat(expensesApi.middleware)
       .concat(movementsApi.middleware)
-      .concat(warehouseApi.middleware),
+      .concat(warehouseApi.middleware)
+      .concat(reportsApi.middleware),
 });
 setupListeners(store.dispatch);
 
