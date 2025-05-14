@@ -1,250 +1,452 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-  addDays,
-  format,
-  isBefore,
-  isSameDay,
-  startOfDay,
-  // startOfToday,
-  //   isToday,
-  //   endOfMonth,
-  //   startOfMonth,
-  //   subDays,
-} from "date-fns";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { addDays, format, isBefore, isSameDay, startOfDay } from "date-fns";
 import { es } from "date-fns/locale";
 import { UseFormReturn } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 
 import { CalendarBig } from "@/components/form/CalendarBig";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TimeInput } from "@/components/ui/time-input";
 import { cn } from "@/lib/utils";
+import { socketService } from "@/services/socketService";
 import {
   DEFAULT_CHECKIN_TIME,
   DEFAULT_CHECKOUT_TIME,
   formDateToPeruISO,
+  getFormattedCheckInTimeValue,
+  getFormattedCheckOutTimeValue,
   getPeruStartOfToday,
-  getTimeOptionsForDay,
   isoToPeruTimeString,
-  peruDateTimeToUTC,
 } from "@/utils/peru-datetime";
 import { processError } from "@/utils/process-error";
 import { useRoomAvailabilityForUpdate } from "../../_hooks/use-roomAvailability";
 import { DetailedReservation, UpdateReservationInput } from "../../_schemas/reservation.schemas";
+import { reservationApi } from "../../_services/reservationApi";
 
-export type BookingFormData = {
-  checkInDate: string;
-  checkOutDate: string;
-  roomId?: string;
-};
+// Sistema de caché optimizado para verificaciones de disponibilidad
+const roomAvailabilityCache = new Map<
+  string,
+  {
+    params: string;
+    timestamp: number;
+  }
+>();
 
 interface UpdateBookingCalendarTimeProps {
   form: UseFormReturn<UpdateReservationInput>;
   roomId?: string;
   onRoomAvailabilityChange?: (available: boolean) => void;
   reservation: DetailedReservation;
-  // isOriginalInterval: boolean;
-  // originalRoom: DetailedRoom;
 }
+
+// Cache simplificado para el estado del calendario
+const calendarStateCache = new Map<
+  string,
+  {
+    checkInDate: Date;
+    checkOutDate: Date;
+    checkInTime: string;
+    checkOutTime: string;
+    lastUpdate: number;
+  }
+>();
 
 export default function UpdateBookingCalendarTime({
   form,
   roomId,
   onRoomAvailabilityChange,
   reservation,
-  // isOriginalInterval,
-  // originalRoom,
 }: UpdateBookingCalendarTimeProps) {
-  const [activeTab, setActiveTab] = useState<"checkin" | "checkout">("checkin");
+  const dispatch = useDispatch();
 
-  // Estados para manejar selección de fecha y hora
-  const [selectedCheckInDate, setSelectedCheckInDate] = useState<Date>(new Date(reservation.checkInDate));
-  const [selectedCheckOutDate, setSelectedCheckOutDate] = useState<Date>(new Date(reservation.checkOutDate));
-  const [selectedCheckInTime, setSelectedCheckInTime] = useState<string>(
-    reservation.checkInDate ? isoToPeruTimeString(reservation.checkInDate) : DEFAULT_CHECKIN_TIME
-  );
-  const [selectedCheckOutTime, setSelectedCheckOutTime] = useState<string>(
-    reservation.checkOutDate ? isoToPeruTimeString(reservation.checkOutDate) : DEFAULT_CHECKOUT_TIME
-  );
+  // Referencias para optimizar operaciones
+  const isUpdating = useRef(false);
+  const lastVerifiedParams = useRef("");
+  const verificationsBlocked = useRef(false);
+  const reservationId = reservation.id;
 
-  // Obtener valores actuales del formulario
-  const checkInDate = form.watch("checkInDate");
-  const checkOutDate = form.watch("checkOutDate");
+  // Inicializar o recuperar datos del caché
+  if (!calendarStateCache.has(reservationId)) {
+    calendarStateCache.set(reservationId, {
+      checkInDate: new Date(reservation.checkInDate),
+      checkOutDate: new Date(reservation.checkOutDate),
+      checkInTime: reservation.checkInDate ? isoToPeruTimeString(reservation.checkInDate) : DEFAULT_CHECKIN_TIME,
+      checkOutTime: reservation.checkOutDate ? isoToPeruTimeString(reservation.checkOutDate) : DEFAULT_CHECKOUT_TIME,
+      lastUpdate: Date.now(),
+    });
+  }
 
-  // Hook personalizado para verificar disponibilidad de habitación
-  const { isAvailable, isLoading, checkAvailability, isError, error } = useRoomAvailabilityForUpdate({
-    reservationId: reservation.id,
-    checkInDate: reservation.checkInDate,
-    checkOutDate: reservation.checkOutDate,
-    roomId: reservation.roomId,
+  // Obtener datos del caché
+  const cachedData = calendarStateCache.get(reservationId)!;
+
+  // Estado local del calendario
+  const [calendarState, setCalendarState] = useState({
+    activeTab: "checkin" as "checkin" | "checkout",
+    checkInDate: cachedData.checkInDate,
+    checkOutDate: cachedData.checkOutDate,
+    checkInTime: cachedData.checkInTime,
+    checkOutTime: cachedData.checkOutTime,
+    formInitialized: false,
+    renderCount: 0,
   });
-  // if (isAvailable){
-  //   toast.success("Habitación disponible para estas fechas");
-  // }
 
-  // Inicializar con valores de la reservación
+  // Valores actuales del formulario
+  const formCheckInDate = form.watch("checkInDate");
+  const formCheckOutDate = form.watch("checkOutDate");
+
+  // Hook para verificar disponibilidad específica de una habitación
+  const {
+    isAvailable,
+    isLoading: isCheckingAvailability,
+    isError,
+    error,
+    checkAvailability: verifyRoomAvailability,
+  } = useRoomAvailabilityForUpdate({
+    roomId: roomId || "",
+    checkInDate: formCheckInDate || reservation.checkInDate,
+    checkOutDate: formCheckOutDate || reservation.checkOutDate,
+    reservationId,
+  });
+
+  // Notificar al componente padre sobre la disponibilidad
   useEffect(() => {
-    if (!checkInDate) {
-      form.setValue("checkInDate", reservation.checkInDate);
-    }
-    if (!checkOutDate) {
-      form.setValue("checkOutDate", reservation.checkOutDate);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reservation]);
-
-  // Efecto para verificar disponibilidad cuando cambia la selección
-  useEffect(() => {
-    if (roomId && selectedCheckInDate && selectedCheckOutDate) {
-      const formattedCheckIn = format(selectedCheckInDate, "yyyy-MM-dd");
-      const formattedCheckOut = format(selectedCheckOutDate, "yyyy-MM-dd");
-
-      // Convertir a formato ISO con zona horaria de Perú
-      const checkInISO = peruDateTimeToUTC(formattedCheckIn, selectedCheckInTime);
-      const checkOutISO = peruDateTimeToUTC(formattedCheckOut, selectedCheckOutTime);
-
-      checkAvailability({
-        roomId,
-        checkInDate: checkInISO,
-        checkOutDate: checkOutISO,
-        reservationId: reservation.id,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomId, selectedCheckInDate, selectedCheckOutDate, selectedCheckInTime, selectedCheckOutTime]);
-
-  // Notificar al componente padre sobre cambios en la disponibilidad
-  useEffect(() => {
-    if (onRoomAvailabilityChange) {
+    if (onRoomAvailabilityChange && roomId) {
       onRoomAvailabilityChange(isAvailable);
     }
-  }, [isAvailable, onRoomAvailabilityChange]);
+  }, [isAvailable, onRoomAvailabilityChange, roomId]);
 
-  // Handler para cuando cambia la fecha de check-in
-  const handleCheckInDateChange = (date: Date | undefined) => {
-    if (!date) return;
+  // Mostrar errores si hay problemas al verificar disponibilidad
+  useEffect(() => {
+    if (isError && error) {
+      const processedError = processError(error);
+      toast.error(`Error al verificar disponibilidad: ${processedError}`);
+    }
+  }, [isError, error]);
 
-    // Actualizar estado local
-    setSelectedCheckInDate(date);
+  // Verificar disponibilidad (PUNTO CENTRAL DE VERIFICACIÓN)
+  // Este es el ÚNICO lugar donde llamamos a verifyRoomAvailability
+  const checkRoomAvailabilityIfNeeded = useCallback(() => {
+    // Si las verificaciones están bloqueadas o faltan datos esenciales, salir
+    if (verificationsBlocked.current || !roomId || !formCheckInDate || !formCheckOutDate) return;
 
-    // Si la fecha de check-out es anterior o el mismo dia a la nueva fecha de check-in, ajustarla
-    if (selectedCheckOutDate <= date || isSameDay(selectedCheckOutDate, date)) {
-      const newCheckOutDate = addDays(date, 1);
-      setSelectedCheckOutDate(newCheckOutDate);
+    // Crear firma para esta verificación
+    const paramsSignature = `${roomId}:${formCheckInDate}:${formCheckOutDate}`;
 
-      // Actualizar el formulario con la nueva fecha de check-out
-      const checkOutISO = formDateToPeruISO(
-        format(newCheckOutDate, "yyyy-MM-dd"),
-        false,
-        DEFAULT_CHECKIN_TIME,
-        selectedCheckOutTime
+    // Evitar verificaciones duplicadas con exactamente los mismos parámetros
+    if (paramsSignature === lastVerifiedParams.current) return;
+
+    // Verificar caché
+    const cacheKey = `room-${roomId}-${reservationId}`;
+    const cached = roomAvailabilityCache.get(cacheKey);
+
+    if (cached && cached.params === paramsSignature) {
+      // Si verificamos hace menos de 3 segundos, no volver a verificar
+      if (Date.now() - cached.timestamp < 3000) {
+        return;
+      }
+    }
+
+    // Bloquear verificaciones adicionales durante un breve periodo
+    verificationsBlocked.current = true;
+
+    // Actualizar caché y estado de verificación
+    roomAvailabilityCache.set(cacheKey, {
+      params: paramsSignature,
+      timestamp: Date.now(),
+    });
+    lastVerifiedParams.current = paramsSignature;
+
+    // Realizar la verificación real
+    verifyRoomAvailability({
+      roomId,
+      checkInDate: formCheckInDate,
+      checkOutDate: formCheckOutDate,
+      reservationId,
+    });
+
+    // Desbloquear después de un breve período
+    setTimeout(() => {
+      verificationsBlocked.current = false;
+    }, 500);
+  }, [roomId, formCheckInDate, formCheckOutDate, reservationId, verifyRoomAvailability]);
+
+  // ÚNICO efecto que dispara verificaciones de disponibilidad
+  useEffect(() => {
+    // Solo verificar cuando tengamos todos los datos necesarios
+    if (roomId && formCheckInDate && formCheckOutDate) {
+      checkRoomAvailabilityIfNeeded();
+    }
+  }, [roomId, formCheckInDate, formCheckOutDate, checkRoomAvailabilityIfNeeded]);
+
+  // Conectar con el sistema de WebSockets existente
+  // En lugar de duplicar los listeners, usamos el sistema de invalidación de cache de RTK Query
+  useEffect(() => {
+    if (!roomId || !formCheckInDate || !formCheckOutDate) return;
+
+    console.log("[Calendario] Configurando actualización de disponibilidad en tiempo real");
+
+    // Función para forzar la verificación de disponibilidad
+    const forceAvailabilityCheck = () => {
+      verificationsBlocked.current = false;
+      checkRoomAvailabilityIfNeeded();
+    };
+
+    // Suscribirse a los eventos relevantes para nuestro calendario
+    const unsubscribeNew = socketService.onNewReservation(() => {
+      console.log("[Calendario] Nueva reserva detectada, actualizando disponibilidad");
+      // Invalidar la cache de disponibilidad para esta habitación
+      dispatch(
+        reservationApi.util.invalidateTags([
+          { type: "RoomAvailability", id: `${roomId}-${formCheckInDate}-${formCheckOutDate}-${reservationId}` },
+        ])
+      );
+      forceAvailabilityCheck();
+    });
+
+    const unsubscribeUpdated = socketService.onReservationUpdated(() => {
+      console.log("[Calendario] Reserva actualizada, verificando disponibilidad");
+      dispatch(
+        reservationApi.util.invalidateTags([
+          { type: "RoomAvailability", id: `${roomId}-${formCheckInDate}-${formCheckOutDate}-${reservationId}` },
+        ])
+      );
+      forceAvailabilityCheck();
+    });
+
+    const unsubscribeDeleted = socketService.onReservationDeleted(() => {
+      console.log("[Calendario] Reserva eliminada, verificando disponibilidad");
+      dispatch(
+        reservationApi.util.invalidateTags([
+          { type: "RoomAvailability", id: `${roomId}-${formCheckInDate}-${formCheckOutDate}-${reservationId}` },
+        ])
       );
 
-      form.setValue("checkOutDate", checkOutISO, {
-        shouldValidate: true,
-        shouldDirty: true,
+      // Dar tiempo para que el backend procese la eliminación
+      setTimeout(forceAvailabilityCheck, 500);
+    });
+
+    const unsubscribeAvailability = socketService.onAvailabilityChanged(() => {
+      console.log("[Calendario] Cambio en disponibilidad detectado");
+      dispatch(
+        reservationApi.util.invalidateTags([
+          { type: "RoomAvailability", id: `${roomId}-${formCheckInDate}-${formCheckOutDate}-${reservationId}` },
+        ])
+      );
+      forceAvailabilityCheck();
+    });
+
+    return () => {
+      console.log("[Calendario] Limpiando listeners de WebSocket");
+      unsubscribeNew();
+      unsubscribeUpdated();
+      unsubscribeDeleted();
+      unsubscribeAvailability();
+    };
+  }, [roomId, formCheckInDate, formCheckOutDate, checkRoomAvailabilityIfNeeded, dispatch, reservationId]);
+
+  // ====== INICIALIZACIÓN DEL FORMULARIO ======
+  useEffect(() => {
+    if (!calendarState.formInitialized) {
+      // Obtener valores actuales del formulario
+      const currentCheckInDate = form.getValues("checkInDate");
+      const currentCheckOutDate = form.getValues("checkOutDate");
+
+      // Solo actualizar si los valores no están ya establecidos
+      if (!currentCheckInDate) {
+        form.setValue("checkInDate", reservation.checkInDate, { shouldValidate: false, shouldDirty: false });
+      }
+      if (!currentCheckOutDate) {
+        form.setValue("checkOutDate", reservation.checkOutDate, { shouldValidate: false, shouldDirty: false });
+      }
+
+      // Marcar como inicializado
+      setCalendarState((prev) => ({
+        ...prev,
+        formInitialized: true,
+      }));
+    }
+  }, [form, reservation, calendarState.formInitialized]);
+
+  // Cambio de pestaña
+  const handleTabChange = (tab: string) => {
+    setCalendarState((prev) => ({
+      ...prev,
+      activeTab: tab as "checkin" | "checkout",
+    }));
+  };
+
+  // Función unificada para actualizar el estado y el caché
+  const updateState = useCallback(
+    (updates: Partial<typeof calendarState>) => {
+      if (isUpdating.current) return;
+
+      isUpdating.current = true;
+
+      try {
+        // Actualizar estado local
+        setCalendarState((prev) => ({
+          ...prev,
+          ...updates,
+          renderCount: prev.renderCount + 1,
+        }));
+
+        // Actualizar caché
+        if (calendarStateCache.has(reservationId)) {
+          const cached = calendarStateCache.get(reservationId)!;
+          calendarStateCache.set(reservationId, {
+            ...cached,
+            ...("checkInDate" in updates ? { checkInDate: updates.checkInDate as Date } : {}),
+            ...("checkOutDate" in updates ? { checkOutDate: updates.checkOutDate as Date } : {}),
+            ...("checkInTime" in updates ? { checkInTime: updates.checkInTime as string } : {}),
+            ...("checkOutTime" in updates ? { checkOutTime: updates.checkOutTime as string } : {}),
+            lastUpdate: Date.now(),
+          });
+        }
+      } finally {
+        // Garantizar que isUpdating se restablezca
+        setTimeout(() => {
+          isUpdating.current = false;
+        }, 300);
+      }
+    },
+    [reservationId]
+  );
+
+  // Cambio de fecha de check-in
+  const handleCheckInDateChange = useCallback(
+    (date: Date | undefined) => {
+      if (!date || isUpdating.current) return;
+
+      let newCheckOutDate = calendarState.checkOutDate;
+
+      // Si checkout es antes o igual al nuevo check-in, ajustarlo
+      if (calendarState.checkOutDate <= date || isSameDay(calendarState.checkOutDate, date)) {
+        newCheckOutDate = addDays(date, 1);
+      }
+
+      // Actualizar formulario
+      const checkInISO = formDateToPeruISO(
+        format(date, "yyyy-MM-dd"),
+        true,
+        calendarState.checkInTime,
+        DEFAULT_CHECKOUT_TIME
+      );
+
+      form.setValue("checkInDate", checkInISO, { shouldValidate: true, shouldDirty: true });
+
+      // Si cambió el checkout, actualizarlo también
+      if (newCheckOutDate !== calendarState.checkOutDate) {
+        const checkOutISO = formDateToPeruISO(
+          format(newCheckOutDate, "yyyy-MM-dd"),
+          false,
+          DEFAULT_CHECKIN_TIME,
+          calendarState.checkOutTime
+        );
+
+        form.setValue("checkOutDate", checkOutISO, { shouldValidate: true, shouldDirty: true });
+      }
+
+      // Actualizar estado
+      updateState({
+        checkInDate: date,
+        checkOutDate: newCheckOutDate,
       });
-    }
+    },
+    [calendarState, form, updateState]
+  );
 
-    // Actualizar el formulario con la nueva fecha de check-in
-    const checkInISO = formDateToPeruISO(format(date, "yyyy-MM-dd"), true, selectedCheckInTime, DEFAULT_CHECKOUT_TIME);
+  // Cambio de fecha de check-out
+  const handleCheckOutDateChange = useCallback(
+    (date: Date | undefined) => {
+      if (!date || isUpdating.current) return;
 
-    form.setValue("checkInDate", checkInISO, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
-  };
+      // Actualizar formulario
+      const checkOutISO = formDateToPeruISO(
+        format(date, "yyyy-MM-dd"),
+        false,
+        DEFAULT_CHECKIN_TIME,
+        calendarState.checkOutTime
+      );
 
-  // Handler para cuando cambia la fecha de check-out
-  const handleCheckOutDateChange = (date: Date | undefined) => {
-    if (!date) return;
+      form.setValue("checkOutDate", checkOutISO, { shouldValidate: true, shouldDirty: true });
 
-    setSelectedCheckOutDate(date);
+      // Actualizar estado
+      updateState({
+        checkOutDate: date,
+      });
+    },
+    [calendarState, form, updateState]
+  );
 
-    // Actualizar el formulario con la nueva fecha de check-out
-    const checkOutISO = formDateToPeruISO(
-      format(date, "yyyy-MM-dd"),
-      false,
-      DEFAULT_CHECKIN_TIME,
-      selectedCheckOutTime
-    );
+  // Cambio de hora de check-in
+  const handleCheckInTimeChange = useCallback(
+    (timeStr: string) => {
+      if (timeStr === calendarState.checkInTime || isUpdating.current) return;
 
-    form.setValue("checkOutDate", checkOutISO, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
-  };
+      // Actualizar formulario
+      const checkInISO = formDateToPeruISO(
+        format(calendarState.checkInDate, "yyyy-MM-dd"),
+        true,
+        timeStr,
+        DEFAULT_CHECKOUT_TIME
+      );
 
-  // Handler para cuando cambia la hora de check-in
-  const handleCheckInTimeChange = (timeStr: string) => {
-    setSelectedCheckInTime(timeStr);
+      form.setValue("checkInDate", checkInISO, { shouldValidate: true, shouldDirty: true });
 
-    // Actualizar el formulario con la nueva hora de check-in
-    const checkInISO = formDateToPeruISO(
-      format(selectedCheckInDate, "yyyy-MM-dd"),
-      true,
-      timeStr,
-      DEFAULT_CHECKOUT_TIME
-    );
+      // Actualizar estado
+      updateState({
+        checkInTime: timeStr,
+      });
+    },
+    [calendarState, form, updateState]
+  );
 
-    form.setValue("checkInDate", checkInISO, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
-  };
+  // Cambio de hora de check-out
+  const handleCheckOutTimeChange = useCallback(
+    (timeStr: string) => {
+      if (timeStr === calendarState.checkOutTime || isUpdating.current) return;
 
-  // Handler para cuando cambia la hora de check-out
-  const handleCheckOutTimeChange = (timeStr: string) => {
-    setSelectedCheckOutTime(timeStr);
+      // Actualizar formulario
+      const checkOutISO = formDateToPeruISO(
+        format(calendarState.checkOutDate, "yyyy-MM-dd"),
+        false,
+        DEFAULT_CHECKIN_TIME,
+        timeStr
+      );
 
-    // Actualizar el formulario con la nueva hora de check-out
-    const checkOutISO = formDateToPeruISO(
-      format(selectedCheckOutDate, "yyyy-MM-dd"),
-      false,
-      DEFAULT_CHECKIN_TIME,
-      timeStr
-    );
+      form.setValue("checkOutDate", checkOutISO, { shouldValidate: true, shouldDirty: true });
 
-    form.setValue("checkOutDate", checkOutISO, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
-  };
+      // Actualizar estado
+      updateState({
+        checkOutTime: timeStr,
+      });
+    },
+    [calendarState, form, updateState]
+  );
 
-  // Función para verificar si una fecha debe estar deshabilitada
-  const isDateDisabled = (date: Date, isCheckIn: boolean) => {
-    const today = getPeruStartOfToday();
+  // Función para deshabilitar fechas incorrectas
+  const isDateDisabled = useCallback(
+    (date: Date, isCheckIn: boolean) => {
+      const today = getPeruStartOfToday();
 
-    // Para check-in, solo deshabilitar fechas pasadas y la de hoy
-    if (isCheckIn) {
-      return isBefore(startOfDay(date), today) || isSameDay(startOfDay(date), today);
-    }
+      if (isCheckIn) {
+        return isBefore(startOfDay(date), today);
+      }
 
-    // Para check-out, deshabilitar fechas anteriores o iguales a check-in
-    return isBefore(startOfDay(date), startOfDay(selectedCheckInDate)) || isSameDay(date, selectedCheckInDate);
-  };
-
-  // Obtener las opciones de hora para check-in y check-out
-  const checkInTimes = getTimeOptionsForDay("checkin");
-  const checkOutTimes = getTimeOptionsForDay("checkout");
-
-  if (isError) {
-    const processedError = processError(error);
-
-    toast.error(`Ocurrió un error al verificar la disponibilidad de la habitación: ${processedError}`);
-  }
+      return (
+        isBefore(startOfDay(date), startOfDay(calendarState.checkInDate)) || isSameDay(date, calendarState.checkInDate)
+      );
+    },
+    [calendarState.checkInDate]
+  );
 
   return (
     <div className="w-full space-y-4">
-      <Tabs
-        defaultValue="checkin"
-        value={activeTab}
-        onValueChange={(v) => setActiveTab(v as "checkin" | "checkout")}
-        className="w-full"
-      >
+      <Tabs defaultValue="checkin" value={calendarState.activeTab} onValueChange={handleTabChange} className="w-full">
         <div className="w-full flex justify-center">
           <TabsList className="grid grid-cols-2 !mb-4">
             <TabsTrigger value="checkin">Check-in</TabsTrigger>
@@ -252,111 +454,111 @@ export default function UpdateBookingCalendarTime({
           </TabsList>
         </div>
 
-        <TabsContent value="checkin" className="space-y-4">
-          <div className="w-auto space-x-10 flex-wrap flex items-start h-fit">
-            <div className="space-y-4">
-              <h3 className="font-semibold">Fecha de Check-in</h3>
-              {isLoading ? (
-                <div className="flex justify-center items-center p-6 border rounded-md">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                </div>
-              ) : (
+        <TabsContent value="checkin" className="space-y-4 w-full items-center">
+          <div className="items-center flex flex-col sm:flex-row justify-center">
+            <div className="gap-8 flex flex-col items-center h-fit">
+              <div className="space-y-4">
+                <h3 className="font-semibold text-sm">Fecha de Check-in</h3>
                 <CalendarBig
+                  key={`checkin-calendar-${calendarState.renderCount}`}
                   locale={es}
-                  selected={selectedCheckInDate}
+                  selected={calendarState.checkInDate}
                   mode="single"
                   disabled={(date) => isDateDisabled(date, true)}
-                  defaultMonth={selectedCheckInDate}
+                  defaultMonth={calendarState.checkInDate}
                   onSelect={handleCheckInDateChange}
                 />
-              )}
-            </div>
-            <div className="space-y-4">
-              <h3 className="font-semibold">Hora de Check-in</h3>
-              <p className="text-sm text-muted-foreground">
-                {format(selectedCheckInDate, "EEEE, d 'de' MMMM, yyyy", {
-                  locale: es,
-                })}
-              </p>
-              <p className="text-xs text-muted-foreground font-semibold">Horario de Lima (GMT-5)</p>
-              <ScrollArea className="h-[22rem] w-[250px]">
-                <div className="grid gap-2 pr-4">
-                  {checkInTimes.map((timeStr) => {
-                    const isSelected = timeStr === selectedCheckInTime;
-
-                    return (
-                      <Button
-                        key={timeStr}
-                        type="button"
-                        variant={isSelected ? "default" : "outline"}
-                        className="w-full justify-start"
-                        onClick={() => handleCheckInTimeChange(timeStr)}
-                      >
-                        {timeStr}
-                      </Button>
-                    );
+              </div>
+              <div className="space-y-4">
+                <h3 className="font-semibold text-center">Hora de Check-in</h3>
+                <p className="text-sm text-muted-foreground">
+                  {format(calendarState.checkInDate, "EEEE, d 'de' MMMM, yyyy", {
+                    locale: es,
                   })}
-                </div>
-              </ScrollArea>
+                </p>
+                <p className="text-xs text-muted-foreground font-semibold text-center">Horario de Lima (GMT-5)</p>
+
+                <TimeInput
+                  value={getFormattedCheckInTimeValue(calendarState.checkInTime)}
+                  onTimeChange={(timeStr) => {
+                    // Convertir el formato 24h del input al formato 12h con AM/PM
+                    const [hours, minutes] = timeStr.split(":");
+                    const hoursInt = parseInt(hours, 10);
+                    const minutesInt = parseInt(minutes, 10);
+
+                    // Formato de 12 horas para AM/PM
+                    const is12HourFormat = hoursInt >= 12;
+                    const hours12 = hoursInt % 12 || 12;
+                    const amPm = is12HourFormat ? "PM" : "AM";
+
+                    // Formato final: "HH:MM AM/PM" (formato 12h)
+                    const formattedTime = `${String(hours12).padStart(2, "0")}:${String(minutesInt).padStart(2, "0")} ${amPm}`;
+
+                    // Enviar al handler
+                    handleCheckInTimeChange(formattedTime);
+                  }}
+                  className="w-full"
+                />
+              </div>
             </div>
           </div>
           <div className="flex justify-center pt-4">
-            <Button variant="outline" onClick={() => setActiveTab("checkout")} className="w-fit">
+            <Button variant="outline" onClick={() => handleTabChange("checkout")} className="w-fit text-wrap">
               Siguiente: Seleccionar Check-out
             </Button>
           </div>
         </TabsContent>
 
-        <TabsContent value="checkout" className="space-y-4">
-          <div className="w-auto space-x-10 flex-wrap flex items-start h-fit">
-            <div className="space-y-4">
-              <h3 className="font-semibold">Fecha de Check-out</h3>
-              {isLoading ? (
-                <div className="flex justify-center items-center p-6 border rounded-md">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                </div>
-              ) : (
+        <TabsContent value="checkout" className="space-y-4 w-full items-center">
+          <div className="items-center flex flex-col sm:flex-row justify-center">
+            <div className="gap-8 flex flex-col items-center h-fit">
+              <div className="space-y-4">
+                <h3 className="font-semibold text-sm">Fecha de Check-out</h3>
                 <CalendarBig
+                  key={`checkout-calendar-${calendarState.renderCount}`}
                   locale={es}
-                  selected={selectedCheckOutDate}
+                  selected={calendarState.checkOutDate}
                   mode="single"
                   disabled={(date) => isDateDisabled(date, false)}
-                  defaultMonth={selectedCheckOutDate}
+                  defaultMonth={calendarState.checkOutDate}
                   onSelect={handleCheckOutDateChange}
                 />
-              )}
-            </div>
-            <div className="space-y-4">
-              <h3 className="font-semibold">Hora de Check-out</h3>
-              <p className="text-sm text-muted-foreground">
-                {format(selectedCheckOutDate, "EEEE, d 'de' MMMM, yyyy", {
-                  locale: es,
-                })}
-              </p>
-              <p className="text-xs text-muted-foreground font-semibold">Horario de Lima (GMT-5)</p>
-              <ScrollArea className="h-[22rem] w-[250px]">
-                <div className="grid gap-2 pr-4">
-                  {checkOutTimes.map((timeStr) => {
-                    const isSelected = timeStr === selectedCheckOutTime;
-
-                    return (
-                      <Button
-                        key={timeStr}
-                        type="button"
-                        variant={isSelected ? "default" : "outline"}
-                        className="w-full justify-start"
-                        onClick={() => handleCheckOutTimeChange(timeStr)}
-                      >
-                        {timeStr}
-                      </Button>
-                    );
+              </div>
+              <div className="space-y-4">
+                <h3 className="font-semibold text-center">Hora de Check-out</h3>
+                <p className="text-sm text-muted-foreground">
+                  {format(calendarState.checkOutDate, "EEEE, d 'de' MMMM, yyyy", {
+                    locale: es,
                   })}
-                </div>
-              </ScrollArea>
+                </p>
+                <p className="text-xs text-muted-foreground font-semibold text-center">Horario de Lima (GMT-5)</p>
+
+                <TimeInput
+                  value={getFormattedCheckOutTimeValue(calendarState.checkOutTime)}
+                  onTimeChange={(timeStr) => {
+                    // Convertir el formato 24h del input al formato 12h con AM/PM
+                    const [hours, minutes] = timeStr.split(":");
+                    const hoursInt = parseInt(hours, 10);
+                    const minutesInt = parseInt(minutes, 10);
+
+                    // Formato de 12 horas para AM/PM
+                    const is12HourFormat = hoursInt >= 12;
+                    const hours12 = hoursInt % 12 || 12;
+                    const amPm = is12HourFormat ? "PM" : "AM";
+
+                    // Formato final: "HH:MM AM/PM" (formato 12h)
+                    const formattedTime = `${String(hours12).padStart(2, "0")}:${String(minutesInt).padStart(2, "0")} ${amPm}`;
+
+                    // Enviar al handler
+                    handleCheckOutTimeChange(formattedTime);
+                  }}
+                  className="w-full"
+                />
+              </div>
             </div>
           </div>
           <div className="flex justify-center pt-4">
-            <Button variant="outline" onClick={() => setActiveTab("checkin")} className="w-1/2">
+            <Button variant="outline" onClick={() => handleTabChange("checkin")} className="w-fit text-wrap">
               Volver a Check-in
             </Button>
           </div>
@@ -364,19 +566,19 @@ export default function UpdateBookingCalendarTime({
           {roomId && (
             <div
               className={cn(
-                "mt-2 p-3 rounded-md text-center font-medium w-full",
-                isLoading
-                  ? "bg-muted text-muted-foreground"
+                "mt-2 p-3 rounded-md text-center font-medium",
+                isCheckingAvailability
+                  ? "bg-yellow-100 text-yellow-800"
                   : isAvailable
                     ? "bg-green-100 text-green-800"
                     : "bg-red-100 text-red-800"
               )}
             >
-              {isLoading
+              {isCheckingAvailability
                 ? "Verificando disponibilidad..."
                 : isAvailable
-                  ? "✓ Habitación disponible para estas fechas o es el rango de la reserva original"
-                  : "✗ Habitación no disponible para estas fechas"}
+                  ? "Habitación disponible para estas fechas"
+                  : "Habitación no disponible para estas fechas"}
             </div>
           )}
         </TabsContent>
