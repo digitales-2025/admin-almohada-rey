@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import {
   useLazyDownloadBalanceReportQuery,
   useLazyDownloadExpenseReportQuery,
+  useLazyDownloadOccupancyReportQuery,
   useLazyDownloadProfitReportQuery,
   useLazyDownloadProfitTypeRoomReportQuery,
 } from "../_services/reportsApi";
@@ -16,6 +17,7 @@ export function useDownloadReport() {
   const [downloadExpense] = useLazyDownloadExpenseReportQuery();
   const [downloadBalance] = useLazyDownloadBalanceReportQuery();
   const [downloadProfitTypeRoom] = useLazyDownloadProfitTypeRoomReportQuery();
+  const [downloadOccupancy] = useLazyDownloadOccupancyReportQuery();
 
   // Ahora recibe también el título del reporte
   const onDownloadReport = async (
@@ -40,6 +42,9 @@ export function useDownloadReport() {
           break;
         case "typeRoom":
           blob = await downloadProfitTypeRoom(params).unwrap();
+          break;
+        case "occupancy":
+          blob = await downloadOccupancy(params).unwrap();
           break;
         default:
           throw new Error("Tipo de reporte no soportado");

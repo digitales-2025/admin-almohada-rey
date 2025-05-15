@@ -1608,6 +1608,106 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/reports/profit": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Descargar Excel de profit mensual
+     * @description Genera y descarga un archivo Excel con el profit para un mes y año específicos.
+     */
+    get: operations["ReportsController_downloadProfitExcel_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/reports/expense": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Descargar Excel de expense mensual
+     * @description Genera y descarga un archivo Excel con el expense para un mes y año específicos.
+     */
+    get: operations["ReportsController_downloadExpenseExcel_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/reports/balance": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Descargar Excel de balance mensual
+     * @description Genera y descarga un archivo Excel con el balance para un mes y año específicos.
+     */
+    get: operations["ReportsController_downloadBalanceExcel_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/reports/profitRoomType": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Descargar Excel de ganancias por tipo de habitación
+     * @description Genera y descarga un archivo Excel con el profit para un mes, año y tipo de habitación específicos.
+     */
+    get: operations["ReportsController_downloadProfitTypeRoomExcel_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/reports/occupancy": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Descargar Excel de estadísticas de ocupación
+     * @description Genera y descarga un archivo Excel con estadísticas de ocupación por tipo de habitación para un mes y año específicos.
+     */
+    get: operations["ReportsController_downloadOccupancyExcel_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1727,13 +1827,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-14T18:04:17.076Z
+       * @example 2025-05-15T18:10:04.151Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-14T18:04:17.076Z
+       * @example 2025-05-15T18:10:04.151Z
        */
       updatedAt: string;
       /** @description Customer name */
@@ -1795,13 +1895,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-14T18:04:17.076Z
+       * @example 2025-05-15T18:10:04.151Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-14T18:04:17.076Z
+       * @example 2025-05-15T18:10:04.151Z
        */
       updatedAt: string;
       /** @description User name */
@@ -1844,13 +1944,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-14T18:04:17.076Z
+       * @example 2025-05-15T18:10:04.151Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-14T18:04:17.076Z
+       * @example 2025-05-15T18:10:04.151Z
        */
       updatedAt: string;
       /**
@@ -1908,13 +2008,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-14T18:04:17.076Z
+       * @example 2025-05-15T18:10:04.151Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-14T18:04:17.076Z
+       * @example 2025-05-15T18:10:04.151Z
        */
       updatedAt: string;
       /**
@@ -2003,13 +2103,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-05-14T18:04:17.076Z
+       * @example 2025-05-15T18:10:04.151Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-05-14T18:04:17.076Z
+       * @example 2025-05-15T18:10:04.151Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -2197,13 +2297,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-05-14T18:04:17.076Z
+       * @example 2025-05-15T18:10:04.151Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-05-14T18:04:17.076Z
+       * @example 2025-05-15T18:10:04.151Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -2466,13 +2566,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-14T18:04:17.076Z
+       * @example 2025-05-15T18:10:04.151Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-14T18:04:17.076Z
+       * @example 2025-05-15T18:10:04.151Z
        */
       updatedAt: string;
       /**
@@ -2967,13 +3067,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-14T18:04:17.076Z
+       * @example 2025-05-15T18:10:04.151Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-14T18:04:17.076Z
+       * @example 2025-05-15T18:10:04.151Z
        */
       updatedAt: string;
       name: string;
@@ -3217,13 +3317,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-14T18:04:17.076Z
+       * @example 2025-05-15T18:10:04.151Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-14T18:04:17.076Z
+       * @example 2025-05-15T18:10:04.151Z
        */
       updatedAt: string;
       /**
@@ -8139,6 +8239,133 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  ReportsController_downloadProfitExcel_v1: {
+    parameters: {
+      query: {
+        /** @description Mes numérico (1-12) */
+        month: number;
+        /** @description Año en formato YYYY */
+        year: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Archivo Excel con el profit mensual */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  ReportsController_downloadExpenseExcel_v1: {
+    parameters: {
+      query: {
+        /** @description Mes numérico (1-12) */
+        month: number;
+        /** @description Año en formato YYYY */
+        year: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Archivo Excel con el expense mensual */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  ReportsController_downloadBalanceExcel_v1: {
+    parameters: {
+      query: {
+        /** @description Mes numérico (1-12) */
+        month: number;
+        /** @description Año en formato YYYY */
+        year: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Archivo Excel con el balance mensual */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  ReportsController_downloadProfitTypeRoomExcel_v1: {
+    parameters: {
+      query: {
+        /** @description Mes numérico (1-12) */
+        month: number;
+        /** @description Año en formato YYYY */
+        year: number;
+        /** @description ID del tipo de habitación */
+        typeRoomId: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Archivo Excel con el profit por tipo de habitación */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  ReportsController_downloadOccupancyExcel_v1: {
+    parameters: {
+      query: {
+        /** @description Mes numérico (1-12) */
+        month: number;
+        /** @description Año en formato YYYY */
+        year: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Archivo Excel con estadísticas de ocupación */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
       };
     };
   };
