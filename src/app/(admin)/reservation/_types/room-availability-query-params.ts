@@ -21,3 +21,9 @@ export type GenericAvailabilityFormUpdateParams = {
   checkOutDate: string;
   reservationId: string;
 };
+
+export type BookingFormData = {
+  checkInDate: string;
+  checkOutDate: string;
+  roomId?: string;
+};
