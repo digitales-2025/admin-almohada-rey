@@ -36,11 +36,15 @@ const roomAvailabilityCache = new Map<
   }
 >();
 
+// Control de verificaciones iniciales por reserva/instancia
+const initialVerificationRegistry = new Map<string, boolean>();
+
 interface UpdateBookingCalendarTimeProps {
   form: UseFormReturn<UpdateReservationInput>;
   roomId?: string;
   onRoomAvailabilityChange?: (available: boolean) => void;
   reservation: DetailedReservation;
+  parentIsCheckingAvailability?: boolean;
 }
 
 // Cache simplificado para el estado del calendario
@@ -60,6 +64,7 @@ export default function UpdateBookingCalendarTime({
   roomId,
   onRoomAvailabilityChange,
   reservation,
+  parentIsCheckingAvailability = false,
 }: UpdateBookingCalendarTimeProps) {
   const dispatch = useDispatch();
 
@@ -68,6 +73,8 @@ export default function UpdateBookingCalendarTime({
   const lastVerifiedParams = useRef("");
   const verificationsBlocked = useRef(false);
   const reservationId = reservation.id;
+  const componentInstanceId = useRef(`calendar-${reservationId}-${Math.random().toString(36).substr(2, 9)}`);
+  const initialSetupComplete = useRef(false);
 
   // Inicializar o recuperar datos del caché
   if (!calendarStateCache.has(reservationId)) {
@@ -111,6 +118,16 @@ export default function UpdateBookingCalendarTime({
     checkOutDate: formCheckOutDate || reservation.checkOutDate,
     reservationId,
   });
+
+  // Registrar la instancia para control de verificaciones
+  useEffect(() => {
+    const instanceId = componentInstanceId.current;
+
+    return () => {
+      // Limpiar registros cuando el componente se desmonta
+      initialVerificationRegistry.delete(instanceId);
+    };
+  }, []);
 
   // Notificar al componente padre sobre la disponibilidad
   useEffect(() => {
@@ -175,12 +192,35 @@ export default function UpdateBookingCalendarTime({
   }, [roomId, formCheckInDate, formCheckOutDate, reservationId, verifyRoomAvailability]);
 
   // ÚNICO efecto que dispara verificaciones de disponibilidad
+  // ¡ESTE ES EL CAMBIO CLAVE!
   useEffect(() => {
-    // Solo verificar cuando tengamos todos los datos necesarios
-    if (roomId && formCheckInDate && formCheckOutDate) {
-      checkRoomAvailabilityIfNeeded();
+    // Verificación para el montaje inicial del componente
+    const instanceId = componentInstanceId.current;
+    const isInitialRender = !initialVerificationRegistry.has(instanceId);
+
+    // Solo verificar cuando tengamos todos los datos necesarios y el padre NO esté verificando
+    if (roomId && formCheckInDate && formCheckOutDate && !parentIsCheckingAvailability) {
+      // Si es el montaje inicial, aplicamos un breve retraso para evitar triples peticiones
+      if (isInitialRender) {
+        initialVerificationRegistry.set(instanceId, true);
+
+        // Usar setTimeout para evitar que React dispare múltiples verificaciones
+        // en el primer ciclo de renderizado
+        const timer = setTimeout(() => {
+          checkRoomAvailabilityIfNeeded();
+          initialSetupComplete.current = true;
+        }, 200);
+
+        return () => {
+          clearTimeout(timer);
+        };
+      }
+      // Para actualizaciones posteriores, verificar normalmente si el padre no está verificando
+      else if (initialSetupComplete.current) {
+        checkRoomAvailabilityIfNeeded();
+      }
     }
-  }, [roomId, formCheckInDate, formCheckOutDate, checkRoomAvailabilityIfNeeded]);
+  }, [roomId, formCheckInDate, formCheckOutDate, checkRoomAvailabilityIfNeeded, parentIsCheckingAvailability]);
 
   // Conectar con el sistema de WebSockets existente
   // En lugar de duplicar los listeners, usamos el sistema de invalidación de cache de RTK Query
@@ -567,14 +607,14 @@ export default function UpdateBookingCalendarTime({
             <div
               className={cn(
                 "mt-2 p-3 rounded-md text-center font-medium",
-                isCheckingAvailability
+                isCheckingAvailability || parentIsCheckingAvailability
                   ? "bg-yellow-100 text-yellow-800"
                   : isAvailable
                     ? "bg-green-100 text-green-800"
                     : "bg-red-100 text-red-800"
               )}
             >
-              {isCheckingAvailability
+              {isCheckingAvailability || parentIsCheckingAvailability
                 ? "Verificando disponibilidad..."
                 : isAvailable
                   ? "Habitación disponible para estas fechas"
