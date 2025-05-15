@@ -183,6 +183,9 @@ export default function StepRoomPayment({
                       placeholder="Ingrese el precio por noche"
                       type={"number"}
                       {...field}
+                      onChange={(e) => {
+                        field.onChange(Number(e.target.value) || 0);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
