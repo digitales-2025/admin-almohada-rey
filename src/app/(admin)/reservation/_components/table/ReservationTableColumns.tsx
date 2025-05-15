@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { Ellipsis, Pencil, Trash } from "lucide-react";
+import { CalendarCog, Ellipsis, Pencil, Trash } from "lucide-react";
 import { toast } from "sonner";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
@@ -27,6 +27,7 @@ import {
 import { reservationStatusConfig } from "../../_types/reservation-enum.config";
 import { getAvailableActions } from "../../_utils/reservation-status-validation.utils";
 import { CreatePaymentDialog } from "../create-payment/CreatePaymentsDialog";
+import { ExtensionReservationDialog } from "../extension/ExtensionReservationDialog";
 import { DeactivateReservationsDialog } from "../state-management/DeactivateReservationsDialog";
 import { DIALOG_DICTIONARY } from "../state-management/reservation-status-dialog-config";
 import { TransitionReservationStatusDialog } from "../state-management/TransitionReservationStatusDialog";
@@ -254,8 +255,8 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
       const [showCheckOutDialog, setShowCheckOutDialog] = useState(false);
       const [showDeactivateDialog, setShowDeactivateDialog] = useState(false);
       const [showDetailDialog, setShowDetailDialog] = useState(false);
-      const { status, isPendingDeletePayment } = row.original;
-      const { isActive } = row.original;
+      const [showExtensionDialog, setShowExtensionDialog] = useState(false);
+      const { status, isPendingDeletePayment, isActive } = row.original;
 
       const confirmConfig = DIALOG_DICTIONARY["CONFIRMED"];
       const cancelConfig = DIALOG_DICTIONARY["CANCELED"];
@@ -330,6 +331,14 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
             {showDetailDialog && (
               <ReservationDetailsDialog open={showDetailDialog} setOpen={setShowDetailDialog} row={row?.original} />
             )}
+            {showExtensionDialog && (
+              <ExtensionReservationDialog
+                open={showExtensionDialog}
+                onOpenChange={setShowExtensionDialog}
+                reservation={row?.original}
+                roomRate={row?.original.room.RoomTypes.price}
+              />
+            )}
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -349,6 +358,15 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
                   <Pencil className="size-4" aria-hidden="true" />
                 </DropdownMenuShortcut>
               </DropdownMenuItem>
+
+              {status === "CHECKED_IN" && (
+                <DropdownMenuItem onSelect={() => setShowExtensionDialog(true)}>
+                  Extender reserva
+                  <DropdownMenuShortcut>
+                    <CalendarCog className="size-4" aria-hidden="true" />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              )}
 
               {canConfirm && (
                 <DropdownMenuItem onSelect={() => setShowCreatePaymentDialog(true)} disabled={status !== "PENDING"}>
