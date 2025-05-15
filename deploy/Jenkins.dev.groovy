@@ -1,14 +1,9 @@
 pipeline {
     agent any
     environment {
-        // Credentials for jenkins to access private github repos
-        GITHUB_CREDENTIALS = "8d51209e-434f-4761-bb3d-1f9e3974d0b1"
-
         //
         // Build config
         //
-        // prefix of the image to build, config triplet
-        //  <project>-<service>-<stage>
         PROJECT_NAME = "almohada"
         PROJECT_SERVICE = "frontend"
         PROJECT_STAGE = "develop"
@@ -17,10 +12,9 @@ pipeline {
         //
         // VPS setup
         //
-        REMOTE_USER = "ansible"
-        REMOTE_IP = credentials("acide-elastika-01")
-        // Folder where docker-compose and .env files are placed
-        REMOTE_FOLDER = "/home/${REMOTE_USER}/docker/${PROJECT_NAME}-${PROJECT_STAGE}/"
+        REMOTE_USER = "fernando"
+        REMOTE_IP = credentials("fernando-hetzner-hel-01-ip")
+        REMOTE_FOLDER = "/home/fernando/services/acide/almohada/"
 
         //
         // Docker registry setup
@@ -34,9 +28,10 @@ pipeline {
 
         // SSH command
         SSH_COM = "ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_IP}"
+        SSH_CRED = "hetzner-helsink-01"
 
         // Docker build variables
-        NEXT_PUBLIC_BACKEND_URL = "https://almohada-backend-develop.acide.win/v1"
+        NEXT_PUBLIC_BACKEND_URL = "https://almohada-backend-develop.araozu.dev/v1"
         INTERNAL_BACKEND_URL = "http://almohada-backend-develop:4000/v1"
         NEXT_PUBLIC_IMAGE_DOMAIN="pub-0974deb2e04246f0ba3e7ab7bad64223.r2.dev"
     }
@@ -44,22 +39,67 @@ pipeline {
     stages {
         stage("Build & push image") {
             steps {
-                sh "cp deploy/Dockerfile.dev ./Dockerfile"
                 script {
                     withDockerRegistry(credentialsId: "${REGISTRY_CREDENTIALS}") {
-                        def image = docker.build("${FULL_REGISTRY_URL}:${BUILD_NUMBER}", "--build-arg NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL} --build-arg INTERNAL_BACKEND_URL=${INTERNAL_BACKEND_URL} --build-arg NEXT_PUBLIC_IMAGE_DOMAIN=${NEXT_PUBLIC_IMAGE_DOMAIN}  .")
+                        def image = docker.build("${FULL_REGISTRY_URL}:${BUILD_NUMBER}", "--build-arg NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL} --build-arg INTERNAL_BACKEND_URL=${INTERNAL_BACKEND_URL} --build-arg NEXT_PUBLIC_IMAGE_DOMAIN=${NEXT_PUBLIC_IMAGE_DOMAIN} -f deploy/Dockerfile.dev .")
                         image.push()
+                        image.push("latest")
                     }
                 }
-                sh "rm Dockerfile || true"
             }
         }
-        stage("Restart backend service") {
+        stage("Restart frontend service") {
             steps {
-                sshagent(['ssh-deploy']) {
-                    // Replace docker image version
-                    sh "${SSH_COM} 'cd ${REMOTE_FOLDER} && sed -i -E \"s/image: ${ESCAPED_REGISTRY_URL}:.+\$/image: ${ESCAPED_REGISTRY_URL}:${BUILD_NUMBER}/\" docker-compose.yml'"
-                    sh "${SSH_COM} 'cd ${REMOTE_FOLDER} && docker compose up -d --no-deps ${PROJECT_TRIPLET}'"
+                script {
+                    def config = readYaml file: 'deploy/env.yaml'
+                    def env = config.develop.frontend
+
+                    def nonSensitiveVars = env.nonsensitive.collect { k, v -> "${k}=${v}" }
+                    def sensitiveVars = env.sensitive
+
+                    def credentialsList = sensitiveVars.collect { 
+                        string(credentialsId: it, variable: it)
+                    }
+
+                    withCredentials(credentialsList) {
+                        sshagent([SSH_CRED]) {
+                            // Create a temporary script that will create the .env file
+                            // This enables us to use shell variables to properly handle 
+                            // the credentials without using binding.getVariable()
+                            sh """
+                                cat > ${WORKSPACE}/create_env.sh << 'EOL'
+#!/bin/bash
+cat << EOF
+# Non-sensitive variables
+ALMOHADA_FRONTEND_VERSION=${BUILD_NUMBER}
+${nonSensitiveVars.join('\n')}
+# Sensitive variables
+${sensitiveVars.collect { varName -> "${varName}=\${${varName}}" }.join('\n')}
+EOF
+EOL
+                                chmod +x ${WORKSPACE}/create_env.sh
+                            """
+
+                            // Execute the script to generate env content and send it to remote
+                            sh """
+                                ${WORKSPACE}/create_env.sh | ${SSH_COM} 'umask 077 && cat > ${REMOTE_FOLDER}/.env.frontend'
+                            """
+
+                            // populate & restart
+                            sh """
+                                ${SSH_COM} 'cd ${REMOTE_FOLDER} && \
+                                docker pull ${FULL_REGISTRY_URL}:${BUILD_NUMBER} && \
+                                (rm .env || true) && \
+                                touch .env.base && \
+                                touch .env.backend && \
+                                touch .env.frontend && \
+                                cat .env.base >> .env && \
+                                cat .env.backend >> .env && \
+                                cat .env.frontend >> .env && \
+                                docker compose up -d'
+                            """
+                        }
+                    }
                 }
             }
         }
