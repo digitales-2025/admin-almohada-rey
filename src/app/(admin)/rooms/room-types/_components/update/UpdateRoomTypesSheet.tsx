@@ -52,10 +52,13 @@ export function UpdateRoomTypeSheet({ roomType, open, onOpenChange }: UpdateRoom
     resolver: zodResolver(updateRoomTypeSchema),
     defaultValues: {
       name: roomType.name,
+      nameEn: roomType.nameEn || "",
       guests: roomType.guests,
       price: roomType.price,
       description: roomType.description || "",
+      descriptionEn: roomType.descriptionEn || "",
       bed: roomType.bed || "",
+      bedEn: roomType.bedEn || "",
       newImage: undefined,
       // IMPORTANTE: Inicializar con la imagen principal actual como punto de partida
       imageUpdate: mainImage
@@ -75,10 +78,13 @@ export function UpdateRoomTypeSheet({ roomType, open, onOpenChange }: UpdateRoom
 
       form.reset({
         name: roomType.name,
+        nameEn: roomType.nameEn || "",
         guests: roomType.guests,
         price: roomType.price,
         description: roomType.description || "",
+        descriptionEn: roomType.descriptionEn || "", // <-- Añadir esta línea
         bed: roomType.bed || "",
+        bedEn: roomType.bedEn || "", // <-- Añadir esta línea
         newImage: undefined,
         // IMPORTANTE: Reiniciar con la imagen principal actual
         imageUpdate: mainImage
