@@ -215,9 +215,8 @@ export default function UpdateReservationForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 grid grid-cols-1 sm:grid-cols-2 gap-4 px-6">
-        {/* Header - Siempre ocupa 2 columnas */}
-        <div className="col-span-2">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 grid grid-cols-1 gap-4 px-6">
+        <div>
           <UpdateHeaderReservation
             availableRooms={availableRooms}
             form={form}
@@ -227,10 +226,10 @@ export default function UpdateReservationForm({
           />
         </div>
 
-        <Separator className="col-span-2" />
+        <Separator />
 
         {/* Selección de fechas - Solo visible si la reserva no está en el pasado */}
-        <div className="col-span-2">
+        <div>
           {!reservationCheckInIsInThePast ? (
             <div className="space-y-2">
               <UpdateBookingCalendarTime
@@ -281,13 +280,13 @@ export default function UpdateReservationForm({
           )}
         </div>
 
-        <Separator className="col-span-2" />
+        <Separator />
 
         <FormField
           control={form.control}
           name="origin"
           render={({ field }) => (
-            <FormItem className="col-span-2">
+            <FormItem>
               <FormLabel>{UPDATE_FORMSTATICS.origin.label}</FormLabel>
               <FormControl>
                 <InputWithIcon {...field} Icon={MapPinHouse} placeholder={UPDATE_FORMSTATICS.origin.placeholder} />
@@ -298,10 +297,10 @@ export default function UpdateReservationForm({
           )}
         />
 
-        <Separator className="col-span-2" />
+        <Separator />
 
         {/* Sección de huéspedes - Siempre ocupa 2 columnas */}
-        <div className="col-span-2">
+        <div>
           {selectedRoom?.RoomTypes?.guests && (
             <div className="mb-4">
               <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
@@ -338,14 +337,14 @@ export default function UpdateReservationForm({
           )}
         </div>
 
-        <Separator className="col-span-2" />
+        <Separator />
 
         {/* Razón y observaciones - Ocupando las 2 columnas */}
         <FormField
           control={form.control}
           name="reason"
           render={({ field }) => (
-            <FormItem className="col-span-2">
+            <FormItem>
               <FormLabel>{FORMSTATICS.reason.label}</FormLabel>
               <FormControl>
                 <TextareaWithIcon {...field} Icon={UserRoundCheck} placeholder={FORMSTATICS.reason.placeholder} />
@@ -360,7 +359,7 @@ export default function UpdateReservationForm({
           control={form.control}
           name="observations"
           render={({ field }) => (
-            <FormItem className="col-span-2">
+            <FormItem>
               <FormLabel>{FORMSTATICS.observations.label}</FormLabel>
               <FormControl>
                 <TextareaWithIcon {...field} Icon={ListCheck} placeholder={FORMSTATICS.observations.placeholder} />
@@ -372,7 +371,7 @@ export default function UpdateReservationForm({
         />
 
         {/* Botones u otros elementos pasados como children */}
-        <div className="col-span-2">{children}</div>
+        <div>{children}</div>
       </form>
     </Form>
   );

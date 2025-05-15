@@ -227,8 +227,6 @@ export default function UpdateBookingCalendarTime({
   useEffect(() => {
     if (!roomId || !formCheckInDate || !formCheckOutDate) return;
 
-    console.log("[Calendario] Configurando actualización de disponibilidad en tiempo real");
-
     // Función para forzar la verificación de disponibilidad
     const forceAvailabilityCheck = () => {
       verificationsBlocked.current = false;
@@ -237,7 +235,6 @@ export default function UpdateBookingCalendarTime({
 
     // Suscribirse a los eventos relevantes para nuestro calendario
     const unsubscribeNew = socketService.onNewReservation(() => {
-      console.log("[Calendario] Nueva reserva detectada, actualizando disponibilidad");
       // Invalidar la cache de disponibilidad para esta habitación
       dispatch(
         reservationApi.util.invalidateTags([
@@ -248,7 +245,6 @@ export default function UpdateBookingCalendarTime({
     });
 
     const unsubscribeUpdated = socketService.onReservationUpdated(() => {
-      console.log("[Calendario] Reserva actualizada, verificando disponibilidad");
       dispatch(
         reservationApi.util.invalidateTags([
           { type: "RoomAvailability", id: `${roomId}-${formCheckInDate}-${formCheckOutDate}-${reservationId}` },
@@ -258,7 +254,6 @@ export default function UpdateBookingCalendarTime({
     });
 
     const unsubscribeDeleted = socketService.onReservationDeleted(() => {
-      console.log("[Calendario] Reserva eliminada, verificando disponibilidad");
       dispatch(
         reservationApi.util.invalidateTags([
           { type: "RoomAvailability", id: `${roomId}-${formCheckInDate}-${formCheckOutDate}-${reservationId}` },
@@ -270,7 +265,6 @@ export default function UpdateBookingCalendarTime({
     });
 
     const unsubscribeAvailability = socketService.onAvailabilityChanged(() => {
-      console.log("[Calendario] Cambio en disponibilidad detectado");
       dispatch(
         reservationApi.util.invalidateTags([
           { type: "RoomAvailability", id: `${roomId}-${formCheckInDate}-${formCheckOutDate}-${reservationId}` },
@@ -280,7 +274,6 @@ export default function UpdateBookingCalendarTime({
     });
 
     return () => {
-      console.log("[Calendario] Limpiando listeners de WebSocket");
       unsubscribeNew();
       unsubscribeUpdated();
       unsubscribeDeleted();
@@ -485,8 +478,8 @@ export default function UpdateBookingCalendarTime({
   );
 
   return (
-    <div className="w-full space-y-4">
-      <Tabs defaultValue="checkin" value={calendarState.activeTab} onValueChange={handleTabChange} className="w-full">
+    <div className="space-y-4">
+      <Tabs defaultValue="checkin" value={calendarState.activeTab} onValueChange={handleTabChange}>
         <div className="w-full flex justify-center">
           <TabsList className="grid grid-cols-2 !mb-4">
             <TabsTrigger value="checkin">Check-in</TabsTrigger>
@@ -494,8 +487,8 @@ export default function UpdateBookingCalendarTime({
           </TabsList>
         </div>
 
-        <TabsContent value="checkin" className="space-y-4 w-full items-center">
-          <div className="items-center flex flex-col sm:flex-row justify-center">
+        <TabsContent value="checkin" className="space-y-4 items-center">
+          <div className="items-center flex flex-col justify-center">
             <div className="gap-8 flex flex-col items-center h-fit">
               <div className="space-y-4">
                 <h3 className="font-semibold text-sm">Fecha de Check-in</h3>
