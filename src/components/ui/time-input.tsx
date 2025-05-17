@@ -12,11 +12,25 @@ export interface TimeInputProps extends React.InputHTMLAttributes<HTMLInputEleme
   onTimeChange?: (time: string) => void;
   label?: string;
   includeSeconds?: boolean;
+  min?: string;
+  max?: string;
 }
 
 const TimeInput = React.forwardRef<HTMLInputElement, TimeInputProps>(
   (
-    { className, onTimeChange, onChange, label, value, defaultValue, disabled, includeSeconds = false, ...props },
+    {
+      className,
+      onTimeChange,
+      onChange,
+      label,
+      value,
+      defaultValue,
+      disabled,
+      includeSeconds = false,
+      min,
+      max,
+      ...props
+    },
     ref
   ) => {
     // Usar el hook para detectar pantallas móviles
@@ -38,84 +52,219 @@ const TimeInput = React.forwardRef<HTMLInputElement, TimeInputProps>(
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const newTime = e.target.value;
-      setTime(newTime);
 
-      if (onTimeChange) {
-        onTimeChange(newTime);
-      }
+      // Solo actualizar si el tiempo está dentro del rango o si está vacío
+      if (newTime === "" || isTimeInRange(newTime)) {
+        setTime(newTime);
 
-      if (onChange) {
-        onChange(e);
-      }
-    };
-
-    // Extraer horas, minutos y segundos del tiempo actual
-    const timeParts = time.split(":");
-    const hours = Number.parseInt(timeParts[0]);
-    const minutes = Number.parseInt(timeParts[1]);
-    const seconds = timeParts.length > 2 ? Number.parseInt(timeParts[2]) : 0;
-
-    const updateTime = (newHours: number, newMinutes: number, newSeconds?: number) => {
-      const formattedHours = newHours.toString().padStart(2, "0");
-      const formattedMinutes = newMinutes.toString().padStart(2, "0");
-
-      let newTime: string;
-
-      if (includeSeconds) {
-        const formattedSeconds = (newSeconds !== undefined ? newSeconds : seconds).toString().padStart(2, "0");
-        newTime = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
-      } else {
-        newTime = `${formattedHours}:${formattedMinutes}`;
-      }
-
-      setTime(newTime);
-
-      if (onTimeChange) {
-        onTimeChange(newTime);
-      }
-
-      // Actualizar el input nativo
-      if (inputRef.current) {
-        inputRef.current.value = newTime;
-
-        // Crear un evento sintético para mantener compatibilidad
-        const event = Object.create(new Event("change", { bubbles: true }));
-        Object.defineProperty(event, "target", {
-          writable: false,
-          value: { value: newTime, name: inputRef.current.name },
-        });
+        if (onTimeChange) {
+          onTimeChange(newTime);
+        }
 
         if (onChange) {
-          onChange(event as React.ChangeEvent<HTMLInputElement>);
+          onChange(e);
         }
       }
     };
 
+    // Memoizar las partes del tiempo para evitar cálculos repetidos
+    const timeParts = React.useMemo(() => {
+      const parts = time.split(":");
+      return {
+        hours: Number.parseInt(parts[0]),
+        minutes: Number.parseInt(parts[1]),
+        seconds: parts.length > 2 ? Number.parseInt(parts[2]) : 0,
+      };
+    }, [time]);
+
+    // Función para convertir tiempo en string a minutos totales para comparación
+    const timeToMinutes = React.useCallback((timeStr: string): number => {
+      const parts = timeStr.split(":");
+      const hours = Number.parseInt(parts[0], 10);
+      const minutes = Number.parseInt(parts[1], 10);
+      const seconds = parts.length > 2 ? Number.parseInt(parts[2], 10) / 60 : 0;
+      return hours * 60 + minutes + seconds;
+    }, []);
+
+    // Verificar si un tiempo está dentro del rango permitido
+    const isTimeInRange = React.useCallback(
+      (timeToCheck: string): boolean => {
+        if (!min && !max) return true;
+
+        const timeInMinutes = timeToMinutes(timeToCheck);
+
+        if (min && timeInMinutes < timeToMinutes(min)) return false;
+        if (max && timeInMinutes > timeToMinutes(max)) return false;
+
+        return true;
+      },
+      [min, max, timeToMinutes]
+    );
+
+    const { hours, minutes, seconds } = timeParts;
+
+    // Optimizar la función updateTime con useCallback para evitar recreaciones
+    const updateTime = React.useCallback(
+      (newHours: number, newMinutes: number, newSeconds?: number) => {
+        const formattedHours = newHours.toString().padStart(2, "0");
+        const formattedMinutes = newMinutes.toString().padStart(2, "0");
+
+        let newTime: string;
+
+        if (includeSeconds) {
+          const formattedSeconds = (newSeconds !== undefined ? newSeconds : seconds).toString().padStart(2, "0");
+          newTime = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+        } else {
+          newTime = `${formattedHours}:${formattedMinutes}`;
+        }
+
+        // Verificar si el nuevo tiempo está dentro del rango permitido
+        if (!isTimeInRange(newTime)) return;
+
+        setTime(newTime);
+
+        if (onTimeChange) {
+          onTimeChange(newTime);
+        }
+
+        // Actualizar el input nativo
+        if (inputRef.current) {
+          inputRef.current.value = newTime;
+
+          // Crear un evento sintético para mantener compatibilidad
+          const event = new Event("change", { bubbles: true }) as any;
+          Object.defineProperty(event, "target", {
+            writable: false,
+            value: { value: newTime, name: inputRef.current.name },
+          });
+
+          if (onChange) {
+            onChange(event as React.ChangeEvent<HTMLInputElement>);
+          }
+        }
+      },
+      [includeSeconds, seconds, onTimeChange, onChange, isTimeInRange]
+    );
+
     // Función para obtener el período (AM/PM)
-    const getPeriod = (hour: number) => (hour < 12 ? "AM" : "PM");
-    // Generar números para los selectores de minutero
-    const generateNumbers = (current: number, max: number) => {
-      // Usar 3 elementos en móvil y 5 en escritorio
-      const visible = isMobile ? 3 : 5;
-      const half = Math.floor(visible / 2);
-      const numbers = [];
+    const getPeriod = React.useCallback((hour: number) => (hour < 12 ? "AM" : "PM"), []);
 
-      for (let i = -half; i <= half; i++) {
-        const num = (current + i + max) % max;
-        numbers.push(num);
+    // Reemplazar la función generateNumbers para que siempre muestre los números en orden descendente
+    const generateNumbers = React.useCallback(
+      (current: number, max: number) => {
+        // Usar 3 elementos en móvil y 5 en escritorio
+        const visible = isMobile ? 3 : 5;
+        const half = Math.floor(visible / 2);
+        const numbers = [];
+
+        // Generar números en orden descendente, con el valor actual en el centro
+        for (let i = 0; i < visible; i++) {
+          // Calcular el offset desde el centro
+          const offset = i - half;
+
+          // Calcular el número para esta posición
+          // Para mantener el orden descendente, usamos resta en lugar de suma
+          let num = (current - offset + max) % max;
+
+          // Asegurar que el número esté en el rango correcto
+          if (num < 0) num += max;
+          if (num >= max) num -= max;
+
+          numbers.push(num);
+        }
+
+        return numbers;
+      },
+      [isMobile]
+    );
+
+    // Memoizar los arrays de valores visibles para evitar recálculos innecesarios
+    const visibleHours = React.useMemo(() => generateNumbers(hours, 24), [generateNumbers, hours]);
+    const visibleMinutes = React.useMemo(() => generateNumbers(minutes, 60), [generateNumbers, minutes]);
+    const visibleSeconds = React.useMemo(
+      () => (includeSeconds ? generateNumbers(seconds, 60) : []),
+      [includeSeconds, generateNumbers, seconds]
+    );
+
+    // Funciones de incremento/decremento
+    const incrementHour = React.useCallback(() => {
+      const newHour = (hours + 1) % 24;
+      if (
+        isTimeInRange(
+          `${newHour.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}${includeSeconds ? `:${seconds.toString().padStart(2, "0")}` : ""}`
+        )
+      ) {
+        updateTime(newHour, minutes, seconds);
       }
+    }, [updateTime, hours, minutes, seconds, isTimeInRange, includeSeconds]);
 
-      return numbers;
-    };
+    const decrementHour = React.useCallback(() => {
+      const newHour = (hours - 1 + 24) % 24;
+      if (
+        isTimeInRange(
+          `${newHour.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}${includeSeconds ? `:${seconds.toString().padStart(2, "0")}` : ""}`
+        )
+      ) {
+        updateTime(newHour, minutes, seconds);
+      }
+    }, [updateTime, hours, minutes, seconds, isTimeInRange, includeSeconds]);
 
-    // Generar horas visibles
-    const visibleHours = generateNumbers(hours, 24);
+    const incrementMinute = React.useCallback(() => {
+      const newMinute = (minutes + 1) % 60;
+      if (
+        isTimeInRange(
+          `${hours.toString().padStart(2, "0")}:${newMinute.toString().padStart(2, "0")}${includeSeconds ? `:${seconds.toString().padStart(2, "0")}` : ""}`
+        )
+      ) {
+        updateTime(hours, newMinute, seconds);
+      }
+    }, [updateTime, hours, minutes, seconds, isTimeInRange, includeSeconds]);
 
-    // Generar minutos visibles
-    const visibleMinutes = generateNumbers(minutes, 60);
+    const decrementMinute = React.useCallback(() => {
+      const newMinute = (minutes - 1 + 60) % 60;
+      if (
+        isTimeInRange(
+          `${hours.toString().padStart(2, "0")}:${newMinute.toString().padStart(2, "0")}${includeSeconds ? `:${seconds.toString().padStart(2, "0")}` : ""}`
+        )
+      ) {
+        updateTime(hours, newMinute, seconds);
+      }
+    }, [updateTime, hours, minutes, seconds, isTimeInRange, includeSeconds]);
 
-    // Generar segundos visibles
-    const visibleSeconds = includeSeconds ? generateNumbers(seconds, 60) : [];
+    const incrementSecond = React.useCallback(() => {
+      const newSecond = (seconds + 1) % 60;
+      if (
+        isTimeInRange(
+          `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${newSecond.toString().padStart(2, "0")}`
+        )
+      ) {
+        updateTime(hours, minutes, newSecond);
+      }
+    }, [updateTime, hours, minutes, seconds, isTimeInRange]);
+
+    const decrementSecond = React.useCallback(() => {
+      const newSecond = (seconds - 1 + 60) % 60;
+      if (
+        isTimeInRange(
+          `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${newSecond.toString().padStart(2, "0")}`
+        )
+      ) {
+        updateTime(hours, minutes, newSecond);
+      }
+    }, [updateTime, hours, minutes, seconds, isTimeInRange]);
+
+    const handleHourClick = React.useCallback(
+      (hour: number) => () => updateTime(hour, minutes, seconds),
+      [updateTime, minutes, seconds]
+    );
+    const handleMinuteClick = React.useCallback(
+      (minute: number) => () => updateTime(hours, minute, seconds),
+      [updateTime, hours, seconds]
+    );
+    const handleSecondClick = React.useCallback(
+      (second: number) => () => updateTime(hours, minutes, second),
+      [updateTime, hours, minutes]
+    );
 
     return (
       <div className="space-y-2">
@@ -137,7 +286,7 @@ const TimeInput = React.forwardRef<HTMLInputElement, TimeInputProps>(
                   disabled && "opacity-50 cursor-not-allowed"
                 )}
               >
-                <Clock className="h-4 w-4" />
+                <Clock className="h-4 w-4 shrink-0" />
               </button>
             </PopoverTrigger>
 
@@ -152,13 +301,12 @@ const TimeInput = React.forwardRef<HTMLInputElement, TimeInputProps>(
               disabled={disabled}
               className={cn(
                 // Estilos base
-                "w-full h-10 pl-10 pr-3 rounded-md transition-all duration-200",
-                "text-base text-gray-900 dark:text-gray-100",
+                "w-full h-9 pl-10 rounded-md transition-all duration-200",
+                "text-sm font-medium",
                 "appearance-none",
 
                 // Estilos de borde y fondo
-                "border border-gray-300 dark:border-gray-700",
-                "bg-white dark:bg-gray-950",
+                "border border-input",
 
                 // Estados
                 focused && "border-primary ring-2 ring-primary/20",
@@ -224,8 +372,18 @@ const TimeInput = React.forwardRef<HTMLInputElement, TimeInputProps>(
                       {/* Botón para incrementar */}
                       <button
                         type="button"
-                        onClick={() => updateTime((hours + 1) % 24, minutes, seconds)}
-                        className="absolute top-0 left-0 right-0 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-t-lg z-10 transition-colors"
+                        onClick={incrementHour}
+                        disabled={
+                          !isTimeInRange(
+                            `${((hours + 1) % 24).toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}${includeSeconds ? `:${seconds.toString().padStart(2, "0")}` : ""}`
+                          )
+                        }
+                        className={cn(
+                          "absolute top-0 left-0 right-0 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-t-lg z-10 transition-colors",
+                          !isTimeInRange(
+                            `${((hours + 1) % 24).toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}${includeSeconds ? `:${seconds.toString().padStart(2, "0")}` : ""}`
+                          ) && "opacity-50 cursor-not-allowed"
+                        )}
                       >
                         <ChevronUp className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                       </button>
@@ -236,6 +394,10 @@ const TimeInput = React.forwardRef<HTMLInputElement, TimeInputProps>(
                           {visibleHours.map((hour, index) => {
                             const isCenter = index === Math.floor(visibleHours.length / 2);
 
+                            // Verificar si esta hora está dentro del rango permitido
+                            const hourTime = `${hour.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}${includeSeconds ? `:${seconds.toString().padStart(2, "0")}` : ""}`;
+                            const isDisabled = !isTimeInRange(hourTime);
+
                             return (
                               <div
                                 key={`hour-${index}`}
@@ -243,9 +405,11 @@ const TimeInput = React.forwardRef<HTMLInputElement, TimeInputProps>(
                                   "py-2 flex items-center justify-center transition-all duration-150",
                                   isCenter
                                     ? "bg-primary/10 text-primary font-bold rounded-md"
-                                    : "text-gray-500 dark:text-gray-400"
+                                    : isDisabled
+                                      ? "text-gray-300 dark:text-gray-600 cursor-not-allowed"
+                                      : "text-gray-500 dark:text-gray-400 cursor-pointer"
                                 )}
-                                onClick={() => updateTime(hour, minutes, seconds)}
+                                onClick={isDisabled ? undefined : handleHourClick(hour)}
                               >
                                 <div className="flex items-center justify-center">
                                   <span>{hour.toString().padStart(2, "0")}</span>
@@ -259,8 +423,18 @@ const TimeInput = React.forwardRef<HTMLInputElement, TimeInputProps>(
                       {/* Botón para decrementar */}
                       <button
                         type="button"
-                        onClick={() => updateTime((hours - 1 + 24) % 24, minutes, seconds)}
-                        className="absolute bottom-0 left-0 right-0 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-b-lg z-10 transition-colors"
+                        onClick={decrementHour}
+                        disabled={
+                          !isTimeInRange(
+                            `${((hours - 1 + 24) % 24).toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}${includeSeconds ? `:${seconds.toString().padStart(2, "0")}` : ""}`
+                          )
+                        }
+                        className={cn(
+                          "absolute bottom-0 left-0 right-0 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-b-lg z-10 transition-colors",
+                          !isTimeInRange(
+                            `${((hours - 1 + 24) % 24).toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}${includeSeconds ? `:${seconds.toString().padStart(2, "0")}` : ""}`
+                          ) && "opacity-50 cursor-not-allowed"
+                        )}
                       >
                         <ChevronDown className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                       </button>
@@ -278,8 +452,18 @@ const TimeInput = React.forwardRef<HTMLInputElement, TimeInputProps>(
                       {/* Botón para incrementar */}
                       <button
                         type="button"
-                        onClick={() => updateTime(hours, (minutes + 1) % 60, seconds)}
-                        className="absolute top-0 left-0 right-0 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-t-lg z-10 transition-colors"
+                        onClick={incrementMinute}
+                        disabled={
+                          !isTimeInRange(
+                            `${hours.toString().padStart(2, "0")}:${((minutes + 1) % 60).toString().padStart(2, "0")}${includeSeconds ? `:${seconds.toString().padStart(2, "0")}` : ""}`
+                          )
+                        }
+                        className={cn(
+                          "absolute top-0 left-0 right-0 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-t-lg z-10 transition-colors",
+                          !isTimeInRange(
+                            `${hours.toString().padStart(2, "0")}:${((minutes + 1) % 60).toString().padStart(2, "0")}${includeSeconds ? `:${seconds.toString().padStart(2, "0")}` : ""}`
+                          ) && "opacity-50 cursor-not-allowed"
+                        )}
                       >
                         <ChevronUp className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                       </button>
@@ -291,6 +475,10 @@ const TimeInput = React.forwardRef<HTMLInputElement, TimeInputProps>(
                             const isCenter = index === Math.floor(visibleMinutes.length / 2);
                             const isMultipleOf5 = minute % 5 === 0;
 
+                            // Verificar si este minuto está dentro del rango permitido
+                            const minuteTime = `${hours.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}${includeSeconds ? `:${seconds.toString().padStart(2, "0")}` : ""}`;
+                            const isDisabled = !isTimeInRange(minuteTime);
+
                             return (
                               <div
                                 key={`minute-${index}`}
@@ -298,11 +486,13 @@ const TimeInput = React.forwardRef<HTMLInputElement, TimeInputProps>(
                                   "py-2 flex items-center justify-center transition-all duration-150",
                                   isCenter
                                     ? "bg-primary/10 text-primary font-bold rounded-md"
-                                    : isMultipleOf5
-                                      ? "text-gray-700 dark:text-gray-300"
-                                      : "text-gray-500 dark:text-gray-400"
+                                    : isDisabled
+                                      ? "text-gray-300 dark:text-gray-600 cursor-not-allowed"
+                                      : isMultipleOf5
+                                        ? "text-gray-700 dark:text-gray-300 cursor-pointer"
+                                        : "text-gray-500 dark:text-gray-400 cursor-pointer"
                                 )}
-                                onClick={() => updateTime(hours, minute, seconds)}
+                                onClick={isDisabled ? undefined : handleMinuteClick(minute)}
                               >
                                 <div className="flex items-center justify-center">
                                   <span>{minute.toString().padStart(2, "0")}</span>
@@ -316,8 +506,18 @@ const TimeInput = React.forwardRef<HTMLInputElement, TimeInputProps>(
                       {/* Botón para decrementar */}
                       <button
                         type="button"
-                        onClick={() => updateTime(hours, (minutes - 1 + 60) % 60, seconds)}
-                        className="absolute bottom-0 left-0 right-0 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-b-lg z-10 transition-colors"
+                        onClick={decrementMinute}
+                        disabled={
+                          !isTimeInRange(
+                            `${hours.toString().padStart(2, "0")}:${((minutes - 1 + 60) % 60).toString().padStart(2, "0")}${includeSeconds ? `:${seconds.toString().padStart(2, "0")}` : ""}`
+                          )
+                        }
+                        className={cn(
+                          "absolute bottom-0 left-0 right-0 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-b-lg z-10 transition-colors",
+                          !isTimeInRange(
+                            `${hours.toString().padStart(2, "0")}:${((minutes - 1 + 60) % 60).toString().padStart(2, "0")}${includeSeconds ? `:${seconds.toString().padStart(2, "0")}` : ""}`
+                          ) && "opacity-50 cursor-not-allowed"
+                        )}
                       >
                         <ChevronDown className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                       </button>
@@ -336,8 +536,18 @@ const TimeInput = React.forwardRef<HTMLInputElement, TimeInputProps>(
                         {/* Botón para incrementar */}
                         <button
                           type="button"
-                          onClick={() => updateTime(hours, minutes, (seconds + 1) % 60)}
-                          className="absolute top-0 left-0 right-0 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-t-lg z-10 transition-colors"
+                          onClick={incrementSecond}
+                          disabled={
+                            !isTimeInRange(
+                              `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${((seconds + 1) % 60).toString().padStart(2, "0")}`
+                            )
+                          }
+                          className={cn(
+                            "absolute top-0 left-0 right-0 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-t-lg z-10 transition-colors",
+                            !isTimeInRange(
+                              `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${((seconds + 1) % 60).toString().padStart(2, "0")}`
+                            ) && "opacity-50 cursor-not-allowed"
+                          )}
                         >
                           <ChevronUp className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                         </button>
@@ -349,6 +559,10 @@ const TimeInput = React.forwardRef<HTMLInputElement, TimeInputProps>(
                               const isCenter = index === Math.floor(visibleSeconds.length / 2);
                               const isMultipleOf5 = second % 5 === 0;
 
+                              // Verificar si este segundo está dentro del rango permitido
+                              const secondTime = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${second.toString().padStart(2, "0")}`;
+                              const isDisabled = !isTimeInRange(secondTime);
+
                               return (
                                 <div
                                   key={`second-${index}`}
@@ -356,11 +570,13 @@ const TimeInput = React.forwardRef<HTMLInputElement, TimeInputProps>(
                                     "py-2 flex items-center justify-center transition-all duration-150",
                                     isCenter
                                       ? "bg-orange-500/10 text-orange-500 font-bold text-xl rounded-md"
-                                      : isMultipleOf5
-                                        ? "text-gray-700 dark:text-gray-300"
-                                        : "text-gray-500 dark:text-gray-400"
+                                      : isDisabled
+                                        ? "text-gray-300 dark:text-gray-600 cursor-not-allowed"
+                                        : isMultipleOf5
+                                          ? "text-gray-700 dark:text-gray-300 cursor-pointer"
+                                          : "text-gray-500 dark:text-gray-400 cursor-pointer"
                                   )}
-                                  onClick={() => updateTime(hours, minutes, second)}
+                                  onClick={isDisabled ? undefined : handleSecondClick(second)}
                                 >
                                   <div className="flex items-center justify-center">
                                     <span>{second.toString().padStart(2, "0")}</span>
@@ -374,8 +590,18 @@ const TimeInput = React.forwardRef<HTMLInputElement, TimeInputProps>(
                         {/* Botón para decrementar */}
                         <button
                           type="button"
-                          onClick={() => updateTime(hours, minutes, (seconds - 1 + 60) % 60)}
-                          className="absolute bottom-0 left-0 right-0 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-b-lg z-10 transition-colors"
+                          onClick={decrementSecond}
+                          disabled={
+                            !isTimeInRange(
+                              `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${((seconds - 1 + 60) % 60).toString().padStart(2, "0")}`
+                            )
+                          }
+                          className={cn(
+                            "absolute bottom-0 left-0 right-0 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-b-lg z-10 transition-colors",
+                            !isTimeInRange(
+                              `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${((seconds - 1 + 60) % 60).toString().padStart(2, "0")}`
+                            ) && "opacity-50 cursor-not-allowed"
+                          )}
                         >
                           <ChevronDown className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                         </button>
