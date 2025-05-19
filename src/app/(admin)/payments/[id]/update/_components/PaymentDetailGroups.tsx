@@ -94,9 +94,11 @@ export default function PaymentDetailGroups({ paymentDetails, missingDays, payme
 
   const handleEditDetail = (detail: PaymentDetail) => {
     // Determine detail type
-    let type: "ROOM" | "SERVICE" | "PRODUCT" = "ROOM";
+    let type: "ROOM" | "SERVICE" | "PRODUCT" | "LATE_CHECKOUT" = "ROOM";
     if (detail.type === "ROOM_RESERVATION") {
       type = "ROOM";
+    } else if (detail.type === "LATE_CHECKOUT") {
+      type = "LATE_CHECKOUT";
     } else if (detail.service) {
       type = "SERVICE";
     } else if (detail.product) {
