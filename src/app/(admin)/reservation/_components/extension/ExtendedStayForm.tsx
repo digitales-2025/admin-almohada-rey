@@ -1,12 +1,11 @@
 "use client";
 
-import { addDays, differenceInDays, format, parse, parseISO } from "date-fns";
+import { differenceInDays, format, parse, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { AlertCircle, BadgeCheck, Calendar, CreditCard, DollarSign, FileText, Info, Loader2 } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 
 import { PaymentDetailMethod } from "@/app/(admin)/payments/_types/payment";
-import { CalendarBig } from "@/components/form/CalendarBig";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import DatePicker from "@/components/ui/date-time-picker";
@@ -15,13 +14,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import type { ExtendStayFormValues } from "../../_schemas/extension-reservation.schemas";
+import type { CreateExtendStay } from "../../_schemas/extension-reservation.schemas";
 import type { DetailedReservation } from "../../_schemas/reservation.schemas";
 import { getMethodIcon, getPaymentMethodLabel } from "../../_utils/reservationPayment.utils";
+import ExtendedBookingCalendar from "./ExtendedBookingCalendar";
 
 interface ExtendedStayFormProps {
-  extendStayForm: UseFormReturn<ExtendStayFormValues>;
-  onSubmitExtendStay: (data: ExtendStayFormValues) => void;
+  extendStayForm: UseFormReturn<CreateExtendStay>;
+  onSubmitExtendStay: (data: CreateExtendStay) => void;
   isProcessing: boolean;
   reservation: DetailedReservation;
   extendedStayCost: number;
@@ -119,42 +119,12 @@ export default function ExtendedStayForm({
               </div>
             </div>
 
-            {/* Selector de calendario */}
-            <FormField
-              control={extendStayForm.control}
-              name="newCheckoutDate"
-              render={({ field }) => (
-                <FormItem className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
-                  <div className="p-5 border-b border-border bg-muted/20">
-                    <FormLabel className="font-medium flex items-center m-0">
-                      <Calendar className="h-5 w-5 text-primary mr-3" />
-                      Seleccione Nueva Fecha de Salida
-                    </FormLabel>
-                  </div>
-                  <div className="p-6">
-                    <FormControl>
-                      <div className="flex justify-center">
-                        <CalendarBig
-                          key={`extend-stay-calendar-${renderCount}`}
-                          locale={es}
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={(date) => isDateDisabled(date)}
-                          defaultMonth={field.value || addDays(originalCheckoutDate, 1)}
-                          className="rounded-md border border-border"
-                        />
-                      </div>
-                    </FormControl>
-                    <p className="text-sm text-center mt-3 text-muted-foreground">
-                      {field.value
-                        ? format(field.value, "EEEE, d 'de' MMMM, yyyy", { locale: es })
-                        : "Seleccione una fecha"}
-                    </p>
-                    <FormMessage className="text-center mt-1" />
-                  </div>
-                </FormItem>
-              )}
+            <ExtendedBookingCalendar
+              extendStayForm={extendStayForm}
+              isDateDisabled={isDateDisabled}
+              originalCheckoutDate={originalCheckoutDate}
+              renderCount={renderCount}
+              idReservation={reservation.id}
             />
 
             {/* Sección de costo */}
