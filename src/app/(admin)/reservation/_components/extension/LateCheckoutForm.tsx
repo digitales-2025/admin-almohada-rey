@@ -1,7 +1,6 @@
 "use client";
 
 import { format, parse, parseISO } from "date-fns";
-import { es } from "date-fns/locale";
 import { AlertCircle, BadgeCheck, Clock, CreditCard, DollarSign, FileText, Info, Loader2 } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 
@@ -12,15 +11,15 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { TimeInput } from "@/components/ui/time-input";
 import { cn } from "@/lib/utils";
-import type { LateCheckoutFormValues } from "../../_schemas/extension-reservation.schemas";
+import type { CreateLateCheckout } from "../../_schemas/extension-reservation.schemas";
 import type { DetailedReservation } from "../../_schemas/reservation.schemas";
 import { getMethodIcon, getPaymentMethodLabel } from "../../_utils/reservationPayment.utils";
+import LateCheckoutTimeInput from "./LateCheckoutTimeInput";
 
 interface LateCheckoutFormProps {
-  lateCheckoutForm: UseFormReturn<LateCheckoutFormValues>;
-  onSubmitLateCheckout: (data: LateCheckoutFormValues) => void;
+  lateCheckoutForm: UseFormReturn<CreateLateCheckout>;
+  onSubmitLateCheckout: (data: CreateLateCheckout) => void;
   isProcessing: boolean;
   reservation: DetailedReservation;
   lateCheckoutCost: number;
@@ -37,6 +36,7 @@ export default function LateCheckoutForm({
   roomPrice,
   onOpenChange,
 }: LateCheckoutFormProps) {
+  const originalCheckoutDate = reservation.checkOutDate ? parseISO(reservation.checkOutDate) : new Date();
   return (
     <TabsContent value="late-checkout" className="p-0 m-0">
       <Form {...lateCheckoutForm}>
@@ -51,54 +51,11 @@ export default function LateCheckoutForm({
           </div>
 
           {/* Late Checkout Time Section */}
-          <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
-            <div className="p-5 border-b border-border bg-muted/20">
-              <div className="font-medium text-foreground flex items-center">
-                <Clock className="h-5 w-5 text-primary mr-3" />
-                <h3 className="font-medium"> Configuración de Late Checkout</h3>
-              </div>
-            </div>
-
-            <div className="px-4 py-2">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="rounded-lg p-3 text-center justify-center flex flex-col">
-                  <span className="text-xs uppercase tracking-wide text-muted-foreground block mb-1">
-                    Fecha de Salida
-                  </span>
-                  <span className="font-medium text-foreground text-sm">
-                    {reservation.checkOutDate
-                      ? format(parseISO(reservation.checkOutDate), "dd/MM/yyyy", { locale: es })
-                      : "N/A"}
-                  </span>
-                </div>
-
-                <div className="rounded-lg p-3">
-                  <span className="text-xs uppercase tracking-wide text-muted-foreground block mb-1 text-center">
-                    Hora de Salida
-                  </span>
-                  <FormField
-                    control={lateCheckoutForm.control}
-                    name="lateCheckoutTime"
-                    render={({ field }) => (
-                      <FormItem className="space-y-0">
-                        <FormControl>
-                          <TimeInput
-                            id="late-checkout-time"
-                            value={field.value}
-                            onTimeChange={field.onChange}
-                            min="12:00"
-                            className="border-input mx-auto"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground mt-3 text-center">Horario de Lima (GMT-5)</p>
-            </div>
-          </div>
+          <LateCheckoutTimeInput
+            lateCheckoutForm={lateCheckoutForm}
+            originalCheckoutDate={originalCheckoutDate}
+            idReservation={reservation.id}
+          />
 
           {/* Cost Section */}
           <div className="bg-card border border-border rounded-lg p-4 shadow-sm">
@@ -119,11 +76,11 @@ export default function LateCheckoutForm({
           {/* Payment Section */}
           <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
             <div className="p-5 border-b border-border bg-muted/20">
-              <h3 className="font-medium text-foreground flex items-center">
+              <div className="font-medium text-foreground flex items-center">
                 <CreditCard className="h-5 w-5 text-primary mr-3" />
 
                 <h3 className="font-medium"> Detalles de Pago</h3>
-              </h3>
+              </div>
             </div>
 
             <div className="p-4 space-y-5">
