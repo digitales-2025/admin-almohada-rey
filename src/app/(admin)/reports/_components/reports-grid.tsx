@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { DollarSign, FileText, HouseWifi, TrendingUp } from "lucide-react";
+import { BarChart2, DollarSign, FileText, HouseWifi, TrendingUp } from "lucide-react";
 
 import ReporteDialog from "@/app/(admin)/reports/_components/report-dialog";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -42,6 +42,13 @@ const tiposReportes: {
     descripcion: "Reporte de ganancias por tipo de habitación",
     icono: HouseWifi,
     color: "bg-emerald-100 text-emerald-600",
+  },
+  {
+    id: "occupancy",
+    titulo: "Ocupación y Arribos",
+    descripcion: "Estadísticas de ocupación por tipo de habitación",
+    icono: BarChart2,
+    color: "bg-purple-100 text-purple-600",
   },
   // Otros reportes pueden agregarse aquí en el futuro
   /*  {
