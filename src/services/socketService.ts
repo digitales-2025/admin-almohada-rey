@@ -22,6 +22,13 @@ type EventsMap = {
     timestamp: string;
   };
   getReservationsInInterval: { checkInDate: string; checkOutDate: string };
+  checkoutAvailabilityChecked: {
+    roomId: string;
+    originalCheckoutDate: string;
+    newCheckoutDate: string;
+    isAvailable: boolean;
+    timestamp: string;
+  };
 };
 
 class SocketService {
@@ -192,6 +199,19 @@ class SocketService {
     }) => void
   ) {
     return this.on("reservationsInInterval", handler);
+  }
+
+  // Método para escuchar eventos de verificación de disponibilidad de checkout extendido
+  onCheckoutAvailabilityChecked(
+    handler: (data: {
+      roomId: string;
+      originalCheckoutDate: string;
+      newCheckoutDate: string;
+      isAvailable: boolean;
+      timestamp: string;
+    }) => void
+  ) {
+    return this.on("checkoutAvailabilityChecked", handler);
   }
 
   // Método para solicitar reservaciones en un intervalo
