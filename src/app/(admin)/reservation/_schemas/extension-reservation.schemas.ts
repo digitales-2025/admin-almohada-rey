@@ -38,6 +38,6 @@ export const extensionReservationSchema = z.discriminatedUnion("type", [
 ]);
 
 // Tipos derivados del esquema
-export type LateCheckoutFormValues = z.infer<typeof lateCheckoutSchema>;
-export type ExtendStayFormValues = z.infer<typeof extendStaySchema>;
+export type CreateLateCheckout = z.infer<typeof lateCheckoutSchema>;
+export type CreateExtendStay = z.infer<typeof extendStaySchema>;
 export type ExtensionReservationFormValues = z.infer<typeof extensionReservationSchema>;
