@@ -542,6 +542,66 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/reservation/{id}/check-extended-checkout": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Verificar disponibilidad para extender checkout
+     * @description Comprueba si es posible aplicar un late checkout o extender estadía sin generar conflictos
+     */
+    get: operations["ReservationController_checkExtendedCheckoutAvailability_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/reservation/{id}/late-checkout": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Aplicar Late Checkout a una reserva
+     * @description Extiende la hora de salida de una reserva en el mismo día. Valida que no haya conflictos con otras reservas.
+     */
+    patch: operations["ReservationController_applyLateCheckout_v1"];
+    trace?: never;
+  };
+  "/v1/reservation/{id}/extend-stay": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Extender estadía de una reserva
+     * @description Cambia la fecha de checkout a una fecha posterior. Valida disponibilidad y conflictos.
+     */
+    patch: operations["ReservationController_extendStay_v1"];
+    trace?: never;
+  };
   "/v1/rooms": {
     parameters: {
       query?: never;
@@ -1016,6 +1076,160 @@ export interface paths {
     head?: never;
     /** Actualizar servicio existente */
     patch: operations["ServiceController_update_v1"];
+    trace?: never;
+  };
+  "/v1/movements": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get all movements
+     * @description Get all movements with the provided data
+     */
+    get: operations["MovementsController_findAll_v1"];
+    put?: never;
+    /**
+     * Create a new movement
+     * @description Create a new movement with the provided data
+     */
+    post: operations["MovementsController_create_v1"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/movements/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get movement by id
+     * @description Get movement by id with the provided data
+     */
+    get: operations["MovementsController_findOne_v1"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete movement by id
+     * @description Delete movement by id with the provided data
+     */
+    delete: operations["MovementsController_remove_v1"];
+    options?: never;
+    head?: never;
+    /**
+     * Update movement by id
+     * @description Update movement by id with the provided data
+     */
+    patch: operations["MovementsController_update_v1"];
+    trace?: never;
+  };
+  "/v1/movements/type/paginated": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get paginated movements by type */
+    get: operations["MovementsController_findByTypePaginated_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/warehouse": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get all warehouses */
+    get: operations["WarehouseController_findAll_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/warehouse/paginated": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get paginated warehouses */
+    get: operations["WarehouseController_findAllPaginated_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/warehouse/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get warehouse by id */
+    get: operations["WarehouseController_findOne_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/warehouse/all/type/{type}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get warehouse by type */
+    get: operations["WarehouseController_findAllByType_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/warehouse/stock/product/{type}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get stock of products by warehouse type */
+    get: operations["WarehouseController_findProductsStockByType_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
     trace?: never;
   };
   "/v1/seeds": {
@@ -1505,13 +1719,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-03T17:17:40.326Z
+       * @example 2025-05-19T17:54:40.963Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-03T17:17:40.326Z
+       * @example 2025-05-19T17:54:40.964Z
        */
       updatedAt: string;
       /** @description Customer name */
@@ -1568,13 +1782,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-03T17:17:40.326Z
+       * @example 2025-05-19T17:54:40.963Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-03T17:17:40.326Z
+       * @example 2025-05-19T17:54:40.964Z
        */
       updatedAt: string;
       /** @description User name */
@@ -1617,13 +1831,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-03T17:17:40.326Z
+       * @example 2025-05-19T17:54:40.963Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-03T17:17:40.326Z
+       * @example 2025-05-19T17:54:40.964Z
        */
       updatedAt: string;
       /**
@@ -1666,13 +1880,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-03T17:17:40.326Z
+       * @example 2025-05-19T17:54:40.963Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-03T17:17:40.326Z
+       * @example 2025-05-19T17:54:40.964Z
        */
       updatedAt: string;
       /**
@@ -1761,13 +1975,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-05-03T17:17:40.326Z
+       * @example 2025-05-19T17:54:40.963Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-05-03T17:17:40.326Z
+       * @example 2025-05-19T17:54:40.964Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -1812,6 +2026,11 @@ export interface components {
        * @default false
        */
       isPendingDeletePayment: boolean;
+      /**
+       * @description Wheter the reservation was applied late check out
+       * @default false
+       */
+      appliedLateCheckOut: boolean;
       /** @description Customer associated with the reservation */
       customer: components["schemas"]["Customer"];
       /** @description User associated with the reservation */
@@ -1935,13 +2154,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-05-03T17:17:40.326Z
+       * @example 2025-05-19T17:54:40.963Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-05-03T17:17:40.326Z
+       * @example 2025-05-19T17:54:40.964Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -1986,6 +2205,11 @@ export interface components {
        * @default false
        */
       isPendingDeletePayment: boolean;
+      /**
+       * @description Wheter the reservation was applied late check out
+       * @default false
+       */
+      appliedLateCheckOut: boolean;
     };
     UpdateManyDto: {
       /**
@@ -2142,6 +2366,50 @@ export interface components {
        */
       roomPrice?: number;
     };
+    LateCheckoutDto: {
+      /**
+       * @description Nueva hora de checkout (formato HH:mm)
+       * @example 14:30
+       */
+      lateCheckoutTime: string;
+      /**
+       * @description Notas adicionales sobre el late checkout
+       * @example Cliente solicitó una extensión de tiempo por motivos personales
+       */
+      additionalNotes?: string;
+      /**
+       * @description Date of the payment
+       * @example 2021-09-21
+       */
+      paymentDate: string;
+      /**
+       * @description Método de pago utilizado. Puede ser CASH, CREDIT_CARD, DEBIT_CARD, TRANSFER, YAPE, PLIN, PAYPAL, IZI_PAY o PENDING_PAYMENT
+       * @example CREDIT_CARD
+       */
+      paymentMethod: string;
+    };
+    ExtendStayDto: {
+      /**
+       * @description Nueva fecha de checkout en formato ISO 8601
+       * @example 2025-05-25T12:00:00.000Z
+       */
+      newCheckoutDate: string;
+      /**
+       * @description Notas adicionales sobre el late checkout
+       * @example Cliente solicitó una extensión de tiempo por motivos personales
+       */
+      additionalNotes?: string;
+      /**
+       * @description Date of the payment
+       * @example 2021-09-21
+       */
+      paymentDate: string;
+      /**
+       * @description Método de pago utilizado. Puede ser CASH, CREDIT_CARD, DEBIT_CARD, TRANSFER, YAPE, PLIN, PAYPAL, IZI_PAY o PENDING_PAYMENT
+       * @example CREDIT_CARD
+       */
+      paymentMethod: string;
+    };
     CreateRoomDto: {
       /**
        * @description ID del tipo de habitación
@@ -2184,13 +2452,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-03T17:17:40.326Z
+       * @example 2025-05-19T17:54:40.963Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-03T17:17:40.326Z
+       * @example 2025-05-19T17:54:40.964Z
        */
       updatedAt: string;
       /**
@@ -2655,13 +2923,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-03T17:17:40.326Z
+       * @example 2025-05-19T17:54:40.963Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-03T17:17:40.326Z
+       * @example 2025-05-19T17:54:40.964Z
        */
       updatedAt: string;
       name: string;
@@ -2685,6 +2953,87 @@ export interface components {
        * @example 15.99
        */
       price?: number;
+    };
+    CreateMovementDto: {
+      /**
+       * @description Date of the movement
+       * @example 2021-09-21
+       */
+      dateMovement: string;
+      /**
+       * @description Type of movement to set the movement to. Can only be INPUT or OUTPUT
+       * @example INPUT
+       */
+      type: string;
+      /**
+       * @description Document number of the movement
+       * @example 123456
+       */
+      documentNumber?: string;
+      /**
+       * @description Description of the movement
+       * @example Description of the movement
+       */
+      description: string;
+      /**
+       * @description Id of the warehouse
+       * @example id del almacen
+       */
+      warehouseId: string;
+      /**
+       * @description Array of details of the movement
+       * @example [
+       *       {
+       *         "quantity": 0,
+       *         "unitCost": 0,
+       *         "productId": "id del producto"
+       *       }
+       *     ]
+       */
+      movementDetail?: string[];
+    };
+    UpdateMovementDto: {
+      /**
+       * @description Date of the movement
+       * @example 2021-09-21
+       */
+      dateMovement?: string;
+      /**
+       * @description Type of movement to set the movement to. Can only be INPUT or OUTPUT
+       * @example INPUT
+       */
+      type?: string;
+      /**
+       * @description Document number of the movement with payment receipt
+       * @example 123456
+       */
+      documentNumber?: string;
+      /**
+       * @description Description of the movement
+       * @example Description of the movement
+       */
+      description?: string;
+      /**
+       * @description Id of the warehouse
+       * @example id del almacen
+       */
+      warehouseId?: string;
+      /**
+       * @description Array of details of the movement
+       * @example [
+       *       {
+       *         "quantity": 0,
+       *         "unitCost": 0,
+       *         "productId": "id del producto"
+       *       }
+       *     ]
+       */
+      movementDetail?: string[];
+      /**
+       * @description Indicates if the movement has a payment receipt
+       * @example true
+       */
+      hasPaymentReceipt?: boolean;
     };
     CreateCustomerDto: {
       /** @description Nombre del cliente */
@@ -2824,13 +3173,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-03T17:17:40.326Z
+       * @example 2025-05-19T17:54:40.963Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-03T17:17:40.326Z
+       * @example 2025-05-19T17:54:40.964Z
        */
       updatedAt: string;
       /**
@@ -2951,11 +3300,11 @@ export interface components {
     HotelExpenseEntity: {
       id: string;
       description: string;
-      category: Record<string, never>;
-      paymentMethod: Record<string, never>;
+      category: string;
+      paymentMethod: string;
       amount: number;
       date: string;
-      documentType?: Record<string, never>;
+      documentType?: string;
       documentNumber?: string;
       /** Format: date-time */
       createdAt: string;
@@ -4587,6 +4936,159 @@ export interface operations {
       };
     };
   };
+  ReservationController_checkExtendedCheckoutAvailability_v1: {
+    parameters: {
+      query: {
+        /** @description Nueva fecha/hora de checkout en formato ISO */
+        newCheckoutDate: string;
+      };
+      header?: never;
+      path: {
+        /** @description ID de la reserva */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Verificación completada */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error: formato incorrecto o reserva no encontrada */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error: reservación no encontrada */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ReservationController_applyLateCheckout_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["LateCheckoutDto"];
+      };
+    };
+    responses: {
+      /** @description Late checkout aplicado correctamente */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BaseApiResponse"];
+        };
+      };
+      /** @description Error: formato incorrecto o reserva incompatible con late checkout */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error: reservación no encontrada */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error: conflicto con otra reservación existente */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ReservationController_extendStay_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ExtendStayDto"];
+      };
+    };
+    responses: {
+      /** @description Estadía extendida correctamente */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BaseApiResponse"];
+        };
+      };
+      /** @description Error: formato incorrecto de fecha o reserva incompatible con extensión */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error: reservación no encontrada */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error: conflicto con otra reservación existente */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   RoomController_findAll_v1: {
     parameters: {
       query?: never;
@@ -5966,6 +6468,443 @@ export interface operations {
       };
     };
   };
+  MovementsController_findAll_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Get all movements */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  MovementsController_create_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateMovementDto"];
+      };
+    };
+    responses: {
+      /** @description Movement successfully created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  MovementsController_findOne_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Get movement by id */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  MovementsController_remove_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Movement successfully deleted */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  MovementsController_update_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateMovementDto"];
+      };
+    };
+    responses: {
+      /** @description Movement successfully updated */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  MovementsController_findByTypePaginated_v1: {
+    parameters: {
+      query: {
+        /** @description Type of movement (INPUT or OUTPUT) */
+        type: "INPUT" | "OUTPUT";
+        /** @description Page number */
+        page?: number;
+        /** @description Number of items per page */
+        pageSize?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Paginated list of movements by type */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data?: {
+              id?: string;
+              codeUnique?: string;
+              /** Format: date-time */
+              dateMovement?: string;
+              /** @enum {string} */
+              type?: "INPUT" | "OUTPUT";
+              description?: string;
+              warehouse?: {
+                id?: string;
+                /** @enum {string} */
+                type?: "CENTRAL" | "LOCAL";
+              };
+              typePurchaseOrder?: string | null;
+              documentNumber?: string | null;
+            }[];
+            meta?: {
+              total?: number;
+              page?: number;
+              pageSize?: number;
+              totalPages?: number;
+              hasNext?: boolean;
+              hasPrevious?: boolean;
+            };
+          };
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  WarehouseController_findAll_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Get all warehouse */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  WarehouseController_findAllPaginated_v1: {
+    parameters: {
+      query?: {
+        /** @description Page number */
+        page?: number;
+        /** @description Number of items per page */
+        pageSize?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Paginated list of warehouses */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data?: {
+              id?: string;
+              /** @enum {string} */
+              type?: "CENTRAL" | "LOCAL";
+              quantityProducts?: number;
+              totalCost?: number;
+            }[];
+            meta?: {
+              total?: number;
+              page?: number;
+              pageSize?: number;
+              totalPages?: number;
+              hasNext?: boolean;
+              hasPrevious?: boolean;
+            };
+          };
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  WarehouseController_findOne_v1: {
+    parameters: {
+      query: {
+        /** @description Warehouse ID */
+        id: string;
+        /** @description Movement ID to filter the warehouse data */
+        movementId?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Get warehouse by id */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  WarehouseController_findAllByType_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Tipo de almacén (COMMERCIAL o INTERNAL_USE) */
+        type: components["schemas"]["ProductType"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Get warehouse by type */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  WarehouseController_findProductsStockByType_v1: {
+    parameters: {
+      query?: {
+        /** @description Payment detail ID to filter the stock data */
+        paymentDetailId?: string;
+      };
+      header?: never;
+      path: {
+        /** @description Tipo de almacén (COMMERCIAL o INTERNAL_USE) */
+        type: components["schemas"]["ProductType"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Get stock of products by warehouse type */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   SeedsController_initSeed_v1: {
     parameters: {
       query?: never;
@@ -6938,8 +7877,10 @@ export interface operations {
   ExpenseController_findByDate_v1: {
     parameters: {
       query?: {
-        /** @description Fecha del gasto (formato YYYY-MM-DD, opcional) */
-        date?: string;
+        /** @description Mes para filtrar (ejemplo: enero, febrero, etc.) */
+        month?: string;
+        /** @description Año para filtrar (ejemplo: 2023, 2024, etc.) */
+        year?: string;
         /** @description Número de página */
         page?: number;
         /** @description Cantidad de elementos por página */
