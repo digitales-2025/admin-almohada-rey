@@ -44,6 +44,7 @@ export function DateRangePicker({
     <Popover>
       <PopoverTrigger asChild>
         <Button
+          type="button"
           variant="outline"
           className={cn(
             "justify-start text-left font-normal truncate text-ellipsis w-full",
@@ -98,7 +99,7 @@ export function DateRangePicker({
         {tempRange?.from && <Separator className="my-2" />}
         <div className="flex justify-end items-center p-2">
           {tempRange?.from && (
-            <Button variant="ghost" size="sm" className="h-8 px-2" onClick={clearSelection}>
+            <Button variant="ghost" size="sm" className="h-8 px-2" type="button" onClick={clearSelection}>
               <XCircleIcon className="h-4 w-4 mr-1" />
               <span className="text-xs">Limpiar</span>
             </Button>

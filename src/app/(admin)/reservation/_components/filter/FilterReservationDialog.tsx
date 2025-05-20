@@ -1,16 +1,16 @@
 "use client";
 
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon, CalendarPlus, Filter, LoaderCircle, User, Users } from "lucide-react";
+import { Filter, LoaderCircle } from "lucide-react";
+import { DateRange } from "react-day-picker";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { Customer } from "@/app/(admin)/customers/_types/customer";
 import { CustomFormDescription } from "@/components/form/CustomFormDescription";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-// import { CardDescription } from "@/components/ui/card";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
 import {
   Dialog,
   DialogContent,
@@ -29,26 +29,14 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Form, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { cn } from "@/lib/utils";
 import { PaginationParams } from "@/types/api/paginated-response";
-import { createPeruBookingDateTime, formatPeruBookingDate } from "@/utils/peru-datetime";
+import { createPeruBookingDateTime } from "@/utils/peru-datetime";
 import { PaginatedReservationHookResponse } from "../../_hooks/use-reservation";
-import {
-  FilterByCheckInOutInput,
-  FilterByCheckInOutSchema,
-  FilterByCustomerCheckInOutInput,
-  FilterByCustomerCheckInOutSchema,
-  FilterByCustomerInput,
-  FilterByCustomerSchema,
-} from "../../_schemas/reservation.schemas";
+import { FilterByCustomerCheckInOutInput, FilterByCustomerCheckInOutSchema } from "../../_schemas/reservation.schemas";
 import { PaginatedReservationParams } from "../../_services/reservationApi";
-import { FORMSTATICS } from "../../_statics/forms";
 import { SearchCustomerCombobox } from "../search/SearchCustomerCombobox";
-import { FilterReservationTabCardContent } from "./FilterReservationTabCardContent";
 
 type CurrentFilterOptions = PaginatedReservationParams;
 interface FilterReservationDialogProps {
@@ -65,74 +53,28 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
     submitButton: "Aplicar",
   };
 
-  const TAB_OPTIONS = useMemo(
-    () => ({
-      BY_CUSTOMER: {
-        label: "Por cliente",
-        value: "BY_CUSTOMER",
-        description: "Selecciona el cliente para filtrar las reservas",
-      },
-      BY_CHECK_INOUT: {
-        label: "Por fechas",
-        value: "BY_CHECK_INOUT",
-        description: "Selecciona las fechas de check-in y check-out para filtrar las reservas",
-      },
-      BY_CUSTOMER_N_CHECK_INOUT: {
-        label: "Por cliente y fechas",
-        value: "BY_STORAGE_N_PRODUCT",
-        description: "Selecciona un almacén y un producto para filtrar el stock",
-      },
-      ALL_BOOKINGS: {
-        label: "Todos las reservas",
-        value: "ALL_BOOKINGS",
-        description: "Muestra todas las reservas",
-      },
-    }),
-    []
-  );
-
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
-  const dayAfterTomorrow = new Date(today);
-  dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
 
   const todayFormatted = today.toISOString().split("T")[0];
   const tomorrowFormatted = tomorrow.toISOString().split("T")[0];
-  //   const dayAfterTomorrowFormatted = dayAfterTomorrow.toISOString().split("T")[0];
 
   const { checkIn, checkOut } = createPeruBookingDateTime(todayFormatted, tomorrowFormatted);
 
   const [open, setOpen] = useState(false);
-  //CONTROLA LAS RERENDIRACIONES DE LOS TABS Y SUS CONTENTS
-  const [activeTab, setActiveTab] = useState(TAB_OPTIONS.ALL_BOOKINGS.value);
 
-  const { queryResponse, updateFilters } = paginatedHookResponse;
+  // Guardamos la referencia al cliente seleccionado y su información de visualización
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [customerDisplayInfo, setCustomerDisplayInfo] = useState<string | undefined>(undefined);
 
-  const { data, isLoading, isError, isSuccess } = queryResponse;
-
-  const isDesktop = useMediaQuery("(min-width: 640px)");
-
-  const handleClose = useCallback(() => {
-    setOpen(false);
-  }, []);
-
-  const filterByCustomerForm = useForm({
-    resolver: zodResolver(FilterByCustomerSchema),
-    defaultValues: {
-      customerId: "",
-    },
+  // Estado para manejar el rango de fechas
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: checkIn ? new Date(checkIn) : undefined,
+    to: checkOut ? new Date(checkOut) : undefined,
   });
 
-  const filterByCheckInCheckOutForm = useForm({
-    resolver: zodResolver(FilterByCheckInOutSchema),
-    defaultValues: {
-      checkInDate: checkIn,
-      checkOutDate: checkOut,
-    },
-  });
-
-  const filterByCustomerAndDatesForm = useForm({
+  const filterForm = useForm({
     resolver: zodResolver(FilterByCustomerCheckInOutSchema),
     defaultValues: {
       customerId: "",
@@ -141,74 +83,68 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
     },
   });
 
+  const { queryResponse, updateFilters } = paginatedHookResponse;
+  const { data, isLoading, isError, isSuccess } = queryResponse;
+  const isDesktop = useMediaQuery("(min-width: 640px)");
+
+  const handleClose = useCallback(() => {
+    setOpen(false);
+  }, []);
+
+  // Efecto para actualizar los valores del formulario cuando cambia el rango de fechas
+  useEffect(() => {
+    // No modificar la lógica del DateRangePicker que ya funciona para ti
+    if (dateRange?.from) {
+      filterForm.setValue("checkInDate", dateRange.from.toISOString());
+    } else {
+      filterForm.setValue("checkInDate", undefined);
+    }
+
+    if (dateRange?.to) {
+      filterForm.setValue("checkOutDate", dateRange.to.toISOString());
+    } else {
+      filterForm.setValue("checkOutDate", undefined);
+    }
+  }, [dateRange, filterForm]);
+
+  // Efecto para conservar el cliente seleccionado
+  useEffect(() => {
+    // Mantener el ID del cliente cuando se tiene seleccionado uno
+    if (selectedCustomer && selectedCustomer.id) {
+      filterForm.setValue("customerId", selectedCustomer.id);
+    }
+  }, [selectedCustomer, filterForm]);
+
   const defaultPaginationConfig: PaginationParams = {
     page: 1,
     pageSize: 10,
   };
 
-  const onSubmitCustomer = useCallback(
-    (input: FilterByCustomerInput) => {
-      const localFilters: PaginatedReservationParams = {
-        pagination: defaultPaginationConfig,
-        fieldFilters: {
-          customerId: input.customerId,
-        },
-      };
-      if (onSaveFilter) {
-        onSaveFilter(localFilters);
-        if (isSuccess && data) handleClose();
-      } else {
-        updateFilters(localFilters);
-        if (isError) {
-          toast.error("Error al filtrar reservaciones");
-        }
-        if (data) {
-          toast.success("Reservas filtrado correctamente");
-          handleClose();
-        }
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [updateFilters]
-  );
-
-  const onSubmitCheckInOut = useCallback(
-    (values: FilterByCheckInOutInput) => {
-      const localFilters: PaginatedReservationParams = {
-        pagination: defaultPaginationConfig,
-        fieldFilters: {
-          checkInDate: values.checkInDate,
-          checkOutDate: values.checkOutDate,
-        },
-      };
-      if (onSaveFilter) {
-        onSaveFilter(localFilters);
-        if (isSuccess && data) handleClose();
-      } else {
-        updateFilters(localFilters);
-        if (isError) {
-          toast.error("Error al filtrar reservaciones");
-        }
-        if (data) {
-          toast.success("Reservas filtrado correctamente");
-          handleClose();
-        }
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [updateFilters]
-  );
-
-  const onSubmitStorageAndProduct = useCallback(
+  const onSubmit = useCallback(
     (input: FilterByCustomerCheckInOutInput) => {
+      // Creamos un objeto vacío para los filtros
+      const fieldFilters: Record<string, any> = {};
+
+      // Solo incluimos campos que tienen un valor definido
+      if (input.customerId) {
+        fieldFilters.customerId = input.customerId;
+      }
+
+      if (input.checkInDate) {
+        fieldFilters.checkInDate = input.checkInDate;
+      }
+
+      if (input.checkOutDate) {
+        fieldFilters.checkOutDate = input.checkOutDate;
+      }
+
       const localFilters: PaginatedReservationParams = {
         pagination: defaultPaginationConfig,
-        fieldFilters: {
-          customerId: input.customerId,
-          checkInDate: input.checkInDate,
-          checkOutDate: input.checkOutDate,
-        },
+        fieldFilters,
       };
+
+      console.log("Aplicando filtros:", localFilters);
+
       if (onSaveFilter) {
         onSaveFilter(localFilters);
         if (isSuccess && data) handleClose();
@@ -216,26 +152,17 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
         updateFilters(localFilters);
         if (isError) {
           toast.error("Error al filtrar reservaciones");
-        }
-        if (data) {
-          toast.success("Reservas filtrado correctamente");
+        } else {
+          toast.success("Reservas filtradas correctamente");
           handleClose();
         }
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [updateFilters]
+    [updateFilters, onSaveFilter, defaultPaginationConfig, isSuccess, isError, data, handleClose]
   );
-
-  if (isError) {
-    toast.error("Error al filtrar stock");
-  }
-  if (isLoading) {
-    toast.success("Filtrando...");
-  }
 
   const DialogFooterContent = () => (
-    <div className="gap-2 sm:space-x-0 flex sm:flex-row-reverse flex-row-reverse w-full">
+    <div className="gap-2 sm:space-x-2 flex sm:flex-row-reverse flex-col w-full">
       <Button type="button" variant="outline" className="w-full" onClick={handleClose}>
         {FILTER_DIALOG_MESSAGES.cancel}
       </Button>
@@ -250,7 +177,7 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
       aria-label="Open menu"
       className="flex p-2 data-[state=open]:bg-muted"
     >
-      <Filter />
+      <Filter className="mr-1" />
       {FILTER_DIALOG_MESSAGES.button}
     </Button>
   );
@@ -258,10 +185,8 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
   const SubmitButton = ({ type = "submit", onClick, ...rest }: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
     <Button {...rest} type={type} className="w-full" disabled={isLoading} onClick={onClick}>
       {isLoading ? (
-        <div>
-          <span className="animate-spin">
-            <LoaderCircle></LoaderCircle>
-          </span>
+        <div className="flex items-center justify-center space-x-2">
+          <LoaderCircle className="animate-spin" size={16} />
           <span>Filtrando...</span>
         </div>
       ) : (
@@ -270,305 +195,54 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
     </Button>
   );
 
-  const FilteringTabs = () => (
+  const FilteringForm = () => (
     <div>
-      <Tabs
-        defaultValue={TAB_OPTIONS.BY_CUSTOMER.value}
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="w-full flex flex-col space-y-4"
-      >
-        <TabsList className="grid w-full grid-cols-3 h-fit">
-          {/* <TabsTrigger value={TAB_OPTIONS.ALL_BOOKINGS.value}>{TAB_OPTIONS.ALL_BOOKINGS.label}</TabsTrigger> */}
-          <TabsTrigger value={TAB_OPTIONS.BY_CUSTOMER.value}>
-            <User className="size-4 shrink-0"></User>
-            <span className="truncate text-ellipsis">{TAB_OPTIONS.BY_CUSTOMER.label}</span>
-          </TabsTrigger>
-          <TabsTrigger value={TAB_OPTIONS.BY_CHECK_INOUT.value}>
-            <CalendarPlus className="size-4 shrink-0"></CalendarPlus>
-            <span className="truncate text-ellipsis">{TAB_OPTIONS.BY_CHECK_INOUT.label}</span>
-          </TabsTrigger>
-          <TabsTrigger value={TAB_OPTIONS.BY_CUSTOMER_N_CHECK_INOUT.value} className="truncate sm:text-ellipsis">
-            <Users className="size-4 shrink-0"></Users>
-            <span className="truncate text-ellipsis">{TAB_OPTIONS.BY_CUSTOMER_N_CHECK_INOUT.label}</span>
-          </TabsTrigger>
-        </TabsList>
-
-        <FilterReservationTabCardContent
-          value={TAB_OPTIONS.BY_CUSTOMER.value}
-          title={TAB_OPTIONS.BY_CUSTOMER.label}
-          description={TAB_OPTIONS.BY_CUSTOMER.description}
-        >
-          <Form {...filterByCustomerForm}>
-            <form
-              onSubmit={filterByCustomerForm.handleSubmit(onSubmitCustomer)}
-              className="space-y-4 flex flex-col items-center"
-            >
-              <FormField
-                control={filterByCustomerForm.control}
-                name="customerId"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Seleccionar cliente</FormLabel>
-                    <SearchCustomerCombobox
-                      onValueChange={(_val, c) => {
-                        const customer = c as Customer;
-                        field.onChange(customer.id);
-                      }}
-                      className="w-full truncate sm:text-ellipsis"
-                    />
-                    <FormMessage />
-                    <FormDescription>Solo visualizará clientes activos</FormDescription>
-                  </FormItem>
-                )}
-              ></FormField>
-              <SubmitButton></SubmitButton>
-            </form>
-          </Form>
-        </FilterReservationTabCardContent>
-
-        <FilterReservationTabCardContent
-          value={TAB_OPTIONS.BY_CHECK_INOUT.value}
-          title={TAB_OPTIONS.BY_CHECK_INOUT.label}
-          description={TAB_OPTIONS.BY_CHECK_INOUT.description}
-        >
-          <Form {...filterByCheckInCheckOutForm}>
-            <form
-              onSubmit={filterByCheckInCheckOutForm.handleSubmit(onSubmitCheckInOut)}
-              className="space-y-4 flex flex-col items-center"
-            >
-              <div className="grid sm:grid-cols-2 gap-4 w-full">
-                <FormField
-                  control={filterByCheckInCheckOutForm.control}
-                  name={"checkInDate"}
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col justify-between h-full">
-                      <FormLabel>{FORMSTATICS.checkInDate.label}</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full pl-3 text-left font-normal truncate sm:text-ellipsis",
-                                !field.value && "text-muted-foreground "
-                              )}
-                            >
-                              {field.value ? (
-                                // Verifica si es string
-                                typeof field.value === "string" ? (
-                                  formatPeruBookingDate(new Date(field.value).toISOString()).customPeruDateTime
-                                    .displayDateTime
-                                ) : (
-                                  <span>Escoja una fecha</span>
-                                )
-                              ) : (
-                                <span>Escoja una fecha</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={typeof field.value === "string" ? new Date(field.value) : undefined}
-                            onSelect={(val) => field.onChange(val?.toISOString() ?? "")}
-                            disabled={(date) => date < new Date("2000-01-01")}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <CustomFormDescription required={true} validateOptionalField={true} />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={filterByCheckInCheckOutForm.control}
-                  name={"checkOutDate"}
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col justify-between h-full">
-                      <FormLabel>{FORMSTATICS.checkOutDate.label}</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full pl-3 text-left font-normal truncate sm:text-ellipsis",
-                                !field.value && "text-muted-foreground "
-                              )}
-                            >
-                              {field.value ? (
-                                // Verifica si es string
-                                typeof field.value === "string" ? (
-                                  formatPeruBookingDate(new Date(field.value).toISOString()).customPeruDateTime
-                                    .displayDateTime
-                                ) : (
-                                  <span>Escoja una fecha</span>
-                                )
-                              ) : (
-                                <span>Escoja una fecha</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={typeof field.value === "string" ? new Date(field.value) : undefined}
-                            onSelect={(val) => field.onChange(val?.toISOString() ?? "")}
-                            disabled={(date) =>
-                              date < new Date("2000-01-01") ||
-                              new Date(filterByCheckInCheckOutForm.watch("checkInDate")) > date
-                            }
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <CustomFormDescription required={true} validateOptionalField={true} />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <SubmitButton></SubmitButton>
-            </form>
-          </Form>
-        </FilterReservationTabCardContent>
-
-        <FilterReservationTabCardContent
-          value={TAB_OPTIONS.BY_CUSTOMER_N_CHECK_INOUT.value}
-          title={TAB_OPTIONS.BY_CUSTOMER_N_CHECK_INOUT.label}
-          description={TAB_OPTIONS.BY_CUSTOMER_N_CHECK_INOUT.description}
-        >
-          <Form {...filterByCustomerAndDatesForm}>
-            <form
-              onSubmit={filterByCustomerAndDatesForm.handleSubmit(onSubmitStorageAndProduct)}
-              className="space-y-4 flex flex-col items-center"
-            >
-              <FormField
-                control={filterByCustomerAndDatesForm.control}
-                name="customerId"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Seleccionar cliente</FormLabel>
-                    <SearchCustomerCombobox
-                      onValueChange={(_val, c) => {
-                        const customer = c as Customer;
-                        field.onChange(customer.id);
-                      }}
-                      className="w-full truncate sm:text-ellipsis"
-                    />
-                    <FormMessage />
-                    <FormDescription>Solo visualizará clientes activos</FormDescription>
-                  </FormItem>
-                )}
-              ></FormField>
-              <div className="grid sm:grid-cols-2 gap-4 w-full">
-                <FormField
-                  control={filterByCustomerAndDatesForm.control}
-                  name={"checkInDate"}
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col justify-between h-full">
-                      <FormLabel>{FORMSTATICS.checkInDate.label}</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full pl-3 text-left font-normal overflow-ellipsis truncate sm:text-ellipsis",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                // Verifica si es string
-                                typeof field.value === "string" ? (
-                                  formatPeruBookingDate(new Date(field.value).toISOString()).customPeruDateTime
-                                    .displayDateTime
-                                ) : (
-                                  <span>Escoja una fecha</span>
-                                )
-                              ) : (
-                                <span>Escoja una fecha</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={typeof field.value === "string" ? new Date(field.value) : undefined}
-                            onSelect={(val) => field.onChange(val?.toISOString() ?? "")}
-                            disabled={(date) => date < new Date("2000-01-01")}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <CustomFormDescription required={true} validateOptionalField={true} />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={filterByCustomerAndDatesForm.control}
-                  name={"checkOutDate"}
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col justify-between h-full">
-                      <FormLabel>{FORMSTATICS.checkOutDate.label}</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full pl-3 text-left font-normal overflow-ellipsis truncate sm:text-ellipsis",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                // Verifica si es string
-                                typeof field.value === "string" ? (
-                                  formatPeruBookingDate(new Date(field.value).toISOString()).customPeruDateTime
-                                    .displayDateTime
-                                ) : (
-                                  <span>Escoja una fecha</span>
-                                )
-                              ) : (
-                                <span>Escoja una fecha</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={typeof field.value === "string" ? new Date(field.value) : undefined}
-                            onSelect={(val) => field.onChange(val?.toISOString() ?? "")}
-                            disabled={(date) =>
-                              date < new Date("2000-01-01") ||
-                              new Date(filterByCheckInCheckOutForm.watch("checkInDate")) > date
-                            }
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <CustomFormDescription required={true} validateOptionalField={true} />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <SubmitButton></SubmitButton>
-            </form>
-          </Form>
-        </FilterReservationTabCardContent>
-      </Tabs>
+      <Form {...filterForm}>
+        <form onSubmit={filterForm.handleSubmit(onSubmit)} className="space-y-4 flex flex-col items-center">
+          <FormField
+            control={filterForm.control}
+            name="customerId"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Seleccionar cliente</FormLabel>
+                <div className="w-full">
+                  <SearchCustomerCombobox
+                    onValueChange={(_val, c) => {
+                      const customer = c as Customer;
+                      field.onChange(customer.id);
+                      // Guardar el cliente seleccionado y su información de visualización
+                      setSelectedCustomer(customer);
+                      // Construir el texto para mostrar
+                      const displayText = `${customer.name} - ${customer.documentNumber || ""}`;
+                      setCustomerDisplayInfo(displayText);
+                    }}
+                    // Usar el customerDisplayInfo si está disponible, sino usar el documentNumber
+                    defaultValue={customerDisplayInfo || selectedCustomer?.documentNumber}
+                    className="!w-full"
+                  />
+                </div>
+                <FormMessage />
+                <FormDescription>Solo visualizará clientes activos</FormDescription>
+              </FormItem>
+            )}
+          />
+          <FormItem className="w-full">
+            <FormLabel>Fechas de check-in y check-out</FormLabel>
+            <DateRangePicker
+              dateRange={dateRange}
+              setDateRange={(range) => {
+                setDateRange(range);
+                // No tocamos la lógica adicional ya que no afecta al cliente
+              }}
+              placeholder="Seleccionar fechas de check-in y check-out"
+              className="w-full"
+            />
+            <CustomFormDescription required={false} validateOptionalField={false} />
+            <FormMessage />
+          </FormItem>
+          <SubmitButton />
+        </form>
+      </Form>
     </div>
   );
 
@@ -583,7 +257,7 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
             <DialogTitle>{FILTER_DIALOG_MESSAGES.title}</DialogTitle>
             <DialogDescription>{FILTER_DIALOG_MESSAGES.description}</DialogDescription>
           </DialogHeader>
-          <FilteringTabs></FilteringTabs>
+          <FilteringForm />
           <DialogFooter>
             <DialogFooterContent />
           </DialogFooter>
@@ -603,7 +277,7 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
           <DrawerDescription>{FILTER_DIALOG_MESSAGES.description}</DrawerDescription>
         </DrawerHeader>
         <div className="px-2">
-          <FilteringTabs></FilteringTabs>
+          <FilteringForm />
         </div>
         <DrawerFooter>
           <DialogFooterContent />
