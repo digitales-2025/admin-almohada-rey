@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addDays, format, parseISO } from "date-fns";
@@ -6,7 +8,16 @@ import { useForm } from "react-hook-form";
 
 import { PaymentDetailMethod } from "@/app/(admin)/payments/_types/payment";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { DEFAULT_EXTENDED_CHECKOUT_TIME } from "@/utils/peru-datetime";
 import useExtendReservation from "../../_hooks/use-extend-reservation";
 import {
@@ -26,6 +37,9 @@ interface ExtensionReservationDialogProps {
 }
 
 export function ExtensionReservationDialog({ open, onOpenChange, reservation }: ExtensionReservationDialogProps) {
+  // Use media query to detect mobile screens
+  const isMobile = useMediaQuery("(max-width: 950px)");
+
   // Destructuring de las funciones y estados del hook de extensión
   const {
     onApplyLateCheckout,
@@ -86,14 +100,14 @@ export function ExtensionReservationDialog({ open, onOpenChange, reservation }: 
       lateCheckoutForm.reset();
       onOpenChange(false);
     }
-  }, [isSuccessLateCheckout]);
+  }, [isSuccessLateCheckout, lateCheckoutForm, onOpenChange]);
 
   useEffect(() => {
     if (isSuccessExtendStay) {
       extendStayForm.reset();
       onOpenChange(false);
     }
-  }, [isSuccessExtendStay]);
+  }, [isSuccessExtendStay, extendStayForm, onOpenChange]);
 
   // Manejador de envío para Late Checkout
   const onSubmitLateCheckout = (data: CreateLateCheckout) => {
@@ -111,27 +125,48 @@ export function ExtensionReservationDialog({ open, onOpenChange, reservation }: 
     });
   };
 
-  return (
-    <Dialog
-      open={open}
-      onOpenChange={(value) => {
-        // Prevenir cierre durante procesamiento
-        if (isProcessing && !value) return;
+  // Handle closing logic for both components
+  const handleOpenChange = (value: boolean) => {
+    // Prevenir cierre durante procesamiento
+    if (isProcessing && !value) return;
 
-        // Resetear formularios al cerrar
-        if (!value) {
-          lateCheckoutForm.reset();
-          extendStayForm.reset();
-        }
+    // Resetear formularios al cerrar
+    if (!value) {
+      lateCheckoutForm.reset();
+      extendStayForm.reset();
+    }
 
-        onOpenChange(value);
-      }}
-    >
-      <DialogContent className="sm:max-w-[950px] p-0 flex flex-col md:flex-row">
-        {/* Panel lateral con información de la reserva */}
-        <SideBarExtensionReservationDialog reservation={reservation} />
-        <div className="-pl-8">
-          {/* Encabezado con información de tipo de extensión */}
+    onOpenChange(value);
+  };
+
+  // Common content for both Dialog and Drawer
+  const renderDialogContent = () => (
+    <>
+      {/* Panel lateral con información de la reserva */}
+      {!isMobile && <SideBarExtensionReservationDialog reservation={reservation} />}
+
+      <div className={isMobile ? "w-full" : "-pl-8"}>
+        {/* Encabezado con información de tipo de extensión */}
+        {isMobile ? (
+          <DrawerHeader className="flex flex-row items-start py-4">
+            <div className="p-2.5">
+              {selectedTab === "late-checkout" ? (
+                <CalendarClock className="h-5 w-5 text-primary" />
+              ) : (
+                <CalendarDays className="h-5 w-5 text-primary" />
+              )}
+            </div>
+            <div>
+              <DrawerTitle className="text-lg">
+                {selectedTab === "late-checkout" ? "Late Checkout" : "Extender Estadía"}
+              </DrawerTitle>
+              <DrawerDescription>
+                {selectedTab === "late-checkout" ? "Extensión de horario de salida" : "Extensión de días de estadía"}
+              </DrawerDescription>
+            </div>
+            <DrawerClose className="absolute right-4 top-4" />
+          </DrawerHeader>
+        ) : (
           <DialogHeader className="flex flex-row items-start py-4">
             <div className="p-2.5">
               {selectedTab === "late-checkout" ? (
@@ -149,25 +184,45 @@ export function ExtensionReservationDialog({ open, onOpenChange, reservation }: 
               </DialogDescription>
             </div>
           </DialogHeader>
-          <ScrollArea className="max-h-[80vh] h-full">
-            <div className="pr-4">
-              <ExtensionReservationForm
-                extendStayForm={extendStayForm}
-                isProcessing={isProcessing}
-                lateCheckoutApplied={lateCheckoutApplied}
-                lateCheckoutForm={lateCheckoutForm}
-                onOpenChange={onOpenChange}
-                onSubmitExtendStay={onSubmitExtendStay}
-                onSubmitLateCheckout={onSubmitLateCheckout}
-                renderCount={renderCount}
-                reservation={reservation}
-                selectedTab={selectedTab}
-                setSelectedTab={setSelectedTab}
-              />
-            </div>
-          </ScrollArea>
-        </div>
-      </DialogContent>
+        )}
+        <ScrollArea className={`${isMobile ? "max-h-[60vh]" : "max-h-[80vh]"} h-full`}>
+          <div className={isMobile ? "px-4 pb-16" : "pr-4"}>
+            {isMobile && (
+              <div className="mb-4">
+                <SideBarExtensionReservationDialog reservation={reservation} />
+              </div>
+            )}
+            <ExtensionReservationForm
+              extendStayForm={extendStayForm}
+              isProcessing={isProcessing}
+              lateCheckoutApplied={lateCheckoutApplied}
+              lateCheckoutForm={lateCheckoutForm}
+              onOpenChange={onOpenChange}
+              onSubmitExtendStay={onSubmitExtendStay}
+              onSubmitLateCheckout={onSubmitLateCheckout}
+              renderCount={renderCount}
+              reservation={reservation}
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+            />
+          </div>
+        </ScrollArea>
+      </div>
+    </>
+  );
+
+  // Conditionally render Dialog or Drawer based on screen size
+  if (isMobile) {
+    return (
+      <Drawer open={open} onOpenChange={handleOpenChange}>
+        <DrawerContent className="px-0 h-[70vh]">{renderDialogContent()}</DrawerContent>
+      </Drawer>
+    );
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className="sm:max-w-[950px] p-0 flex flex-col md:flex-row">{renderDialogContent()}</DialogContent>
     </Dialog>
   );
 }

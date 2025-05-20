@@ -55,7 +55,7 @@ export default function ExtensionReservationForm({
         {!lateCheckoutApplied && (
           <TabsTrigger
             value="late-checkout"
-            className="data-[state=active]:bg-background data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary"
+            className="data-[state=active]:bg-background data-[state=active]:border-primary"
           >
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 shrink-0" />
@@ -65,7 +65,7 @@ export default function ExtensionReservationForm({
         )}
         <TabsTrigger
           value="extend-stay"
-          className="data-[state=active]:bg-background data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary"
+          className="data-[state=active]:bg-background data-[state=active]:border-primary"
         >
           <div className="flex items-center gap-2">
             <Bed className="h-4 w-4 shrink-0" />

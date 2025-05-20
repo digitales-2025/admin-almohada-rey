@@ -15,7 +15,7 @@ interface SideBarExtensionReservationDialogProps {
 
 export default function SideBarExtensionReservationDialog({ reservation }: SideBarExtensionReservationDialogProps) {
   return (
-    <div className="md:w-[300px] bg-gradient-to-b from-primary/40 to-primary/20 dark:from-primary/20 dark:to-primary/10 p-5">
+    <div className="lg:w-[300px] bg-gradient-to-b from-primary/40 to-primary/20 dark:from-primary/20 dark:to-primary/10 p-5 rounded-md">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">

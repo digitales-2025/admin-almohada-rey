@@ -162,7 +162,7 @@ export default function LateCheckoutTimeInput({
       </div>
 
       <div className="px-4 py-2">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="rounded-lg p-3 text-center justify-center flex flex-col">
             <span className="text-xs uppercase tracking-wide text-muted-foreground block mb-1">Fecha de Salida</span>
             <span className="font-medium text-foreground text-sm">
