@@ -136,43 +136,41 @@ export default function LateCheckoutForm({
                 )}
               />
 
-              {lateCheckoutForm.watch("paymentMethod") !== PaymentDetailMethod.PENDING_PAYMENT && (
-                <FormField
-                  control={lateCheckoutForm.control}
-                  name="paymentDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel htmlFor="payment-date-late" className="block mb-2 text-foreground">
-                        Fecha de Pago
-                      </FormLabel>
-                      <FormControl>
-                        <DatePicker
-                          value={field.value ? parse(field.value, "yyyy-MM-dd", new Date()) : undefined}
-                          onChange={(date) => {
-                            if (date) {
-                              const formattedDate = format(date, "yyyy-MM-dd");
-                              field.onChange(formattedDate);
-                            } else {
-                              field.onChange("");
-                            }
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
+              <FormField
+                control={lateCheckoutForm.control}
+                name="paymentDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="payment-date-late" className="block mb-2 text-foreground">
+                      Fecha de Pago
+                    </FormLabel>
+                    <FormControl>
+                      <DatePicker
+                        value={field.value ? parse(field.value, "yyyy-MM-dd", new Date()) : undefined}
+                        onChange={(date) => {
+                          if (date) {
+                            const formattedDate = format(date, "yyyy-MM-dd");
+                            field.onChange(formattedDate);
+                          } else {
+                            field.onChange("");
+                          }
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               {lateCheckoutForm.watch("paymentMethod") === PaymentDetailMethod.PENDING_PAYMENT && (
-                <div className="bg-secondary/10 border border-border rounded-lg p-4 shadow-sm">
+                <div className="bg-amber-100 dark:bg-slate-800 border-amber-300 dark:border-amber-800 rounded-lg p-4 shadow-sm">
                   <div className="flex items-start gap-3">
-                    <div className="bg-secondary/20 p-2 rounded-full flex-shrink-0">
-                      <AlertCircle className="h-5 w-5 text-secondary-foreground" />
+                    <div className="bg-amber-200 dark:bg-amber-800 p-2 rounded-full flex-shrink-0">
+                      <AlertCircle className="h-5 w-5 text-amber-400 dark:text-amber-500 " />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-foreground">Pago Pendiente</p>
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <p className="text-sm text-muted-foreground dark:text-white mt-1">
                         El cargo se registrará como pendiente. El cliente deberá realizar el pago antes de la fecha de
                         check-out.
                       </p>

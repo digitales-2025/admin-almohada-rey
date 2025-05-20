@@ -214,39 +214,42 @@ export default function ExtendedStayForm({
                     )}
                   />
 
-                  {extendStayForm.watch("paymentMethod") !== PaymentDetailMethod.PENDING_PAYMENT ? (
-                    <FormField
-                      control={extendStayForm.control}
-                      name="paymentDate"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-muted-foreground mb-2 block">Fecha de pago</FormLabel>
-                          <FormControl>
-                            <DatePicker
-                              value={field.value ? parse(field.value, "yyyy-MM-dd", new Date()) : undefined}
-                              onChange={(date) => {
-                                if (date) {
-                                  const formattedDate = format(date, "yyyy-MM-dd");
-                                  field.onChange(formattedDate);
-                                } else {
-                                  field.onChange("");
-                                }
-                              }}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  ) : (
-                    <div className="flex items-start gap-3 p-4 bg-secondary/10 rounded-lg border border-border">
-                      <AlertCircle className="h-5 w-5 text-secondary-foreground flex-shrink-0 mt-0.5" />
-                      <div>
-                        <div className="font-medium mb-1">Pago pendiente</div>
-                        <p className="text-sm text-muted-foreground">
-                          El cargo se registrará como pendiente. El cliente deberá realizar el pago antes de la fecha de
-                          check-out.
-                        </p>
+                  <FormField
+                    control={extendStayForm.control}
+                    name="paymentDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-muted-foreground mb-2 block">Fecha de pago</FormLabel>
+                        <FormControl>
+                          <DatePicker
+                            value={field.value ? parse(field.value, "yyyy-MM-dd", new Date()) : undefined}
+                            onChange={(date) => {
+                              if (date) {
+                                const formattedDate = format(date, "yyyy-MM-dd");
+                                field.onChange(formattedDate);
+                              } else {
+                                field.onChange("");
+                              }
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  {extendStayForm.watch("paymentMethod") === PaymentDetailMethod.PENDING_PAYMENT && (
+                    <div className="bg-amber-100 dark:bg-slate-800 border-amber-300 dark:border-amber-800 rounded-lg p-4 shadow-sm sm:col-span-2">
+                      <div className="flex items-start gap-3">
+                        <div className="bg-amber-200 dark:bg-amber-800 p-2 rounded-full flex-shrink-0">
+                          <AlertCircle className="h-5 w-5 text-amber-400 dark:text-amber-500 " />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-foreground">Pago Pendiente</p>
+                          <p className="text-sm text-muted-foreground dark:text-white mt-1">
+                            El cargo se registrará como pendiente. El cliente deberá realizar el pago antes de la fecha
+                            de check-out.
+                          </p>
+                        </div>
                       </div>
                     </div>
                   )}
