@@ -1,44 +1,28 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Separator } from "@radix-ui/react-separator";
-import { Switch } from "@radix-ui/react-switch";
 import { isBefore, isSameDay } from "date-fns";
-import { Check, ChevronsUpDown, ListCheck, MapPinHouse, Trash2, UserRoundCheck } from "lucide-react";
-import { Controller, UseFieldArrayReturn, UseFormReturn } from "react-hook-form";
+import { ListCheck, MapPinHouse, UserRoundCheck } from "lucide-react";
+import { UseFieldArrayReturn, UseFormReturn } from "react-hook-form";
+import { toast } from "sonner";
 
 import { CustomFormDescription } from "@/components/form/CustomFormDescription";
 import ErrorMessageForm from "@/components/form/ErrorMessageForm";
 import LoadingFormSkeleton from "@/components/form/LoadingFormSkeleton";
 import { TextareaWithIcon } from "@/components/form/TextareaWithIcon";
 import { InputWithIcon } from "@/components/input-with-icon";
-import { Button } from "@/components/ui/button";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { PhoneInput } from "@/components/ui/phone-input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sheet } from "@/components/ui/sheet";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
-import { SelectOption } from "@/types/form/select-option";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { formatPeruBookingDate, getPeruStartOfToday } from "@/utils/peru-datetime";
+import { processError } from "@/utils/process-error";
 import { useAllAvailableRoomsInTimeIntervalForUpdate } from "../../_hooks/use-roomAvailability";
-import {
-  DetailedReservation,
-  DetailedRoom,
-  DocumentType,
-  reservationStatusSelectOptions,
-  UpdateReservationInput,
-} from "../../_schemas/reservation.schemas";
+import { DetailedReservation, DetailedRoom, UpdateReservationInput } from "../../_schemas/reservation.schemas";
 import { FORMSTATICS, UPDATE_FORMSTATICS } from "../../_statics/forms";
-import { documentTypeStatusConfig } from "../../_types/document-type.enum.config";
-import { reservationStatusConfig } from "../../_types/reservation-enum.config";
 import { GenericAvailabilityFormUpdateParams } from "../../_types/room-availability-query-params";
 import UpdateBookingCalendarTime from "./UpdateBookingCalendarTime";
+import UpdateHeaderReservation from "./UpdateHeaderReservation";
+import UpdateReservationGuestTable from "./UpdateReservationGuestTable";
 
-interface UpdateReservationSheetFormProps
-  extends Omit<React.ComponentPropsWithRef<typeof Sheet>, "open" | "onOpenChange"> {
+interface UpdateReservationFormProps {
   children: React.ReactNode;
   form: UseFormReturn<UpdateReservationInput>;
   reservation: DetailedReservation;
@@ -46,112 +30,141 @@ interface UpdateReservationSheetFormProps
   onSubmit: (data: UpdateReservationInput) => void;
 }
 
+// Singleton para controlar las verificaciones de disponibilidad entre todos los componentes
+const availabilityControlSingleton = {
+  lastCheckedValues: new Map<
+    string,
+    {
+      roomId: string;
+      checkInDate: string;
+      checkOutDate: string;
+    }
+  >(),
+  isChecking: new Set<string>(),
+};
+
 export default function UpdateReservationForm({
   children,
   form,
   onSubmit,
   reservation,
   controlledFieldArray,
-}: UpdateReservationSheetFormProps) {
+}: UpdateReservationFormProps) {
+  // Referencias para optimizar verificaciones y estados
+  const initialLoadCompleted = useRef(false);
+  const reservationId = reservation.id;
+
+  // Estados de UI
   const [allowGuests, setAllowGuests] = useState(true);
   const [selectedRoom, setSelectedRoom] = useState<DetailedRoom | undefined>(reservation.room);
-  const [guestNumber, setGuestNumber] = useState<number>(0);
   const [isRoomAvailable, setIsRoomAvailable] = useState(true);
-  const [isChecking, setIsChecking] = useState(false);
+
+  // Estado para coordinar verificaciones entre padre e hijo
+  const [isParentCheckingAvailability, setIsParentCheckingAvailability] = useState(false);
+
+  // Determinación de reservación en el pasado (memoizada)
   const reservationCheckInIsInThePast = useMemo(() => {
     const today = getPeruStartOfToday();
     const reservationDate = new Date(reservation.checkInDate);
     return isBefore(reservationDate, today) || isSameDay(reservationDate, today);
-  }, [reservation]);
+  }, [reservation.checkInDate]);
 
+  // Extraer utilidades del formulario
   const { watch, register } = form;
-  const { fields, append, remove } = controlledFieldArray;
-  const watchFieldArray = watch("guests");
-  const controlledFields = fields.map((field, index) => {
-    const watchItem = watchFieldArray?.[index];
-    return {
-      ...field,
-      ...(watchItem ?? {}),
-    };
-  });
 
-  const originalRoom = useRef(reservation.room);
-  const defaultOriginalCheckInDate = useRef(form.getValues("checkInDate"));
-  const defaultOriginalCheckOutDate = useRef(form.getValues("checkOutDate"));
-
+  // Valores observados del formulario
   const checkInDate = watch("checkInDate");
   const checkOutDate = watch("checkOutDate");
   const roomId = watch("roomId");
 
+  // Configuración para verificar disponibilidad
   const defaultCheckInCheckOutDates: GenericAvailabilityFormUpdateParams = {
-    checkInDate: checkInDate,
-    checkOutDate: checkOutDate,
-    reservationId: reservation.id,
+    checkInDate,
+    checkOutDate,
+    reservationId,
   };
 
-  // 1. Referencia para almacenar el último valor verificado
-  const lastCheckedRef = useRef({
-    roomId: originalRoom.current.id,
-    checkInDate: defaultOriginalCheckInDate.current,
-    checkOutDate: defaultOriginalCheckOutDate.current,
-  });
-
+  // Hook para verificar disponibilidad
   const { isLoading, isError, error, availableRooms, checkAvailability, refetch } =
-    useAllAvailableRoomsInTimeIntervalForUpdate(defaultCheckInCheckOutDates, reservation.id);
-  // const [isOriginalInterval, setIsOriginalInterval] = useState(true);
+    useAllAvailableRoomsInTimeIntervalForUpdate(defaultCheckInCheckOutDates, reservationId);
 
-  const memoizedCheckAvailability = useCallback(() => {
-    // Si ya está verificando, no iniciar otra verificación
-    if (isChecking) return;
+  // Función optimizada para verificar disponibilidad (reutilizable)
+  const verifyAvailability = useCallback(() => {
+    // Solo verificar si hay valores válidos y no estamos en el pasado
+    if (!roomId || !checkInDate || !checkOutDate || reservationCheckInIsInThePast) {
+      return;
+    }
 
-    // Comparar con valores anteriores para evitar verificaciones redundantes
+    // Crear ID único para esta verificación
+    const verificationId = `${reservationId}-${roomId}`;
+
+    // Evitar verificaciones simultáneas
+    if (availabilityControlSingleton.isChecking.has(verificationId)) {
+      return;
+    }
+
+    // Verificar si esta combinación ya se procesó
+    const lastCheckedValue = availabilityControlSingleton.lastCheckedValues.get(verificationId);
     if (
-      lastCheckedRef.current.roomId === roomId &&
-      lastCheckedRef.current.checkInDate === checkInDate &&
-      lastCheckedRef.current.checkOutDate === checkOutDate
+      lastCheckedValue &&
+      lastCheckedValue.roomId === roomId &&
+      lastCheckedValue.checkInDate === checkInDate &&
+      lastCheckedValue.checkOutDate === checkOutDate
     ) {
       return;
     }
 
     // Marcar como verificando
-    setIsChecking(true);
+    availabilityControlSingleton.isChecking.add(verificationId);
+    // Señalar que estamos verificando (para coordinar con el componente hijo)
+    setIsParentCheckingAvailability(true);
 
-    // Actualizar referencia
-    lastCheckedRef.current = {
-      roomId,
-      checkInDate,
-      checkOutDate,
-    };
+    try {
+      // Actualizar registro de valores verificados
+      availabilityControlSingleton.lastCheckedValues.set(verificationId, {
+        roomId,
+        checkInDate,
+        checkOutDate,
+      });
 
-    // Usar un timeout más largo para reducir peticiones durante cambios rápidos
-    const timeoutId = setTimeout(() => {
+      // Realizar la verificación
       checkAvailability({
         checkInDate,
         checkOutDate,
-        reservationId: reservation.id,
+        reservationId,
       });
-
-      // Establecer un timeout adicional para finalizar el estado de carga
+    } finally {
+      // Quitar marca de verificación después de un tiempo
       setTimeout(() => {
-        setIsChecking(false);
+        availabilityControlSingleton.isChecking.delete(verificationId);
+        setIsParentCheckingAvailability(false);
       }, 300);
-    }, 500); // Debounce de 500ms
-
-    // Limpieza del timeout si cambian las dependencias antes de que se ejecute
-    return () => clearTimeout(timeoutId);
-  }, [roomId, checkInDate, checkOutDate, isChecking, checkAvailability, reservation.id]);
+    }
+  }, [roomId, checkInDate, checkOutDate, reservationId, reservationCheckInIsInThePast, checkAvailability]);
 
   // Efecto que ejecuta la verificación cuando cambian los valores importantes
   useEffect(() => {
-    // Solo verificar si hay valores válidos para todos los campos necesarios
-    if (roomId && checkInDate && checkOutDate) {
-      const cleanup = memoizedCheckAvailability();
-      return cleanup;
-    }
-  }, [memoizedCheckAvailability, roomId, checkInDate, checkOutDate]);
+    verifyAvailability();
+  }, [verifyAvailability]);
 
+  // Manejo de errores en la verificación
+  useEffect(() => {
+    if (isError && error) {
+      const processedError = processError(error);
+      toast.error(`Error al verificar disponibilidad: ${processedError}`);
+    }
+  }, [isError, error]);
+
+  // Efecto para marcar cuando la carga inicial se ha completado
+  useEffect(() => {
+    if (!isLoading && !initialLoadCompleted.current) {
+      initialLoadCompleted.current = true;
+    }
+  }, [isLoading]);
+
+  // Funciones de manejo de huéspedes
   const handleAddGuest = () => {
-    append({
+    controlledFieldArray.append({
       name: "",
       age: 0,
       documentType: "DNI",
@@ -160,538 +173,183 @@ export default function UpdateReservationForm({
       email: undefined,
       additionalInfo: undefined,
     });
-    setGuestNumber((prev) => prev + 1);
   };
 
   const handleRemoveGuest = (index: number) => {
-    remove(index);
-    setGuestNumber((prev) => prev - 1);
+    controlledFieldArray.remove(index);
   };
 
-  const roomOptions: SelectOption<string>[] =
-    availableRooms?.map((room) => {
-      const roomNumber = room.number ?? "Sin número";
-      const roomType = room.RoomTypes?.name.toUpperCase() ?? "Sin tipo";
-      const roomPrice = room.RoomTypes?.price ?? 0;
-      const roomCapacity = room.RoomTypes?.guests ?? 0;
+  // Opciones de habitaciones
+  const roomOptions = useMemo(
+    () =>
+      availableRooms?.map((room) => {
+        const roomNumber = room.number ?? "Sin número";
+        const roomType = room.RoomTypes?.name.toUpperCase() ?? "Sin tipo";
+        const roomPrice = room.RoomTypes?.price ?? 0;
+        const roomCapacity = room.RoomTypes?.guests ?? 0;
 
-      return {
-        label: `${roomNumber} - ${roomType} ( ${roomCapacity}🧍) - ${roomPrice.toLocaleString("es-PE", {
-          style: "currency",
-          currency: "PEN",
-        })}`,
-        value: room.id as string, // Type assertion to ensure TypeScript knows this is always a string
-      };
-    }) ?? [];
+        return {
+          label: `${roomNumber} - ${roomType} ( ${roomCapacity}🧍) - ${roomPrice.toLocaleString("es-PE", {
+            style: "currency",
+            currency: "PEN",
+          })}`,
+          value: room.id as string,
+        };
+      }) ?? [],
+    [availableRooms]
+  );
 
-  const onRoomSelected = (room?: DetailedRoom) => {
+  const onRoomSelected = useCallback((room?: DetailedRoom) => {
     if (!room) return;
-    // if (isOriginalInterval && room.id === originalRoom.current.id) {
-    //   setSelectedRoom(originalRoom.current);
-    // }
     setSelectedRoom(room);
-  };
+  }, []);
 
-  const customerOptions: SelectOption<string>[] = [
-    {
-      label:
-        reservation.customer.name +
-        " " +
-        documentTypeStatusConfig[reservation.customer.documentType].name +
-        `(${reservation.customer.documentNumber})`,
-      value: reservation.customerId,
-    },
-  ];
-
-  if (isLoading) {
-    return <LoadingFormSkeleton></LoadingFormSkeleton>;
+  // Estados de carga y error - Solo mostrar loading skeleton en la carga inicial
+  if (isLoading && !initialLoadCompleted.current) {
+    return <LoadingFormSkeleton />;
   }
+
   if (isError) {
-    return <ErrorMessageForm error={error} refetch={refetch}></ErrorMessageForm>;
+    return <ErrorMessageForm error={error} refetch={refetch} />;
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 gap-4 px-6 ">
-        <FormField
-          control={form.control}
-          name="customerId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{UPDATE_FORMSTATICS.customerId.label}</FormLabel>
-              <Select disabled onValueChange={field.onChange} value={field.value}>
-                <FormControl>
-                  <SelectTrigger className="w-full text-ellipsis capitalize truncate">
-                    <SelectValue placeholder="Seleccione un cliente" className="capitalize" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectGroup>
-                    {customerOptions.map((customer) => {
-                      return (
-                        <SelectItem className="capitalize" key={customer.value} value={customer.value}>
-                          <span>{customer.label}</span>
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 grid grid-cols-1 gap-4 px-6">
+        <div>
+          <UpdateHeaderReservation
+            availableRooms={availableRooms}
+            form={form}
+            onRoomSelected={onRoomSelected}
+            reservation={reservation}
+            roomOptions={roomOptions}
+          />
+        </div>
+
+        <Separator />
+
+        {/* Selección de fechas - Solo visible si la reserva no está en el pasado */}
+        <div>
+          {!reservationCheckInIsInThePast ? (
+            <div className="space-y-2">
+              <UpdateBookingCalendarTime
+                form={form}
+                roomId={roomId}
+                onRoomAvailabilityChange={setIsRoomAvailable}
+                reservation={reservation}
+                parentIsCheckingAvailability={isParentCheckingAvailability}
+              />
               <CustomFormDescription
-                required={UPDATE_FORMSTATICS.customerId.required}
-                validateOptionalField={true}
-              ></CustomFormDescription>
-              <FormMessage>
-                {form.formState.errors.customerId && (
-                  <span className="text-destructive">{form.formState.errors.customerId.message}</span>
-                )}
-              </FormMessage>
-            </FormItem>
-          )}
-        />
+                required={UPDATE_FORMSTATICS.observations.required}
+                validateOptionalField={false}
+              />
+              {form.formState.errors.checkInDate || form.formState.errors.checkOutDate ? (
+                <FormMessage className="text-destructive">
+                  {form.formState.errors.checkInDate?.message || form.formState.errors.checkOutDate?.message}
+                </FormMessage>
+              ) : null}
 
-        <FormField
-          control={form.control}
-          name="roomId"
-          render={({ field }) => (
-            <FormItem className="w-full">
-              <FormLabel>{UPDATE_FORMSTATICS.roomId.label}</FormLabel>
-              <FormControl>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        className={cn(
-                          "w-full justify-between capitalize truncate",
-                          !field.value && "text-muted-foreground"
-                        )}
-                        disabled={roomOptions.length === 0}
-                      >
-                        {field.value
-                          ? roomOptions.find((room) => room.value === field.value)?.label
-                          : UPDATE_FORMSTATICS.roomId.placeholder}
-                        <ChevronsUpDown className="opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-full p-0">
-                    <Command>
-                      <CommandInput placeholder={UPDATE_FORMSTATICS.roomId.placeholder} className="h-9" />
-                      <CommandList>
-                        <CommandEmpty>No hay habitaciones disponibles</CommandEmpty>
-                        <CommandGroup>
-                          {roomOptions.map((room) => (
-                            <CommandItem
-                              value={room.value}
-                              key={room.value}
-                              onSelect={() => {
-                                form.setValue("roomId", room.value);
-                                // const detailedRoom = isOriginalInterval
-                                //   ? reservation.room
-                                //   : availableRooms?.find((r) => r.id === room.value);
-                                const detailedRoom = availableRooms?.find((r) => r.id === room.value);
-                                onRoomSelected(detailedRoom);
-                              }}
-                            >
-                              {room.label}
-                              <Check
-                                className={cn("ml-auto", room.value === field.value ? "opacity-100" : "opacity-0")}
-                              />
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <Separator className="w-full" />
-
-        {!reservationCheckInIsInThePast && (
-          <div className="space-y-2">
-            <UpdateBookingCalendarTime
-              form={form}
-              roomId={roomId}
-              onRoomAvailabilityChange={setIsRoomAvailable}
-              reservation={reservation}
-              // isOriginalInterval={isOriginalInterval}
-              // originalRoom={originalRoom.current}
-            />
-            <CustomFormDescription
-              required={UPDATE_FORMSTATICS.observations.required}
-              validateOptionalField={false}
-            ></CustomFormDescription>
-            {form.formState.errors.checkInDate || form.formState.errors.checkOutDate ? (
-              <FormMessage className="text-destructive">
-                {form.formState.errors.checkInDate?.message || form.formState.errors.checkOutDate?.message}
-              </FormMessage>
-            ) : null}
-
-            {!isRoomAvailable && roomId && (
-              <FormMessage className="text-destructive">
-                La habitación seleccionada no está disponible para estas fechas. Por favor, selecciona otras fechas o
-                una habitación diferente.
-              </FormMessage>
-            )}
-          </div>
-        )}
-
-        {reservationCheckInIsInThePast && (
-          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-            <div className="space-y-0.5">
-              <FormLabel>Reserva en el pasado</FormLabel>
-              <FormDescription>
-                La reserva no puede ser editada o reprogramada porque la fecha de check-in es anterior a la fecha
-                actual.
-              </FormDescription>
-              <FormDescription>
-                <span className="block">
-                  Fecha de check-in: {formatPeruBookingDate(reservation.checkInDate).localeDateString}
-                </span>
-                <span className="block">
-                  Fecha de check-out: {formatPeruBookingDate(reservation.checkOutDate).localeDateString}
-                </span>
-              </FormDescription>
-            </div>
-            <FormControl>
-              <UserRoundCheck className="text-primary shrink-0" />
-            </FormControl>
-          </FormItem>
-        )}
-
-        <Separator orientation="horizontal" />
-
-        <FormField
-          control={form.control}
-          name="status"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel htmlFor="city">{UPDATE_FORMSTATICS.status.label}</FormLabel>
-              <Select disabled onValueChange={field.onChange} value={field.value}>
-                <FormControl>
-                  <SelectTrigger className="w-full text-ellipsis">
-                    <SelectValue placeholder="Seleccione el estado de reserva" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectGroup>
-                    {Object.values(reservationStatusSelectOptions).map((status) => {
-                      const {
-                        icon: Icon,
-                        borderColor,
-                        textColor,
-                        hoverBgColor,
-                        hoverTextColor,
-                        hoverBorderColor,
-                      } = reservationStatusConfig[status.value];
-
-                      return (
-                        <SelectItem
-                          key={status.value}
-                          value={status.value}
-                          className={cn(
-                            "flex items-center gap-2 mb-1",
-                            borderColor,
-                            textColor,
-                            hoverBgColor,
-                            hoverTextColor,
-                            hoverBorderColor ?? ""
-                          )}
-                        >
-                          <Icon className={`size-4`} />
-                          <span>{status.label}</span>
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              {
-                <CustomFormDescription
-                  required={UPDATE_FORMSTATICS.status.required}
-                  validateOptionalField={true}
-                ></CustomFormDescription>
-              }
-              <FormDescription>
-                Solo se puede actualizar el estado de la reserva por medio de eventos externos.
-              </FormDescription>
-              {form.formState.errors.status && (
-                <FormMessage className="text-destructive">{form.formState.errors.status.message}</FormMessage>
+              {!isRoomAvailable && roomId && (
+                <FormMessage className="text-destructive">
+                  La habitación seleccionada no está disponible para estas fechas. Por favor, selecciona otras fechas o
+                  una habitación diferente.
+                </FormMessage>
               )}
+            </div>
+          ) : (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+              <div className="space-y-0.5">
+                <FormLabel>Reserva en el pasado</FormLabel>
+                <FormDescription>
+                  La reserva no puede ser editada o reprogramada porque la fecha de check-in es anterior a la fecha
+                  actual.
+                </FormDescription>
+                <FormDescription>
+                  <span className="block">
+                    Fecha de check-in: {formatPeruBookingDate(reservation.checkInDate).localeDateString}
+                  </span>
+                  <span className="block">
+                    Fecha de check-out: {formatPeruBookingDate(reservation.checkOutDate).localeDateString}
+                  </span>
+                </FormDescription>
+              </div>
+              <FormControl>
+                <UserRoundCheck className="text-primary shrink-0" />
+              </FormControl>
             </FormItem>
           )}
-        />
+        </div>
+
+        <Separator />
 
         <FormField
           control={form.control}
-          name={"origin"}
+          name="origin"
           render={({ field }) => (
             <FormItem>
               <FormLabel>{UPDATE_FORMSTATICS.origin.label}</FormLabel>
               <FormControl>
                 <InputWithIcon {...field} Icon={MapPinHouse} placeholder={UPDATE_FORMSTATICS.origin.placeholder} />
               </FormControl>
-              <CustomFormDescription
-                required={UPDATE_FORMSTATICS.origin.required}
-                validateOptionalField={true}
-              ></CustomFormDescription>
+              <CustomFormDescription required={UPDATE_FORMSTATICS.origin.required} validateOptionalField={true} />
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Separator orientation="horizontal" />
+        <Separator />
 
-        {selectedRoom?.RoomTypes?.guests && (
-          <div className="space-y-4">
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-              <div className="space-y-0.5">
-                <FormLabel>¿Acompañantes?</FormLabel>
-                <FormDescription>
-                  Puede agregar mas acompañantes dependiendo de la capacidad del tipo de habitación que escoja.
-                  {selectedRoom?.RoomTypes?.guests && (
-                    <span>
-                      {" "}
-                      Puede agregar hasta{" "}
-                      <span className="text-base font-bold">{selectedRoom?.RoomTypes?.guests - 1}</span> acompañantes.
-                    </span>
-                  )}
-                </FormDescription>
-              </div>
-              <FormControl>
-                <Switch checked={allowGuests} onCheckedChange={setAllowGuests} />
-              </FormControl>
-            </FormItem>
-          </div>
-        )}
-
-        {allowGuests && selectedRoom?.RoomTypes?.guests && (
-          <div className="flex flex-col gap-4 animate-ease-in">
-            <FormLabel>{UPDATE_FORMSTATICS.guests.label}</FormLabel>
-            <Table className="w-full overflow-auto">
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[100px]">Nombre y Apell.</TableHead>
-                  <TableHead>Edad</TableHead>
-                  <TableHead>Tipo de Identidad</TableHead>
-                  <TableHead>Nro. de Identidad</TableHead>
-                  <TableHead>Telefono</TableHead>
-                  <TableHead className="text-center">Email</TableHead>
-                  <TableHead className="text-center">Adicional</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {controlledFields.map((field, index) => {
-                  const isDocumentTypeSelected = field.documentType !== undefined;
-                  return (
-                    <TableRow key={field.id} className="animate-fade-down duration-500">
-                      <TableCell>
-                        <FormItem>
-                          <Input {...register(`guests.${index}.name` as const)} className="min-w-[100px] w-full" />
-                          <CustomFormDescription
-                            required={UPDATE_FORMSTATICS.guests.subFields?.name?.required ?? false}
-                            validateOptionalField={true}
-                          ></CustomFormDescription>
-                          <FormMessage>
-                            {form.formState.errors.guests?.[index]?.name &&
-                              form.formState.errors.guests[index]?.name?.message}
-                          </FormMessage>
-                        </FormItem>
-                      </TableCell>
-                      <TableCell>
-                        <FormItem className="min-w-[50px] w-full">
-                          <Input {...register(`guests.${index}.age` as const)} type="number" min={0} placeholder="0" />
-                          <CustomFormDescription
-                            required={UPDATE_FORMSTATICS.guests.subFields?.age.required ?? false}
-                            validateOptionalField={true}
-                          ></CustomFormDescription>
-                          <FormMessage>
-                            {form.formState.errors.guests?.[index]?.age &&
-                              form.formState.errors.guests[index]?.age?.message}
-                          </FormMessage>
-                        </FormItem>
-                      </TableCell>
-                      <TableCell>
-                        <FormItem>
-                          <Select
-                            {...register(`guests.${index}.documentType` as const)}
-                            defaultValue={field.documentType}
-                            onValueChange={(val) => {
-                              form.setValue(`guests.${index}.documentType`, val as DocumentType);
-                            }}
-                          >
-                            <FormControl>
-                              <SelectTrigger className="min-w-[100px] w-full">
-                                <SelectValue
-                                  placeholder={UPDATE_FORMSTATICS.guests.subFields?.documentType.placeholder}
-                                  className="text-ellipsis"
-                                />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {Object.values(documentTypeStatusConfig).map((documentType, idx) => (
-                                <SelectItem key={`${documentType.value}-${idx}`} value={documentType.value}>
-                                  {documentType.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <CustomFormDescription
-                            required={UPDATE_FORMSTATICS.guests.subFields?.documentType.required ?? false}
-                            validateOptionalField={true}
-                          ></CustomFormDescription>
-                          <FormMessage>
-                            {form.formState.errors.guests?.[index]?.documentType &&
-                              form.formState.errors.guests[index]?.documentType?.message}
-                          </FormMessage>
-                        </FormItem>
-                      </TableCell>
-                      <TableCell>
-                        <FormItem>
-                          <Input
-                            disabled={!isDocumentTypeSelected}
-                            {...register(`guests.${index}.documentId` as const)}
-                          />
-                          <CustomFormDescription
-                            required={UPDATE_FORMSTATICS.guests.subFields?.documentId.required ?? false}
-                            validateOptionalField={true}
-                          ></CustomFormDescription>
-                          <FormMessage>
-                            {form.formState.errors.guests?.[index]?.documentId &&
-                              form.formState.errors.guests[index]?.documentId?.message}
-                          </FormMessage>
-                        </FormItem>
-                      </TableCell>
-                      <TableCell>
-                        <Controller
-                          control={form.control}
-                          name={`guests.${index}.phone`}
-                          render={({ field: { onChange, value } }) => (
-                            <FormItem>
-                              <FormControl>
-                                <PhoneInput
-                                  className="min-w-[170px] w-full"
-                                  defaultCountry="PE"
-                                  placeholder="999 888 777"
-                                  value={value}
-                                  onChange={onChange}
-                                />
-                              </FormControl>
-                              <CustomFormDescription
-                                required={FORMSTATICS.guests.subFields?.phone.required ?? false}
-                                validateOptionalField={true}
-                              ></CustomFormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <FormItem>
-                          <Input className="min-w-[100px] w-full" {...register(`guests.${index}.email` as const)} />
-                          <CustomFormDescription
-                            required={UPDATE_FORMSTATICS.guests.subFields?.email.required ?? false}
-                            validateOptionalField={true}
-                          ></CustomFormDescription>
-                          <FormMessage>
-                            {form.formState.errors.guests?.[index]?.email &&
-                              form.formState.errors.guests[index]?.email?.message}
-                          </FormMessage>
-                        </FormItem>
-                      </TableCell>
-                      <TableCell>
-                        <FormItem>
-                          <Textarea
-                            className="min-w-[100px] w-full"
-                            {...register(`guests.${index}.additionalInfo` as const, {
-                              setValueAs: (v) => (v === "" ? undefined : String(v)),
-                            })}
-                          />
-                          <CustomFormDescription
-                            required={FORMSTATICS.guests.subFields?.additionalInfo.required ?? false}
-                            validateOptionalField={true}
-                          ></CustomFormDescription>
-                          <FormMessage>
-                            {form.formState.errors.guests?.[index]?.additionalInfo &&
-                              form.formState.errors.guests[index]?.additionalInfo?.message}
-                          </FormMessage>
-                        </FormItem>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="hover:bg-destructive hover:text-white"
-                          size="sm"
-                          onClick={() => handleRemoveGuest(index)}
-                        >
-                          <Trash2 />
-                          {/* Eliminar */}
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-            <div className="w-full flex flex-col gap-2 justify-center items-center py-4">
-              <Button
-                variant={"outline"}
-                disabled={
-                  selectedRoom?.RoomTypes?.guests && guestNumber >= selectedRoom?.RoomTypes?.guests - 1 ? true : false
-                }
-                type="button"
-                onClick={handleAddGuest}
-                className="flex items-center gap-2"
-              >
-                <ListCheck className="size-4" />
-                Añadir Huésped
-                {selectedRoom?.RoomTypes?.guests && (
-                  <div>
-                    {"("}
-                    <span className="text-primary text-base font-bold">
-                      {/* -1 beacause of the current guest who is making the reservation */}
-                      {selectedRoom?.RoomTypes?.guests - 1 - guestNumber}
-                    </span>{" "}
-                    lugar{selectedRoom?.RoomTypes?.guests > 1 ? "es" : ""} restante
-                    {selectedRoom?.RoomTypes?.guests > 1 ? "s" : ""}
-                    {")"}
-                  </div>
-                )}
-              </Button>
-              <CustomFormDescription
-                required={FORMSTATICS.guests.required}
-                validateOptionalField={true}
-              ></CustomFormDescription>
-              {form.formState.errors.guests && (
-                <FormMessage className="text-destructive">{form.formState.errors.guests.message}</FormMessage>
-              )}
+        {/* Sección de huéspedes - Siempre ocupa 2 columnas */}
+        <div>
+          {selectedRoom?.RoomTypes?.guests && (
+            <div className="mb-4">
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                <div className="space-y-0.5">
+                  <FormLabel>¿Acompañantes?</FormLabel>
+                  <FormDescription>
+                    Puede agregar mas acompañantes dependiendo de la capacidad del tipo de habitación que escoja.
+                    {selectedRoom?.RoomTypes?.guests && (
+                      <span>
+                        {" "}
+                        Puede agregar hasta{" "}
+                        <span className="text-base font-bold">{selectedRoom?.RoomTypes?.guests - 1}</span> acompañantes.
+                      </span>
+                    )}
+                  </FormDescription>
+                </div>
+                <FormControl>
+                  <Switch checked={allowGuests} onCheckedChange={setAllowGuests} />
+                </FormControl>
+              </FormItem>
             </div>
-          </div>
-        )}
+          )}
 
-        <Separator orientation="horizontal" />
+          {allowGuests && selectedRoom?.RoomTypes?.guests && (
+            <UpdateReservationGuestTable
+              controlledFieldArray={controlledFieldArray}
+              form={form}
+              handleAddGuest={handleAddGuest}
+              handleRemoveGuest={handleRemoveGuest}
+              register={register}
+              selectedRoom={selectedRoom}
+              watch={watch}
+            />
+          )}
+        </div>
 
+        <Separator />
+
+        {/* Razón y observaciones - Ocupando las 2 columnas */}
         <FormField
           control={form.control}
-          name={"reason"}
+          name="reason"
           render={({ field }) => (
             <FormItem>
               <FormLabel>{FORMSTATICS.reason.label}</FormLabel>
               <FormControl>
                 <TextareaWithIcon {...field} Icon={UserRoundCheck} placeholder={FORMSTATICS.reason.placeholder} />
               </FormControl>
-              <CustomFormDescription
-                required={FORMSTATICS.reason.required}
-                validateOptionalField={true}
-              ></CustomFormDescription>
+              <CustomFormDescription required={FORMSTATICS.reason.required} validateOptionalField={true} />
               <FormMessage />
             </FormItem>
           )}
@@ -699,22 +357,21 @@ export default function UpdateReservationForm({
 
         <FormField
           control={form.control}
-          name={"observations"}
+          name="observations"
           render={({ field }) => (
             <FormItem>
               <FormLabel>{FORMSTATICS.observations.label}</FormLabel>
               <FormControl>
                 <TextareaWithIcon {...field} Icon={ListCheck} placeholder={FORMSTATICS.observations.placeholder} />
               </FormControl>
-              <CustomFormDescription
-                required={FORMSTATICS.observations.required}
-                validateOptionalField={true}
-              ></CustomFormDescription>
+              <CustomFormDescription required={FORMSTATICS.observations.required} validateOptionalField={true} />
               <FormMessage />
             </FormItem>
           )}
         />
-        {children}
+
+        {/* Botones u otros elementos pasados como children */}
+        <div>{children}</div>
       </form>
     </Form>
   );

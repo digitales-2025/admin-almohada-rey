@@ -342,19 +342,21 @@ export function PaymentStatusColumn({
                           Editar detalle
                         </Button>
 
-                        <Button
-                          type="button"
-                          variant={"outline"}
-                          size="sm"
-                          className="h-7 border-border text-xs text-foreground hover:bg-accent"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRemoveDetail(detail);
-                          }}
-                        >
-                          <Trash2 className="mr-1 h-3 w-3" />
-                          Eliminar detalle
-                        </Button>
+                        {detail.type !== "LATE_CHECKOUT" && (
+                          <Button
+                            type="button"
+                            variant={"outline"}
+                            size="sm"
+                            className="h-7 border-border text-xs text-foreground hover:bg-accent"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveDetail(detail);
+                            }}
+                          >
+                            <Trash2 className="mr-1 h-3 w-3" />
+                            Eliminar detalle
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>

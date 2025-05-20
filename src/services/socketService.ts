@@ -22,6 +22,13 @@ type EventsMap = {
     timestamp: string;
   };
   getReservationsInInterval: { checkInDate: string; checkOutDate: string };
+  checkoutAvailabilityChecked: {
+    roomId: string;
+    originalCheckoutDate: string;
+    newCheckoutDate: string;
+    isAvailable: boolean;
+    timestamp: string;
+  };
 };
 
 class SocketService {
@@ -33,7 +40,6 @@ class SocketService {
     if (!this.socket) {
       // USAR LA URL de ENV
       const socketUrl = `${process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000"}/reservations`;
-      console.log("Intentando conectar a:", socketUrl);
 
       // Opciones de conexión optimizadas
       this.socket = io(socketUrl, {
@@ -47,8 +53,6 @@ class SocketService {
       });
 
       this.socket.on("connect", () => {
-        console.log("Socket conectado:", this.socket?.id);
-
         // Limpiar timer de reconexión si existe
         if (this.reconnectTimer) {
           clearTimeout(this.reconnectTimer);
@@ -64,34 +68,24 @@ class SocketService {
       });
 
       this.socket.on("disconnect", (reason) => {
-        console.log(`Socket desconectado: ${reason}`);
-
         // Si la desconexión no fue intencional, iniciar reconexión manual
         if (reason === "io server disconnect" || reason === "transport close") {
           this.manualReconnect();
         }
       });
 
-      this.socket.on("connect_error", (error) => {
-        console.error("Error de conexión socket:", error);
-        console.log("Intentando con polling...");
-
+      this.socket.on("connect_error", () => {
         // Si falla, intentar con polling
         if (this.socket) {
           this.socket.io.opts.transports = ["polling", "websocket"];
         }
       });
 
-      this.socket.io.on("reconnect_attempt", (attempt) => {
-        console.log(`Intento de reconexión ${attempt}`);
-      });
+      this.socket.io.on("reconnect_attempt", () => {});
 
-      this.socket.io.on("reconnect_error", (error) => {
-        console.error("Error de reconexión:", error);
-      });
+      this.socket.io.on("reconnect_error", () => {});
 
       this.socket.io.on("reconnect_failed", () => {
-        console.error("Falló la reconexión después de todos los intentos");
         this.manualReconnect();
       });
     }
@@ -103,7 +97,6 @@ class SocketService {
     if (this.reconnectTimer) return;
 
     this.reconnectTimer = setTimeout(() => {
-      console.log("Intentando reconexión manual...");
       if (this.socket) {
         this.socket.disconnect();
         this.socket = null;
@@ -143,7 +136,6 @@ class SocketService {
   // Método genérico para emitir eventos con tipo
   emit<E extends keyof EventsMap>(event: E, data?: EventsMap[E]) {
     if (!this.socket?.connected) {
-      console.log(`Socket no conectado. Intentando conectar antes de emitir ${event}...`);
       this.connect();
 
       // Esperar 500ms para dar tiempo a la conexión
@@ -207,6 +199,19 @@ class SocketService {
     }) => void
   ) {
     return this.on("reservationsInInterval", handler);
+  }
+
+  // Método para escuchar eventos de verificación de disponibilidad de checkout extendido
+  onCheckoutAvailabilityChecked(
+    handler: (data: {
+      roomId: string;
+      originalCheckoutDate: string;
+      newCheckoutDate: string;
+      isAvailable: boolean;
+      timestamp: string;
+    }) => void
+  ) {
+    return this.on("checkoutAvailabilityChecked", handler);
   }
 
   // Método para solicitar reservaciones en un intervalo

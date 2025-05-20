@@ -44,7 +44,7 @@ interface TransitionReservationStatusDialogProps extends ComponentPropsWithoutRe
 export function TransitionReservationStatusDialog({
   reservation,
   newStatus,
-  showTrigger = true,
+  showTrigger = false,
   onSuccess,
   ...props
 }: TransitionReservationStatusDialogProps) {

@@ -100,13 +100,6 @@ export function UpdateReservationSheet({ reservation, open, onOpenChange }: Upda
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updateReservationResponse.isSuccess]);
 
-  // useEffect(() => {
-  //   if (open) {
-  //     form.reset(defaultFormValues);
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [open, reservation]);
-
   const onSubmit = async (input: UpdateReservationInput) => {
     const params: UpdateParams = {
       id: reservation.id,
@@ -140,7 +133,7 @@ export function UpdateReservationSheet({ reservation, open, onOpenChange }: Upda
             reservation={reservation}
           >
             <SheetFooter className="gap-2 pt-2 sm:space-x-0">
-              <div className="flex flex-row-reverse gap-2">
+              <div className="flex flex-row-reverse gap-2 justify-center">
                 <Button type="submit" disabled={updateReservationResponse.isLoading}>
                   {updateReservationResponse.isLoading && (
                     <RefreshCcw className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />

@@ -62,6 +62,7 @@ export type PaymentDetail = {
 export enum PaymentDetailType {
   ROOM_RESERVATION = "ROOM_RESERVATION",
   EXTRA_SERVICE = "EXTRA_SERVICE",
+  LATE_CHECKOUT = "LATE_CHECKOUT",
 }
 
 export enum PaymentDetailMethod {

@@ -41,7 +41,7 @@ function CalendarBig({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn("p-3", className)}
+      className={cn("sm:p-3", className)}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
@@ -56,10 +56,10 @@ function CalendarBig({
         nav_button_next: "absolute right-1",
         table: "w-full border-collapse space-y-1",
         head_row: "flex",
-        head_cell: "text-muted-foreground rounded-md w-10 sm:w-14 font-normal text-[0.8rem]",
+        head_cell: "text-muted-foreground rounded-md w-9 sm:w-14 font-normal text-[0.8rem]",
         row: "flex w-full mt-2",
         cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-        day: cn(buttonVariants({ variant: "ghost" }), "sm:size-14 size-10 p-0 font-normal aria-selected:opacity-100"),
+        day: cn(buttonVariants({ variant: "ghost" }), "sm:size-14 size-9 p-0 font-normal aria-selected:opacity-100"),
         day_selected:
           "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
         day_today: "bg-accent text-accent-foreground",
@@ -70,17 +70,12 @@ function CalendarBig({
         ...classNames,
       }}
       components={{
-        // IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
-        // IconRight: ({ ...props }) => (
-        // 	<ChevronRight className="h-4 w-4" />
-        // ),
         IconLeft: () => <ChevronLeft className="h-4 w-4" />,
         IconRight: () => <ChevronRight className="h-4 w-4" />,
       }}
       {...props}
       disabled={(date) => !isDayAvailable(date)}
       onMonthChange={(date) => {
-        // console.log("Mes cambiado en CalendarBig:", date);
         if (onMonthChange) {
           onMonthChange(date); // Llama a la función con la fecha original
         }

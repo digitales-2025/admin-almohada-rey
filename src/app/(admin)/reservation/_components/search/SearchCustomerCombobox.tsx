@@ -73,7 +73,7 @@ export function SearchCustomerCombobox({
   return (
     <SearchCombobox<ApiCustomer>
       queryState={queryStateData}
-      className={cn("max-w-90", className)}
+      className={cn(className || "max-w-90")}
       items={data ? mapToComboboxItems(data) : []}
       value={value}
       label={label}

@@ -152,13 +152,14 @@ export default function UpdatePaymentDetailForm({
                 />
               </div>
 
-              {watchDetailType === "ROOM" ? (
+              {watchDetailType === "ROOM" || watchDetailType === "LATE_CHECKOUT" ? (
                 <UpdatePaymentDetailRoom
                   detailForm={detailForm}
                   dataRoomsAll={dataRoomsAll}
                   missingDays={missingDays}
                   paymentDays={paymentDays}
                   selectedDetailDays={selectedDetailDays}
+                  watchDetailType={watchDetailType}
                 />
               ) : (
                 <UpdatePaymentDetailService
