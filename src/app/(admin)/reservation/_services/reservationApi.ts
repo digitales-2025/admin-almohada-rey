@@ -25,6 +25,7 @@ type UpdateReservationReduxResponse = BaseApiResponse<Reservation>;
 export type PaginatedReservationParams = PaginatedQueryParams<Reservation>;
 type ApplyLateCheckoutReduxResponse = BaseApiResponse<Reservation>;
 type ExtendStayReduxResponse = BaseApiResponse<Reservation>;
+type RemoveLateCheckoutReduxResponse = BaseApiResponse<Reservation>;
 
 export const reservationApi = createApi({
   reducerPath: "reservationApi",
@@ -59,6 +60,15 @@ export const reservationApi = createApi({
         credentials: "include",
       }),
       invalidatesTags: (result, error, { id }) => [{ type: "Reservation", id }, "Reservation", "RoomAvailability"],
+    }),
+
+    removeLateCheckout: build.mutation<RemoveLateCheckoutReduxResponse, string>({
+      query: (id) => ({
+        url: `/reservation/${id}/late-checkout`,
+        method: "DELETE",
+        credentials: "include",
+      }),
+      invalidatesTags: (result, error, id) => [{ type: "Reservation", id }, "Reservation", "RoomAvailability"],
     }),
 
     extendStay: build.mutation<ExtendStayReduxResponse, { id: string; data: CreateExtendStay }>({
@@ -308,6 +318,7 @@ export const {
   useCreateReservationMutation,
   useUpdateReservationMutation,
   useApplyLateCheckoutMutation,
+  useRemoveLateCheckoutMutation,
   useExtendStayMutation,
   useTransitionReservationStatusMutation,
   useGetReservationByIdQuery,

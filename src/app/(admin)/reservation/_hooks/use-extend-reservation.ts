@@ -6,6 +6,7 @@ import {
   useApplyLateCheckoutMutation,
   useCheckExtendedCheckoutAvailabilityQuery,
   useExtendStayMutation,
+  useRemoveLateCheckoutMutation,
 } from "../_services/reservationApi";
 
 interface UseExtendReservationProps {
@@ -37,6 +38,9 @@ export const useExtendReservation = (options: UseExtendReservationProps = {}) =>
   const [applyLateCheckout, { isLoading: isLoadingLateCheckout, isSuccess: isSuccessLateCheckout }] =
     useApplyLateCheckoutMutation();
 
+  const [removeLateCheckout, { isLoading: isLoadingRemoveLateCheckout, isSuccess: isSuccessRemoveLateCheckout }] =
+    useRemoveLateCheckoutMutation();
+
   const [extendStay, { isLoading: isLoadingExtendStay, isSuccess: isSuccessExtendStay }] = useExtendStayMutation();
 
   // Función para aplicar late checkout
@@ -46,6 +50,19 @@ export const useExtendReservation = (options: UseExtendReservationProps = {}) =>
     toast.promise(promise, {
       loading: "Aplicando late checkout...",
       success: "Late checkout aplicado con éxito",
+      error: (err) => err.message,
+    });
+
+    return await promise;
+  }
+
+  // Función para remover late checkout
+  async function onRemoveLateCheckout(id: string) {
+    const promise = runAndHandleError(() => removeLateCheckout(id).unwrap());
+
+    toast.promise(promise, {
+      loading: "Eliminando late checkout...",
+      success: "Late checkout eliminado con éxito",
       error: (err) => err.message,
     });
 
@@ -74,11 +91,16 @@ export const useExtendReservation = (options: UseExtendReservationProps = {}) =>
 
     // Funciones principales
     onApplyLateCheckout,
+    onRemoveLateCheckout,
     onExtendStay,
 
     // Estados de late checkout
     isLoadingLateCheckout,
     isSuccessLateCheckout,
+
+    // Estados de remove late checkout
+    isLoadingRemoveLateCheckout,
+    isSuccessRemoveLateCheckout,
 
     // Estados de extend stay
     isLoadingExtendStay,

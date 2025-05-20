@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { CalendarCog, Ellipsis, Pencil, Trash } from "lucide-react";
+import { CalendarCog, CalendarX2, Ellipsis, Pencil, Trash } from "lucide-react";
 import { toast } from "sonner";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
@@ -29,6 +29,7 @@ import { getAvailableActions } from "../../_utils/reservation-status-validation.
 import { CreatePaymentDialog } from "../create-payment/CreatePaymentsDialog";
 import { ExtensionReservationDialog } from "../extension/ExtensionReservationDialog";
 import { DeactivateReservationsDialog } from "../state-management/DeactivateReservationsDialog";
+import { DeleteLateCheckoutDialog } from "../state-management/DeleteLateCheckoutDialog";
 import { DIALOG_DICTIONARY } from "../state-management/reservation-status-dialog-config";
 import { TransitionReservationStatusDialog } from "../state-management/TransitionReservationStatusDialog";
 import { UpdateReservationSheet } from "../update/UpdateReservationSheet";
@@ -256,7 +257,8 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
       const [showDeactivateDialog, setShowDeactivateDialog] = useState(false);
       const [showDetailDialog, setShowDetailDialog] = useState(false);
       const [showExtensionDialog, setShowExtensionDialog] = useState(false);
-      const { status, isPendingDeletePayment, isActive } = row.original;
+      const [showDeleteLateCheckoutDialog, setShowDeleteLateCheckoutDialog] = useState(false);
+      const { status, isPendingDeletePayment, isActive, appliedLateCheckOut } = row.original;
 
       const confirmConfig = DIALOG_DICTIONARY["CONFIRMED"];
       const cancelConfig = DIALOG_DICTIONARY["CANCELED"];
@@ -338,6 +340,14 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
                 reservation={row?.original}
               />
             )}
+
+            {showDeleteLateCheckoutDialog && (
+              <DeleteLateCheckoutDialog
+                open={showDeleteLateCheckoutDialog}
+                onOpenChange={setShowDeleteLateCheckoutDialog}
+                id={row?.original.id}
+              />
+            )}
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -363,6 +373,15 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
                   Extender reserva
                   <DropdownMenuShortcut>
                     <CalendarCog className="size-4" aria-hidden="true" />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              )}
+
+              {appliedLateCheckOut && (
+                <DropdownMenuItem className="text-red-700" onSelect={() => setShowDeleteLateCheckoutDialog(true)}>
+                  Eliminar Late Checkout
+                  <DropdownMenuShortcut>
+                    <CalendarX2 className="size-4 text-red-700" aria-hidden="true" />
                   </DropdownMenuShortcut>
                 </DropdownMenuItem>
               )}
