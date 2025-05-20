@@ -96,6 +96,45 @@ export default function UpdateRoomTypeForm({
 
           <FormField
             control={form.control}
+            name="nameEn"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nombre (en Inglés)</FormLabel>
+                <FormControl>
+                  <InputWithIcon Icon={Bed} placeholder="Ej: Presidential Suite" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* Segunda fila: Área y Precio */}
+        <div className="grid grid-cols-2 gap-4">
+          {/*      <FormField
+            control={form.control}
+            name="area"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Área (m²)</FormLabel>
+                <FormControl>
+                  <InputWithIcon
+                    Icon={AreaChart}
+                    placeholder="Ej: 30"
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    {...field}
+                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                    value={field.value}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          /> */}
+          <FormField
+            control={form.control}
             name="guests"
             render={({ field }) => (
               <FormItem>
@@ -115,10 +154,7 @@ export default function UpdateRoomTypeForm({
               </FormItem>
             )}
           />
-        </div>
 
-        {/* Segunda fila: Área y Precio */}
-        <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="price"
@@ -141,6 +177,9 @@ export default function UpdateRoomTypeForm({
               </FormItem>
             )}
           />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="bed"
@@ -149,6 +188,19 @@ export default function UpdateRoomTypeForm({
                 <FormLabel>Cama</FormLabel>
                 <FormControl>
                   <InputWithIcon Icon={Bed} placeholder="Ej: King size con colchón ortopédico" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="bedEn"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Cama (en Inglés)</FormLabel>
+                <FormControl>
+                  <InputWithIcon Icon={Bed} placeholder="Ej: Orthopedic King size" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -166,6 +218,24 @@ export default function UpdateRoomTypeForm({
               <FormControl>
                 <Textarea
                   placeholder="Describe las características de este tipo de habitación..."
+                  className="min-h-[120px]"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="descriptionEn"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Descripción (en Inglés)</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Describe las características de este tipo de habitación en inglés..."
                   className="min-h-[120px]"
                   {...field}
                 />

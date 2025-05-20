@@ -1530,6 +1530,74 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/landing-reservation/check-available-rooms": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Check available rooms for reservation */
+    get: operations["ReservationController_checkAvailableRooms_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/landing-reservation/check-reservation-exists/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Check if a reservation exists */
+    get: operations["ReservationController_checkReservationExists_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/landing-reservation/create-reservation": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Create a reservation */
+    post: operations["ReservationController_createLandingReservation_v1"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/landing-reservation/confirm-reservation": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Confirm a reservation */
+    post: operations["ReservationController_confirmReservation_v1"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v1/expenses": {
     parameters: {
       query?: never;
@@ -1595,6 +1663,106 @@ export interface paths {
     post?: never;
     /** Eliminar múltiples gastos */
     delete: operations["ExpenseController_deleteMany_v1"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/reports/profit": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Descargar Excel de profit mensual
+     * @description Genera y descarga un archivo Excel con el profit para un mes y año específicos.
+     */
+    get: operations["ReportsController_downloadProfitExcel_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/reports/expense": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Descargar Excel de expense mensual
+     * @description Genera y descarga un archivo Excel con el expense para un mes y año específicos.
+     */
+    get: operations["ReportsController_downloadExpenseExcel_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/reports/balance": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Descargar Excel de balance mensual
+     * @description Genera y descarga un archivo Excel con el balance para un mes y año específicos.
+     */
+    get: operations["ReportsController_downloadBalanceExcel_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/reports/profitRoomType": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Descargar Excel de ganancias por tipo de habitación
+     * @description Genera y descarga un archivo Excel con el profit para un mes, año y tipo de habitación específicos.
+     */
+    get: operations["ReportsController_downloadProfitTypeRoomExcel_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/reports/occupancy": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Descargar Excel de estadísticas de ocupación
+     * @description Genera y descarga un archivo Excel con estadísticas de ocupación por tipo de habitación para un mes y año específicos.
+     */
+    get: operations["ReportsController_downloadOccupancyExcel_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -1719,13 +1887,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-19T17:54:40.963Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-19T17:54:40.964Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       updatedAt: string;
       /** @description Customer name */
@@ -1766,6 +1934,11 @@ export interface components {
       ruc?: string;
       /** @description Customer company address */
       companyAddress?: string;
+      /**
+       * @description Customer created by landing page
+       * @default false
+       */
+      createdByLandingPage: boolean;
     };
     User: {
       /**
@@ -1782,13 +1955,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-19T17:54:40.963Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-19T17:54:40.964Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       updatedAt: string;
       /** @description User name */
@@ -1831,13 +2004,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-19T17:54:40.963Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-19T17:54:40.964Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       updatedAt: string;
       /**
@@ -1845,6 +2018,11 @@ export interface components {
        * @example Habitación doble
        */
       name: string;
+      /**
+       * @description Nombre del tipo de habitación en inglés
+       * @example Double Room
+       */
+      nameEn: string;
       /**
        * @description Capacidad máxima de huéspedes
        * @example 2
@@ -1861,10 +2039,20 @@ export interface components {
        */
       description: string;
       /**
+       * @description Descripción del tipo de habitación en inglés
+       * @example Room with sea view and private balcony
+       */
+      descriptionEn: string;
+      /**
        * @description Descripción de la cama
        * @example Cama matrimonial king size
        */
       bed: string;
+      /**
+       * @description Descripción de la cama en inglés
+       * @example King size bed
+       */
+      bedEn: string;
     };
     DetailedRoom: {
       /**
@@ -1880,13 +2068,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-19T17:54:40.963Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-19T17:54:40.964Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       updatedAt: string;
       /**
@@ -1975,13 +2163,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-05-19T17:54:40.963Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-05-19T17:54:40.964Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -2019,18 +2207,28 @@ export interface components {
       reason: string;
       /** @description JSON list of companions/guests */
       guests?: string;
+      /**
+       * @description Number of guests requested by the landing page
+       * @default 1
+       */
+      requestedGuestNumber: number;
       /** @description Additional notes or observations */
       observations?: string;
+      /**
+       * @description Whether the customer accepted extra services
+       * @default false
+       */
+      didAcceptExtraServices: boolean;
+      /**
+       * @description Whether the customer accepted terms and conditions
+       * @default false
+       */
+      didAcceptTerms: boolean;
       /**
        * @description Whether the reservation is pending payment deletion
        * @default false
        */
       isPendingDeletePayment: boolean;
-      /**
-       * @description Wheter the reservation was applied late check out
-       * @default false
-       */
-      appliedLateCheckOut: boolean;
       /** @description Customer associated with the reservation */
       customer: components["schemas"]["Customer"];
       /** @description User associated with the reservation */
@@ -2154,13 +2352,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-05-19T17:54:40.963Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-05-19T17:54:40.964Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -2198,18 +2396,28 @@ export interface components {
       reason: string;
       /** @description JSON list of companions/guests */
       guests?: string;
+      /**
+       * @description Number of guests requested by the landing page
+       * @default 1
+       */
+      requestedGuestNumber: number;
       /** @description Additional notes or observations */
       observations?: string;
+      /**
+       * @description Whether the customer accepted extra services
+       * @default false
+       */
+      didAcceptExtraServices: boolean;
+      /**
+       * @description Whether the customer accepted terms and conditions
+       * @default false
+       */
+      didAcceptTerms: boolean;
       /**
        * @description Whether the reservation is pending payment deletion
        * @default false
        */
       isPendingDeletePayment: boolean;
-      /**
-       * @description Wheter the reservation was applied late check out
-       * @default false
-       */
-      appliedLateCheckOut: boolean;
     };
     UpdateManyDto: {
       /**
@@ -2452,13 +2660,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-19T17:54:40.963Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-19T17:54:40.964Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       updatedAt: string;
       /**
@@ -2612,6 +2820,11 @@ export interface components {
        */
       name: string;
       /**
+       * @description Nombre del tipo de habitación en inglés
+       * @example Double Room
+       */
+      nameEn?: string;
+      /**
        * @description Capacidad máxima de huéspedes
        * @example 2
        */
@@ -2627,10 +2840,20 @@ export interface components {
        */
       description: string;
       /**
+       * @description Descripción del tipo de habitación en inglés
+       * @example Room with private balcony
+       */
+      descriptionEn: string;
+      /**
        * @description Descripción de la cama
        * @example Cama matrimonial king size
        */
       bed: string;
+      /**
+       * @description Descripción de la cama en inglés
+       * @example King size bed
+       */
+      bedEn?: string;
       /** @description Imágenes del tipo de habitación (exactamente 5 requeridas) */
       images: string[];
     };
@@ -2658,6 +2881,11 @@ export interface components {
        */
       name?: string;
       /**
+       * @description Nombre del tipo de habitación en inglés
+       * @example Double Room
+       */
+      nameEn?: string;
+      /**
        * @description Capacidad máxima de huéspedes
        * @example 2
        */
@@ -2673,10 +2901,20 @@ export interface components {
        */
       description?: string;
       /**
+       * @description Descripción del tipo de habitación en inglés
+       * @example Room with private balcony
+       */
+      descriptionEn?: string;
+      /**
        * @description Descripción de la cama
        * @example Cama matrimonial king size
        */
       bed?: string;
+      /**
+       * @description Descripción de la cama en inglés
+       * @example King size bed
+       */
+      bedEn?: string;
       /**
        * Format: binary
        * @description Nueva imagen para agregar o reemplazar
@@ -2923,13 +3161,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-19T17:54:40.963Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-19T17:54:40.964Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       updatedAt: string;
       name: string;
@@ -3173,13 +3411,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-19T17:54:40.963Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-19T17:54:40.964Z
+       * @example 2025-05-03T17:17:40.326Z
        */
       updatedAt: string;
       /**
@@ -3235,12 +3473,21 @@ export interface components {
        */
       observations?: string;
     };
-    LandRoomTypeMainImg: {
+    BaseQueryDto: {
+      /**
+       * @description The locale for the response data
+       * @example en
+       * @enum {string}
+       */
+      locale?: "es" | "en";
+    };
+    BaseRoomTypeMainImg: {
       id: string;
       name: string;
       description: string;
       price: number;
       guests: number;
+      bed: string;
       mainImageUrl: string;
     };
     LandImageRoomType: {
@@ -3256,6 +3503,145 @@ export interface components {
       guests: number;
       bed: string;
       images: components["schemas"]["LandImageRoomType"][];
+    };
+    BaseReservationWsActionsDto: {
+      clientId: string;
+      /** @enum {string} */
+      locale: "es" | "en";
+      /**
+       * @description Reservation ID
+       * @example 67890
+       */
+      reservationId: string;
+    };
+    BaseWsResponse: {
+      clientId?: string;
+      message: string;
+      /** @description Response data */
+      data?: Record<string, never>;
+      error?: boolean;
+      reason?: string;
+      timestamp?: string;
+    };
+    StartBookingPaymentDataResponse: {
+      clientId: string;
+      /** @enum {string} */
+      locale: "es" | "en";
+      /**
+       * @description Time Limit for the reservation in seconds
+       * @example 300
+       */
+      timeLimit: number;
+    };
+    StartBookingReservationResponseDto: {
+      clientId?: string;
+      message: string;
+      /** @description Response data */
+      data: components["schemas"]["StartBookingPaymentDataResponse"];
+      error?: boolean;
+      reason?: string;
+      timestamp?: string;
+    };
+    BaseWsErrorResponse: {
+      clientId?: string;
+      message: string;
+      /** @description Response data */
+      data?: Record<string, never>;
+      error: boolean;
+      reason: string;
+      timestamp?: string;
+    };
+    OnConnectionResponseData: {
+      /**
+       * @description Client socket ID
+       * @example 1234567890abcdef
+       */
+      reservation: components["schemas"]["DetailedReservation"];
+    };
+    OnConnectionResponse: {
+      clientId?: string;
+      message: string;
+      /** @description Response data */
+      data: components["schemas"]["OnConnectionResponseData"];
+      error?: boolean;
+      reason?: string;
+      timestamp?: string;
+    };
+    CreateLandingReservationDto: {
+      /**
+       * @description The CHeck-in date in YYYY-MM-DD format
+       * @example 2023-10-01
+       */
+      checkInDate: string;
+      /**
+       * @description The Check-out date in YYYY-MM-DD format
+       * @example 2023-10-10
+       */
+      checkOutDate: string;
+      /**
+       * @description The number of guests
+       * @example 2
+       */
+      guestNumber: number;
+      /**
+       * @description The ID of the room being reserved
+       * @example room-123
+       */
+      roomId?: string;
+    };
+    CustomerDto: {
+      /**
+       * @description Nombre del cliente
+       * @example Juan
+       */
+      name: string;
+      /**
+       * @description Apellido del cliente
+       * @example Pérez
+       */
+      lastname: string;
+      /**
+       * @description Correo electrónico del cliente
+       * @example cliente@example.com
+       */
+      email: string;
+      /**
+       * @description Número de teléfono del cliente
+       * @example +34600123456
+       */
+      phone: string;
+      /**
+       * @description Tipo de documento del cliente
+       * @example DNI
+       * @enum {string}
+       */
+      documentType: "DNI" | "PASSPORT" | "FOREIGNER_CARD";
+      /**
+       * @description Número de documento del cliente
+       * @example 12345678X
+       */
+      documentNumber: string;
+    };
+    ConfirmBookingDto: {
+      /** @description Datos del cliente */
+      customer: components["schemas"]["CustomerDto"];
+      /** @description Datos de la reserva */
+      reservation: components["schemas"]["UpdateReservationDto"];
+      /**
+       * @description Observaciones para la reserva
+       * @example Prefiero una habitación con vistas al mar
+       */
+      observations?: string;
+      /**
+       * @description Indica si se han aceptado los servicios extra
+       * @example true
+       */
+      didAcceptExtraServices?: boolean;
+      /**
+       * @description Indica si se han aceptado los términos y condiciones
+       * @example true
+       */
+      didAcceptTermsAndConditions?: boolean;
     };
     CreateHotelExpenseDto: {
       /**
@@ -7676,7 +8062,10 @@ export interface operations {
   };
   LandRoomTypeController_findAllLandingRoomTypes_v1: {
     parameters: {
-      query?: never;
+      query?: {
+        /** @description The locale for the response data */
+        locale?: "es" | "en";
+      };
       header?: never;
       path?: never;
       cookie?: never;
@@ -7689,7 +8078,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["LandRoomTypeMainImg"][];
+          "application/json": components["schemas"]["BaseRoomTypeMainImg"][];
         };
       };
     };
@@ -7714,6 +8103,148 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["LandRoomTypeAllImg"];
         };
+      };
+    };
+  };
+  ReservationController_checkAvailableRooms_v1: {
+    parameters: {
+      query: {
+        /** @description The locale for the response data */
+        locale?: "es" | "en";
+        /** @description Check-in date (YYYY-MM-DD) */
+        checkInDate: string;
+        /** @description Check-out date (YYYY-MM-DD) */
+        checkOutDate: string;
+        /** @description Number of guests */
+        guestNumber: number;
+        /** @description Optional room ID */
+        roomId?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description List of available rooms */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailedRoom"][];
+        };
+      };
+      /** @description Invalid input parameters */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ReservationController_checkReservationExists_v1: {
+    parameters: {
+      query: {
+        /** @description ID of the reservation to check */
+        reservationId: string;
+      };
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Reservation exists */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Reservation not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ReservationController_createLandingReservation_v1: {
+    parameters: {
+      query: {
+        locale: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateLandingReservationDto"];
+      };
+    };
+    responses: {
+      /** @description Reservation created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Reservation"];
+        };
+      };
+      /** @description Invalid input parameters */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Room not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ReservationController_confirmReservation_v1: {
+    parameters: {
+      query: {
+        locale: string;
+        reservationId: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ConfirmBookingDto"];
+      };
+    };
+    responses: {
+      /** @description Reservation confirmed successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Reservation"];
+        };
+      };
+      /** @description Invalid input parameters */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };
@@ -7955,6 +8486,133 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  ReportsController_downloadProfitExcel_v1: {
+    parameters: {
+      query: {
+        /** @description Mes numérico (1-12) */
+        month: number;
+        /** @description Año en formato YYYY */
+        year: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Archivo Excel con el profit mensual */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  ReportsController_downloadExpenseExcel_v1: {
+    parameters: {
+      query: {
+        /** @description Mes numérico (1-12) */
+        month: number;
+        /** @description Año en formato YYYY */
+        year: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Archivo Excel con el expense mensual */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  ReportsController_downloadBalanceExcel_v1: {
+    parameters: {
+      query: {
+        /** @description Mes numérico (1-12) */
+        month: number;
+        /** @description Año en formato YYYY */
+        year: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Archivo Excel con el balance mensual */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  ReportsController_downloadProfitTypeRoomExcel_v1: {
+    parameters: {
+      query: {
+        /** @description Mes numérico (1-12) */
+        month: number;
+        /** @description Año en formato YYYY */
+        year: number;
+        /** @description ID del tipo de habitación */
+        typeRoomId: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Archivo Excel con el profit por tipo de habitación */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  ReportsController_downloadOccupancyExcel_v1: {
+    parameters: {
+      query: {
+        /** @description Mes numérico (1-12) */
+        month: number;
+        /** @description Año en formato YYYY */
+        year: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Archivo Excel con estadísticas de ocupación */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
       };
     };
   };
