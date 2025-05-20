@@ -336,7 +336,6 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
                 open={showExtensionDialog}
                 onOpenChange={setShowExtensionDialog}
                 reservation={row?.original}
-                roomRate={row?.original.room.RoomTypes.price}
               />
             )}
           </div>
