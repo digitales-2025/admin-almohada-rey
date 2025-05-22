@@ -3,8 +3,10 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import baseQueryWithReauth from "@/utils/baseQuery";
 import {
   AnnualAdministratorStatistics,
-  MontlyEarningsAndExpenses,
+  MonthlyBookingTrend,
+  MonthlyEarningsAndExpenses,
   NextPendingPayments,
+  OccupationStatisticsPercentage,
   RecentReservations,
   RoomOccupancyMap,
 } from "../_types/dashboard";
@@ -26,7 +28,7 @@ export const dashboardApi = createApi({
     }),
 
     // Obtener ganancias y gastos mensuales
-    getMonthlyEarningsExpenses: build.query<MontlyEarningsAndExpenses[], number | void>({
+    getMonthlyEarningsExpenses: build.query<MonthlyEarningsAndExpenses[], number | void>({
       query: (year = new Date().getFullYear()) => ({
         url: `dashboard/monthly-earnings-expenses`,
         method: "GET",
@@ -65,6 +67,26 @@ export const dashboardApi = createApi({
       }),
       providesTags: ["Dashboard"],
     }),
+
+    getOccupationStatisticsPercentageByType: build.query<OccupationStatisticsPercentage[], number | void>({
+      query: (year = new Date().getFullYear()) => ({
+        url: `dashboard/occupation-statistics`,
+        method: "GET",
+        params: { year },
+        credentials: "include",
+      }),
+      providesTags: ["Dashboard"],
+    }),
+
+    getMonthlyBookingTrend: build.query<MonthlyBookingTrend[], number | void>({
+      query: (year = new Date().getFullYear()) => ({
+        url: `dashboard/booking-trends`,
+        method: "GET",
+        params: { year },
+        credentials: "include",
+      }),
+      providesTags: ["Dashboard"],
+    }),
   }),
 });
 
@@ -74,4 +96,6 @@ export const {
   useGetRoomOccupancyQuery,
   useGetRecentReservationsQuery,
   useGetNextPendingPaymentsQuery,
+  useGetOccupationStatisticsPercentageByTypeQuery,
+  useGetMonthlyBookingTrendQuery,
 } = dashboardApi;

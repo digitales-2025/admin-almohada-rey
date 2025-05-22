@@ -1,17 +1,20 @@
 import {
   useGetAnnualStatisticsQuery,
+  useGetMonthlyBookingTrendQuery,
   useGetMonthlyEarningsExpensesQuery,
   useGetNextPendingPaymentsQuery,
+  useGetOccupationStatisticsPercentageByTypeQuery,
   useGetRecentReservationsQuery,
   useGetRoomOccupancyQuery,
 } from "../_services/dashbordApi";
 
 interface UseDashboardProps {
   year?: number;
+  yearReservation?: number;
 }
 
 export const useDashboard = (options: UseDashboardProps = {}) => {
-  const { year } = options;
+  const { year, yearReservation } = options;
 
   // Estadísticas anuales
   const {
@@ -52,13 +55,30 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetch: refetchNextPendingPayments,
   } = useGetNextPendingPaymentsQuery();
 
+  const {
+    data: occupancyStatisticsPercentage,
+    isLoading: isLoadingOccupancyStatisticsPercentage,
+    refetch: refetchOccupancyStatisticsPercentage,
+  } = useGetOccupationStatisticsPercentageByTypeQuery(year, {
+    skip: !year,
+  });
+
+  const {
+    data: monthlyBookingTrend,
+    isLoading: isLoadingMonthlyBookingTrend,
+    refetch: refetchMonthlyBookingTrend,
+  } = useGetMonthlyBookingTrendQuery(yearReservation, {
+    skip: !yearReservation,
+  });
+
   // Estado de carga combinado
   const isLoading =
     isLoadingAnnualStatistics ||
     isLoadingMonthlyEarningsExpenses ||
     isLoadingRoomOccupancy ||
     isLoadingRecentReservations ||
-    isLoadingNextPendingPayments;
+    isLoadingNextPendingPayments ||
+    isLoadingOccupancyStatisticsPercentage;
 
   return {
     // Datos
@@ -67,6 +87,8 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     roomOccupancy,
     recentReservations,
     nextPendingPayments,
+    occupancyStatisticsPercentage,
+    monthlyBookingTrend,
 
     // Estados de carga
     isLoadingAnnualStatistics,
@@ -74,7 +96,9 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     isLoadingRoomOccupancy,
     isLoadingRecentReservations,
     isLoadingNextPendingPayments,
+    isLoadingOccupancyStatisticsPercentage,
     isLoading,
+    isLoadingMonthlyBookingTrend,
 
     // Funciones de actualización
     refetchAnnualStatistics,
@@ -82,5 +106,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetchRoomOccupancy,
     refetchRecentReservations,
     refetchNextPendingPayments,
+    refetchOccupancyStatisticsPercentage,
+    refetchMonthlyBookingTrend,
   };
 };

@@ -11,7 +11,7 @@ export interface AnnualAdministratorStatistics {
   pendingPayments: number;
 }
 
-export interface MontlyEarningsAndExpenses {
+export interface MonthlyEarningsAndExpenses {
   month: string;
   earnings: number;
   expenses: number;
@@ -57,4 +57,16 @@ export interface Top5PendingPayments {
   roomNumber: number;
   code: string;
   amount: number;
+}
+
+export interface OccupationStatisticsPercentage {
+  id: string;
+  type: string;
+  percentage: number;
+}
+
+export interface MonthlyBookingTrend {
+  month: string;
+  webBookings: number;
+  directBookings: number;
 }

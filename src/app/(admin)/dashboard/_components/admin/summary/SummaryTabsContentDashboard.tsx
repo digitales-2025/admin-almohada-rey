@@ -4,7 +4,7 @@ import { FilterYear } from "@/components/ui/filter-year";
 import { TabsContent } from "@/components/ui/tabs";
 import {
   AnnualAdministratorStatistics,
-  MontlyEarningsAndExpenses,
+  MonthlyEarningsAndExpenses,
   NextPendingPayments,
   RecentReservations,
   RoomOccupancyMap,
@@ -20,7 +20,7 @@ interface SummaryTabsContentDashboardProps {
   setYear: (year: number) => void;
   roomOccupancy: RoomOccupancyMap | undefined;
   annualStatistics: AnnualAdministratorStatistics | undefined;
-  monthlyEarningsExpenses: MontlyEarningsAndExpenses[] | undefined;
+  monthlyEarningsExpenses: MonthlyEarningsAndExpenses[] | undefined;
   recentReservations: RecentReservations | undefined;
   nextPendingPayments: NextPendingPayments | undefined;
 }
@@ -36,7 +36,7 @@ export default function SummaryTabsContentDashboard({
 }: SummaryTabsContentDashboardProps) {
   const element = document.getElementById("headerContent");
   return (
-    <TabsContent value="resumen" className="space-y-4">
+    <TabsContent value="resumen" className="space-y-4 px-6">
       {element &&
         createPortal(
           <div id="headerContent">
