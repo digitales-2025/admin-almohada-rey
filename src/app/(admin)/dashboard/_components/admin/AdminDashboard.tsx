@@ -40,58 +40,42 @@ export function AdminDashboard() {
   return (
     <div className="flex flex-col gap-4">
       <Tabs defaultValue="resumen" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="relative grid grid-cols-3 md:grid-cols-5 w-full h-fit border-0 z-10">
+        <TabsList className="relative grid grid-cols-5 w-full h-fit border-0 z-10">
           <TabsTrigger
             value="resumen"
-            className="flex items-center justify-center gap-2 py-2 px-3 text-sm rounded-lg data-[state=active]:text-primary/80
-            data-[state=active]:border-b-2 data-[state=active]:border-primary/80 data-[state=inactive]:text-muted-foreground"
+            className="flex items-center justify-center gap-2 py-2 px-3 text-sm rounded-lg data-[state=active]:text-primary/80 data-[state=active]:border-b-2 data-[state=active]:border-primary/80 data-[state=inactive]:text-muted-foreground"
           >
-            <Home className="h-4 w-4" />
-            <span className="hidden sm:inline font-medium">Resumen</span>
+            <Home className="h-4 w-4 shrink-0" />
+            <span className="truncate text-ellipsis font-medium">Resumen</span>
           </TabsTrigger>
-
           <TabsTrigger
             value="ocupacion"
-            className="flex items-center justify-center gap-2 py-2 px-3 text-sm rounded-lg 
-             data-[state=active]:text-primary/80
-            data-[state=active]:border-b-2 data-[state=active]:border-primary/80 data-[state=inactive]:text-muted-foreground"
+            className="flex items-center justify-center gap-2 py-2 px-3 text-sm rounded-lg data-[state=active]:text-primary/80 data-[state=active]:border-b-2 data-[state=active]:border-primary/80 data-[state=inactive]:text-muted-foreground"
           >
-            <BarChart3 className="h-4 w-4" />
-
-            <span className="hidden sm:inline font-medium">Ocupación</span>
+            <BarChart3 className="h-4 w-4 shrink-0" />
+            <span className="truncate text-ellipsis font-medium">Ocupación</span>
           </TabsTrigger>
-
           <TabsTrigger
             value="reservas"
-            className="flex items-center justify-center gap-2 py-2 px-3 text-sm rounded-lg 
-             data-[state=active]:text-primary/80
-            data-[state=active]:border-b-2 data-[state=active]:border-primary/80 data-[state=inactive]:text-muted-foreground"
+            className="flex items-center justify-center gap-2 py-2 px-3 text-sm rounded-lg data-[state=active]:text-primary/80 data-[state=active]:border-b-2 data-[state=active]:border-primary/80 data-[state=inactive]:text-muted-foreground"
           >
-            <Calendar className="h-4 w-4" />
-
-            <span className="hidden sm:inline font-medium">Reservas</span>
+            <Calendar className="h-4 w-4 shrink-0" />
+            <span className="truncate text-ellipsis font-medium">Reservas</span>
           </TabsTrigger>
-
           <TabsTrigger
             value="finanzas"
-            className="flex items-center justify-center gap-2 py-2 px-3 text-sm rounded-lg 
-             data-[state=active]:text-primary/80
-            data-[state=active]:border-b-2 data-[state=active]:border-primary/80 data-[state=inactive]:text-muted-foreground"
+            className="flex items-center justify-center gap-2 py-2 px-3 text-sm rounded-lg data-[state=active]:text-primary/80 data-[state=active]:border-b-2 data-[state=active]:border-primary/80 data-[state=inactive]:text-muted-foreground"
           >
-            <PieChart className="h-4 w-4" />
-
-            <span className="hidden sm:inline font-medium">Finanzas</span>
+            <PieChart className="h-4 w-4 shrink-0" />
+            <span className="truncate text-ellipsis font-medium">Finanzas</span>
           </TabsTrigger>
 
           <TabsTrigger
             value="procedencia"
-            className="flex items-center justify-center gap-2 py-2 px-3 text-sm rounded-lg 
-             data-[state=active]:text-primary/80
-            data-[state=active]:border-b-2 data-[state=active]:border-primary/80 data-[state=inactive]:text-muted-foreground"
+            className="flex items-center justify-center gap-2 py-2 px-3 text-sm rounded-lg data-[state=active]:text-primary/80 data-[state=active]:border-b-2 data-[state=active]:border-primary/80 data-[state=inactive]:text-muted-foreground"
           >
-            <Globe className="h-4 w-4" />
-
-            <span className="hidden sm:inline font-medium">Procedencia</span>
+            <Globe className="h-4 w-4 shrink-0" />
+            <span className="truncate text-ellipsis font-medium">Procedencia</span>
           </TabsTrigger>
         </TabsList>
 
