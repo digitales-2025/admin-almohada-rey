@@ -16,6 +16,7 @@ import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recha
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FilterYear } from "@/components/ui/filter-year";
+import { NumberCounter } from "@/components/ui/number-counter";
 import { Progress } from "@/components/ui/progress";
 import { TabsContent } from "@/components/ui/tabs";
 
@@ -122,6 +123,7 @@ export default function FinanceTabsContentDashboard({
         )}
 
       {/* Tarjetas de resumen principal */}
+
       <div className="grid gap-6 md:grid-cols-3">
         <Card className="overflow-hidden border-l-4 border-l-green-500">
           <CardHeader className="pb-2">
@@ -132,7 +134,11 @@ export default function FinanceTabsContentDashboard({
             <CardDescription>Año fiscal {year}</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-green-600">{formatCurrency(financeSummary.totalIncome)}</div>
+            <NumberCounter
+              value={financeSummary.totalIncome}
+              formatter={(val) => formatCurrency(val)}
+              className="text-3xl font-bold text-green-600"
+            />
             <div className="mt-2 flex items-center text-sm">
               <ArrowUp className="mr-1 h-4 w-4 text-green-500" />
               <span className="text-green-500 font-medium">+{roomsPercentage}%</span>
@@ -150,7 +156,11 @@ export default function FinanceTabsContentDashboard({
             <CardDescription>Año fiscal {year}</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-red-600">{formatCurrency(financeSummary.totalExpenses)}</div>
+            <NumberCounter
+              value={financeSummary.totalExpenses}
+              formatter={(val) => formatCurrency(val)}
+              className="text-3xl font-bold text-red-600"
+            />
             <div className="mt-2 flex items-center text-sm">
               <ArrowDown className="mr-1 h-4 w-4 text-red-500" />
               <span className="text-red-500 font-medium">+{fixedExpensesPercentage}%</span>
@@ -168,7 +178,11 @@ export default function FinanceTabsContentDashboard({
             <CardDescription>Año fiscal {year}</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-blue-600">{formatCurrency(financeSummary.totalProfit)}</div>
+            <NumberCounter
+              value={financeSummary.totalProfit}
+              formatter={(val) => formatCurrency(val)}
+              className="text-3xl font-bold text-blue-600"
+            />
             <div className="mt-2 flex items-center text-sm">
               <span className="font-medium">Margen de beneficio:</span>
               <span className="text-blue-500 font-medium ml-1">{profitMargin}%</span>
