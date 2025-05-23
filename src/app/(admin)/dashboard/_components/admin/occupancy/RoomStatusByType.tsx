@@ -49,7 +49,7 @@ export function RoomStatusByType({ roomOccupancy }: RoomStatusByTypeProps) {
       <CardContent>
         <div className="space-y-4">
           <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-4 justify-end">
+            <div className="flex items-center gap-4 justify-end flex-wrap">
               <div className="flex items-center gap-1">
                 <div
                   className={`w-3 h-3 rounded-full ${getRoomStatusConfig(RoomStatus.OCCUPIED).borderColor.replace("border", "bg")}`}
@@ -99,7 +99,7 @@ export function RoomStatusByType({ roomOccupancy }: RoomStatusByTypeProps) {
             </Tabs>
           </div>
 
-          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {currentRooms.map((room) => (
               <div
                 key={room.id}
