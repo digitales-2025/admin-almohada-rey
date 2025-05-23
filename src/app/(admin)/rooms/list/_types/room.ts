@@ -34,6 +34,7 @@ export enum RoomStatus {
   AVAILABLE = "AVAILABLE",
   OCCUPIED = "OCCUPIED",
   CLEANING = "CLEANING",
+  INCOMPLETE = "INCOMPLETE",
 }
 
 export enum FloorType {
