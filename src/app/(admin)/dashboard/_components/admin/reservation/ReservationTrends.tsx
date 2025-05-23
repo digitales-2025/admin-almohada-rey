@@ -2,7 +2,7 @@
 
 import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-import { MonthlyBookingTrend } from "../../_types/dashboard";
+import { MonthlyBookingTrend } from "../../../_types/dashboard";
 
 interface ReservationTrendsProps {
   monthlyBookingTrend: MonthlyBookingTrend[] | undefined;
