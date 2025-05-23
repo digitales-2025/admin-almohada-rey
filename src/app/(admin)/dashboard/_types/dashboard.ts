@@ -70,3 +70,17 @@ export interface MonthlyBookingTrend {
   webBookings: number;
   directBookings: number;
 }
+
+export interface SummaryFinance {
+  totalIncome: number;
+  totalExpenses: number;
+  totalProfit: number;
+  totalRoomReservations: number;
+  totalServices: number;
+  totalProducts: number;
+  totalLateCheckout: number;
+  totalExpensesFixed: number;
+  totalExpensesVariable: number;
+  totalExpensesOther: number;
+  totalExpensesProducts: number;
+}

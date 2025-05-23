@@ -9,6 +9,7 @@ import {
   OccupationStatisticsPercentage,
   RecentReservations,
   RoomOccupancyMap,
+  SummaryFinance,
 } from "../_types/dashboard";
 
 export const dashboardApi = createApi({
@@ -68,6 +69,7 @@ export const dashboardApi = createApi({
       providesTags: ["Dashboard"],
     }),
 
+    // Obtener estadísticas de ocupación por tipo
     getOccupationStatisticsPercentageByType: build.query<OccupationStatisticsPercentage[], number | void>({
       query: (year = new Date().getFullYear()) => ({
         url: `dashboard/occupation-statistics`,
@@ -78,9 +80,21 @@ export const dashboardApi = createApi({
       providesTags: ["Dashboard"],
     }),
 
+    // Obtener tendencia de reservas mensuales
     getMonthlyBookingTrend: build.query<MonthlyBookingTrend[], number | void>({
       query: (year = new Date().getFullYear()) => ({
         url: `dashboard/booking-trends`,
+        method: "GET",
+        params: { year },
+        credentials: "include",
+      }),
+      providesTags: ["Dashboard"],
+    }),
+
+    // Obtener resumen financiero anual
+    getAnnualSummaryFinance: build.query<SummaryFinance, number | void>({
+      query: (year = new Date().getFullYear()) => ({
+        url: `dashboard/summary-finance`,
         method: "GET",
         params: { year },
         credentials: "include",
@@ -98,4 +112,5 @@ export const {
   useGetNextPendingPaymentsQuery,
   useGetOccupationStatisticsPercentageByTypeQuery,
   useGetMonthlyBookingTrendQuery,
+  useGetAnnualSummaryFinanceQuery,
 } = dashboardApi;

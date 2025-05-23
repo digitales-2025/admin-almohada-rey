@@ -1,5 +1,6 @@
 import {
   useGetAnnualStatisticsQuery,
+  useGetAnnualSummaryFinanceQuery,
   useGetMonthlyBookingTrendQuery,
   useGetMonthlyEarningsExpensesQuery,
   useGetNextPendingPaymentsQuery,
@@ -11,10 +12,11 @@ import {
 interface UseDashboardProps {
   year?: number;
   yearReservation?: number;
+  yearFinance?: number;
 }
 
 export const useDashboard = (options: UseDashboardProps = {}) => {
-  const { year, yearReservation } = options;
+  const { year, yearReservation, yearFinance } = options;
 
   // Estadísticas anuales
   const {
@@ -71,6 +73,14 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     skip: !yearReservation,
   });
 
+  const {
+    data: annualSummaryFinance,
+    isLoading: isLoadingAnnualSummaryFinance,
+    refetch: refetchAnnualSummaryFinance,
+  } = useGetAnnualSummaryFinanceQuery(yearFinance, {
+    skip: !yearFinance,
+  });
+
   // Estado de carga combinado
   const isLoading =
     isLoadingAnnualStatistics ||
@@ -89,6 +99,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     nextPendingPayments,
     occupancyStatisticsPercentage,
     monthlyBookingTrend,
+    annualSummaryFinance,
 
     // Estados de carga
     isLoadingAnnualStatistics,
@@ -99,6 +110,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     isLoadingOccupancyStatisticsPercentage,
     isLoading,
     isLoadingMonthlyBookingTrend,
+    isLoadingAnnualSummaryFinance,
 
     // Funciones de actualización
     refetchAnnualStatistics,
@@ -108,5 +120,6 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetchNextPendingPayments,
     refetchOccupancyStatisticsPercentage,
     refetchMonthlyBookingTrend,
+    refetchAnnualSummaryFinance,
   };
 };
