@@ -35,13 +35,7 @@ export default function NationalInternationalDistribution({
       <div className="grid gap-6 md:grid-cols-2">
         <Card className="border-none shadow-md">
           <CardHeader>
-            <CardTitle className="text-xl flex items-center gap-2">
-              <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-violet-500"></span>
-              </span>
-              Distribución de Huéspedes
-            </CardTitle>
+            <CardTitle className="text-xl flex items-center gap-2">Distribución de Huéspedes</CardTitle>
             <CardDescription>Proporción de huéspedes nacionales e internacionales</CardDescription>
           </CardHeader>
           <CardContent>
@@ -49,12 +43,12 @@ export default function NationalInternationalDistribution({
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col items-center justify-center p-6 rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950/40 dark:to-emerald-900/30">
                   <Building2 className="h-8 w-8 text-emerald-600 dark:text-emerald-400 mb-2" />
-                  <h3 className="text-4xl font-bold text-emerald-600 dark:text-emerald-400">{nationalPercentage}%</h3>
+                  <h3 className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{nationalPercentage}%</h3>
                   <p className="text-sm font-medium text-muted-foreground mt-1">Nacionales</p>
                 </div>
                 <div className="flex flex-col items-center justify-center p-6 rounded-xl bg-gradient-to-br from-violet-50 to-violet-100 dark:from-violet-950/40 dark:to-violet-900/30">
                   <Globe className="h-8 w-8 text-violet-600 dark:text-violet-400 mb-2" />
-                  <h3 className="text-4xl font-bold text-violet-600 dark:text-violet-400">
+                  <h3 className="text-2xl font-bold text-violet-600 dark:text-violet-400">
                     {internationalPercentage}%
                   </h3>
                   <p className="text-sm font-medium text-muted-foreground mt-1">Internacionales</p>

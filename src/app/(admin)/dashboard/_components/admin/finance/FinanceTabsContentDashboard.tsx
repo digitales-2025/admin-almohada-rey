@@ -83,21 +83,21 @@ export default function FinanceTabsContentDashboard({
     }).format(amount);
   };
 
-  // Datos para el gráfico de ingresos
+  // Datos para el gráfico de ingresos (filtrar valores en cero)
   const incomeData = [
     { name: "Habitaciones", value: financeSummary.totalRoomReservations, color: "#4f46e5" },
     { name: "Servicios", value: financeSummary.totalServices, color: "#0ea5e9" },
     { name: "Productos", value: financeSummary.totalProducts, color: "#10b981" },
     { name: "Late Checkout", value: financeSummary.totalLateCheckout, color: "#f59e0b" },
-  ];
+  ].filter((item) => item.value > 0); // Filtrar elementos con valor cero
 
-  // Datos para el gráfico de gastos
+  // Datos para el gráfico de gastos (filtrar valores en cero)
   const expensesData = [
     { name: "Fijos", value: financeSummary.totalExpensesFixed, color: "#ef4444" },
     { name: "Variables", value: financeSummary.totalExpensesVariable, color: "#f97316" },
     { name: "Productos", value: financeSummary.totalExpensesProducts, color: "#8b5cf6" },
     { name: "Otros", value: financeSummary.totalExpensesOther, color: "#ec4899" },
-  ];
+  ].filter((item) => item.value > 0); // Filtrar elementos con valor cero
 
   return (
     <TabsContent value="finanzas" className="space-y-6 px-6">
@@ -237,26 +237,32 @@ export default function FinanceTabsContentDashboard({
             </div>
 
             <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={incomeData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  >
-                    {incomeData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value) => formatCurrency(Number(value))} />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
+              {incomeData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={incomeData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {incomeData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex h-full items-center justify-center">
+                  <p className="text-muted-foreground text-center">No hay datos de ingresos disponibles</p>
+                </div>
+              )}
             </div>
           </div>
         </CardContent>
@@ -329,26 +335,32 @@ export default function FinanceTabsContentDashboard({
             </div>
 
             <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={expensesData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  >
-                    {expensesData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value) => formatCurrency(Number(value))} />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
+              {expensesData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={expensesData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {expensesData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex h-full items-center justify-center">
+                  <p className="text-muted-foreground text-center">No hay datos de gastos disponibles</p>
+                </div>
+              )}
             </div>
           </div>
         </CardContent>
