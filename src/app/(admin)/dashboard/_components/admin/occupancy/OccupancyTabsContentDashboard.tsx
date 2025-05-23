@@ -1,3 +1,5 @@
+"use client";
+
 import { createPortal } from "react-dom";
 
 import { FilterYear } from "@/components/ui/filter-year";
@@ -20,8 +22,9 @@ export default function OccupancyTabsContentDashboard({
   setYear,
 }: OccupancyTabsContentDashboardProps) {
   const element = document.getElementById("headerContent");
+
   return (
-    <TabsContent value="ocupacion" className="space-y-4 px-6">
+    <TabsContent value="ocupacion" className="space-y-6 px-6">
       {element &&
         createPortal(
           <div id="headerContent">
@@ -29,10 +32,9 @@ export default function OccupancyTabsContentDashboard({
           </div>,
           element
         )}
-      {/* Contenido existente de la pestaña Ocupación */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <RoomStatusByType roomOccupancy={roomOccupancy} />
 
+      <div className="grid gap-6 md:grid-cols-3">
+        <RoomStatusByType roomOccupancy={roomOccupancy} />
         <OccupationStatisticsRooms occupancyStatisticsPercentage={occupancyStatisticsPercentage} />
       </div>
     </TabsContent>
