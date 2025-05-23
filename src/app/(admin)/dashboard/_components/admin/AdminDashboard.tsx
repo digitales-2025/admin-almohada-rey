@@ -3,19 +3,12 @@
 import { useState } from "react";
 import { BarChart3, Calendar, Globe, Home, PieChart } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDashboard } from "../../_hooks/use-dashboard";
-import { CustomerOriginStats } from "./CustomerOriginStats";
-import { CustomerOriginTrends } from "./CustomerOriginTrends";
 import FinanceTabsContentDashboard from "./finance/FinanceTabsContentDashboard";
-import { InternationalCustomersChart } from "./InternationalCustomersChart";
-import { NationalCustomersChart } from "./NationalCustomersChart";
 import OccupancyTabsContentDashboard from "./occupancy/OccupancyTabsContentDashboard";
+import OriginCustomerTabsContentDashboard from "./origin-customer/OriginCustomerTabsContentDashboard";
 import ReservationTabsContentDashboard from "./reservation/ReservationTabsContentDashboard";
-import { ReservationsByOriginChart } from "./ReservationsByOriginChart";
 import SummaryTabsContentDashoard from "./summary/SummaryTabsContentDashboard";
 
 export function AdminDashboard() {
@@ -23,7 +16,7 @@ export function AdminDashboard() {
   const [year, setYear] = useState(new Date().getFullYear() as number);
   const [yearReservation, setYearReservation] = useState(new Date().getFullYear() as number);
   const [yearFinance, setYearFinance] = useState(new Date().getFullYear() as number);
-  const [originTimeframe, setOriginTimeframe] = useState("este-mes");
+  const [yearOrigin, setYearOrigin] = useState(new Date().getFullYear() as number);
 
   const { annualStatistics, monthlyEarningsExpenses, occupancyStatisticsPercentage } = useDashboard({
     year,
@@ -36,6 +29,11 @@ export function AdminDashboard() {
   const { annualSummaryFinance } = useDashboard({
     yearFinance,
   });
+
+  const { customerOriginSummary, monthlyCustomerOrigin, top10CountriesCustomers, top10ProvincesCustomers } =
+    useDashboard({
+      yearOrigin,
+    });
 
   const { nextPendingPayments, recentReservations, roomOccupancy } = useDashboard();
 
@@ -131,118 +129,14 @@ export function AdminDashboard() {
         />
 
         {/* Pestaña de Procedencia */}
-        <TabsContent value="procedencia" className="space-y-4 px-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
-            <div></div>
-            <div className="flex items-center gap-2">
-              <Select value={originTimeframe} onValueChange={setOriginTimeframe}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Seleccionar período" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="este-mes">Este mes</SelectItem>
-                  <SelectItem value="ultimo-trimestre">Último trimestre</SelectItem>
-                  <SelectItem value="este-año">Este año</SelectItem>
-                  <SelectItem value="todo">Todo el tiempo</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button>Exportar</Button>
-            </div>
-          </div>
-
-          {/* Tarjetas de estadísticas */}
-          <CustomerOriginStats />
-
-          {/* Distribución Nacional vs Internacional */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl">Distribución Nacional vs Internacional</CardTitle>
-              <CardDescription>Proporción de huéspedes nacionales e internacionales</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-8 md:grid-cols-2">
-                <div className="flex flex-col items-center justify-center">
-                  <div className="text-center mb-4">
-                    <h3 className="text-lg font-semibold">Distribución de Huéspedes</h3>
-                    <p className="text-sm text-muted-foreground">Total: 1,248 huéspedes</p>
-                  </div>
-                  <div className="w-full max-w-xs">
-                    <div className="relative h-6 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className="absolute top-0 left-0 h-full bg-green-500 rounded-l-full"
-                        style={{ width: "65%" }}
-                      ></div>
-                      <div
-                        className="absolute top-0 right-0 h-full bg-blue-500 rounded-r-full"
-                        style={{ width: "35%" }}
-                      ></div>
-                    </div>
-                    <div className="flex justify-between mt-2 text-sm">
-                      <div className="flex items-center">
-                        <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                        <span>Nacionales (65%)</span>
-                      </div>
-                      <div className="flex items-center">
-                        <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
-                        <span>Internacionales (35%)</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4 mt-6 w-full">
-                    <div className="bg-green-50 p-4 rounded-lg border border-green-100">
-                      <div className="text-sm text-muted-foreground">Huéspedes Nacionales</div>
-                      <div className="text-2xl font-bold text-green-600">812</div>
-                    </div>
-                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                      <div className="text-sm text-muted-foreground">Huéspedes Internacionales</div>
-                      <div className="text-2xl font-bold text-blue-600">436</div>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <CustomerOriginTrends />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            {/* Huéspedes Nacionales por Departamento */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-xl">Huéspedes Nacionales por Departamento</CardTitle>
-                <CardDescription>Top 10 departamentos de origen</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <NationalCustomersChart />
-              </CardContent>
-            </Card>
-
-            {/* Huéspedes Internacionales por País */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-xl">Huéspedes Internacionales por País</CardTitle>
-                <CardDescription>Top 10 países de origen</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <InternationalCustomersChart />
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Análisis de Reservas por Origen */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl">Análisis de Reservas por Origen</CardTitle>
-              <CardDescription>
-                Comparativa de duración de estancia, gasto promedio y tipo de habitación
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ReservationsByOriginChart />
-            </CardContent>
-          </Card>
-        </TabsContent>
+        <OriginCustomerTabsContentDashboard
+          year={yearOrigin}
+          setYear={setYearOrigin}
+          customerOriginSummary={customerOriginSummary}
+          monthlyCustomerOrigin={monthlyCustomerOrigin}
+          top10CountriesCustomers={top10CountriesCustomers}
+          top10ProvincesCustomers={top10ProvincesCustomers}
+        />
       </Tabs>
     </div>
   );
