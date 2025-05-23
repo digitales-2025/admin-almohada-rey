@@ -4,7 +4,7 @@ import { RoomStatus } from "../_types/room";
 
 // Schema for status change
 export const statusRoomsSchema = z.object({
-  status: z.enum([RoomStatus.AVAILABLE, RoomStatus.OCCUPIED, RoomStatus.CLEANING]),
+  status: z.enum([RoomStatus.AVAILABLE, RoomStatus.OCCUPIED, RoomStatus.CLEANING, RoomStatus.INCOMPLETE]),
 });
 
 export type UpdateStatusRoomsSchema = z.infer<typeof statusRoomsSchema>;
