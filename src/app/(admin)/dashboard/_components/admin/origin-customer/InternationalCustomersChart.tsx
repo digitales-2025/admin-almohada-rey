@@ -2,53 +2,23 @@
 
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-const data = [
-  {
-    name: "EE.UU.",
-    value: 110,
-  },
-  {
-    name: "Chile",
-    value: 78,
-  },
-  {
-    name: "Argentina",
-    value: 65,
-  },
-  {
-    name: "España",
-    value: 52,
-  },
-  {
-    name: "Colombia",
-    value: 44,
-  },
-  {
-    name: "Brasil",
-    value: 35,
-  },
-  {
-    name: "Alemania",
-    value: 22,
-  },
-  {
-    name: "Francia",
-    value: 18,
-  },
-  {
-    name: "Japón",
-    value: 9,
-  },
-  {
-    name: "Australia",
-    value: 5,
-  },
-];
+import { Top10CountriesProvinces } from "../../../_types/dashboard";
 
-export function InternationalCustomersChart() {
+interface InternationalCustomersChartProps {
+  top10CountriesCustomers: Top10CountriesProvinces[] | undefined;
+}
+
+export function InternationalCustomersChart({ top10CountriesCustomers }: InternationalCustomersChartProps) {
+  // Usamos los datos proporcionados o un array vacío si son undefined
+  const chartData =
+    top10CountriesCustomers?.map((item) => ({
+      name: item.countryProvince,
+      value: item.totalCustomers,
+    })) || [];
+
   return (
     <ResponsiveContainer width="100%" height={350}>
-      <BarChart data={data} layout="vertical" margin={{ top: 5, right: 30, left: 60, bottom: 5 }}>
+      <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 30, left: 60, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
         <XAxis type="number" axisLine={false} tickLine={false} />
         <YAxis
@@ -73,7 +43,7 @@ export function InternationalCustomersChart() {
           fill="#60a5fa"
           radius={[0, 4, 4, 0]}
           barSize={20}
-          label={{ position: "right", formatter: (value) => value, fontSize: 12 }}
+          label={{ position: "right", formatter: (value: number) => value, fontSize: 12 }}
         />
       </BarChart>
     </ResponsiveContainer>

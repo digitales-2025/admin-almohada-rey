@@ -22,7 +22,7 @@ export function CustomerOriginStats({ customerOriginSummary }: CustomerOriginSta
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {/* Total Guests Card */}
-      <Card className="border-0 shadow-md overflow-hidden relative group hover:shadow-lg transition-all duration-300">
+      <Card className="border-0 overflow-hidden relative group transition-all duration-300">
         <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 z-0"></div>
         <div className="absolute top-0 left-0 w-full h-1 bg-slate-400"></div>
         <CardContent className="relative z-10">
@@ -35,7 +35,7 @@ export function CustomerOriginStats({ customerOriginSummary }: CustomerOriginSta
                 className="text-3xl font-bold"
               />
             </div>
-            <div className="h-14 w-14 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+            <div className="h-14 w-14 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
               <Users className="h-7 w-7 text-slate-600 dark:text-slate-300" />
             </div>
           </div>
@@ -46,7 +46,7 @@ export function CustomerOriginStats({ customerOriginSummary }: CustomerOriginSta
       </Card>
 
       {/* National Guests Card */}
-      <Card className="border-0 shadow-md overflow-hidden relative group hover:shadow-lg transition-all duration-300">
+      <Card className="border-0 overflow-hidden relative group transition-all duration-300">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950 dark:to-slate-800 z-0"></div>
         <div className="absolute top-0 left-0 w-full h-1 bg-emerald-400"></div>
         <CardContent className="relative z-10">
@@ -59,7 +59,7 @@ export function CustomerOriginStats({ customerOriginSummary }: CustomerOriginSta
                 className="text-3xl font-bold"
               />
             </div>
-            <div className="h-14 w-14 rounded-full bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+            <div className="h-14 w-14 rounded-full bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
               <MapPin className="h-7 w-7 text-emerald-600 dark:text-emerald-400" />
             </div>
           </div>
@@ -70,7 +70,7 @@ export function CustomerOriginStats({ customerOriginSummary }: CustomerOriginSta
       </Card>
 
       {/* International Guests Card */}
-      <Card className="border-0 shadow-md overflow-hidden relative group hover:shadow-lg transition-all duration-300">
+      <Card className="border-0 overflow-hidden relative group transition-all duration-300">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-white dark:from-blue-950 dark:to-slate-800 z-0"></div>
         <div className="absolute top-0 left-0 w-full h-1 bg-blue-400"></div>
         <CardContent className="relative z-10">
@@ -83,7 +83,7 @@ export function CustomerOriginStats({ customerOriginSummary }: CustomerOriginSta
                 className="text-3xl font-bold"
               />
             </div>
-            <div className="h-14 w-14 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+            <div className="h-14 w-14 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
               <Globe className="h-7 w-7 text-blue-600 dark:text-blue-400" />
             </div>
           </div>
@@ -94,7 +94,7 @@ export function CustomerOriginStats({ customerOriginSummary }: CustomerOriginSta
       </Card>
 
       {/* Countries Represented Card */}
-      <Card className="border-0 shadow-md overflow-hidden relative group hover:shadow-lg transition-all duration-300">
+      <Card className="border-0 overflow-hidden relative group transition-all duration-300">
         <div className="absolute inset-0 bg-gradient-to-br from-amber-50 to-white dark:from-amber-950 dark:to-slate-800 z-0"></div>
         <div className="absolute top-0 left-0 w-full h-1 bg-amber-400"></div>
         <CardContent className="relative z-10">
@@ -107,7 +107,7 @@ export function CustomerOriginStats({ customerOriginSummary }: CustomerOriginSta
                 className="text-3xl font-bold"
               />
             </div>
-            <div className="h-14 w-14 rounded-full bg-amber-100 dark:bg-amber-900 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+            <div className="h-14 w-14 rounded-full bg-amber-100 dark:bg-amber-900 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
               <TrendingUp className="h-7 w-7 text-amber-600 dark:text-amber-400" />
             </div>
           </div>
