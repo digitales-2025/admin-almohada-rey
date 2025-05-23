@@ -113,14 +113,6 @@ export function CustomerOriginStats({ customerOriginSummary }: CustomerOriginSta
           </div>
           <div className="mt-4 pt-4 border-t border-dashed border-amber-200 dark:border-amber-800">
             <div className="text-xs text-muted-foreground">Diversidad de origen de los huéspedes</div>
-            <div className="mt-2 flex">
-              {Array.from({ length: Math.min(10, summary.totalCountry) }).map((_, i) => (
-                <div key={i} className="h-1.5 w-1.5 rounded-full bg-amber-400 dark:bg-amber-500 mr-1"></div>
-              ))}
-              {summary.totalCountry > 10 && (
-                <div className="text-xs text-amber-500 dark:text-amber-400 ml-1">+{summary.totalCountry - 10}</div>
-              )}
-            </div>
           </div>
         </CardContent>
       </Card>
