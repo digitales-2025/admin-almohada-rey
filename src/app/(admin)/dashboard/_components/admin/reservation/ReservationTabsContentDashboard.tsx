@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FilterYear } from "@/components/ui/filter-year";
 import { MonthlyBookingTrend } from "../../../_types/dashboard";
-import { ReservationTrends } from "../ReservationTrends";
+import { ReservationTrends } from "./ReservationTrends";
 
 interface ReservationTabsContentDashboardProps {
   year: number;

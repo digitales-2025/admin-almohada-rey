@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDashboard } from "../../_hooks/use-dashboard";
 import { CustomerOriginStats } from "./CustomerOriginStats";
 import { CustomerOriginTrends } from "./CustomerOriginTrends";
+import FinanceTabsContentDashboard from "./finance/FinanceTabsContentDashboard";
 import { InternationalCustomersChart } from "./InternationalCustomersChart";
 import { NationalCustomersChart } from "./NationalCustomersChart";
 import OccupancyTabsContentDashboard from "./occupancy/OccupancyTabsContentDashboard";
@@ -21,6 +22,7 @@ export function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("resumen");
   const [year, setYear] = useState(new Date().getFullYear() as number);
   const [yearReservation, setYearReservation] = useState(new Date().getFullYear() as number);
+  const [yearFinance, setYearFinance] = useState(new Date().getFullYear() as number);
   const [originTimeframe, setOriginTimeframe] = useState("este-mes");
 
   const { annualStatistics, monthlyEarningsExpenses, occupancyStatisticsPercentage } = useDashboard({
@@ -29,6 +31,10 @@ export function AdminDashboard() {
 
   const { monthlyBookingTrend } = useDashboard({
     yearReservation,
+  });
+
+  const { annualSummaryFinance } = useDashboard({
+    yearFinance,
   });
 
   const { nextPendingPayments, recentReservations, roomOccupancy } = useDashboard();
@@ -118,64 +124,11 @@ export function AdminDashboard() {
         />
 
         {/* Pestaña de Finanzas */}
-        <TabsContent value="finanzas" className="space-y-4 px-6">
-          {/* Contenido existente de la pestaña Finanzas */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl">Resumen Financiero</CardTitle>
-              <CardDescription>Análisis detallado de ingresos y gastos</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-8">
-                <div className="grid gap-4 md:grid-cols-3">
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-medium">Ingresos Totales</h3>
-                    <div className="text-3xl font-bold text-green-600">S/ 152,450.00</div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-medium">Gastos Totales</h3>
-                    <div className="text-3xl font-bold text-red-600">S/ 87,320.00</div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-medium">Beneficio Neto</h3>
-                    <div className="text-3xl font-bold text-blue-600">S/ 65,130.00</div>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <h3 className="text-lg font-medium">Desglose de Ingresos</h3>
-                  <div className="grid gap-4 md:grid-cols-4">
-                    <div className="rounded-lg border p-3">
-                      <div className="text-sm text-muted-foreground">Habitaciones</div>
-                      <div className="text-xl font-bold mt-1">S/ 98,750.00</div>
-                      <div className="text-xs text-green-500">65% del total</div>
-                    </div>
-
-                    <div className="rounded-lg border p-3">
-                      <div className="text-sm text-muted-foreground">Restaurante</div>
-                      <div className="text-xl font-bold mt-1">S/ 32,450.00</div>
-                      <div className="text-xs text-green-500">21% del total</div>
-                    </div>
-
-                    <div className="rounded-lg border p-3">
-                      <div className="text-sm text-muted-foreground">Servicios</div>
-                      <div className="text-xl font-bold mt-1">S/ 15,320.00</div>
-                      <div className="text-xs text-green-500">10% del total</div>
-                    </div>
-
-                    <div className="rounded-lg border p-3">
-                      <div className="text-sm text-muted-foreground">Otros</div>
-                      <div className="text-xl font-bold mt-1">S/ 5,930.00</div>
-                      <div className="text-xs text-green-500">4% del total</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+        <FinanceTabsContentDashboard
+          year={yearFinance}
+          setYear={setYearFinance}
+          annualSummaryFinance={annualSummaryFinance}
+        />
 
         {/* Pestaña de Procedencia */}
         <TabsContent value="procedencia" className="space-y-4 px-6">
