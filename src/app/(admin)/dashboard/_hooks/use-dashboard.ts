@@ -1,22 +1,27 @@
 import {
   useGetAnnualStatisticsQuery,
   useGetAnnualSummaryFinanceQuery,
+  useGetCustomerOriginSummaryQuery,
   useGetMonthlyBookingTrendQuery,
+  useGetMonthlyCustomerOriginQuery,
   useGetMonthlyEarningsExpensesQuery,
   useGetNextPendingPaymentsQuery,
   useGetOccupationStatisticsPercentageByTypeQuery,
   useGetRecentReservationsQuery,
   useGetRoomOccupancyQuery,
+  useGetTop10CountriesCustomersQuery,
+  useGetTop10ProvincesCustomersQuery,
 } from "../_services/dashbordApi";
 
 interface UseDashboardProps {
   year?: number;
   yearReservation?: number;
   yearFinance?: number;
+  yearOrigin?: number;
 }
 
 export const useDashboard = (options: UseDashboardProps = {}) => {
-  const { year, yearReservation, yearFinance } = options;
+  const { year, yearReservation, yearFinance, yearOrigin } = options;
 
   // Estadísticas anuales
   const {
@@ -81,6 +86,38 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     skip: !yearFinance,
   });
 
+  const {
+    data: customerOriginSummary,
+    isLoading: isLoadingCustomerOriginSummary,
+    refetch: refetchCustomerOriginSummary,
+  } = useGetCustomerOriginSummaryQuery(yearOrigin, {
+    skip: !yearOrigin,
+  });
+
+  const {
+    data: monthlyCustomerOrigin,
+    isLoading: isLoadingMonthlyCustomerOrigin,
+    refetch: refetchMonthlyCustomerOrigin,
+  } = useGetMonthlyCustomerOriginQuery(yearOrigin, {
+    skip: !yearOrigin,
+  });
+
+  const {
+    data: top10CountriesCustomers,
+    isLoading: isLoadingTop10CountriesCustomers,
+    refetch: refetchTop10CountriesCustomers,
+  } = useGetTop10CountriesCustomersQuery(yearOrigin, {
+    skip: !yearOrigin,
+  });
+
+  const {
+    data: top10ProvincesCustomers,
+    isLoading: isLoadingTop10ProvincesCustomers,
+    refetch: refetchTop10ProvincesCustomers,
+  } = useGetTop10ProvincesCustomersQuery(yearOrigin, {
+    skip: !yearOrigin,
+  });
+
   // Estado de carga combinado
   const isLoading =
     isLoadingAnnualStatistics ||
@@ -89,6 +126,12 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     isLoadingRecentReservations ||
     isLoadingNextPendingPayments ||
     isLoadingOccupancyStatisticsPercentage;
+
+  const isLoadingOrigin =
+    isLoadingCustomerOriginSummary ||
+    isLoadingMonthlyCustomerOrigin ||
+    isLoadingTop10CountriesCustomers ||
+    isLoadingTop10ProvincesCustomers;
 
   return {
     // Datos
@@ -100,6 +143,10 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     occupancyStatisticsPercentage,
     monthlyBookingTrend,
     annualSummaryFinance,
+    customerOriginSummary,
+    monthlyCustomerOrigin,
+    top10CountriesCustomers,
+    top10ProvincesCustomers,
 
     // Estados de carga
     isLoadingAnnualStatistics,
@@ -111,6 +158,11 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     isLoading,
     isLoadingMonthlyBookingTrend,
     isLoadingAnnualSummaryFinance,
+    isLoadingOrigin,
+    isLoadingCustomerOriginSummary,
+    isLoadingMonthlyCustomerOrigin,
+    isLoadingTop10CountriesCustomers,
+    isLoadingTop10ProvincesCustomers,
 
     // Funciones de actualización
     refetchAnnualStatistics,
@@ -121,5 +173,9 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetchOccupancyStatisticsPercentage,
     refetchMonthlyBookingTrend,
     refetchAnnualSummaryFinance,
+    refetchCustomerOriginSummary,
+    refetchMonthlyCustomerOrigin,
+    refetchTop10CountriesCustomers,
+    refetchTop10ProvincesCustomers,
   };
 };

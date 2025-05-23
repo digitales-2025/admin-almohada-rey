@@ -3,13 +3,16 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import baseQueryWithReauth from "@/utils/baseQuery";
 import {
   AnnualAdministratorStatistics,
+  CustomerOriginSummary,
   MonthlyBookingTrend,
+  MonthlyCustomerOrigin,
   MonthlyEarningsAndExpenses,
   NextPendingPayments,
   OccupationStatisticsPercentage,
   RecentReservations,
   RoomOccupancyMap,
   SummaryFinance,
+  Top10CountriesProvinces,
 } from "../_types/dashboard";
 
 export const dashboardApi = createApi({
@@ -101,6 +104,50 @@ export const dashboardApi = createApi({
       }),
       providesTags: ["Dashboard"],
     }),
+
+    // Obtener resumen de origen de clientes
+    getCustomerOriginSummary: build.query<CustomerOriginSummary, number | void>({
+      query: (year = new Date().getFullYear()) => ({
+        url: `dashboard/customer-origin`,
+        method: "GET",
+        params: { year },
+        credentials: "include",
+      }),
+      providesTags: ["Dashboard"],
+    }),
+
+    // Obtener tendencia de origen de clientes mensuales
+    getMonthlyCustomerOrigin: build.query<MonthlyCustomerOrigin[], number | void>({
+      query: (year = new Date().getFullYear()) => ({
+        url: `dashboard/monthly-customer-origin`,
+        method: "GET",
+        params: { year },
+        credentials: "include",
+      }),
+      providesTags: ["Dashboard"],
+    }),
+
+    // Obtener top 10 países
+    getTop10CountriesCustomers: build.query<Top10CountriesProvinces[], number | void>({
+      query: (year = new Date().getFullYear()) => ({
+        url: `dashboard/top-countries`,
+        method: "GET",
+        params: { year },
+        credentials: "include",
+      }),
+      providesTags: ["Dashboard"],
+    }),
+
+    // Obtener top 10 provincias
+    getTop10ProvincesCustomers: build.query<Top10CountriesProvinces[], number | void>({
+      query: (year = new Date().getFullYear()) => ({
+        url: `dashboard/top-provinces`,
+        method: "GET",
+        params: { year },
+        credentials: "include",
+      }),
+      providesTags: ["Dashboard"],
+    }),
   }),
 });
 
@@ -113,4 +160,8 @@ export const {
   useGetOccupationStatisticsPercentageByTypeQuery,
   useGetMonthlyBookingTrendQuery,
   useGetAnnualSummaryFinanceQuery,
+  useGetCustomerOriginSummaryQuery,
+  useGetMonthlyCustomerOriginQuery,
+  useGetTop10CountriesCustomersQuery,
+  useGetTop10ProvincesCustomersQuery,
 } = dashboardApi;
