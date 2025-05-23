@@ -19,20 +19,7 @@ import { FilterYear } from "@/components/ui/filter-year";
 import { NumberCounter } from "@/components/ui/number-counter";
 import { Progress } from "@/components/ui/progress";
 import { TabsContent } from "@/components/ui/tabs";
-
-interface SummaryFinance {
-  totalIncome: number;
-  totalExpenses: number;
-  totalProfit: number;
-  totalRoomReservations: number;
-  totalServices: number;
-  totalProducts: number;
-  totalLateCheckout: number;
-  totalExpensesFixed: number;
-  totalExpensesVariable: number;
-  totalExpensesOther: number;
-  totalExpensesProducts: number;
-}
+import { SummaryFinance } from "../../../_types/dashboard";
 
 interface FinanceTabsContentDashboardProps {
   year: number;
