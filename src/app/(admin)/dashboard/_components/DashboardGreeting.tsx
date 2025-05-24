@@ -36,7 +36,7 @@ export function DashboardGreeting({ userName = "Administrador" }: DashboardGreet
       <div className="flex items-center gap-3">
         <div className="bg-white/80 dark:bg-slate-800/80 p-3 rounded-full shadow-sm">{icon}</div>
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-200 dark:to-slate-100 bg-clip-text text-transparent">
+          <h1 className="text-3xl capitalize font-bold tracking-tight bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-200 dark:to-slate-100 bg-clip-text text-transparent">
             {greeting}, {userName}!
           </h1>
           <p className="text-muted-foreground">Bienvenido de nuevo al Panel Administrativo</p>
