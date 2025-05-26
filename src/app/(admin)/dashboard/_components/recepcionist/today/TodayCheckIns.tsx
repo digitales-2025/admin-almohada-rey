@@ -1,89 +1,66 @@
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+
+import { ReservationStatus } from "@/app/(admin)/reservation/_schemas/reservation.schemas";
+import { reservationStatusConfig } from "@/app/(admin)/reservation/_types/reservation-enum.config";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Top5TodayCheckIn } from "../../../_types/dashboard";
 
-export function TodayCheckIns() {
-  const checkIns = [
-    {
-      id: "RES-001",
-      customer: {
-        name: "Juan Pérez",
-        initials: "JP",
-      },
-      room: "101",
-      time: "10:00",
-      status: "CHECKED_IN",
-    },
-    {
-      id: "RES-002",
-      customer: {
-        name: "María García",
-        initials: "MG",
-      },
-      room: "205",
-      time: "12:00",
-      status: "PENDING",
-    },
-    {
-      id: "RES-003",
-      customer: {
-        name: "Roberto Jiménez",
-        initials: "RJ",
-      },
-      room: "302",
-      time: "14:00",
-      status: "PENDING",
-    },
-    {
-      id: "RES-004",
-      customer: {
-        name: "Ana Martínez",
-        initials: "AM",
-      },
-      room: "110",
-      time: "15:30",
-      status: "CHECKED_IN",
-    },
-    {
-      id: "RES-005",
-      customer: {
-        name: "Carlos López",
-        initials: "CL",
-      },
-      room: "215",
-      time: "17:00",
-      status: "CHECKED_IN",
-    },
-  ];
+interface TodayCheckInsProps {
+  top5TodayCheckIn: Top5TodayCheckIn[] | undefined;
+}
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "CHECKED_IN":
-        return <Badge className="bg-green-500">Registrado</Badge>;
-      case "PENDING":
-        return <Badge variant="secondary">Pendiente</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
+export function TodayCheckIns({ top5TodayCheckIn = [] }: TodayCheckInsProps) {
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .substring(0, 2);
+  };
+
+  const getStatusBadge = (status: ReservationStatus) => {
+    const config = reservationStatusConfig[status];
+    const Icon = config.icon;
+
+    return (
+      <Badge className={`${config.backgroundColor} ${config.textColor} font-medium`} variant="outline">
+        <Icon className="h-3 w-3 mr-1" />
+        {config.name}
+      </Badge>
+    );
+  };
+
+  const formatTime = (date: Date) => {
+    return format(new Date(date), "HH:mm", { locale: es });
   };
 
   return (
     <div className="space-y-4">
-      {checkIns.map((checkIn) => (
-        <div key={checkIn.id} className="flex items-center justify-between border-b pb-4">
-          <div className="flex items-center space-x-4">
-            <Avatar>
-              <AvatarFallback>{checkIn.customer.initials}</AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="text-sm font-medium">{checkIn.customer.name}</p>
-              <p className="text-xs text-muted-foreground">
-                Hab. {checkIn.room} • Esperado a las {checkIn.time}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">{getStatusBadge(checkIn.status)}</div>
+      {top5TodayCheckIn.length === 0 ? (
+        <div className="py-6 text-center">
+          <p className="text-muted-foreground">No hay check-ins programados para hoy</p>
         </div>
-      ))}
+      ) : (
+        top5TodayCheckIn.map((checkIn) => (
+          <div key={checkIn.id} className="flex items-center justify-between border-b pb-4">
+            <div className="flex items-center space-x-4">
+              <Avatar>
+                <AvatarFallback>{getInitials(checkIn.customerName)}</AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="text-sm font-medium capitalize">{checkIn.customerName}</p>
+                <p className="text-xs text-muted-foreground">
+                  Hab. {checkIn.roomNumber} • Esperado a las {formatTime(checkIn.checkInDate)}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">{getStatusBadge(checkIn.status)}</div>
+          </div>
+        ))
+      )}
     </div>
   );
 }
