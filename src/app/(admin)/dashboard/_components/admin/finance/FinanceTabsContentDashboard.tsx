@@ -114,7 +114,7 @@ export default function FinanceTabsContentDashboard({
       <div className="grid gap-6 md:grid-cols-3">
         <Card className="overflow-hidden border-l-4 border-l-green-500">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xl flex items-center justify-between">
+            <CardTitle className="text-sm font-medium flex items-center justify-between">
               <span>Ingresos Totales</span>
               <DollarSign className="h-5 w-5 text-green-500" />
             </CardTitle>
@@ -136,7 +136,7 @@ export default function FinanceTabsContentDashboard({
 
         <Card className="overflow-hidden border-l-4 border-l-red-500">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xl flex items-center justify-between">
+            <CardTitle className="text-sm font-medium flex items-center justify-between">
               <span>Gastos Totales</span>
               <CreditCard className="h-5 w-5 text-red-500" />
             </CardTitle>
@@ -158,7 +158,7 @@ export default function FinanceTabsContentDashboard({
 
         <Card className="overflow-hidden border-l-4 border-l-blue-500">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xl flex items-center justify-between">
+            <CardTitle className="text-sm font-medium flex items-center justify-between">
               <span>Beneficio Neto</span>
               <Building className="h-5 w-5 text-blue-500" />
             </CardTitle>

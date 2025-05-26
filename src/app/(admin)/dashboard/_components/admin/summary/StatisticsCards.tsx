@@ -66,7 +66,7 @@ export default function StatisticsCards({ annualStatistics }: StatisticsCardsPro
             <span className="text-xl font-medium mr-1">+</span>
             <NumberCounter
               value={annualStatistics?.newCustomers || 0}
-              formatter={(val) => val.toFixed(0)}
+              formatter={(val) => Math.round(val).toString()}
               className="text-3xl font-bold"
             />
           </div>
