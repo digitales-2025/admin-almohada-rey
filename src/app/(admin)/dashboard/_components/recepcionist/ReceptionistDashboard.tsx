@@ -9,9 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDashboard } from "../../_hooks/use-dashboard";
-import { RoomStatusByType } from "../admin/occupancy/RoomStatusByType";
 import PendingAmenitiesTabsContentDashboard from "./pending-amenities/PendingAmenitiesTabsContentDashboard";
-import { AvailableRooms } from "./rooms/AvailableRooms";
+import RoomsTabsContentDashboard from "./rooms/RoomsTabsContentDashboard";
 import TodayTabsContentDashboard from "./today/TodayTabsContentDashboard";
 
 export function ReceptionistDashboard() {
@@ -23,6 +22,7 @@ export function ReceptionistDashboard() {
     top5PriorityPendingAmenities,
     roomOccupancy,
     amenitiesByPriority,
+    todayAvailableRooms,
   } = useDashboard({ activeTab });
 
   return (
@@ -66,26 +66,7 @@ export function ReceptionistDashboard() {
           top5TodayCheckOut={top5TodayCheckOut}
         />
 
-        <TabsContent value="habitaciones" className="space-y-4">
-          <RoomStatusByType roomOccupancy={roomOccupancy} />
-
-          <Card className="shadow-md">
-            <CardHeader className="pb-2">
-              <div className="flex justify-between items-center">
-                <div>
-                  <CardTitle className="text-xl">Habitaciones Disponibles</CardTitle>
-                  <CardDescription>Habitaciones listas para check-in</CardDescription>
-                </div>
-                <Button variant="outline" size="sm">
-                  Ver todas
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <AvailableRooms />
-            </CardContent>
-          </Card>
-        </TabsContent>
+        <RoomsTabsContentDashboard roomOccupancy={roomOccupancy} todayAvailableRooms={todayAvailableRooms} />
 
         <TabsContent value="reservas" className="space-y-4">
           {/* Estadísticas rápidas */}

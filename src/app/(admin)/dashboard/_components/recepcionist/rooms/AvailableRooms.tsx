@@ -1,91 +1,70 @@
-import { BedDouble, Coffee, Tv, Wifi } from "lucide-react";
-
+import { RoomStatus } from "@/app/(admin)/rooms/list/_types/room";
+import { getRoomTypeKey, RoomStatusLabels, RoomTypeLabels } from "@/app/(admin)/rooms/list/_utils/rooms.utils";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { TodayAvailableRooms } from "../../../_types/dashboard";
 
-export function AvailableRooms() {
-  const rooms = [
-    {
-      number: "101",
-      type: "Estándar",
-      price: "S/ 120/noche",
-      amenities: ["WiFi", "TV", "Cafetera"],
-      status: "AVAILABLE",
-    },
-    {
-      number: "203",
-      type: "Deluxe",
-      price: "S/ 180/noche",
-      amenities: ["WiFi", "TV", "Cafetera", "Minibar"],
-      status: "AVAILABLE",
-    },
-    {
-      number: "305",
-      type: "Suite",
-      price: "S/ 250/noche",
-      amenities: ["WiFi", "TV", "Cafetera", "Minibar", "Jacuzzi"],
-      status: "AVAILABLE",
-    },
-    {
-      number: "108",
-      type: "Estándar",
-      price: "S/ 120/noche",
-      amenities: ["WiFi", "TV", "Cafetera"],
-      status: "AVAILABLE",
-    },
-    {
-      number: "210",
-      type: "Deluxe",
-      price: "S/ 180/noche",
-      amenities: ["WiFi", "TV", "Cafetera", "Minibar"],
-      status: "AVAILABLE",
-    },
-  ];
+interface AvailableRoomsProps {
+  todayAvailableRooms: TodayAvailableRooms[] | undefined;
+}
 
-  const getAmenityIcon = (amenity: string) => {
-    switch (amenity) {
-      case "WiFi":
-        return <Wifi className="h-4 w-4" />;
-      case "TV":
-        return <Tv className="h-4 w-4" />;
-      case "Cafetera":
-        return <Coffee className="h-4 w-4" />;
-      default:
-        return null;
-    }
+export function AvailableRooms({ todayAvailableRooms = [] }: AvailableRoomsProps) {
+  const getRoomTypeInfo = (typeRoom: string) => {
+    const typeKey = getRoomTypeKey(typeRoom);
+    return RoomTypeLabels[typeKey];
+  };
+
+  const getStatusInfo = (status: RoomStatus) => {
+    return RoomStatusLabels[status];
+  };
+
+  // Función local para formatear precios
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("es-PE", {
+      style: "currency",
+      currency: "PEN",
+      minimumFractionDigits: 2,
+    }).format(price);
   };
 
   return (
     <div className="space-y-4">
-      {rooms.map((room) => (
-        <div key={room.number} className="flex items-center justify-between border-b pb-4">
-          <div className="flex items-center space-x-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-              <BedDouble className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm font-medium">
-                Habitación {room.number} - {room.type}
-              </p>
-              <p className="text-xs text-muted-foreground">{room.price}</p>
-              <div className="mt-1 flex space-x-1">
-                {room.amenities.slice(0, 3).map((amenity) => (
-                  <div key={amenity} className="text-muted-foreground">
-                    {getAmenityIcon(amenity)}
+      {todayAvailableRooms.length === 0 ? (
+        <div className="py-6 text-center">
+          <p className="text-muted-foreground">No hay habitaciones disponibles</p>
+        </div>
+      ) : (
+        todayAvailableRooms.map((room) => {
+          const roomTypeInfo = getRoomTypeInfo(room.typeRoom);
+          const RoomTypeIcon = roomTypeInfo.icon;
+          const statusInfo = getStatusInfo(room.status);
+          const StatusIcon = statusInfo.icon;
+
+          return (
+            <div key={room.id} className="flex items-center justify-between border-b pb-4">
+              <div className="flex items-center space-x-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                  <RoomTypeIcon className={`h-5 w-5 ${roomTypeInfo.className}`} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium">Habitación {room.number}</p>
+                    <Badge variant="outline" className={`text-xs ${roomTypeInfo.className}`}>
+                      {roomTypeInfo.label}
+                    </Badge>
                   </div>
-                ))}
-                {room.amenities.length > 3 && (
-                  <span className="text-xs text-muted-foreground">+{room.amenities.length - 3} más</span>
-                )}
+                  <p className="text-xs text-muted-foreground">{formatPrice(room.price)} por noche</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Badge variant="outline" className={statusInfo.className}>
+                  <StatusIcon className="h-3 w-3 mr-1" />
+                  {statusInfo.label}
+                </Badge>
               </div>
             </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Badge className="bg-blue-500">Disponible</Badge>
-            <Button size="sm">Reservar</Button>
-          </div>
-        </div>
-      ))}
+          );
+        })
+      )}
     </div>
   );
 }
