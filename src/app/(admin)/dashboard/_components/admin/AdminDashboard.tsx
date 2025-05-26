@@ -35,7 +35,7 @@ export function AdminDashboard() {
       yearOrigin,
     });
 
-  const { nextPendingPayments, recentReservations, roomOccupancy } = useDashboard();
+  const { nextPendingPayments, recentReservations, roomOccupancy } = useDashboard({ activeTab });
 
   return (
     <div className="flex flex-col gap-4">
