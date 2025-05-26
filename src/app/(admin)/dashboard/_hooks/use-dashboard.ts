@@ -1,4 +1,5 @@
 import {
+  useGetAmenitiesByPriorityQuery,
   useGetAnnualStatisticsQuery,
   useGetAnnualSummaryFinanceQuery,
   useGetCustomerOriginSummaryQuery,
@@ -177,6 +178,15 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetchOnMountOrArgChange: true,
   });
 
+  const {
+    data: amenitiesByPriority,
+    isLoading: isLoadingAmenitiesByPriority,
+    refetch: refetchAmenitiesByPriority,
+  } = useGetAmenitiesByPriorityQuery(undefined, {
+    skip: activeTab !== "amenidades",
+    refetchOnMountOrArgChange: true,
+  });
+
   // Estado de carga combinado
   const isLoading =
     isLoadingAnnualStatistics ||
@@ -216,6 +226,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     top5TodayCheckIn,
     top5TodayCheckOut,
     top5PriorityPendingAmenities,
+    amenitiesByPriority,
 
     // Estados de carga
     isLoadingAnnualStatistics,
@@ -237,6 +248,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     isLoadingTop5TodayCheckIn,
     isLoadingTop5TodayCheckOut,
     isLoadingTop5PriorityPendingAmenities,
+    isLoadingAmenitiesByPriority,
 
     // Funciones de actualización
     refetchAnnualStatistics,
@@ -255,5 +267,6 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetchTop5TodayCheckIn,
     refetchTop5TodayCheckOut,
     refetchTop5PriorityPendingAmenities,
+    refetchAmenitiesByPriority,
   };
 };

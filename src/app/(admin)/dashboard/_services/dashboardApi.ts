@@ -2,6 +2,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 
 import baseQueryWithReauth from "@/utils/baseQuery";
 import {
+  AmenitiesByPriority,
   AnnualAdministratorStatistics,
   CustomerOriginSummary,
   MonthlyBookingTrend,
@@ -192,6 +193,16 @@ export const dashboardApi = createApi({
       }),
       providesTags: ["Dashboard"],
     }),
+
+    // Obtener amenidades agrupadas por prioridad
+    getAmenitiesByPriority: build.query<AmenitiesByPriority, void>({
+      query: () => ({
+        url: `dashboard/priority-amenities-grouped`,
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["Dashboard"],
+    }),
   }),
 });
 
@@ -212,4 +223,5 @@ export const {
   useGetTop5TodayCheckInQuery,
   useGetTop5TodayCheckOutQuery,
   useGetTop5PriorityPendingAmenitiesQuery,
+  useGetAmenitiesByPriorityQuery,
 } = dashboardApi;

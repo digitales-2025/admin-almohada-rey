@@ -143,3 +143,22 @@ export interface Top5PriorityPendingAmenities {
   priority: PriorityLevel;
   description: string;
 }
+
+export interface AmenitiesByPriority {
+  highPriority: PriorityAmenitiesGroup;
+  mediumPriority: PriorityAmenitiesGroup;
+  lowPriority: PriorityAmenitiesGroup;
+}
+
+export interface PriorityAmenitiesGroup {
+  count: number;
+  rooms: RoomAmenityDetail[];
+}
+
+export interface RoomAmenityDetail {
+  id: string;
+  roomNumber: number;
+  typeRoom: string;
+  priority: PriorityLevel;
+  description: string;
+}
