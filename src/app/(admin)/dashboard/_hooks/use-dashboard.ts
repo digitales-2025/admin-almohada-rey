@@ -35,6 +35,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetch: refetchAnnualStatistics,
   } = useGetAnnualStatisticsQuery(year, {
     skip: !year,
+    refetchOnMountOrArgChange: true,
   });
 
   // Ganancias y gastos mensuales
@@ -44,6 +45,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetch: refetchMonthlyEarningsExpenses,
   } = useGetMonthlyEarningsExpensesQuery(year, {
     skip: !year,
+    refetchOnMountOrArgChange: true,
   });
 
   // Mapa de ocupación de habitaciones
@@ -53,6 +55,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetch: refetchRoomOccupancy,
   } = useGetRoomOccupancyQuery(undefined, {
     skip: activeTab !== "habitaciones" && activeTab !== "ocupacion",
+    refetchOnMountOrArgChange: true,
   });
 
   // Reservaciones recientes
@@ -62,6 +65,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetch: refetchRecentReservations,
   } = useGetRecentReservationsQuery(undefined, {
     skip: activeTab !== "resumen",
+    refetchOnMountOrArgChange: true,
   });
 
   // Próximos pagos pendientes
@@ -71,6 +75,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetch: refetchNextPendingPayments,
   } = useGetNextPendingPaymentsQuery(undefined, {
     skip: activeTab !== "resumen",
+    refetchOnMountOrArgChange: true,
   });
 
   const {
@@ -79,6 +84,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetch: refetchOccupancyStatisticsPercentage,
   } = useGetOccupationStatisticsPercentageByTypeQuery(year, {
     skip: !year,
+    refetchOnMountOrArgChange: true,
   });
 
   const {
@@ -87,6 +93,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetch: refetchMonthlyBookingTrend,
   } = useGetMonthlyBookingTrendQuery(yearReservation, {
     skip: !yearReservation,
+    refetchOnMountOrArgChange: true,
   });
 
   const {
@@ -95,6 +102,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetch: refetchAnnualSummaryFinance,
   } = useGetAnnualSummaryFinanceQuery(yearFinance, {
     skip: !yearFinance,
+    refetchOnMountOrArgChange: true,
   });
 
   const {
@@ -103,6 +111,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetch: refetchCustomerOriginSummary,
   } = useGetCustomerOriginSummaryQuery(yearOrigin, {
     skip: !yearOrigin,
+    refetchOnMountOrArgChange: true,
   });
 
   const {
@@ -111,6 +120,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetch: refetchMonthlyCustomerOrigin,
   } = useGetMonthlyCustomerOriginQuery(yearOrigin, {
     skip: !yearOrigin,
+    refetchOnMountOrArgChange: true,
   });
 
   const {
@@ -119,6 +129,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetch: refetchTop10CountriesCustomers,
   } = useGetTop10CountriesCustomersQuery(yearOrigin, {
     skip: !yearOrigin,
+    refetchOnMountOrArgChange: true,
   });
 
   const {
@@ -127,6 +138,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetch: refetchTop10ProvincesCustomers,
   } = useGetTop10ProvincesCustomersQuery(yearOrigin, {
     skip: !yearOrigin,
+    refetchOnMountOrArgChange: true,
   });
 
   const {
@@ -135,6 +147,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetch: refetchTodayRecepcionistStatistics,
   } = useGetTodayRecepcionistStatisticsQuery(undefined, {
     skip: activeTab !== "hoy",
+    refetchOnMountOrArgChange: true,
   });
 
   const {
@@ -143,6 +156,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetch: refetchTop5TodayCheckIn,
   } = useGetTop5TodayCheckInQuery(undefined, {
     skip: activeTab !== "hoy",
+    refetchOnMountOrArgChange: true,
   });
 
   const {
@@ -151,6 +165,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetch: refetchTop5TodayCheckOut,
   } = useGetTop5TodayCheckOutQuery(undefined, {
     skip: activeTab !== "hoy",
+    refetchOnMountOrArgChange: true,
   });
 
   const {
@@ -159,6 +174,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetch: refetchTop5PriorityPendingAmenities,
   } = useGetTop5PriorityPendingAmenitiesQuery(undefined, {
     skip: activeTab !== "hoy",
+    refetchOnMountOrArgChange: true,
   });
 
   // Estado de carga combinado
