@@ -2,6 +2,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 
 import baseQueryWithReauth from "@/utils/baseQuery";
 import {
+  AmenitiesByPriority,
   AnnualAdministratorStatistics,
   CustomerOriginSummary,
   MonthlyBookingTrend,
@@ -12,7 +13,13 @@ import {
   RecentReservations,
   RoomOccupancyMap,
   SummaryFinance,
+  TodayAvailableRooms,
+  TodayRecepcionistStatistics,
+  Top5PriorityPendingAmenities,
+  Top5TodayCheckIn,
+  Top5TodayCheckOut,
   Top10CountriesProvinces,
+  WeekReservations,
 } from "../_types/dashboard";
 
 export const dashboardApi = createApi({
@@ -148,6 +155,76 @@ export const dashboardApi = createApi({
       }),
       providesTags: ["Dashboard"],
     }),
+
+    // Obtener estadísticas del recepcionista para el día actual
+    getTodayRecepcionistStatistics: build.query<TodayRecepcionistStatistics, void>({
+      query: () => ({
+        url: `dashboard/today-receptionist-statistics`,
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["Dashboard"],
+    }),
+
+    // Obtener las 5 principales check-ins del día
+    getTop5TodayCheckIn: build.query<Top5TodayCheckIn[], void>({
+      query: () => ({
+        url: `dashboard/top-today-check-ins`,
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["Dashboard"],
+    }),
+
+    // Obtener las 5 principales check-outs del día
+    getTop5TodayCheckOut: build.query<Top5TodayCheckOut[], void>({
+      query: () => ({
+        url: `dashboard/top-today-check-outs`,
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["Dashboard"],
+    }),
+
+    // Obtener las 5 principales amenidades pendientes por prioridad
+    getTop5PriorityPendingAmenities: build.query<Top5PriorityPendingAmenities[], void>({
+      query: () => ({
+        url: `dashboard/top-priority-amenities`,
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["Dashboard"],
+    }),
+
+    // Obtener amenidades agrupadas por prioridad
+    getAmenitiesByPriority: build.query<AmenitiesByPriority, void>({
+      query: () => ({
+        url: `dashboard/priority-amenities-grouped`,
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["Dashboard"],
+    }),
+
+    // Obtener las habitaciones disponibles del día de hoy
+    getTodayAvailableRooms: build.query<TodayAvailableRooms[], void>({
+      query: () => ({
+        url: `dashboard/today-available-rooms`,
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["Dashboard"],
+    }),
+
+    // Obtener las reservas de la semana actual
+    getWeekReservations: build.query<WeekReservations, void>({
+      query: () => ({
+        url: `dashboard/week-reservations`,
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["Dashboard"],
+    }),
   }),
 });
 
@@ -164,4 +241,11 @@ export const {
   useGetMonthlyCustomerOriginQuery,
   useGetTop10CountriesCustomersQuery,
   useGetTop10ProvincesCustomersQuery,
+  useGetTodayRecepcionistStatisticsQuery,
+  useGetTop5TodayCheckInQuery,
+  useGetTop5TodayCheckOutQuery,
+  useGetTop5PriorityPendingAmenitiesQuery,
+  useGetAmenitiesByPriorityQuery,
+  useGetTodayAvailableRoomsQuery,
+  useGetWeekReservationsQuery,
 } = dashboardApi;

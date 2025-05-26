@@ -2,7 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 
 import { customersApi } from "@/app/(admin)/customers/_services/customersApi";
-import { dashboardApi } from "@/app/(admin)/dashboard/_services/dashbordApi";
+import { dashboardApi } from "@/app/(admin)/dashboard/_services/dashboardApi";
 import { expensesApi } from "@/app/(admin)/expenses/_services/expensesApi";
 import { movementsApi } from "@/app/(admin)/inventory/movements/_services/movementsApi";
 import { productsApi } from "@/app/(admin)/inventory/products/_services/productsApi";

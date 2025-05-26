@@ -102,3 +102,93 @@ export interface Top10CountriesProvinces {
   countryProvince: string;
   totalCustomers: number;
 }
+
+export interface TodayRecepcionistStatistics {
+  todayCheckIn: number;
+  todayCheckInPerformed: number;
+  todayCheckOut: number;
+  todayCheckOutPerformed: number;
+  todayAvailableRooms: number;
+  totalRooms: number;
+  todayPendingAmenities: number;
+  urgentPendingAmenities: number;
+}
+
+export interface Top5TodayCheckIn {
+  id: string;
+  customerName: string;
+  roomNumber: number;
+  status: ReservationStatus;
+  checkInDate: Date;
+}
+
+export interface Top5TodayCheckOut {
+  id: string;
+  customerName: string;
+  roomNumber: number;
+  status: ReservationStatus;
+  checkOutDate: Date;
+}
+
+export enum PriorityLevel {
+  LOW = "LOW",
+  MEDIUM = "MEDIUM",
+  HIGH = "HIGH",
+}
+
+export interface Top5PriorityPendingAmenities {
+  id: string;
+  roomNumber: number;
+  typeRoom: string;
+  priority: PriorityLevel;
+  description: string;
+}
+
+export interface AmenitiesByPriority {
+  highPriority: PriorityAmenitiesGroup;
+  mediumPriority: PriorityAmenitiesGroup;
+  lowPriority: PriorityAmenitiesGroup;
+}
+
+export interface PriorityAmenitiesGroup {
+  count: number;
+  rooms: RoomAmenityDetail[];
+}
+
+export interface RoomAmenityDetail {
+  id: string;
+  roomNumber: number;
+  typeRoom: string;
+  priority: PriorityLevel;
+  description: string;
+}
+
+export interface TodayAvailableRooms {
+  id: string;
+  number: number;
+  status: RoomStatus;
+  price: number;
+  typeRoom: string;
+}
+
+export interface WeekReservations {
+  todayReservations: number;
+  tomorrowReservations: number;
+  weekReservations: number;
+  pendingReservations: number;
+  confirmedReservations: number;
+  reservations: FullReservations[];
+}
+
+export interface FullReservations {
+  id: string;
+  customerName: string;
+  roomNumber: number;
+  typeRoom: string;
+  status: ReservationStatus;
+  checkInDate: Date;
+  checkOutDate: Date;
+  subtotal: number;
+  nights: number;
+  numberGuests: number;
+}

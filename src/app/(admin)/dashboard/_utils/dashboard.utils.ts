@@ -1,4 +1,7 @@
-import { ExtendedRoomStatus } from "../_types/dashboard";
+import { AlertCircle, AlertTriangle, ArrowDownCircle } from "lucide-react";
+
+import { EnumConfig } from "@/types/enum/enum-ui.config";
+import { ExtendedRoomStatus, PriorityLevel } from "../_types/dashboard";
 import { RoomStatus } from "../../rooms/list/_types/room";
 
 // Configuración de colores para los estados con soporte para modo claro/oscuro
@@ -76,4 +79,64 @@ export const getStatusText = (status: string) => {
   const config = roomStatusConfig[normalizedStatus];
 
   return config ? config.name : status;
+};
+
+export const priorityLevelConfig: Record<PriorityLevel, EnumConfig> = {
+  LOW: {
+    name: "Baja",
+    backgroundColor: "bg-[#E8F5E9] dark:bg-[#1B4332]",
+    backgroundColorIntense: "bg-[#43A047] dark:bg-[#2E7D32]",
+    textColor: "text-[#2E7D32] dark:text-[#81C784]",
+    hoverBgColor: "hover:bg-[#C8E6C9] dark:hover:bg-[#2E7D32]",
+    borderColor: "border-[#66BB6A] dark:border-[#388E3C]",
+    hoverBorderColor: "hover:border-[#43A047] dark:hover:border-[#2E7D32]",
+    icon: ArrowDownCircle,
+  },
+  MEDIUM: {
+    name: "Media",
+    backgroundColor: "bg-[#FFF8E1] dark:bg-[#4D3800]",
+    backgroundColorIntense: "bg-[#F9A825] dark:bg-[#F57F17]",
+    textColor: "text-[#F57F17] dark:text-[#FFD54F]",
+    hoverBgColor: "hover:bg-[#FFECB3] dark:hover:bg-[#F57F17]",
+    borderColor: "border-[#FBC02D] dark:border-[#F9A825]",
+    hoverBorderColor: "hover:border-[#F9A825] dark:hover:border-[#F57F17]",
+    icon: AlertCircle,
+  },
+  HIGH: {
+    name: "Alta",
+    backgroundColor: "bg-[#FFEBEE] dark:bg-[#4B1F1F]",
+    backgroundColorIntense: "bg-[#D32F2F] dark:bg-[#B71C1C]",
+    textColor: "text-[#C62828] dark:text-[#EF9A9A]",
+    hoverBgColor: "hover:bg-[#FFCDD2] dark:hover:bg-[#C62828]",
+    borderColor: "border-[#E53935] dark:border-[#C62828]",
+    hoverBorderColor: "hover:border-[#D32F2F] dark:hover:border-[#B71C1C]",
+    icon: AlertTriangle,
+  },
+};
+// Función para obtener la configuración completa
+export const getPriorityConfig = (priority: PriorityLevel) => {
+  return priorityLevelConfig[priority] || priorityLevelConfig.MEDIUM;
+};
+
+// Función para obtener el nombre de la prioridad
+export const getPriorityName = (priority: string) => {
+  const normalizedPriority = priority.toUpperCase() as PriorityLevel;
+  const config = priorityLevelConfig[normalizedPriority];
+  return config ? config.name : priority;
+};
+
+// Función para obtener los colores principales de la prioridad
+export const getPriorityColors = (priority: PriorityLevel) => {
+  const config = getPriorityConfig(priority);
+  return {
+    bg: config.backgroundColor,
+    text: config.textColor,
+    border: config.borderColor,
+  };
+};
+
+// Función para obtener el icono de la prioridad
+export const getPriorityIcon = (priority: PriorityLevel) => {
+  const config = getPriorityConfig(priority);
+  return config.icon;
 };
