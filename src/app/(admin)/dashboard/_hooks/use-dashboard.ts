@@ -11,7 +11,7 @@ import {
   useGetRoomOccupancyQuery,
   useGetTop10CountriesCustomersQuery,
   useGetTop10ProvincesCustomersQuery,
-} from "../_services/dashbordApi";
+} from "../_services/dashboardApi";
 
 interface UseDashboardProps {
   year?: number;
