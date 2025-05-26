@@ -19,6 +19,7 @@ import {
   Top5TodayCheckIn,
   Top5TodayCheckOut,
   Top10CountriesProvinces,
+  WeekReservations,
 } from "../_types/dashboard";
 
 export const dashboardApi = createApi({
@@ -214,6 +215,16 @@ export const dashboardApi = createApi({
       }),
       providesTags: ["Dashboard"],
     }),
+
+    // Obtener las reservas de la semana actual
+    getWeekReservations: build.query<WeekReservations, void>({
+      query: () => ({
+        url: `dashboard/week-reservations`,
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["Dashboard"],
+    }),
   }),
 });
 
@@ -236,4 +247,5 @@ export const {
   useGetTop5PriorityPendingAmenitiesQuery,
   useGetAmenitiesByPriorityQuery,
   useGetTodayAvailableRoomsQuery,
+  useGetWeekReservationsQuery,
 } = dashboardApi;

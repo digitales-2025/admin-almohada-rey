@@ -17,6 +17,7 @@ import {
   useGetTop5TodayCheckOutQuery,
   useGetTop10CountriesCustomersQuery,
   useGetTop10ProvincesCustomersQuery,
+  useGetWeekReservationsQuery,
 } from "../_services/dashboardApi";
 
 interface UseDashboardProps {
@@ -197,6 +198,15 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetchOnMountOrArgChange: true,
   });
 
+  const {
+    data: weekReservations,
+    isLoading: isLoadingWeekReservations,
+    refetch: refetchWeekReservations,
+  } = useGetWeekReservationsQuery(undefined, {
+    skip: activeTab !== "semana-reservas",
+    refetchOnMountOrArgChange: true,
+  });
+
   // Estado de carga combinado
   const isLoading =
     isLoadingAnnualStatistics ||
@@ -238,6 +248,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     top5PriorityPendingAmenities,
     amenitiesByPriority,
     todayAvailableRooms,
+    weekReservations,
 
     // Estados de carga
     isLoadingAnnualStatistics,
@@ -261,6 +272,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     isLoadingTop5PriorityPendingAmenities,
     isLoadingAmenitiesByPriority,
     isLoadingTodayAvailableRooms,
+    isLoadingWeekReservations,
 
     // Funciones de actualización
     refetchAnnualStatistics,
@@ -281,5 +293,6 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetchTop5PriorityPendingAmenities,
     refetchAmenitiesByPriority,
     refetchTodayAvailableRooms,
+    refetchWeekReservations,
   };
 };

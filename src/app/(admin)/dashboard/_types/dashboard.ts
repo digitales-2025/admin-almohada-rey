@@ -170,3 +170,25 @@ export interface TodayAvailableRooms {
   price: number;
   typeRoom: string;
 }
+
+export interface WeekReservations {
+  todayReservations: number;
+  tomorrowReservations: number;
+  weekReservations: number;
+  pendingReservations: number;
+  confirmedReservations: number;
+  reservations: FullReservations[];
+}
+
+export interface FullReservations {
+  id: string;
+  customerName: string;
+  roomNumber: number;
+  typeRoom: string;
+  status: ReservationStatus;
+  checkInDate: Date;
+  checkOutDate: Date;
+  subtotal: number;
+  nights: number;
+  numberGuests: number;
+}
