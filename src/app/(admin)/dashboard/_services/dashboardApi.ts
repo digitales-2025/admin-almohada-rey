@@ -13,6 +13,7 @@ import {
   RecentReservations,
   RoomOccupancyMap,
   SummaryFinance,
+  TodayAvailableRooms,
   TodayRecepcionistStatistics,
   Top5PriorityPendingAmenities,
   Top5TodayCheckIn,
@@ -203,6 +204,16 @@ export const dashboardApi = createApi({
       }),
       providesTags: ["Dashboard"],
     }),
+
+    // Obtener las habitaciones disponibles del día de hoy
+    getTodayAvailableRooms: build.query<TodayAvailableRooms[], void>({
+      query: () => ({
+        url: `dashboard/today-available-rooms`,
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["Dashboard"],
+    }),
   }),
 });
 
@@ -224,4 +235,5 @@ export const {
   useGetTop5TodayCheckOutQuery,
   useGetTop5PriorityPendingAmenitiesQuery,
   useGetAmenitiesByPriorityQuery,
+  useGetTodayAvailableRoomsQuery,
 } = dashboardApi;

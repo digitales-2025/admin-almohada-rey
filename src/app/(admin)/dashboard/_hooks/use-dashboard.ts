@@ -10,6 +10,7 @@ import {
   useGetOccupationStatisticsPercentageByTypeQuery,
   useGetRecentReservationsQuery,
   useGetRoomOccupancyQuery,
+  useGetTodayAvailableRoomsQuery,
   useGetTodayRecepcionistStatisticsQuery,
   useGetTop5PriorityPendingAmenitiesQuery,
   useGetTop5TodayCheckInQuery,
@@ -187,6 +188,15 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetchOnMountOrArgChange: true,
   });
 
+  const {
+    data: todayAvailableRooms,
+    isLoading: isLoadingTodayAvailableRooms,
+    refetch: refetchTodayAvailableRooms,
+  } = useGetTodayAvailableRoomsQuery(undefined, {
+    skip: activeTab !== "habitaciones",
+    refetchOnMountOrArgChange: true,
+  });
+
   // Estado de carga combinado
   const isLoading =
     isLoadingAnnualStatistics ||
@@ -227,6 +237,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     top5TodayCheckOut,
     top5PriorityPendingAmenities,
     amenitiesByPriority,
+    todayAvailableRooms,
 
     // Estados de carga
     isLoadingAnnualStatistics,
@@ -249,6 +260,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     isLoadingTop5TodayCheckOut,
     isLoadingTop5PriorityPendingAmenities,
     isLoadingAmenitiesByPriority,
+    isLoadingTodayAvailableRooms,
 
     // Funciones de actualización
     refetchAnnualStatistics,
@@ -268,5 +280,6 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetchTop5TodayCheckOut,
     refetchTop5PriorityPendingAmenities,
     refetchAmenitiesByPriority,
+    refetchTodayAvailableRooms,
   };
 };

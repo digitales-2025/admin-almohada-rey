@@ -162,3 +162,11 @@ export interface RoomAmenityDetail {
   priority: PriorityLevel;
   description: string;
 }
+
+export interface TodayAvailableRooms {
+  id: string;
+  number: number;
+  status: RoomStatus;
+  price: number;
+  typeRoom: string;
+}
