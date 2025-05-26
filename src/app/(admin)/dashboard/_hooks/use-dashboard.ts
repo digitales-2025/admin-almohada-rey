@@ -9,6 +9,10 @@ import {
   useGetOccupationStatisticsPercentageByTypeQuery,
   useGetRecentReservationsQuery,
   useGetRoomOccupancyQuery,
+  useGetTodayRecepcionistStatisticsQuery,
+  useGetTop5PriorityPendingAmenitiesQuery,
+  useGetTop5TodayCheckInQuery,
+  useGetTop5TodayCheckOutQuery,
   useGetTop10CountriesCustomersQuery,
   useGetTop10ProvincesCustomersQuery,
 } from "../_services/dashboardApi";
@@ -18,10 +22,11 @@ interface UseDashboardProps {
   yearReservation?: number;
   yearFinance?: number;
   yearOrigin?: number;
+  activeTab?: string;
 }
 
 export const useDashboard = (options: UseDashboardProps = {}) => {
-  const { year, yearReservation, yearFinance, yearOrigin } = options;
+  const { year, yearReservation, yearFinance, yearOrigin, activeTab } = options;
 
   // Estadísticas anuales
   const {
@@ -46,21 +51,27 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     data: roomOccupancy,
     isLoading: isLoadingRoomOccupancy,
     refetch: refetchRoomOccupancy,
-  } = useGetRoomOccupancyQuery();
+  } = useGetRoomOccupancyQuery(undefined, {
+    skip: activeTab !== "habitaciones" && activeTab !== "ocupacion",
+  });
 
   // Reservaciones recientes
   const {
     data: recentReservations,
     isLoading: isLoadingRecentReservations,
     refetch: refetchRecentReservations,
-  } = useGetRecentReservationsQuery();
+  } = useGetRecentReservationsQuery(undefined, {
+    skip: activeTab !== "resumen",
+  });
 
   // Próximos pagos pendientes
   const {
     data: nextPendingPayments,
     isLoading: isLoadingNextPendingPayments,
     refetch: refetchNextPendingPayments,
-  } = useGetNextPendingPaymentsQuery();
+  } = useGetNextPendingPaymentsQuery(undefined, {
+    skip: activeTab !== "resumen",
+  });
 
   const {
     data: occupancyStatisticsPercentage,
@@ -118,6 +129,38 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     skip: !yearOrigin,
   });
 
+  const {
+    data: todayRecepcionistStatistics,
+    isLoading: isLoadingTodayRecepcionistStatistics,
+    refetch: refetchTodayRecepcionistStatistics,
+  } = useGetTodayRecepcionistStatisticsQuery(undefined, {
+    skip: activeTab !== "hoy",
+  });
+
+  const {
+    data: top5TodayCheckIn,
+    isLoading: isLoadingTop5TodayCheckIn,
+    refetch: refetchTop5TodayCheckIn,
+  } = useGetTop5TodayCheckInQuery(undefined, {
+    skip: activeTab !== "hoy",
+  });
+
+  const {
+    data: top5TodayCheckOut,
+    isLoading: isLoadingTop5TodayCheckOut,
+    refetch: refetchTop5TodayCheckOut,
+  } = useGetTop5TodayCheckOutQuery(undefined, {
+    skip: activeTab !== "hoy",
+  });
+
+  const {
+    data: top5PriorityPendingAmenities,
+    isLoading: isLoadingTop5PriorityPendingAmenities,
+    refetch: refetchTop5PriorityPendingAmenities,
+  } = useGetTop5PriorityPendingAmenitiesQuery(undefined, {
+    skip: activeTab !== "hoy",
+  });
+
   // Estado de carga combinado
   const isLoading =
     isLoadingAnnualStatistics ||
@@ -133,6 +176,12 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     isLoadingTop10CountriesCustomers ||
     isLoadingTop10ProvincesCustomers;
 
+  const isLoadingTodayRecepcionist =
+    isLoadingTodayRecepcionistStatistics ||
+    isLoadingTop5TodayCheckIn ||
+    isLoadingTop5TodayCheckOut ||
+    isLoadingTop5PriorityPendingAmenities;
+
   return {
     // Datos
     annualStatistics,
@@ -147,6 +196,10 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     monthlyCustomerOrigin,
     top10CountriesCustomers,
     top10ProvincesCustomers,
+    todayRecepcionistStatistics,
+    top5TodayCheckIn,
+    top5TodayCheckOut,
+    top5PriorityPendingAmenities,
 
     // Estados de carga
     isLoadingAnnualStatistics,
@@ -163,6 +216,11 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     isLoadingMonthlyCustomerOrigin,
     isLoadingTop10CountriesCustomers,
     isLoadingTop10ProvincesCustomers,
+    isLoadingTodayRecepcionist,
+    isLoadingTodayRecepcionistStatistics,
+    isLoadingTop5TodayCheckIn,
+    isLoadingTop5TodayCheckOut,
+    isLoadingTop5PriorityPendingAmenities,
 
     // Funciones de actualización
     refetchAnnualStatistics,
@@ -177,5 +235,9 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetchMonthlyCustomerOrigin,
     refetchTop10CountriesCustomers,
     refetchTop10ProvincesCustomers,
+    refetchTodayRecepcionistStatistics,
+    refetchTop5TodayCheckIn,
+    refetchTop5TodayCheckOut,
+    refetchTop5PriorityPendingAmenities,
   };
 };

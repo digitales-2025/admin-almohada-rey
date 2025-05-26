@@ -102,3 +102,44 @@ export interface Top10CountriesProvinces {
   countryProvince: string;
   totalCustomers: number;
 }
+
+export interface TodayRecepcionistStatistics {
+  todayCheckIn: number;
+  todayCheckInPerformed: number;
+  todayCheckOut: number;
+  todayCheckOutPerformed: number;
+  todayAvailableRooms: number;
+  totalRooms: number;
+  todayPendingAmenities: number;
+  urgentPendingAmenities: number;
+}
+
+export interface Top5TodayCheckIn {
+  id: string;
+  customerName: string;
+  roomNumber: number;
+  status: ReservationStatus;
+  checkInDate: Date;
+}
+
+export interface Top5TodayCheckOut {
+  id: string;
+  customerName: string;
+  roomNumber: number;
+  status: ReservationStatus;
+  checkOutDate: Date;
+}
+
+export enum PriorityLevel {
+  LOW = "LOW",
+  MEDIUM = "MEDIUM",
+  HIGH = "HIGH",
+}
+
+export interface Top5PriorityPendingAmenities {
+  id: string;
+  roomNumber: number;
+  typeRoom: string;
+  priority: PriorityLevel;
+  description: string;
+}
