@@ -2,6 +2,7 @@ import { getRoomTypeKey, RoomTypeLabels } from "@/app/(admin)/rooms/list/_utils/
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TabsContent } from "@/components/ui/tabs";
+import { EnumConfig } from "@/types/enum/enum-ui.config";
 import { PriorityLevel, type AmenitiesByPriority } from "../../../_types/dashboard";
 import { priorityLevelConfig } from "../../../_utils/dashboard.utils";
 
@@ -35,7 +36,7 @@ export default function PendingAmenitiesTabsContentDashboard({
     rooms,
     count,
   }: {
-    config: any;
+    config: EnumConfig;
     title: string;
     rooms: any[];
     count: number;
