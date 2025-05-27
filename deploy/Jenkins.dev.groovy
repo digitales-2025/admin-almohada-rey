@@ -12,9 +12,9 @@ pipeline {
         //
         // VPS setup
         //
-        REMOTE_USER = "fernando"
-        REMOTE_IP = credentials("fernando-hetzner-hel-01-ip")
-        REMOTE_FOLDER = "/home/fernando/services/acide/almohada/"
+        REMOTE_USER = "docker_admin"
+        REMOTE_IP = "116.203.105.37"
+        REMOTE_FOLDER = "/opt/docker/compose/projects/${PROJECT_NAME}-${PROJECT_STAGE}"
 
         //
         // Docker registry setup
@@ -28,10 +28,10 @@ pipeline {
 
         // SSH command
         SSH_COM = "ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_IP}"
-        SSH_CRED = "hetzner-helsink-01"
+        SSH_CRED = "ssh-id_docker_admin"
 
         // Docker build variables
-        NEXT_PUBLIC_BACKEND_URL = "https://almohada-backend-develop.araozu.dev/v1"
+        NEXT_PUBLIC_BACKEND_URL = "https://almohada-backend-develop.acide.win/v1"
         INTERNAL_BACKEND_URL = "http://almohada-backend-develop:4000/v1"
         NEXT_PUBLIC_IMAGE_DOMAIN="pub-0974deb2e04246f0ba3e7ab7bad64223.r2.dev"
     }
