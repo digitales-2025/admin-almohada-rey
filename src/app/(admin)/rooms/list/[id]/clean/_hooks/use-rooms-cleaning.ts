@@ -6,7 +6,7 @@ import {
   useGetAllRoomsCleaningByRoomIdQuery,
   useGetAllRoomsCleaningQuery,
   useUpdateRoomCleaningMutation,
-} from "../_service/RoomsCleaningApi";
+} from "../_service/roomsCleaningApi";
 import { RoomCleaning } from "../_types/roomCleaning";
 
 interface UseRoomCleaningProps {

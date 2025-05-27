@@ -13,7 +13,7 @@ interface RoomCleaningParams {
 export const roomsCleaningApi = createApi({
   reducerPath: "roomsCleaningApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["Room Cleaning"],
+  tagTypes: ["Room Cleaning", "Rooms"],
   endpoints: (build) => ({
     //Crear historial de limpieza de habitaciones
     createRoomCleaning: build.mutation<RoomCleaning, Partial<RoomCleaning>>({
@@ -23,7 +23,7 @@ export const roomsCleaningApi = createApi({
         body,
         credentials: "include",
       }),
-      invalidatesTags: ["Room Cleaning"],
+      invalidatesTags: ["Room Cleaning", "Rooms"],
     }),
     //Actualizar historial de limpieza de habitaciones
     updateRoomCleaning: build.mutation<RoomCleaning, Partial<RoomCleaning> & { id: string }>({
