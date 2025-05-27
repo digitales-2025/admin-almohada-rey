@@ -12,7 +12,7 @@ export default function RoomsPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const { paginatedRooms, isLoadingPaginatedRooms } = usePaginatedRooms({ page, pageSize });
+  const { paginatedRooms, isLoadingPaginatedRooms, refetchPaginatedRooms } = usePaginatedRooms({ page, pageSize });
 
   const handlePaginationChange = useCallback((newPage: number, newPageSize: number) => {
     setPage(newPage);
@@ -50,6 +50,7 @@ export default function RoomsPage() {
             totalPages: paginatedRooms.meta.totalPages,
           }}
           onPaginationChange={handlePaginationChange}
+          refetchPaginatedRooms={refetchPaginatedRooms}
         />
       </div>
     </div>

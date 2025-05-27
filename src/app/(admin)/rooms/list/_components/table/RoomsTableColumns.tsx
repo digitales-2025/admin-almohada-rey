@@ -31,7 +31,11 @@ import { RoomImageCell } from "./view-image/RoomImageViewer";
  * @param isSuperAdmin Valor si el usuario es super administrador
  * @returns Columnas de la tabla de usuarios
  */
-export const roomsColumns = (isSuperAdmin: boolean, handleRoomCleaningLog: (id: string) => void): ColumnDef<Room>[] => [
+export const roomsColumns = (
+  isSuperAdmin: boolean,
+  handleRoomCleaningLog: (id: string) => void,
+  refetchPaginatedRooms: () => void
+): ColumnDef<Room>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -271,6 +275,7 @@ export const roomsColumns = (isSuperAdmin: boolean, handleRoomCleaningLog: (id: 
                 open={showUpdateAvailabilityDialog}
                 setOpen={setShowUpdateAvailabilityDialog}
                 room={row?.original}
+                refetchPaginatedRooms={refetchPaginatedRooms}
               />
             )}
 
