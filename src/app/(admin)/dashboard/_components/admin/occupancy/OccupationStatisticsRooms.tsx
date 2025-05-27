@@ -1,11 +1,11 @@
 "use client";
 
-import { Award, BarChart3, TrendingUp } from "lucide-react";
-import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
+import { Award, BarChart3, PieChart, TrendingUp } from "lucide-react";
+import { Cell, Pie, PieChart as RechartsPieChart, ResponsiveContainer } from "recharts";
 
 import { getRoomTypeBgColor, getRoomTypeKey, RoomTypeLabels } from "@/app/(admin)/rooms/list/_utils/rooms.utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { OccupationStatisticsPercentage } from "../../../_types/dashboard";
+import type { OccupationStatisticsPercentage } from "../../../_types/dashboard";
 
 interface OccupationStatisticsRoomsProps {
   occupancyStatisticsPercentage: OccupationStatisticsPercentage[] | undefined;
@@ -22,13 +22,25 @@ interface ChartDataItem {
 export default function OccupationStatisticsRooms({ occupancyStatisticsPercentage }: OccupationStatisticsRoomsProps) {
   if (!occupancyStatisticsPercentage || occupancyStatisticsPercentage.length === 0) {
     return (
-      <Card className="col-span-3 md:col-span-1">
+      <Card className="col-span-3 md:col-span-1 overflow-hidden">
         <CardHeader>
-          <CardTitle className="text-xl">Estadísticas de Ocupación</CardTitle>
-          <CardDescription>Análisis por tipo de habitación</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-xl">Estadísticas de Ocupación</CardTitle>
+              <CardDescription>Análisis por tipo de habitación</CardDescription>
+            </div>
+          </div>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">No hay datos disponibles</p>
+        <CardContent className="p-0">
+          <div className="flex flex-col items-center justify-center py-16 space-y-4">
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+              <PieChart className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <div className="text-center space-y-2">
+              <p className="text-sm font-medium text-muted-foreground">No hay datos de ocupación</p>
+              <p className="text-xs text-muted-foreground">Las estadísticas aparecerán cuando haya reservas</p>
+            </div>
+          </div>
         </CardContent>
       </Card>
     );
@@ -116,7 +128,7 @@ export default function OccupationStatisticsRooms({ occupancyStatisticsPercentag
         <div className="relative p-6 flex justify-center">
           <div className="relative h-[180px] w-[180px]">
             <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
+              <RechartsPieChart>
                 <Pie
                   data={chartData}
                   cx="50%"
@@ -140,7 +152,7 @@ export default function OccupationStatisticsRooms({ occupancyStatisticsPercentag
                     return <Cell key={`cell-${index}`} fill={color} stroke="white" strokeWidth={0.5} />;
                   })}
                 </Pie>
-              </PieChart>
+              </RechartsPieChart>
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="text-3xl font-bold">{averageOccupancy}%</span>

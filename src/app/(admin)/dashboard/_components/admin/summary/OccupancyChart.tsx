@@ -1,9 +1,10 @@
 "use client";
 
-import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { PieChart } from "lucide-react";
+import { Cell, Legend, Pie, PieChart as RechartsPieChart, ResponsiveContainer, Tooltip } from "recharts";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { RoomOccupancyMap } from "../../../_types/dashboard";
+import type { RoomOccupancyMap } from "../../../_types/dashboard";
 
 const COLORS = ["#4ade80", "#60a5fa", "#fbbf24", "#f87171", "#a1a1aa"];
 
@@ -15,9 +16,23 @@ export function OccupancyChart({ roomOccupancy }: OccupancyChartProps) {
   // Si no hay datos, mostrar un gráfico vacío o un mensaje
   if (!roomOccupancy) {
     return (
-      <div className="h-[300px] flex items-center justify-center">
-        <p className="text-gray-500">No hay datos de ocupación disponibles</p>
-      </div>
+      <Card className="col-span-7 md:col-span-3">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-xl">Estado de Habitaciones</CardTitle>
+          <CardDescription>Distribución actual de habitaciones</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px] flex flex-col items-center justify-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-muted animate-pulse" />
+            <div className="text-center space-y-2">
+              <p className="text-muted-foreground font-medium">No hay datos disponibles</p>
+              <p className="text-sm text-muted-foreground">
+                Los datos de ocupación se mostrarán aquí cuando estén disponibles
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -30,6 +45,31 @@ export function OccupancyChart({ roomOccupancy }: OccupancyChartProps) {
     { name: "Incompletas", value: roomOccupancy.countIncomplete },
   ].filter((item) => item.value > 0); // Solo incluir estados que tengan al menos una habitación
 
+  // Verificar si todos los valores son cero
+  if (data.length === 0) {
+    return (
+      <Card className="col-span-7 md:col-span-3">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-xl">Estado de Habitaciones</CardTitle>
+          <CardDescription>Distribución actual de habitaciones</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px] flex flex-col items-center justify-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+              <PieChart className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <div className="text-center space-y-2">
+              <p className="text-muted-foreground font-medium">Sin habitaciones registradas</p>
+              <p className="text-sm text-muted-foreground">
+                Configure habitaciones para ver la distribución de estados
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="col-span-7 md:col-span-3">
       <CardHeader className="pb-2">
@@ -38,7 +78,7 @@ export function OccupancyChart({ roomOccupancy }: OccupancyChartProps) {
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
+          <RechartsPieChart>
             <Pie
               data={data}
               cx="50%"
@@ -64,7 +104,7 @@ export function OccupancyChart({ roomOccupancy }: OccupancyChartProps) {
               }}
             />
             <Legend layout="horizontal" verticalAlign="bottom" align="center" iconType="circle" />
-          </PieChart>
+          </RechartsPieChart>
         </ResponsiveContainer>
       </CardContent>
     </Card>

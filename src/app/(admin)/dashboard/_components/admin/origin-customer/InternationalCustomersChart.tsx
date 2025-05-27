@@ -1,8 +1,9 @@
 "use client";
 
+import { Globe } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-import { Top10CountriesProvinces } from "../../../_types/dashboard";
+import type { Top10CountriesProvinces } from "../../../_types/dashboard";
 
 interface InternationalCustomersChartProps {
   top10CountriesCustomers: Top10CountriesProvinces[] | undefined;
@@ -15,6 +16,20 @@ export function InternationalCustomersChart({ top10CountriesCustomers }: Interna
       name: item.countryProvince,
       value: item.totalCustomers,
     })) || [];
+
+  if (chartData.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[350px] space-y-4">
+        <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+          <Globe className="w-6 h-6 text-muted-foreground" />
+        </div>
+        <div className="text-center space-y-1">
+          <p className="text-sm font-medium text-muted-foreground">Sin datos de países</p>
+          <p className="text-xs text-muted-foreground">Los datos aparecerán cuando haya huéspedes internacionales</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <ResponsiveContainer width="100%" height={350}>

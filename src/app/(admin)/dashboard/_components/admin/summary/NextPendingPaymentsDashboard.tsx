@@ -1,4 +1,7 @@
+"use client";
+
 import { useRouter } from "next/navigation";
+import { CreditCard } from "lucide-react";
 
 import { PaymentStatus } from "@/app/(admin)/payments/_types/payment";
 import { PaymentStatusLabels } from "@/app/(admin)/payments/_utils/payments.utils";
@@ -6,7 +9,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { NextPendingPayments } from "../../../_types/dashboard";
+import type { NextPendingPayments } from "../../../_types/dashboard";
 
 interface NextPendingPaymentsDashboardProps {
   nextPendingPayments: NextPendingPayments | undefined;
@@ -14,11 +17,33 @@ interface NextPendingPaymentsDashboardProps {
 
 export function NextPendingPaymentsDashboard({ nextPendingPayments }: NextPendingPaymentsDashboardProps) {
   const router = useRouter();
+
   if (!nextPendingPayments || !nextPendingPayments.newPayments.length) {
     return (
-      <div className="flex items-center justify-center h-40">
-        <p className="text-muted-foreground">No hay pagos pendientes</p>
-      </div>
+      <Card className="col-span-3 md:col-span-1">
+        <CardHeader className="pb-2">
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle className="text-xl">Pagos Pendientes</CardTitle>
+              <CardDescription>No hay pagos pendientes este mes</CardDescription>
+            </div>
+            <Button variant="outline" size="sm" onClick={() => router.push("/payments")}>
+              Ver todos
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-8 space-y-3">
+            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+              <CreditCard className="w-5 h-5 text-muted-foreground" />
+            </div>
+            <div className="text-center space-y-1">
+              <p className="text-sm font-medium text-muted-foreground">No hay pagos pendientes</p>
+              <p className="text-xs text-muted-foreground">Todos los pagos están al día</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 

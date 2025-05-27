@@ -57,7 +57,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     isLoading: isLoadingRoomOccupancy,
     refetch: refetchRoomOccupancy,
   } = useGetRoomOccupancyQuery(undefined, {
-    skip: activeTab !== "habitaciones" && activeTab !== "ocupacion",
+    skip: activeTab !== "habitaciones" && activeTab !== "ocupacion" && activeTab !== "resumen",
     refetchOnMountOrArgChange: true,
   });
 

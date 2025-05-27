@@ -1,7 +1,9 @@
+import { ConciergeBell } from "lucide-react";
+
 import { getRoomTypeKey, RoomTypeLabels } from "@/app/(admin)/rooms/list/_utils/rooms.utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { PriorityLevel, Top5PriorityPendingAmenities } from "../../../_types/dashboard";
+import type { PriorityLevel, Top5PriorityPendingAmenities } from "../../../_types/dashboard";
 import { priorityLevelConfig } from "../../../_utils/dashboard.utils";
 
 interface PendingAmenitiesProps {
@@ -36,8 +38,14 @@ export function PendingAmenities({ top5PriorityPendingAmenities = [] }: PendingA
   return (
     <div className="space-y-4">
       {top5PriorityPendingAmenities.length === 0 ? (
-        <div className="py-6 text-center">
-          <p className="text-muted-foreground">No hay amenidades pendientes</p>
+        <div className="flex flex-col items-center justify-center py-8 space-y-4">
+          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+            <ConciergeBell className="w-6 h-6 text-muted-foreground" />
+          </div>
+          <div className="text-center space-y-1">
+            <p className="text-sm font-medium text-muted-foreground">Todas las amenidades están completas</p>
+            <p className="text-xs text-muted-foreground">Las amenidades pendientes aparecerán aquí</p>
+          </div>
         </div>
       ) : (
         top5PriorityPendingAmenities.map((amenity) => (

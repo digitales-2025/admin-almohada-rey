@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { BedDouble, Calendar, Users } from "lucide-react";
+import { BedDouble, Calendar, CalendarDays, Users } from "lucide-react";
 
 import type { ReservationStatus } from "@/app/(admin)/reservation/_schemas/reservation.schemas";
 import { reservationStatusConfig } from "@/app/(admin)/reservation/_types/reservation-enum.config";
@@ -90,8 +90,14 @@ export default function UpcomingReservations({ weekReservations }: UpcomingReser
       <CardContent>
         <div className="space-y-4">
           {reservations.length === 0 ? (
-            <div className="py-6 text-center">
-              <p className="text-muted-foreground">No hay reservas programadas para los próximos días</p>
+            <div className="flex flex-col items-center justify-center py-8 space-y-4">
+              <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                <CalendarDays className="w-6 h-6 text-muted-foreground" />
+              </div>
+              <div className="text-center space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">No hay reservas próximas</p>
+                <p className="text-xs text-muted-foreground">Las reservas de los próximos 7 días aparecerán aquí</p>
+              </div>
             </div>
           ) : (
             reservations.map((reservation) => (

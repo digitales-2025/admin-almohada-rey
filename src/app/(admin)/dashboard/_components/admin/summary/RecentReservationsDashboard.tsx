@@ -3,13 +3,14 @@
 import { useRouter } from "next/navigation";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
+import { CalendarX } from "lucide-react";
 
-import { ReservationStatus } from "@/app/(admin)/reservation/_schemas/reservation.schemas";
+import type { ReservationStatus } from "@/app/(admin)/reservation/_schemas/reservation.schemas";
 import { reservationStatusConfig } from "@/app/(admin)/reservation/_types/reservation-enum.config";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { RecentReservations } from "../../../_types/dashboard";
+import type { RecentReservations } from "../../../_types/dashboard";
 
 interface RecentReservationsDashboardProps {
   recentReservations: RecentReservations | undefined;
@@ -17,11 +18,33 @@ interface RecentReservationsDashboardProps {
 
 export function RecentReservationsDashboard({ recentReservations }: RecentReservationsDashboardProps) {
   const router = useRouter();
+
   if (!recentReservations || !recentReservations.newReservations || recentReservations.newReservations.length === 0) {
     return (
-      <div className="p-8 text-center">
-        <p className="text-gray-500">No hay reservaciones recientes</p>
-      </div>
+      <Card className="col-span-3 md:col-span-2">
+        <CardHeader className="pb-2">
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle className="text-xl">Reservas Recientes</CardTitle>
+              <CardDescription>No hay reservas nuevas hoy</CardDescription>
+            </div>
+            <Button variant="outline" size="sm" onClick={() => router.push("/reservation")}>
+              Ver todas
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-12 space-y-4">
+            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+              <CalendarX className="w-6 h-6 text-muted-foreground" />
+            </div>
+            <div className="text-center space-y-1">
+              <p className="text-sm font-medium text-muted-foreground">No hay reservas recientes</p>
+              <p className="text-xs text-muted-foreground">Las nuevas reservas aparecerán aquí</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
