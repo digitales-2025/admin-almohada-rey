@@ -1,11 +1,23 @@
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
-import { Briefcase, Building, Calendar, CreditCard, Home, Landmark, Mail, MapPin, Phone } from "lucide-react";
+import {
+  AlertCircle,
+  Briefcase,
+  Building,
+  Calendar,
+  CreditCard,
+  Home,
+  Landmark,
+  Mail,
+  MapPin,
+  Phone,
+} from "lucide-react";
 
 import {
   CustomerDocumentTypeLabels,
   CustomerMaritalStatusLabels,
 } from "@/app/(admin)/customers/_utils/customers.utils";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -16,15 +28,32 @@ interface ReservationTabCustomerContentProps {
 }
 
 export default function ReservationTabCustomerContent({ row }: ReservationTabCustomerContentProps) {
+  // Si no hay cliente asignado, mostrar mensaje
+  if (!row.customer) {
+    return (
+      <Alert variant={"destructive"} className="bg-amber-50 border-amber-200">
+        <div className="flex flex-row items-center gap-2">
+          <AlertCircle className="h-5 w-5 text-amber-600" />
+          <AlertDescription className="text-amber-800">
+            Cliente no asignado. Esta reserva fue creada desde la página web y está pendiente de confirmación.
+          </AlertDescription>
+        </div>
+      </Alert>
+    );
+  }
+
   // Obtener configuraciones de documento y estado civil
   const customerData = row.customer;
-  const documentTypeConfig =
-    CustomerDocumentTypeLabels[customerData.documentType as keyof typeof CustomerDocumentTypeLabels];
+  const documentTypeConfig = customerData.documentType
+    ? CustomerDocumentTypeLabels[customerData.documentType as keyof typeof CustomerDocumentTypeLabels]
+    : undefined;
   const DocumentTypeIcon = documentTypeConfig?.icon;
 
-  const maritalStatusConfig =
-    CustomerMaritalStatusLabels[customerData.maritalStatus as keyof typeof CustomerMaritalStatusLabels];
+  const maritalStatusConfig = customerData.maritalStatus
+    ? CustomerMaritalStatusLabels[customerData.maritalStatus as keyof typeof CustomerMaritalStatusLabels]
+    : undefined;
   const MaritalStatusIcon = maritalStatusConfig?.icon;
+
   return (
     <div className="flex flex-col md:flex-row gap-6">
       <div className="w-full md:w-1/2">
@@ -32,24 +61,28 @@ export default function ReservationTabCustomerContent({ row }: ReservationTabCus
           <div className="bg-primary/10 p-4 flex items-center gap-4">
             <Avatar className="h-16 w-16 border-2 border-primary/20">
               <AvatarFallback className="bg-primary/10 text-primary text-xl">
-                {customerData.name.charAt(0).toUpperCase()}
+                {customerData.name ? customerData.name.charAt(0).toUpperCase() : "?"}
               </AvatarFallback>
             </Avatar>
 
             <div>
-              <h3 className="text-lg font-semibold capitalize">{customerData.name}</h3>
+              <h3 className="text-lg font-semibold capitalize">{customerData.name || "Sin nombre"}</h3>
               <div className="flex flex-wrap gap-2 mt-2">
-                <Badge variant="outline" className={cn("flex items-center gap-1", documentTypeConfig?.className)}>
-                  {DocumentTypeIcon && <DocumentTypeIcon className="h-3 w-3" />}
-                  <span>
-                    {documentTypeConfig?.label}: {customerData.documentNumber}
-                  </span>
-                </Badge>
+                {documentTypeConfig && (
+                  <Badge variant="outline" className={cn("flex items-center gap-1", documentTypeConfig?.className)}>
+                    {DocumentTypeIcon && <DocumentTypeIcon className="h-3 w-3" />}
+                    <span>
+                      {documentTypeConfig?.label}: {customerData.documentNumber}
+                    </span>
+                  </Badge>
+                )}
 
-                <Badge variant="outline" className={cn("flex items-center gap-1", maritalStatusConfig?.className)}>
-                  {MaritalStatusIcon && <MaritalStatusIcon className="h-3 w-3" />}
-                  <span>{maritalStatusConfig?.label}</span>
-                </Badge>
+                {maritalStatusConfig && (
+                  <Badge variant="outline" className={cn("flex items-center gap-1", maritalStatusConfig?.className)}>
+                    {MaritalStatusIcon && <MaritalStatusIcon className="h-3 w-3" />}
+                    <span>{maritalStatusConfig?.label}</span>
+                  </Badge>
+                )}
               </div>
             </div>
           </div>
@@ -61,7 +94,7 @@ export default function ReservationTabCustomerContent({ row }: ReservationTabCus
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Teléfono</p>
-                <p className="text-sm font-medium">{customerData.phone}</p>
+                <p className="text-sm font-medium">{customerData.phone || "No especificado"}</p>
               </div>
             </div>
 
@@ -71,7 +104,7 @@ export default function ReservationTabCustomerContent({ row }: ReservationTabCus
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Email</p>
-                <p className="text-sm font-medium">{customerData.email}</p>
+                <p className="text-sm font-medium">{customerData.email || "No especificado"}</p>
               </div>
             </div>
 
@@ -81,7 +114,7 @@ export default function ReservationTabCustomerContent({ row }: ReservationTabCus
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Ocupación</p>
-                <p className="text-sm font-medium">{customerData.occupation}</p>
+                <p className="text-sm font-medium">{customerData.occupation || "No especificado"}</p>
               </div>
             </div>
 
@@ -115,7 +148,7 @@ export default function ReservationTabCustomerContent({ row }: ReservationTabCus
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Dirección</p>
-                <p className="text-sm font-medium">{customerData.address}</p>
+                <p className="text-sm font-medium">{customerData.address || "No especificado"}</p>
               </div>
             </div>
 
@@ -126,9 +159,9 @@ export default function ReservationTabCustomerContent({ row }: ReservationTabCus
               <div>
                 <p className="text-xs text-muted-foreground">Ubicación</p>
                 <p className="text-sm font-medium">
-                  {customerData.province && `${customerData.province}, `}
-                  {customerData.department && `${customerData.department}, `}
-                  {customerData.country}
+                  {customerData.province ? `${customerData.province}, ` : ""}
+                  {customerData.department ? `${customerData.department}, ` : ""}
+                  {customerData.country || "No especificado"}
                 </p>
               </div>
             </div>
@@ -139,7 +172,7 @@ export default function ReservationTabCustomerContent({ row }: ReservationTabCus
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Lugar de nacimiento</p>
-                <p className="text-sm font-medium">{customerData.birthPlace}</p>
+                <p className="text-sm font-medium">{customerData.birthPlace || "No especificado"}</p>
               </div>
             </div>
           </div>
