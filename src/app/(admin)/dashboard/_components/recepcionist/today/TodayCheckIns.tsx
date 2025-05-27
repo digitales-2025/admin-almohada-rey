@@ -1,11 +1,12 @@
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { CalendarCheck } from "lucide-react";
 
-import { ReservationStatus } from "@/app/(admin)/reservation/_schemas/reservation.schemas";
+import type { ReservationStatus } from "@/app/(admin)/reservation/_schemas/reservation.schemas";
 import { reservationStatusConfig } from "@/app/(admin)/reservation/_types/reservation-enum.config";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Top5TodayCheckIn } from "../../../_types/dashboard";
+import type { Top5TodayCheckIn } from "../../../_types/dashboard";
 
 interface TodayCheckInsProps {
   top5TodayCheckIn: Top5TodayCheckIn[] | undefined;
@@ -40,8 +41,14 @@ export function TodayCheckIns({ top5TodayCheckIn = [] }: TodayCheckInsProps) {
   return (
     <div className="space-y-4">
       {top5TodayCheckIn.length === 0 ? (
-        <div className="py-6 text-center">
-          <p className="text-muted-foreground">No hay check-ins programados para hoy</p>
+        <div className="flex flex-col items-center justify-center py-8 space-y-4">
+          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+            <CalendarCheck className="w-6 h-6 text-muted-foreground" />
+          </div>
+          <div className="text-center space-y-1">
+            <p className="text-sm font-medium text-muted-foreground">No hay check-ins programados</p>
+            <p className="text-xs text-muted-foreground">Los check-ins de hoy aparecerán aquí</p>
+          </div>
         </div>
       ) : (
         top5TodayCheckIn.map((checkIn) => (

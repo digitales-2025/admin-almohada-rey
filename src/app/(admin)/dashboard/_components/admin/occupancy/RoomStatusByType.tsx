@@ -9,7 +9,7 @@ import { getRoomTypeKey, RoomTypeLabels } from "@/app/(admin)/rooms/list/_utils/
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ExtendedRoomStatus, RoomOccupancyMap } from "../../../_types/dashboard";
+import type { ExtendedRoomStatus, RoomOccupancyMap } from "../../../_types/dashboard";
 import { getRoomStatusConfig, getStatusText } from "../../../_utils/dashboard.utils";
 
 interface RoomStatusByTypeProps {
@@ -31,12 +31,33 @@ export function RoomStatusByType({ roomOccupancy }: RoomStatusByTypeProps) {
 
   if (!roomOccupancy || Object.keys(roomOccupancy.roomsByType).length === 0) {
     return (
-      <Card className="col-span-3 md:col-span-2">
-        <CardContent className="flex flex-col items-center justify-center py-16">
-          <Home className="h-12 w-12 text-muted-foreground mb-4" />
-          <p className="text-muted-foreground text-center">No hay información disponible sobre habitaciones.</p>
-        </CardContent>
-      </Card>
+      <div className="col-span-3 md:col-span-2 space-y-6">
+        {/* Header Card */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-lg">Mapa de Habitaciones</CardTitle>
+                <CardDescription>Gestión y estado de todas las habitaciones</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="flex flex-col items-center justify-center py-12 space-y-4">
+              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+                <Home className="w-8 h-8 text-muted-foreground" />
+              </div>
+              <div className="text-center space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">No hay habitaciones configuradas</p>
+                <p className="text-xs text-muted-foreground">Configure las habitaciones para ver el mapa de estados</p>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => router.push("/rooms/list")}>
+                Configurar habitaciones
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 

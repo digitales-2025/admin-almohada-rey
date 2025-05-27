@@ -8,18 +8,20 @@ import {
   CreditCard,
   DollarSign,
   Package,
+  PieChart,
   ShoppingBag,
+  TrendingDown,
   Utensils,
 } from "lucide-react";
 import { createPortal } from "react-dom";
-import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { Cell, Legend, Pie, PieChart as RechartsPieChart, ResponsiveContainer, Tooltip } from "recharts";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FilterYear } from "@/components/ui/filter-year";
 import { NumberCounter } from "@/components/ui/number-counter";
 import { Progress } from "@/components/ui/progress";
 import { TabsContent } from "@/components/ui/tabs";
-import { SummaryFinance } from "../../../_types/dashboard";
+import type { SummaryFinance } from "../../../_types/dashboard";
 
 interface FinanceTabsContentDashboardProps {
   year: number;
@@ -239,7 +241,7 @@ export default function FinanceTabsContentDashboard({
             <div className="h-80">
               {incomeData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
+                  <RechartsPieChart>
                     <Pie
                       data={incomeData}
                       cx="50%"
@@ -256,11 +258,17 @@ export default function FinanceTabsContentDashboard({
                     </Pie>
                     <Tooltip formatter={(value) => formatCurrency(Number(value))} />
                     <Legend />
-                  </PieChart>
+                  </RechartsPieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="flex h-full items-center justify-center">
-                  <p className="text-muted-foreground text-center">No hay datos de ingresos disponibles</p>
+                <div className="flex flex-col h-full items-center justify-center space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                    <PieChart className="w-6 h-6 text-muted-foreground" />
+                  </div>
+                  <div className="text-center space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">Sin datos de ingresos</p>
+                    <p className="text-xs text-muted-foreground">Los ingresos aparecerán cuando se registren</p>
+                  </div>
                 </div>
               )}
             </div>
@@ -337,7 +345,7 @@ export default function FinanceTabsContentDashboard({
             <div className="h-80">
               {expensesData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
+                  <RechartsPieChart>
                     <Pie
                       data={expensesData}
                       cx="50%"
@@ -354,11 +362,17 @@ export default function FinanceTabsContentDashboard({
                     </Pie>
                     <Tooltip formatter={(value) => formatCurrency(Number(value))} />
                     <Legend />
-                  </PieChart>
+                  </RechartsPieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="flex h-full items-center justify-center">
-                  <p className="text-muted-foreground text-center">No hay datos de gastos disponibles</p>
+                <div className="flex flex-col h-full items-center justify-center space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                    <TrendingDown className="w-6 h-6 text-muted-foreground" />
+                  </div>
+                  <div className="text-center space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">Sin datos de gastos</p>
+                    <p className="text-xs text-muted-foreground">Los gastos aparecerán cuando se registren</p>
+                  </div>
                 </div>
               )}
             </div>
