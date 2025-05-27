@@ -36,6 +36,7 @@ export const useWarehouse = (options: UseProductProps = {}) => {
     },
     {
       skip: !typeStockProduct,
+      refetchOnMountOrArgChange: true,
     }
   );
 
