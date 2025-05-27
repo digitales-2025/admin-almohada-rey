@@ -76,8 +76,14 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
     header: ({ column }) => <DataTableColumnHeader column={column} title="Cliente" />,
     cell: ({ row }) => (
       <div className="min-w-40 truncate capitalize">
-        <span className="block font-semibold">{row.original.customer.name}</span>
-        <span className="text-xs">{row.original.customer.phone}</span>
+        {row.original.customer ? (
+          <>
+            <span className="block font-semibold">{row.original.customer.name}</span>
+            <span className="text-xs">{row.original.customer.phone || "Sin teléfono"}</span>
+          </>
+        ) : (
+          <span className="text-muted-foreground italic">Cliente no registrado</span>
+        )}
       </div>
     ),
   },
