@@ -51,3 +51,16 @@ export const cleaningSchema = z
   });
 
 export type CleaningStatusRoomsSchema = z.infer<typeof cleaningSchema>;
+
+export const updateAmenities = z.object({
+  checklist: z.object({
+    trashBin: z.boolean(),
+    towel: z.boolean(),
+    toiletPaper: z.boolean(),
+    showerSoap: z.boolean(),
+    handSoap: z.boolean(),
+    lamp: z.boolean(),
+  }),
+});
+
+export type UpdateAmenitiesSchema = z.infer<typeof updateAmenities>;

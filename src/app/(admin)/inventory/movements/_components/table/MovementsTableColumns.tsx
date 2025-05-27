@@ -4,7 +4,7 @@ import { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 import { format, parseISO as parse } from "date-fns";
 import { es } from "date-fns/locale";
-import { Ellipsis, Hash, PackageMinus, PackagePlus, Pencil } from "lucide-react";
+import { Ellipsis, Hash, PackageMinus, PackagePlus, Pencil, Trash } from "lucide-react";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { MovementsType, SummaryMovements } from "../../_types/movements";
 import { ProductType } from "../../../products/_types/products";
 import { ProductTypeLabels } from "../../../products/_utils/products.utils";
+import { DeleteMovementsDialog } from "../delete/DeleteMovementsDialog";
 import { UpdateMovementsSheet } from "../update/UpdateMovementsSheet";
 import ViewMovementsDialog from "../view/ViewMovementsDialog";
 
@@ -180,12 +181,10 @@ export const movementsColumns = (isSuperAdmin: boolean): ColumnDef<SummaryMoveme
       id: "actions",
       size: 5,
       cell: function Cell({ row }) {
-        console.log("isSuperAdmin", isSuperAdmin);
         const [showEditDialog, setShowEditDialog] = useState(false);
 
-        /*
-             const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-        */
+        const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
         const [showViewMovementDialog, setShowViewMovementDialog] = useState(false);
 
         const { type, hasPaymentAssigned, id } = row.original;
@@ -205,7 +204,6 @@ export const movementsColumns = (isSuperAdmin: boolean): ColumnDef<SummaryMoveme
                   type={type}
                 />
               )}
-              {/* 
 
               <DeleteMovementsDialog
                 open={showDeleteDialog}
@@ -214,7 +212,7 @@ export const movementsColumns = (isSuperAdmin: boolean): ColumnDef<SummaryMoveme
                 onSuccess={() => {
                   row.toggleSelected(false);
                 }}
-              /> */}
+              />
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -233,16 +231,19 @@ export const movementsColumns = (isSuperAdmin: boolean): ColumnDef<SummaryMoveme
                     <Pencil className="size-4" aria-hidden="true" />
                   </DropdownMenuShortcut>
                 </DropdownMenuItem>
-                {/* 
 
                 {isSuperAdmin && (
-                  <DropdownMenuItem className="text-red-700" onSelect={() => setShowDeleteDialog(true)}>
+                  <DropdownMenuItem
+                    className="text-red-700"
+                    disabled={hasPaymentAssigned}
+                    onSelect={() => setShowDeleteDialog(true)}
+                  >
                     Eliminar
                     <DropdownMenuShortcut>
                       <Trash className="size-4" aria-hidden="true" />
                     </DropdownMenuShortcut>
                   </DropdownMenuItem>
-                )} */}
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
