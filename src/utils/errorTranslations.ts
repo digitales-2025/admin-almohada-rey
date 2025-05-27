@@ -36,6 +36,8 @@ const errorTranslations = {
   "This RUC is already in use": "Este RUC ya está en uso",
   "phone must be a valid phone number": "El teléfono debe ser un número de teléfono válido",
   "This name is already in use": "Este nombre ya está en uso",
+  "Review the stock of resources. There are insufficient resources":
+    "Revisa el stock de productos. No hay suficientes productos",
 };
 
 export default errorTranslations;
