@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 
 import { customersApi } from "@/app/(admin)/customers/_services/customersApi";
+import { dashboardApi } from "@/app/(admin)/dashboard/_services/dashboardApi";
 import { expensesApi } from "@/app/(admin)/expenses/_services/expensesApi";
 import { movementsApi } from "@/app/(admin)/inventory/movements/_services/movementsApi";
 import { productsApi } from "@/app/(admin)/inventory/products/_services/productsApi";
@@ -34,6 +35,7 @@ export const store = configureStore({
     [movementsApi.reducerPath]: movementsApi.reducer,
     [warehouseApi.reducerPath]: warehouseApi.reducer,
     [reportsApi.reducerPath]: reportsApi.reducer,
+    [dashboardApi.reducerPath]: dashboardApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -69,7 +71,8 @@ export const store = configureStore({
       .concat(expensesApi.middleware)
       .concat(movementsApi.middleware)
       .concat(warehouseApi.middleware)
-      .concat(reportsApi.middleware),
+      .concat(reportsApi.middleware)
+      .concat(dashboardApi.middleware),
 });
 setupListeners(store.dispatch);
 

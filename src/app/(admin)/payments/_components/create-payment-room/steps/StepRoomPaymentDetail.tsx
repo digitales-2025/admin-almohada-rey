@@ -156,9 +156,11 @@ export default function StepRoomPaymentDetail({
                     <InputWithIcon
                       Icon={Banknote}
                       placeholder="Ingrese el precio por noche"
-                      type="number"
+                      type={"number"}
                       {...field}
-                      value={field.value?.toString() || "0"}
+                      onChange={(e) => {
+                        field.onChange(Number(e.target.value) || 0);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />

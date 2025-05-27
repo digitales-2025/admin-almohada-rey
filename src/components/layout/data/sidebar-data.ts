@@ -1,9 +1,9 @@
 import {
+  BarChart2,
   BedDouble,
   CalendarCheck,
   Clipboard,
   CreditCard,
-  Files,
   HandCoins,
   Hotel,
   LayoutDashboard,
@@ -131,7 +131,7 @@ export const sidebarData: SidebarData = {
         {
           title: "Reportes",
           url: "/reports",
-          icon: Files,
+          icon: BarChart2,
         },
       ],
     },

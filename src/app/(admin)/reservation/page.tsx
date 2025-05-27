@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { HeaderPage } from "@/components/common/HeaderPage";
 import ErrorGeneral from "@/components/errors/general-error";
 import { Button } from "@/components/ui/button";
-import { processError } from "@/utils/process-error";
 import { FilterReservationDialog } from "./_components/filter/FilterReservationDialog";
 import { ReservationTable } from "./_components/table/ReservationTable";
 import { defaultParamConfig, usePaginatedReservation } from "./_hooks/use-reservation";
@@ -21,7 +20,7 @@ export default function ReservationPage() {
 
   const { queryResponse, updateFilters } = usePaginatedReservation();
 
-  const { data: response, isLoading, isError, error, refetch, isSuccess } = queryResponse;
+  const { data: response, isLoading, isError, isSuccess } = queryResponse;
 
   const onSubmitFilter = useCallback(
     (filter?: PaginatedReservationParams) => {
@@ -61,22 +60,6 @@ export default function ReservationPage() {
   }
 
   if (!response) {
-    return (
-      <div>
-        <HeaderPage title={METADATA.entityName} description={METADATA.description} />
-        <ErrorGeneral />
-      </div>
-    );
-  }
-
-  if (isError) {
-    const localError = processError(error);
-    toast.error(localError, {
-      action: {
-        label: "Reintentar",
-        onClick: () => refetch,
-      },
-    });
     return (
       <div>
         <HeaderPage title={METADATA.entityName} description={METADATA.description} />

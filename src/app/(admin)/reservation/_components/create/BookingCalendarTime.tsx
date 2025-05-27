@@ -450,6 +450,7 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
                     // Enviar al handler
                     handleCheckOutTimeChange(formattedTime);
                   }}
+                  disabled
                   className="w-full"
                 />
               </div>

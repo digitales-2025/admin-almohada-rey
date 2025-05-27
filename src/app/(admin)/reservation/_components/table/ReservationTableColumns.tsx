@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { Ellipsis, Pencil, Trash } from "lucide-react";
+import { CalendarCog, CalendarX2, Ellipsis, Pencil, Trash } from "lucide-react";
 import { toast } from "sonner";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
@@ -27,7 +27,9 @@ import {
 import { reservationStatusConfig } from "../../_types/reservation-enum.config";
 import { getAvailableActions } from "../../_utils/reservation-status-validation.utils";
 import { CreatePaymentDialog } from "../create-payment/CreatePaymentsDialog";
+import { ExtensionReservationDialog } from "../extension/ExtensionReservationDialog";
 import { DeactivateReservationsDialog } from "../state-management/DeactivateReservationsDialog";
+import { DeleteLateCheckoutDialog } from "../state-management/DeleteLateCheckoutDialog";
 import { DIALOG_DICTIONARY } from "../state-management/reservation-status-dialog-config";
 import { TransitionReservationStatusDialog } from "../state-management/TransitionReservationStatusDialog";
 import { UpdateReservationSheet } from "../update/UpdateReservationSheet";
@@ -74,8 +76,14 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
     header: ({ column }) => <DataTableColumnHeader column={column} title="Cliente" />,
     cell: ({ row }) => (
       <div className="min-w-40 truncate capitalize">
-        <span className="block font-semibold">{row.original.customer.name}</span>
-        <span className="text-xs">{row.original.customer.phone}</span>
+        {row.original.customer ? (
+          <>
+            <span className="block font-semibold">{row.original.customer.name}</span>
+            <span className="text-xs">{row.original.customer.phone || "Sin teléfono"}</span>
+          </>
+        ) : (
+          <span className="text-muted-foreground italic">Cliente no registrado</span>
+        )}
       </div>
     ),
   },
@@ -204,6 +212,10 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
           >
             Activo
           </Badge>
+        ) : row.original.isPendingDeletePayment ? (
+          <Badge variant="secondary" className="bg-amber-100 text-amber-600 border-amber-200 hover:bg-amber-200">
+            Pago por anular
+          </Badge>
         ) : (
           <Badge variant="secondary" className="bg-red-100 text-red-500 border-red-200 hover:bg-red-200">
             Archivado
@@ -213,6 +225,7 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
     ),
     filterFn: (row, id, value) => {
       const rowValue = row.getValue(id);
+      const hasPaymentToDelete = row.original.isPendingDeletePayment;
 
       // Si value es un array, comprobamos si contiene el valor de la fila
       if (Array.isArray(value)) {
@@ -221,12 +234,17 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
 
         // Convertimos cada elemento del array según sea necesario
         return value.some((v) => {
+          // Caso especial para "payment_to_delete"
+          if (v === "payment_to_delete") return !rowValue && hasPaymentToDelete;
           // Si es string "true"/"false", convertimos a booleano
           if (typeof v === "string") return v === String(rowValue);
           // Si ya es booleano, comparamos directamente
           return v === rowValue;
         });
       }
+
+      // Para el caso de valor único "payment_to_delete"
+      if (value === "payment_to_delete") return !rowValue && hasPaymentToDelete;
 
       // Si es un valor único, hacemos la comparación directa
       return rowValue === value;
@@ -244,8 +262,9 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
       const [showCheckOutDialog, setShowCheckOutDialog] = useState(false);
       const [showDeactivateDialog, setShowDeactivateDialog] = useState(false);
       const [showDetailDialog, setShowDetailDialog] = useState(false);
-      const { status, isPendingDeletePayment } = row.original;
-      const { isActive } = row.original;
+      const [showExtensionDialog, setShowExtensionDialog] = useState(false);
+      const [showDeleteLateCheckoutDialog, setShowDeleteLateCheckoutDialog] = useState(false);
+      const { status, isPendingDeletePayment, isActive, appliedLateCheckOut } = row.original;
 
       const confirmConfig = DIALOG_DICTIONARY["CONFIRMED"];
       const cancelConfig = DIALOG_DICTIONARY["CANCELED"];
@@ -320,6 +339,21 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
             {showDetailDialog && (
               <ReservationDetailsDialog open={showDetailDialog} setOpen={setShowDetailDialog} row={row?.original} />
             )}
+            {showExtensionDialog && (
+              <ExtensionReservationDialog
+                open={showExtensionDialog}
+                onOpenChange={setShowExtensionDialog}
+                reservation={row?.original}
+              />
+            )}
+
+            {showDeleteLateCheckoutDialog && (
+              <DeleteLateCheckoutDialog
+                open={showDeleteLateCheckoutDialog}
+                onOpenChange={setShowDeleteLateCheckoutDialog}
+                id={row?.original.id}
+              />
+            )}
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -339,6 +373,24 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
                   <Pencil className="size-4" aria-hidden="true" />
                 </DropdownMenuShortcut>
               </DropdownMenuItem>
+
+              {status === "CHECKED_IN" && (
+                <DropdownMenuItem onSelect={() => setShowExtensionDialog(true)}>
+                  Extender reserva
+                  <DropdownMenuShortcut>
+                    <CalendarCog className="size-4" aria-hidden="true" />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              )}
+
+              {appliedLateCheckOut && (
+                <DropdownMenuItem className="text-red-700" onSelect={() => setShowDeleteLateCheckoutDialog(true)}>
+                  Eliminar Late Checkout
+                  <DropdownMenuShortcut>
+                    <CalendarX2 className="size-4 text-red-700" aria-hidden="true" />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              )}
 
               {canConfirm && (
                 <DropdownMenuItem onSelect={() => setShowCreatePaymentDialog(true)} disabled={status !== "PENDING"}>

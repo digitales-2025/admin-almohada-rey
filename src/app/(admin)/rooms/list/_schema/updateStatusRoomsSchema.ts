@@ -4,7 +4,7 @@ import { RoomStatus } from "../_types/room";
 
 // Schema for status change
 export const statusRoomsSchema = z.object({
-  status: z.enum([RoomStatus.AVAILABLE, RoomStatus.OCCUPIED, RoomStatus.CLEANING]),
+  status: z.enum([RoomStatus.AVAILABLE, RoomStatus.OCCUPIED, RoomStatus.CLEANING, RoomStatus.INCOMPLETE]),
 });
 
 export type UpdateStatusRoomsSchema = z.infer<typeof statusRoomsSchema>;
@@ -51,3 +51,16 @@ export const cleaningSchema = z
   });
 
 export type CleaningStatusRoomsSchema = z.infer<typeof cleaningSchema>;
+
+export const updateAmenities = z.object({
+  checklist: z.object({
+    trashBin: z.boolean(),
+    towel: z.boolean(),
+    toiletPaper: z.boolean(),
+    showerSoap: z.boolean(),
+    handSoap: z.boolean(),
+    lamp: z.boolean(),
+  }),
+});
+
+export type UpdateAmenitiesSchema = z.infer<typeof updateAmenities>;

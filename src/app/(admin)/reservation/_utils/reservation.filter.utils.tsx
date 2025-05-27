@@ -1,4 +1,4 @@
-import { CheckCircle2, XCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { reservationStatusConfig } from "../_types/reservation-enum.config";
@@ -10,6 +10,10 @@ const ActiveIcon: React.FC<{ className?: string }> = ({ className }) => (
 
 const InactiveIcon: React.FC<{ className?: string }> = ({ className }) => (
   <XCircle className={cn(className, "text-red-500")} />
+);
+
+const PaymentToDeleteIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <AlertTriangle className={cn(className, "text-amber-600")} />
 );
 
 const ReservationStatusIcons = Object.fromEntries(
@@ -33,9 +37,14 @@ export const facetedFilters = [
         icon: ActiveIcon,
       },
       {
-        label: "Inactivo",
+        label: "Archivado",
         value: false,
         icon: InactiveIcon,
+      },
+      {
+        label: "Pago por anular",
+        value: "payment_to_delete",
+        icon: PaymentToDeleteIcon,
       },
     ],
   },

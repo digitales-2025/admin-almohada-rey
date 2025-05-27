@@ -28,6 +28,7 @@ export const reportsApi = createApi({
         credentials: "include",
       }),
     }),
+
     // Endpoint para descargar el reporte de balance (ganancias y gastos)
     downloadBalanceReport: build.query<Blob, DownloadReportParams>({
       query: ({ month, year }) => ({
@@ -47,6 +48,16 @@ export const reportsApi = createApi({
         credentials: "include",
       }),
     }),
+
+    // Endpoint para descargar el reporte de ocupación
+    downloadOccupancyReport: build.query<Blob, DownloadReportParams>({
+      query: ({ month, year }) => ({
+        url: `/reports/occupancy?month=${month}&year=${year}`,
+        method: "GET",
+        responseHandler: async (response: Response) => await response.blob(),
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -56,4 +67,5 @@ export const {
   useLazyDownloadExpenseReportQuery,
   useLazyDownloadBalanceReportQuery,
   useLazyDownloadProfitTypeRoomReportQuery,
+  useLazyDownloadOccupancyReportQuery,
 } = reportsApi;

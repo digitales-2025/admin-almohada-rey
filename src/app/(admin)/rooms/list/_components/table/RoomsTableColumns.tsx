@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { ClipboardCheck, Ellipsis, Monitor, RefreshCcwDot, Ruler, Settings, Trash } from "lucide-react";
+import { ClipboardCheck, Ellipsis, Lamp, Monitor, RefreshCcwDot, Ruler, Settings, Trash } from "lucide-react";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { FloorType, Room, RoomStatus } from "../../_types/room";
 import { FloorTypeLabels, getRoomTypeKey, RoomStatusLabels, RoomTypeLabels } from "../../_utils/rooms.utils";
+import { UpdateAmenitiesRoomsDialog } from "../amenities-management/UpdateAmenitiesRoomsDialog";
 import { UpdateAvailabilityRoomsDialog } from "../availability-management/UpdateAvailabilityRoomsDialog";
 import { DeleteRoomsDialog } from "../state-management/DeleteRoomsDialog";
 import { ReactivateRoomsDialog } from "../state-management/ReactivateRoomsDialog";
@@ -233,8 +234,9 @@ export const roomsColumns = (isSuperAdmin: boolean, handleRoomCleaningLog: (id: 
       const [showReactivateDialog, setShowReactivateDialog] = useState(false);
       const [showEditDialog, setShowEditDialog] = useState(false);
       const [showUpdateAvailabilityDialog, setShowUpdateAvailabilityDialog] = useState(false);
+      const [showEditAmenitiesDialog, setShowEditAmenitiesDialog] = useState(false);
 
-      const { isActive } = row.original;
+      const { isActive, status } = row.original;
       return (
         <div>
           <div>
@@ -271,6 +273,14 @@ export const roomsColumns = (isSuperAdmin: boolean, handleRoomCleaningLog: (id: 
                 room={row?.original}
               />
             )}
+
+            {showEditAmenitiesDialog && (
+              <UpdateAmenitiesRoomsDialog
+                open={showEditAmenitiesDialog}
+                setOpen={setShowEditAmenitiesDialog}
+                room={row?.original}
+              />
+            )}
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -295,6 +305,14 @@ export const roomsColumns = (isSuperAdmin: boolean, handleRoomCleaningLog: (id: 
                   <ClipboardCheck className="size-4" aria-hidden="true" />
                 </DropdownMenuShortcut>
               </DropdownMenuItem>
+              {status !== RoomStatus.CLEANING && status !== RoomStatus.OCCUPIED && (
+                <DropdownMenuItem onSelect={() => setShowEditAmenitiesDialog(true)} disabled={!isActive}>
+                  Gestionar amenidades
+                  <DropdownMenuShortcut>
+                    <Lamp className="size-4" aria-hidden="true" />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              )}
               {isSuperAdmin && (
                 <DropdownMenuItem onSelect={() => setShowReactivateDialog(true)} disabled={isActive}>
                   Reactivar

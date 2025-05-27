@@ -6,6 +6,7 @@ import { PaginatedResponse } from "@/types/api/paginated-response";
 import { BaseApiResponse } from "@/types/api/types";
 import { PaginatedQueryParams } from "@/types/query-filters/generic-paginated-query-params";
 import baseQueryWithReauth from "@/utils/baseQuery";
+import { CreateExtendStay, CreateLateCheckout } from "../_schemas/extension-reservation.schemas";
 import {
   CreateReservationInput,
   DetailedReservation,
@@ -22,6 +23,9 @@ import { AvailabilityParams, GenericAvailabilityParams } from "../_types/room-av
 type CreateReservationReduxResponse = BaseApiResponse<Reservation>;
 type UpdateReservationReduxResponse = BaseApiResponse<Reservation>;
 export type PaginatedReservationParams = PaginatedQueryParams<Reservation>;
+type ApplyLateCheckoutReduxResponse = BaseApiResponse<Reservation>;
+type ExtendStayReduxResponse = BaseApiResponse<Reservation>;
+type RemoveLateCheckoutReduxResponse = BaseApiResponse<Reservation>;
 
 export const reservationApi = createApi({
   reducerPath: "reservationApi",
@@ -46,6 +50,35 @@ export const reservationApi = createApi({
         credentials: "include",
       }),
       invalidatesTags: ["Reservation"],
+    }),
+
+    applyLateCheckout: build.mutation<ApplyLateCheckoutReduxResponse, { id: string; data: CreateLateCheckout }>({
+      query: ({ id, data }) => ({
+        url: `/reservation/${id}/late-checkout`,
+        method: "PATCH",
+        body: data,
+        credentials: "include",
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: "Reservation", id }, "Reservation", "RoomAvailability"],
+    }),
+
+    removeLateCheckout: build.mutation<RemoveLateCheckoutReduxResponse, string>({
+      query: (id) => ({
+        url: `/reservation/${id}/late-checkout`,
+        method: "DELETE",
+        credentials: "include",
+      }),
+      invalidatesTags: (result, error, id) => [{ type: "Reservation", id }, "Reservation", "RoomAvailability"],
+    }),
+
+    extendStay: build.mutation<ExtendStayReduxResponse, { id: string; data: CreateExtendStay }>({
+      query: ({ id, data }) => ({
+        url: `/reservation/${id}/extend-stay`,
+        method: "PATCH",
+        body: data,
+        credentials: "include",
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: "Reservation", id }, "Reservation", "RoomAvailability"],
     }),
 
     transitionReservationStatus: build.mutation<
@@ -171,6 +204,15 @@ export const reservationApi = createApi({
         { type: "RoomAvailability", id: `${arg.roomId}-${arg.checkInDate}-${arg.checkOutDate}-${arg.reservationId}` },
       ],
     }),
+
+    checkExtendedCheckoutAvailability: build.query<{ isAvailable: boolean }, { id: string; newCheckoutDate: string }>({
+      query: ({ id, newCheckoutDate }) => ({
+        url: `/reservation/${id}/check-extended-checkout`,
+        method: "GET",
+        params: { newCheckoutDate },
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -230,12 +272,32 @@ export const setupReservationWebsockets = (dispatch: any) => {
     );
   };
 
+  const handleCheckoutAvailabilityChecked = ({
+    roomId,
+    originalCheckoutDate,
+    newCheckoutDate,
+  }: {
+    roomId: string;
+    originalCheckoutDate: string;
+    newCheckoutDate: string;
+    isAvailable: boolean;
+    timestamp: string;
+  }) => {
+    dispatch(
+      reservationApi.util.invalidateTags([
+        { type: "RoomAvailability", id: `${roomId}_${originalCheckoutDate}_${newCheckoutDate}` },
+        "RoomAvailability",
+      ])
+    );
+  };
+
   // Registramos los listeners usando tus métodos existentes
   socketService.onNewReservation(handleNewReservation);
   socketService.onReservationUpdated(handleUpdatedReservation);
   socketService.onReservationDeleted(handleDeletedReservation);
   socketService.onAvailabilityChanged(handleAvailabilityChanged);
   socketService.onRoomAvailabilityChecked(handleRoomAvailabilityChecked);
+  socketService.onCheckoutAvailabilityChecked(handleCheckoutAvailabilityChecked);
 
   // Limpieza usando el método genérico off
   return () => {
@@ -244,6 +306,7 @@ export const setupReservationWebsockets = (dispatch: any) => {
     socketService.off("reservationDeleted", handleDeletedReservation);
     socketService.off("availabilityChanged", handleAvailabilityChanged);
     socketService.off("roomAvailabilityChecked", handleRoomAvailabilityChecked);
+    socketService.off("checkoutAvailabilityChecked", handleCheckoutAvailabilityChecked);
   };
 };
 
@@ -254,6 +317,9 @@ export const requestReservationsInTimeInterval = (checkInDate: string, checkOutD
 export const {
   useCreateReservationMutation,
   useUpdateReservationMutation,
+  useApplyLateCheckoutMutation,
+  useRemoveLateCheckoutMutation,
+  useExtendStayMutation,
   useTransitionReservationStatusMutation,
   useGetReservationByIdQuery,
   useGetAllReservationsQuery,
@@ -265,4 +331,5 @@ export const {
   useGetReservationsInTimeIntervalQuery,
   useDeactivateReservationsMutation,
   useReactivateReservationsMutation,
+  useCheckExtendedCheckoutAvailabilityQuery,
 } = reservationApi;

@@ -12,6 +12,7 @@ export const LIMA_TO_UTC_OFFSET = 5; // Diferencia horaria entre Lima y UTC
  */
 export const DEFAULT_CHECKIN_TIME = "03:00 PM"; // 15:00
 export const DEFAULT_CHECKOUT_TIME = "12:00 PM"; // 12:00
+export const DEFAULT_EXTENDED_CHECKOUT_TIME = "12:01 PM"; // 14:00
 
 // Constantes para el calendario
 // Variable para almacenar valores persistentes (fuera de React)

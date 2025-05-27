@@ -9,6 +9,7 @@ import {
   useGetAllRoomsQuery,
   useGetPaginatedRoomsQuery,
   useReactivateRoomsMutation,
+  useUpdateAmenitiesMutation,
   useUpdateRoomMutation,
   useUpdateRoomStatusMutation,
 } from "../_services/roomsApi";
@@ -20,6 +21,9 @@ export const useRooms = () => {
   const [createRoom, { isSuccess: isSuccessCreateRoom }] = useCreateRoomMutation();
 
   const [updateRoom, { isSuccess: isSuccessUpdateRoom, isLoading: isLoadingUpdateRoom }] = useUpdateRoomMutation();
+
+  const [updateAmenities, { isSuccess: isSuccessUpdateAmenities, isLoading: isLoadingUpdateAmenities }] =
+    useUpdateAmenitiesMutation();
 
   const [updateRoomStatus, { isSuccess: isSuccessUpdateRoomStatus, isLoading: isLoadingUpdateRoomStatus }] =
     useUpdateRoomStatusMutation();
@@ -46,6 +50,22 @@ export const useRooms = () => {
       toast.promise(promise, {
         loading: "Actualizando habitación...",
         success: "Habitación actualizada exitosamente",
+        error: (error) => {
+          return error.message;
+        },
+      });
+    }
+
+    return await promise;
+  }
+
+  async function onUpdateAmenities(input: Partial<Room> & { id: string }, showToast: boolean = true) {
+    const promise = runAndHandleError(() => updateAmenities(input).unwrap());
+
+    if (showToast) {
+      toast.promise(promise, {
+        loading: "Actualizando amenidades de habitación...",
+        success: "Amenidades actualizadas exitosamente",
         error: (error) => {
           return error.message;
         },
@@ -109,6 +129,9 @@ export const useRooms = () => {
     onUpdateRoom,
     isSuccessUpdateRoom,
     isLoadingUpdateRoom,
+    onUpdateAmenities,
+    isSuccessUpdateAmenities,
+    isLoadingUpdateAmenities,
     onUpdateRoomStatus,
     isSuccessUpdateRoomStatus,
     isLoadingUpdateRoomStatus,

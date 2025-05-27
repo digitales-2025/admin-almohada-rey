@@ -36,6 +36,16 @@ export const roomsApi = createApi({
       }),
       invalidatesTags: ["Rooms"],
     }),
+    // Actualizar las amenidades de una habitación
+    updateAmenities: build.mutation<Room, Partial<Room> & { id: string }>({
+      query: ({ id, ...body }) => ({
+        url: `/rooms/${id}/amenities`,
+        method: "PATCH",
+        body,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Rooms"],
+    }),
     // Actualizar estado de habitación
     updateRoomStatus: build.mutation<Room, { id: string; statusDto: StatusRoomDto }>({
       query: ({ id, statusDto }) => ({
@@ -103,6 +113,7 @@ export const roomsApi = createApi({
 export const {
   useCreateRoomMutation,
   useUpdateRoomMutation,
+  useUpdateAmenitiesMutation,
   useUpdateRoomStatusMutation,
   useGetRoomByIdQuery,
   useGetAllRoomsQuery,

@@ -3,7 +3,7 @@ import { Bed, CreditCard, User2 } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
 import { InputWithIcon } from "@/components/input-with-icon";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 /* import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; */
 import { Textarea } from "@/components/ui/textarea";
 import { CreateRoomTypeSchema } from "../../_schema/roomTypesSchema";
@@ -58,6 +58,22 @@ export default function CreateRoomTypeForm({ children, form, onSubmit }: CreateR
                 <FormControl>
                   <InputWithIcon Icon={Bed} placeholder="Ej: Suite Presidencial" {...field} />
                 </FormControl>
+                <FormDescription>Obligatorio</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="nameEn"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nombre (en inglés)</FormLabel>
+                <FormControl>
+                  <InputWithIcon Icon={Bed} placeholder="Ej: Presidential Suite" {...field} />
+                </FormControl>
+                <FormDescription>Opcional (Para la Landing)</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -93,6 +109,7 @@ export default function CreateRoomTypeForm({ children, form, onSubmit }: CreateR
                     value={field.value || ""}
                   />
                 </FormControl>
+                <FormDescription>Obligatorio</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -165,6 +182,7 @@ export default function CreateRoomTypeForm({ children, form, onSubmit }: CreateR
                     value={field.value || ""}
                   />
                 </FormControl>
+                <FormDescription>Obligatorio</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -193,6 +211,22 @@ export default function CreateRoomTypeForm({ children, form, onSubmit }: CreateR
                 <FormControl>
                   <InputWithIcon Icon={Bed} placeholder="Ej: King size con colchón ortopédico" {...field} />
                 </FormControl>
+                <FormDescription>Obligatorio</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="bedEn"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Cama (en inglés)</FormLabel>
+                <FormControl>
+                  <InputWithIcon Icon={Bed} placeholder="Ej: King size con colchón ortopédico" {...field} />
+                </FormControl>
+                <FormDescription>Opcional (Para la Landing)</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -246,6 +280,26 @@ export default function CreateRoomTypeForm({ children, form, onSubmit }: CreateR
                   {...field}
                 />
               </FormControl>
+              <FormDescription>Obligatorio</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="descriptionEn"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Descripción (en inglés)</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Describe las características de este tipo de habitación..."
+                  className="min-h-[120px]"
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>Obligatorio</FormDescription>
               <FormMessage />
             </FormItem>
           )}

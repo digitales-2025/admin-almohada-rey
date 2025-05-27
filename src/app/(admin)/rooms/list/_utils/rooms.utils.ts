@@ -13,6 +13,7 @@ import {
   ShowerHeadIcon as Shower,
   Toilet,
   Trash2,
+  TriangleAlert,
   Waves,
 } from "lucide-react";
 
@@ -40,6 +41,11 @@ export const RoomStatusLabels: Record<
     label: "Ocupada",
     icon: Lamp,
     className: "text-red-700 border-red-200",
+  },
+  [RoomStatus.INCOMPLETE]: {
+    label: "Incompleta",
+    icon: TriangleAlert,
+    className: "text-amber-700 border-amber-200",
   },
 };
 
@@ -116,6 +122,28 @@ export const getRoomTypeKey = (typeName: string): RoomTypeKey => {
   if (normalizedType.includes("suite")) return "suite";
 
   return "default";
+};
+
+// Versión con soporte para modo oscuro
+export const getRoomTypeBgColor = (typeName: string): string => {
+  const typeKey = getRoomTypeKey(typeName);
+
+  // Color para modo claro y oscuro
+  switch (typeKey) {
+    case "matrimonial":
+      return "bg-pink-500 dark:bg-pink-500";
+    case "dobleFamiliar":
+      return "bg-indigo-500 dark:bg-indigo-500";
+    case "dobleSimple":
+      return "bg-blue-500 dark:bg-blue-500";
+    case "simple":
+      return "bg-cyan-500 dark:bg-cyan-500";
+    case "suite":
+      return "bg-amber-500 dark:bg-amber-500";
+    case "default":
+    default:
+      return "bg-slate-500 dark:bg-slate-500";
+  }
 };
 
 export const getChecklistIcon = (item: keyof CleaningChecklist) => {

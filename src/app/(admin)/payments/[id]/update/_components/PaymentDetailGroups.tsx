@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
-import { ChevronDown, ChevronUp, Edit } from "lucide-react";
+import { Calendar, ChevronDown, ChevronUp, CreditCard, DollarSign, Edit, FileText } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 import { getPaymentMethodLabel } from "@/app/(admin)/reservation/_utils/reservationPayment.utils";
@@ -12,9 +12,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
-  GroupPaymentDetailFormValues,
   groupPaymentDetailSchema,
   paymentDetailSchema,
+  type GroupPaymentDetailFormValues,
   type PaymentDetailFormValues,
 } from "../_schemas/updatePaymentDetailSchema";
 import { calculateSubtotal, groupPaymentDetails, PaymentDetailTypesConfigs } from "../_utils/updatePaymentDetail.utils";
@@ -94,9 +94,11 @@ export default function PaymentDetailGroups({ paymentDetails, missingDays, payme
 
   const handleEditDetail = (detail: PaymentDetail) => {
     // Determine detail type
-    let type: "ROOM" | "SERVICE" | "PRODUCT" = "ROOM";
+    let type: "ROOM" | "SERVICE" | "PRODUCT" | "LATE_CHECKOUT" = "ROOM";
     if (detail.type === "ROOM_RESERVATION") {
       type = "ROOM";
+    } else if (detail.type === "LATE_CHECKOUT") {
+      type = "LATE_CHECKOUT";
     } else if (detail.service) {
       type = "SERVICE";
     } else if (detail.product) {
@@ -221,6 +223,42 @@ export default function PaymentDetailGroups({ paymentDetails, missingDays, payme
 
   return (
     <div className="space-y-8">
+      {groups.length === 0 && (
+        <div className="relative overflow-hidden bg-gradient-to-br from-card to-card/80 p-8 text-center">
+          <div className="relative">
+            <div className="mx-auto mb-6 flex items-center justify-center">
+              <div className="relative">
+                <div className="absolute -inset-4 animate-pulse rounded-full bg-muted/50 blur-sm"></div>
+                <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+                  <CreditCard className="h-8 w-8 text-muted-foreground" />
+                </div>
+              </div>
+            </div>
+
+            <div className="relative mx-auto max-w-md">
+              <h3 className="text-2xl font-bold text-foreground">No hay pagos registrados</h3>
+              <div className="mt-2 flex items-center justify-center space-x-1 text-muted-foreground">
+                <span className="text-sm">Historial de transacciones vacío</span>
+              </div>
+
+              <div className="mt-4 grid grid-cols-3 gap-2">
+                <div className="flex flex-col items-center rounded-lg border border-border/40 bg-background/50 p-2">
+                  <DollarSign className="mb-1 h-5 w-5 text-muted-foreground/70" />
+                  <span className="text-xs text-muted-foreground">Sin pagos</span>
+                </div>
+                <div className="flex flex-col items-center rounded-lg border border-border/40 bg-background/50 p-2">
+                  <Calendar className="mb-1 h-5 w-5 text-muted-foreground/70" />
+                  <span className="text-xs text-muted-foreground">Sin fechas</span>
+                </div>
+                <div className="flex flex-col items-center rounded-lg border border-border/40 bg-background/50 p-2">
+                  <FileText className="mb-1 h-5 w-5 text-muted-foreground/70" />
+                  <span className="text-xs text-muted-foreground">Sin detalles</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Innovative payment visualization */}
       <div className="relative">
         {/* Innovative calendar-inspired layout */}
