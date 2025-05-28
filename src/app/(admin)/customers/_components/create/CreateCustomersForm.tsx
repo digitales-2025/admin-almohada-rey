@@ -1,24 +1,28 @@
-import React, { useState } from "react";
+"use client";
+
+import type React from "react";
+import { useState } from "react";
 import { format, parse } from "date-fns";
 import { BriefcaseBusiness, Building2, Home, IdCard, Mail, MapPin, MapPinned, User } from "lucide-react";
-import { UseFormReturn } from "react-hook-form";
-import { Country, getCountries } from "react-phone-number-input";
+import type { UseFormReturn } from "react-hook-form";
+import { getCountries, type Country } from "react-phone-number-input";
 import flags from "react-phone-number-input/flags";
 import es from "react-phone-number-input/locale/es.json";
 
-import { CountryAutocomplete, CountryOption } from "@/components/country-autocomplete";
+import { CountryAutocomplete, type CountryOption } from "@/components/country-autocomplete";
 import { InputWithIcon } from "@/components/input-with-icon";
-import { AutoComplete, Option } from "@/components/ui/autocomplete";
+import { AutoComplete, type Option } from "@/components/ui/autocomplete";
 import DatePicker from "@/components/ui/date-time-picker";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { departments } from "@/data/department";
-import { City } from "@/types/city";
-import { CreateCustomersSchema } from "../../_schema/createCustomersSchema";
+import type { City } from "@/types/city";
+import type { CreateCustomersSchema } from "../../_schema/createCustomersSchema";
 import { CustomerDocumentType, CustomerMaritalStatus } from "../../_types/customer";
 import { CustomerDocumentTypeLabels, CustomerMaritalStatusLabels } from "../../_utils/customers.utils";
+import DniLookup from "../search-dni/LookupDni";
 
 interface CreateCustomersFormProps extends Omit<React.ComponentPropsWithRef<"form">, "onSubmit"> {
   children: React.ReactNode;
@@ -53,10 +57,80 @@ export default function CreateCustomersForm({ children, form, onSubmit }: Create
     // Resetear el campo de ciudad cuando se cambia el departamento
     form.setValue("province", "");
   };
+
+  // Observar el tipo de documento seleccionado
+  const selectedDocumentType = form.watch("documentType");
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 space-y-2">
+          <div className="sm:col-span-2 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="documentType"
+                render={({ field }) => (
+                  <FormItem className="sm:col-span-2">
+                    <FormLabel htmlFor="documentType">Tipo de Documento</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value ?? ""}>
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Selecciona un tipo de documento" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectGroup>
+                          {Object.values(CustomerDocumentType).map((documentType) => {
+                            const documentTypeConfig = CustomerDocumentTypeLabels[documentType];
+                            const Icon = documentTypeConfig.icon;
+
+                            return (
+                              <SelectItem key={documentType} value={documentType} className="flex items-center gap-2">
+                                <Icon className={`size-4 ${documentTypeConfig.className}`} />
+                                <span>{documentTypeConfig.label}</span>
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Componente DNI Lookup - Solo se muestra cuando el tipo de documento es DNI */}
+              {selectedDocumentType === CustomerDocumentType.DNI ? (
+                <FormField
+                  control={form.control}
+                  name="documentNumber"
+                  render={() => (
+                    <FormItem className="sm:col-span-2">
+                      <FormLabel className="text-sm font-medium">Número de DNI</FormLabel>
+                      <FormControl>
+                        <DniLookup form={form} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ) : (
+                <FormField
+                  control={form.control}
+                  name="documentNumber"
+                  render={({ field }) => (
+                    <FormItem className="sm:col-span-2">
+                      <FormLabel className="text-sm font-medium">Número de Documento</FormLabel>
+                      <FormControl>
+                        <InputWithIcon Icon={IdCard} placeholder="Ingrese el número de documento" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            </div>
+          </div>
           <FormField
             control={form.control}
             name="name"
@@ -230,57 +304,10 @@ export default function CreateCustomersForm({ children, form, onSubmit }: Create
                 <FormControl>
                   <PhoneInput
                     defaultCountry={selectedCountryCode}
-                    placeholder="999 888 777"
+                    placeholder="Ingrese el número de teléfono"
                     value={field.value}
                     onChange={(value) => field.onChange(value)}
                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="documentType"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel htmlFor="documentType">Tipo de Documento</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value ?? ""}>
-                  <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Selecciona un tipo de documento" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectGroup>
-                      {Object.values(CustomerDocumentType).map((documentType) => {
-                        const documentTypeConfig = CustomerDocumentTypeLabels[documentType];
-                        const Icon = documentTypeConfig.icon;
-
-                        return (
-                          <SelectItem key={documentType} value={documentType} className="flex items-center gap-2">
-                            <Icon className={`size-4 ${documentTypeConfig.className}`} />
-                            <span>{documentTypeConfig.label}</span>
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="documentNumber"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Número de Documento</FormLabel>
-                <FormControl>
-                  <InputWithIcon Icon={IdCard} placeholder="Ejm: 12345678" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
