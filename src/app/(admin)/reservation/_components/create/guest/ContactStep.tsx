@@ -24,7 +24,12 @@ export default function ContactStep({ form, activeGuest, register }: ContactStep
             name={`guests.${activeGuest}.phone`}
             render={({ field: { onChange, value } }) => (
               <FormControl>
-                <PhoneInput defaultCountry="PE" placeholder="999 888 777" value={value} onChange={onChange} />
+                <PhoneInput
+                  defaultCountry="PE"
+                  placeholder="Ingrese el número de teléfono"
+                  value={value}
+                  onChange={onChange}
+                />
               </FormControl>
             )}
           />

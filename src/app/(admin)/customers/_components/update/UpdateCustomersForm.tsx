@@ -210,7 +210,7 @@ export default function UpdateCustomersForm({
               <FormControl>
                 <PhoneInput
                   defaultCountry="PE"
-                  placeholder="999 888 777"
+                  placeholder="Ingrese el número de teléfono"
                   value={field.value}
                   onChange={(value) => field.onChange(value)}
                 />
