@@ -3,7 +3,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { PaginatedResponse } from "@/types/api/paginated-response";
 import { PaginatedQueryParams } from "@/types/query-filters/generic-paginated-query-params";
 import baseQueryWithReauth from "@/utils/baseQuery";
-import { ApiCustomer, Customer, HistoryCustomer } from "../_types/customer";
+import { ApiCustomer, Customer, HistoryCustomer, ResponseApiCustomer } from "../_types/customer";
 import { ReservationStatus } from "../../reservation/_schemas/reservation.schemas";
 
 interface GetHistoryCustomerByIdProps {
@@ -177,6 +177,15 @@ export const customersApi = createApi({
         credentials: "include",
       }),
     }),
+
+    // Obtener datos de cliente por DNI desde API de Perú
+    getCustomerDataByDni: build.query<ResponseApiCustomer, string>({
+      query: (dni) => ({
+        url: `/customers/dni/${dni}`,
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -192,4 +201,5 @@ export const {
   useSearchCustomersByDocumentIdQuery,
   useImportCustomersMutation,
   useLazyDownloadCustomerTemplateQuery,
+  useGetCustomerDataByDniQuery,
 } = customersApi;

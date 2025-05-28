@@ -94,3 +94,8 @@ export enum CustomerMaritalStatus {
 }
 
 export type ApiCustomer = components["schemas"]["Customer"];
+
+export type ResponseApiCustomer = {
+  name: string;
+  dni: string;
+};
