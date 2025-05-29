@@ -52,9 +52,13 @@ export const store = configureStore({
           "reportsApi/executeQuery/fulfilled",
           "reportsApi/executeQuery/rejected",
           "reportsApi/executeQuery/pending",
+
+          "warehouseApi/executeQuery/fulfilled",
+          "warehouseApi/executeQuery/rejected",
+          "warehouseApi/executeQuery/pending",
         ],
         // Ignorar las rutas en el estado que contienen valores no serializables
-        ignoredPaths: ["customersApi.mutations", "customersApi.queries", "reportsApi.queries"],
+        ignoredPaths: ["customersApi.mutations", "customersApi.queries", "reportsApi.queries", "warehouseApi.queries"],
       },
     })
       .concat(authApi.middleware)
