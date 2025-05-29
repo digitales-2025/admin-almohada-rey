@@ -31,8 +31,8 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { useMovements } from "../../_hooks/use-movements";
 import { CreateInventoryMovement, inventoryMovementSchema } from "../../_schemas/createMovementsSchema";
 import { MovementCreate, MovementsType } from "../../_types/movements";
-import { ProductType } from "../../../products/_types/products";
 import { useWarehouse } from "../../../warehouse/_hooks/use-warehouse";
+import { WarehouseType } from "../../../warehouse/_types/warehouse";
 import { CreateMovementsForm } from "./CreateMovementsForm";
 
 interface CreateMovementsDialogProps {
@@ -64,7 +64,7 @@ export function CreateMovementsDialog({ diferentPage, type }: CreateMovementsDia
       type: undefined,
       dateMovement: "",
       movementDetail: [],
-      productType: ProductType.COMMERCIAL,
+      productType: WarehouseType.COMMERCIAL,
       hasPaymentReceipt: false,
     },
   });
