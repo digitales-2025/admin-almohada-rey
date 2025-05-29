@@ -59,7 +59,7 @@ function processBody(body: BodyInit | object | undefined): BodyInit | undefined 
  * IMPORTANTE: Si la API no responde, o hubo algun otro error, esta funcion devuelve `{statusCode: 503}`
  *
  * IMPORTANTE: Esta funcion no refresca cookies de sesion. Esta función asume
- * que la cookie `access_token` existe y es válida. El refresco de
+ * que la cookie `ar_token` existe y es válida. El refresco de
  * tokens se realiza en el middleware.
  *
  * @type Success El tipo de dato que el API devuelve
@@ -73,11 +73,11 @@ export async function serverFetch<Success>(
   options?: RequestInit
 ): Promise<Result<Success, ServerFetchError>> {
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get("access_token")?.value;
+  const accessToken = cookieStore.get("ar_token")?.value;
 
   if (!accessToken) {
     if (process.env.NODE_ENV !== "production") {
-      console.error("DEBUG: Intentando user serverFetch sin una cookie `access_token valida`");
+      console.error("DEBUG: Intentando user serverFetch sin una cookie `ar_token valida`");
     }
   }
 
@@ -86,7 +86,7 @@ export async function serverFetch<Success>(
       ...options,
       headers: {
         ...options?.headers,
-        Cookie: `access_token=${accessToken}`,
+        Cookie: `ar_token=${accessToken}`,
       },
     });
 

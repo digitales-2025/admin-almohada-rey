@@ -5,7 +5,7 @@ import { ChevronsUpDown, LogOut, UserCircle } from "lucide-react";
 
 import { User } from "@/app/(admin)/users/_types/user";
 import { useLogout } from "@/app/(auth)/log-in/_hooks/use-logout";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,7 +32,6 @@ export function NavUser({ user }: { user: User | undefined }) {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src="/avatars/01.png" alt={user?.name} />
                 <AvatarFallback className="rounded-lg">
                   {getFirstLetter(user?.name, { includeLastName: true })}
                 </AvatarFallback>
@@ -53,7 +52,6 @@ export function NavUser({ user }: { user: User | undefined }) {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src="/avatars/01.png" alt={user?.name} />
                   <AvatarFallback className="rounded-lg">
                     {getFirstLetter(user?.name, { includeLastName: true })}
                   </AvatarFallback>
