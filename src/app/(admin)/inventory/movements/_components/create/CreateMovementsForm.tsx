@@ -27,6 +27,9 @@ interface CreateMovementsFormProps extends Omit<React.ComponentPropsWithRef<"for
 export const CreateMovementsForm = ({ children, form, onSubmit, type, idWarehouse }: CreateMovementsFormProps) => {
   const [selectedProducts, setSelectedProducts] = useState<CreateMovementDetailDto[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [previousProductType, setPreviousProductType] = useState<WarehouseType | string | undefined>(
+    form.watch("productType")
+  );
 
   const warehouseToProductType = (warehouseType: WarehouseType | string | undefined): ProductType | undefined => {
     if (warehouseType === "DEPOSIT") return "INTERNAL_USE" as ProductType;
@@ -34,6 +37,29 @@ export const CreateMovementsForm = ({ children, form, onSubmit, type, idWarehous
     if (warehouseType === "INTERNAL_USE") return "INTERNAL_USE" as ProductType;
     return undefined;
   };
+
+  const currentProductType = form.watch("productType");
+
+  // Efecto para limpiar los productos seleccionados cuando cambia el tipo de producto
+  useEffect(() => {
+    if (previousProductType !== currentProductType) {
+      // Si el cambio es crítico (por ejemplo, de/a COMMERCIAL)
+      const prevType = warehouseToProductType(previousProductType);
+      const currType = warehouseToProductType(currentProductType);
+
+      if (prevType !== currType) {
+        if (selectedProducts.length > 0) {
+          toast.info("Tipo de producto cambiado", {
+            description: "Se han eliminado los productos seleccionados debido al cambio de tipo",
+            duration: 3000,
+          });
+          setSelectedProducts([]);
+        }
+      }
+
+      setPreviousProductType(currentProductType);
+    }
+  }, [currentProductType]);
 
   const { productByType } = useProducts({
     type: warehouseToProductType(form.watch("productType")),

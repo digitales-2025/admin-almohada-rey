@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { RefreshCcw } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -40,6 +41,9 @@ export const UpdateMovementsForm = ({
   movements,
 }: UpdateMovementsFormProps) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [previousProductType, setPreviousProductType] = useState<WarehouseType | string | undefined>(
+    form.watch("productType")
+  );
 
   const warehouseToProductType = (warehouseType: WarehouseType | string | undefined): ProductType | undefined => {
     if (warehouseType === "DEPOSIT") return "INTERNAL_USE" as ProductType;
@@ -47,6 +51,27 @@ export const UpdateMovementsForm = ({
     if (warehouseType === "INTERNAL_USE") return "INTERNAL_USE" as ProductType;
     return undefined;
   };
+
+  const currentProductType = form.watch("productType");
+
+  // Efecto para limpiar los productos seleccionados cuando cambia el tipo de producto
+  useEffect(() => {
+    if (previousProductType !== currentProductType) {
+      // Si el cambio es crítico (por ejemplo, de/a COMMERCIAL)
+      const prevType = warehouseToProductType(previousProductType);
+      const currType = warehouseToProductType(currentProductType);
+
+      if (prevType !== currType && selectedProducts.length > 0) {
+        toast.info("Tipo de producto cambiado", {
+          description: "Se han eliminado los productos seleccionados debido al cambio de tipo",
+          duration: 3000,
+        });
+        setSelectedResources([]);
+      }
+
+      setPreviousProductType(currentProductType);
+    }
+  }, [currentProductType]); // Solo depende del cambio en currentProductType para evitar bucles
 
   const { productByType } = useProducts({
     type: warehouseToProductType(form.watch("productType")),
