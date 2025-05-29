@@ -6,10 +6,11 @@ import {
   useGetWarehouseByIdQuery,
   useGetWarehousesByTypeQuery,
 } from "../_services/warehouseApi";
+import { WarehouseType } from "../_types/warehouse";
 import { ProductType } from "../../products/_types/products";
 
 interface UseProductProps {
-  type?: ProductType;
+  type?: WarehouseType;
   typeStockProduct?: ProductType;
   id?: string;
   movementId?: string;
@@ -22,7 +23,7 @@ export const useWarehouse = (options: UseProductProps = {}) => {
 
   const { data: warehouseByType, refetch: refetchWarehouseByType } = useGetWarehousesByTypeQuery(
     {
-      type: type as ProductType,
+      type: type as WarehouseType,
     },
     {
       skip: !type,
