@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { Ellipsis, PackageCheck, Warehouse } from "lucide-react";
+import { Download, Ellipsis, PackageCheck, Warehouse } from "lucide-react";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +15,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useWarehouse } from "../../_hooks/use-warehouse";
 import { SummaryWarehouse, WarehouseType } from "../../_types/warehouse";
 import { WarehouseTypeLabels } from "../../_utils/warehouses.utils";
 import { WarehouseStockDialog } from "../stock/WarehouseStockDialog";
@@ -162,8 +163,13 @@ export const warehousesColumns = (): ColumnDef<SummaryWarehouse>[] => [
     id: "actions",
     cell: function Cell({ row }) {
       const [showStockDialog, setShowStockDialog] = useState(false);
+      const { downloadWarehouseExcel, isDownloading } = useWarehouse();
 
-      const { type } = row.original;
+      const { id, code, type } = row.original;
+
+      const handleDownloadExcel = async () => {
+        await downloadWarehouseExcel(id, code);
+      };
 
       return (
         <div>
@@ -183,11 +189,17 @@ export const warehousesColumns = (): ColumnDef<SummaryWarehouse>[] => [
                 <Ellipsis className="size-4" aria-hidden="true" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
+            <DropdownMenuContent align="end" className="w-52">
               <DropdownMenuItem onSelect={() => setShowStockDialog(true)}>
                 Stock
                 <DropdownMenuShortcut>
                   <PackageCheck className="size-4" aria-hidden="true" />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleDownloadExcel} disabled={isDownloading}>
+                Descargar
+                <DropdownMenuShortcut>
+                  <Download className="size-4" aria-hidden="true" />
                 </DropdownMenuShortcut>
               </DropdownMenuItem>
             </DropdownMenuContent>
