@@ -15,9 +15,8 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SummaryWarehouse } from "../../_types/warehouse";
-import { ProductType } from "../../../products/_types/products";
-import { ProductTypeLabels } from "../../../products/_utils/products.utils";
+import { SummaryWarehouse, WarehouseType } from "../../_types/warehouse";
+import { WarehouseTypeLabels } from "../../_utils/warehouses.utils";
 import { WarehouseStockDialog } from "../stock/WarehouseStockDialog";
 
 /**
@@ -74,18 +73,18 @@ export const warehousesColumns = (): ColumnDef<SummaryWarehouse>[] => [
     accessorKey: "type",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Tipo" />,
     cell: ({ row }) => {
-      const productType = row.getValue("tipo") as ProductType;
-      const productTypeConfig = ProductTypeLabels[productType];
+      const warehouseType = row.getValue("tipo") as WarehouseType;
+      const warehouseTypeConfig = WarehouseTypeLabels[warehouseType];
 
-      if (!productTypeConfig) return <div>No definido</div>;
+      if (!warehouseTypeConfig) return <div>No definido</div>;
 
-      const Icon = productTypeConfig.icon;
+      const Icon = warehouseTypeConfig.icon;
 
       return (
         <div className="text-xs min-w-32">
-          <Badge variant="outline" className={productTypeConfig.className}>
+          <Badge variant="outline" className={warehouseTypeConfig.className}>
             <Icon className="size-4 flex-shrink-0 mr-1" aria-hidden="true" />
-            {productTypeConfig.label}
+            {warehouseTypeConfig.label}
           </Badge>
         </div>
       );
