@@ -11,7 +11,7 @@ import { CreateMovementDetailDto, MovementsType, ProductAvailable } from "../../
 import { useProducts } from "../../../products/_hooks/use-products";
 import { ProductType } from "../../../products/_types/products";
 import { useWarehouse } from "../../../warehouse/_hooks/use-warehouse";
-import { StockWarehouse } from "../../../warehouse/_types/warehouse";
+import { StockWarehouse, WarehouseType } from "../../../warehouse/_types/warehouse";
 import AvailableProductsMovements from "./AvailableProductsMovements";
 import CreateHeaderMovements from "./CreateHeaderMovements";
 import SelectedProductsMovements from "./SelectedProductsMovements";
@@ -28,8 +28,16 @@ export const CreateMovementsForm = ({ children, form, onSubmit, type, idWarehous
   const [selectedProducts, setSelectedProducts] = useState<CreateMovementDetailDto[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { productByType } = useProducts({ type: form.watch("productType") as ProductType });
+  const warehouseToProductType = (warehouseType: WarehouseType | string | undefined): ProductType | undefined => {
+    if (warehouseType === "DEPOSIT") return "INTERNAL_USE" as ProductType;
+    if (warehouseType === "COMMERCIAL") return "COMMERCIAL" as ProductType;
+    if (warehouseType === "INTERNAL_USE") return "INTERNAL_USE" as ProductType;
+    return undefined;
+  };
 
+  const { productByType } = useProducts({
+    type: warehouseToProductType(form.watch("productType")),
+  });
   const { warehouseById } = useWarehouse({
     id: idWarehouse,
   });
