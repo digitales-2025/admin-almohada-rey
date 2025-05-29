@@ -10,8 +10,8 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { useMovements } from "../../_hooks/use-movements";
 import { CreateInventoryMovement, inventoryMovementSchema } from "../../_schemas/createMovementsSchema";
 import { CreateMovementDetailDto, MovementsType, SummaryMovements } from "../../_types/movements";
-import { ProductType } from "../../../products/_types/products";
 import { useWarehouse } from "../../../warehouse/_hooks/use-warehouse";
+import { WarehouseType } from "../../../warehouse/_types/warehouse";
 import { UpdateMovementsForm } from "./UpdateMovementsForm";
 
 const infoSheet = {
@@ -50,7 +50,7 @@ export function UpdateMovementsSheet({ movements, open, onOpenChange, type }: Up
       dateMovement: movements.dateMovement ?? "",
       hasPaymentReceipt: (movements.typePurchaseOrder ? true : false) as true | false,
       movementDetail: movementsById?.movementsDetail ?? [],
-      productType: movements.typeProduct as ProductType,
+      productType: movements.typeProduct as WarehouseType,
       ...(movements.type === MovementsType.INPUT && {
         type: movements.typePurchaseOrder ?? undefined,
         documentNumber: movements.documentNumber ?? "",
@@ -71,7 +71,7 @@ export function UpdateMovementsSheet({ movements, open, onOpenChange, type }: Up
           dateMovement: movements.dateMovement ?? "",
           hasPaymentReceipt: true,
           type: movements.typePurchaseOrder!,
-          productType: movements.typeProduct as ProductType,
+          productType: movements.typeProduct as WarehouseType,
           documentNumber: movements.documentNumber ?? "",
           movementDetail: movementsById?.movementsDetail ?? [],
         });
@@ -81,7 +81,7 @@ export function UpdateMovementsSheet({ movements, open, onOpenChange, type }: Up
           description: movements.description ?? "",
           dateMovement: movements.dateMovement ?? "",
           hasPaymentReceipt: false,
-          productType: movements.typeProduct as ProductType,
+          productType: movements.typeProduct as WarehouseType,
           movementDetail: movementsById?.movementsDetail ?? [],
         });
       }

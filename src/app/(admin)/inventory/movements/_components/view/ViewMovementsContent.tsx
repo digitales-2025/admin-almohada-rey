@@ -23,8 +23,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import type { ExpenseDocumentType, Movements, MovementsDetail, MovementsType } from "../../_types/movements";
 import { movementsTypeConfig } from "../../_utils/movements.utils";
-import { ProductType } from "../../../products/_types/products";
-import { ProductTypeLabels } from "../../../products/_utils/products.utils";
+import { WarehouseType } from "../../../warehouse/_types/warehouse";
+import { WarehouseTypeLabels } from "../../../warehouse/_utils/warehouses.utils";
 
 interface ViewMovementsContentProps {
   isDesktop: boolean;
@@ -97,8 +97,9 @@ export default function ViewMovementsContent({
                   <div>
                     <p className="text-sm">Almacén</p>
                     <p className="font-semibold">
-                      {movementsById?.warehouse.type && ProductTypeLabels[movementsById.warehouse.type as ProductType]
-                        ? ProductTypeLabels[movementsById.warehouse.type as ProductType].label
+                      {movementsById?.warehouse.type &&
+                      WarehouseTypeLabels[movementsById.warehouse.type as WarehouseType]
+                        ? WarehouseTypeLabels[movementsById.warehouse.type as WarehouseType].label
                         : movementsById?.warehouse.type}
                     </p>
                   </div>
@@ -110,7 +111,7 @@ export default function ViewMovementsContent({
                   </div>
                   <div>
                     <p className="text-sm">Documento</p>
-                    <p className="font-semibold font-mono">{movementsById?.documentNumber}</p>
+                    <p className="font-semibold font-mono">{movementsById?.documentNumber || "No registrado"}</p>
                   </div>
                 </div>
 
@@ -134,7 +135,7 @@ export default function ViewMovementsContent({
                       {movementsById?.typePurchaseOrder &&
                       ExpenseDocumentTypeLabels[movementsById.typePurchaseOrder as ExpenseDocumentType]
                         ? ExpenseDocumentTypeLabels[movementsById.typePurchaseOrder as ExpenseDocumentType].label
-                        : movementsById?.typePurchaseOrder}
+                        : movementsById?.typePurchaseOrder || "No registrado"}
                     </p>
                   </div>
                 </div>
