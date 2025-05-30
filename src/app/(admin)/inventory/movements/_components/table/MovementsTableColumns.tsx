@@ -225,7 +225,11 @@ export const movementsColumns = (isSuperAdmin: boolean): ColumnDef<SummaryMoveme
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem onSelect={() => setShowEditDialog(true)} disabled={hasPaymentAssigned}>
+                <DropdownMenuItem
+                  onSelect={() => setShowEditDialog(true)}
+                  disabled={hasPaymentAssigned}
+                  className="group"
+                >
                   Editar
                   <DropdownMenuShortcut>
                     <Pencil className="size-4" aria-hidden="true" />
@@ -234,13 +238,13 @@ export const movementsColumns = (isSuperAdmin: boolean): ColumnDef<SummaryMoveme
 
                 {isSuperAdmin && (
                   <DropdownMenuItem
-                    className="text-red-500"
                     disabled={hasPaymentAssigned}
                     onSelect={() => setShowDeleteDialog(true)}
+                    variant="destructive"
                   >
                     Eliminar
                     <DropdownMenuShortcut>
-                      <Trash className="size-4 text-red-500" aria-hidden="true" />
+                      <Trash className="size-4 text-destructive" aria-hidden="true" />
                     </DropdownMenuShortcut>
                   </DropdownMenuItem>
                 )}

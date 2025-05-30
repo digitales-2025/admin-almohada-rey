@@ -184,16 +184,16 @@ export const expensesColumns = (): ColumnDef<HotelExpense>[] => [
             <DropdownMenuContent align="end" className="w-40">
               <DropdownMenuItem onSelect={() => setShowViewDialog(true)}>Ver detalles</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={() => setShowEditDialog(true)}>
+              <DropdownMenuItem onSelect={() => setShowEditDialog(true)} className="group">
                 Editar
                 <DropdownMenuShortcut>
                   <Pencil className="size-4" aria-hidden="true" />
                 </DropdownMenuShortcut>
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setShowDeleteDialog(true)} className="text-red-700">
+              <DropdownMenuItem onSelect={() => setShowDeleteDialog(true)} variant="destructive">
                 Eliminar
                 <DropdownMenuShortcut>
-                  <Trash className="size-4 text-red-700" aria-hidden="true" />
+                  <Trash className="size-4 text-destructive" aria-hidden="true" />
                 </DropdownMenuShortcut>
               </DropdownMenuItem>
             </DropdownMenuContent>

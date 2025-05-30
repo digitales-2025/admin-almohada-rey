@@ -298,20 +298,32 @@ export const roomsColumns = (
                 Editar
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={() => setShowUpdateAvailabilityDialog(true)} disabled={!isActive}>
+              <DropdownMenuItem
+                onSelect={() => setShowUpdateAvailabilityDialog(true)}
+                disabled={!isActive}
+                className="group"
+              >
                 Disponibilidad
                 <DropdownMenuShortcut>
                   <Settings className="size-4" aria-hidden="true" />
                 </DropdownMenuShortcut>
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => handleRoomCleaningLog(row.original.id)} disabled={!isActive}>
+              <DropdownMenuItem
+                onSelect={() => handleRoomCleaningLog(row.original.id)}
+                disabled={!isActive}
+                className="group"
+              >
                 Registro de limpieza
                 <DropdownMenuShortcut>
                   <ClipboardCheck className="size-4" aria-hidden="true" />
                 </DropdownMenuShortcut>
               </DropdownMenuItem>
               {status !== RoomStatus.CLEANING && status !== RoomStatus.OCCUPIED && (
-                <DropdownMenuItem onSelect={() => setShowEditAmenitiesDialog(true)} disabled={!isActive}>
+                <DropdownMenuItem
+                  onSelect={() => setShowEditAmenitiesDialog(true)}
+                  disabled={!isActive}
+                  className="group"
+                >
                   Gestionar amenidades
                   <DropdownMenuShortcut>
                     <Lamp className="size-4" aria-hidden="true" />
@@ -319,21 +331,17 @@ export const roomsColumns = (
                 </DropdownMenuItem>
               )}
               {isSuperAdmin && (
-                <DropdownMenuItem onSelect={() => setShowReactivateDialog(true)} disabled={isActive}>
+                <DropdownMenuItem onSelect={() => setShowReactivateDialog(true)} disabled={isActive} className="group">
                   Reactivar
                   <DropdownMenuShortcut>
                     <RefreshCcwDot className="size-4" aria-hidden="true" />
                   </DropdownMenuShortcut>
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem
-                onSelect={() => setShowDeleteDialog(true)}
-                disabled={!isActive}
-                className="text-red-700"
-              >
+              <DropdownMenuItem onSelect={() => setShowDeleteDialog(true)} disabled={!isActive} variant="destructive">
                 Eliminar
                 <DropdownMenuShortcut>
-                  <Trash className="size-4 text-red-700" aria-hidden="true" />
+                  <Trash className="size-4 text-destructive" aria-hidden="true" />
                 </DropdownMenuShortcut>
               </DropdownMenuItem>
             </DropdownMenuContent>

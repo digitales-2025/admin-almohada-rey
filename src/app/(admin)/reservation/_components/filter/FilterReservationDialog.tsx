@@ -143,8 +143,6 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
         fieldFilters,
       };
 
-      console.log("Aplicando filtros:", localFilters);
-
       if (onSaveFilter) {
         onSaveFilter(localFilters);
         if (isSuccess && data) handleClose();

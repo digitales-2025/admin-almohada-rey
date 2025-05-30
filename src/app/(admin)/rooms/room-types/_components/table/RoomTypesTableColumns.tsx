@@ -260,21 +260,17 @@ export const roomTypesColumns = (isSuperAdmin: boolean): ColumnDef<RoomType>[] =
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               {isSuperAdmin && (
-                <DropdownMenuItem onSelect={() => setShowReactivateDialog(true)} disabled={isActive}>
+                <DropdownMenuItem onSelect={() => setShowReactivateDialog(true)} disabled={isActive} className="group">
                   Reactivar
                   <DropdownMenuShortcut>
                     <RefreshCcwDot className="size-4" aria-hidden="true" />
                   </DropdownMenuShortcut>
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem
-                onSelect={() => setShowDeleteDialog(true)}
-                disabled={!isActive}
-                className="text-red-700"
-              >
+              <DropdownMenuItem onSelect={() => setShowDeleteDialog(true)} disabled={!isActive} variant="destructive">
                 Eliminar
                 <DropdownMenuShortcut>
-                  <Trash className="size-4 text-red-700" aria-hidden="true" />
+                  <Trash className="size-4 text-destructive" aria-hidden="true" />
                 </DropdownMenuShortcut>
               </DropdownMenuItem>
             </DropdownMenuContent>

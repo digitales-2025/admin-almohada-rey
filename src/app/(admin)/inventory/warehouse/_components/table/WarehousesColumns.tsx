@@ -190,13 +190,13 @@ export const warehousesColumns = (): ColumnDef<SummaryWarehouse>[] => [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuItem onSelect={() => setShowStockDialog(true)}>
+              <DropdownMenuItem onSelect={() => setShowStockDialog(true)} className="group">
                 Stock
                 <DropdownMenuShortcut>
                   <PackageCheck className="size-4" aria-hidden="true" />
                 </DropdownMenuShortcut>
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={handleDownloadExcel} disabled={isDownloading}>
+              <DropdownMenuItem onSelect={handleDownloadExcel} disabled={isDownloading} className="group">
                 Descargar
                 <DropdownMenuShortcut>
                   <Download className="size-4" aria-hidden="true" />

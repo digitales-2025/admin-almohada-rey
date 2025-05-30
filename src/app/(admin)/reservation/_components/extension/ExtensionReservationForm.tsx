@@ -48,11 +48,26 @@ export default function ExtensionReservationForm({
   const extendedStayCost = extendStayForm.watch("newCheckoutDate")
     ? roomPrice * differenceInDays(extendStayForm.watch("newCheckoutDate"), originalCheckoutDate)
     : 0;
+
+  // Si late checkout fue aplicado, forzar la selección del tab "extend-stay"
+  if (lateCheckoutApplied && selectedTab === "late-checkout") {
+    setSelectedTab("extend-stay");
+  }
+
   return (
-    <Tabs value={selectedTab} onValueChange={(v) => setSelectedTab(v as "late-checkout" | "extend-stay")}>
-      <TabsList className={`grid ${lateCheckoutApplied ? "grid-cols-1" : "grid-cols-2"} w-full bg-muted/50`}>
-        {/* Solo mostrar la pestaña de Late Checkout si no ha sido aplicado */}
-        {!lateCheckoutApplied && (
+    <Tabs
+      value={selectedTab}
+      onValueChange={(v) => setSelectedTab(v as "late-checkout" | "extend-stay")}
+      className="w-full"
+    >
+      {lateCheckoutApplied ? (
+        // Si late checkout fue aplicado, mostrar solo el tab de extender estadía
+        <TabsList className="hidden">
+          <TabsTrigger value="extend-stay" />
+        </TabsList>
+      ) : (
+        // Si late checkout no fue aplicado, mostrar ambos tabs
+        <TabsList className="grid grid-cols-2 w-full bg-muted/50">
           <TabsTrigger
             value="late-checkout"
             className="data-[state=active]:bg-background data-[state=active]:border-primary"
@@ -62,17 +77,17 @@ export default function ExtensionReservationForm({
               <span className="truncate text-ellipsis">Late Checkout</span>
             </div>
           </TabsTrigger>
-        )}
-        <TabsTrigger
-          value="extend-stay"
-          className="data-[state=active]:bg-background data-[state=active]:border-primary"
-        >
-          <div className="flex items-center gap-2">
-            <Bed className="h-4 w-4 shrink-0" />
-            <span className="truncate text-ellipsis">Extender Estadía</span>
-          </div>
-        </TabsTrigger>
-      </TabsList>
+          <TabsTrigger
+            value="extend-stay"
+            className="data-[state=active]:bg-background data-[state=active]:border-primary"
+          >
+            <div className="flex items-center gap-2">
+              <Bed className="h-4 w-4 shrink-0" />
+              <span className="truncate text-ellipsis">Extender Estadía</span>
+            </div>
+          </TabsTrigger>
+        </TabsList>
+      )}
 
       {/* Contenido de los formularios */}
       <div className="bg-background">
