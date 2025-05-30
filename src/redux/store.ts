@@ -12,7 +12,7 @@ import { adminApi } from "@/app/(admin)/profile/_services/adminApi";
 import { reportsApi } from "@/app/(admin)/reports/_services/reportsApi";
 import { reservationApi } from "@/app/(admin)/reservation/_services/reservationApi";
 import { roomsApi } from "@/app/(admin)/rooms/list/_services/roomsApi";
-import { roomsCleaningApi } from "@/app/(admin)/rooms/list/[id]/clean/_service/RoomsCleaningApi";
+import { roomsCleaningApi } from "@/app/(admin)/rooms/list/[id]/clean/_service/roomsCleaningApi";
 import { roomTypeApi } from "@/app/(admin)/rooms/room-types/_services/roomTypesApi";
 import { usersApi } from "@/app/(admin)/users/_services/usersApi";
 import { authApi } from "@/app/(auth)/log-in/_services/authApi";
@@ -52,9 +52,13 @@ export const store = configureStore({
           "reportsApi/executeQuery/fulfilled",
           "reportsApi/executeQuery/rejected",
           "reportsApi/executeQuery/pending",
+
+          "warehouseApi/executeQuery/fulfilled",
+          "warehouseApi/executeQuery/rejected",
+          "warehouseApi/executeQuery/pending",
         ],
         // Ignorar las rutas en el estado que contienen valores no serializables
-        ignoredPaths: ["customersApi.mutations", "customersApi.queries", "reportsApi.queries"],
+        ignoredPaths: ["customersApi.mutations", "customersApi.queries", "reportsApi.queries", "warehouseApi.queries"],
       },
     })
       .concat(authApi.middleware)

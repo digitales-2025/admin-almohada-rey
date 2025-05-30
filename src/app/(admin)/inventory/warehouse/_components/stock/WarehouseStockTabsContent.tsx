@@ -2,15 +2,13 @@ import { AlertTriangle, CheckCircle, Package } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { StockWarehouse } from "../../_types/warehouse";
-import { getMinStockThreshold } from "../../_utils/warehouses.utils";
-import { ProductType } from "../../../products/_types/products";
-import { ProductTypeLabels } from "../../../products/_utils/products.utils";
+import { StockWarehouse, WarehouseType } from "../../_types/warehouse";
+import { getMinStockThreshold, WarehouseTypeLabels } from "../../_utils/warehouses.utils";
 
 interface WarehouseStockContentProps {
   setActiveTab: (value: string) => void;
   sortedItems: StockWarehouse[];
-  currentWarehouseType: ProductType | undefined;
+  currentWarehouseType: WarehouseType | undefined;
   animateItems: boolean;
 }
 
@@ -92,7 +90,7 @@ export default function WarehouseStockTabsContent({
                           {/* Usamos la propiedad icon para obtener el componente de icono y luego renderizamos ese componente */}
                           {(() => {
                             const IconComponent =
-                              ProductTypeLabels[currentWarehouseType ?? ProductType.COMMERCIAL].icon;
+                              WarehouseTypeLabels[currentWarehouseType ?? WarehouseType.COMMERCIAL].icon;
                             return <IconComponent />;
                           })()}
                         </div>
@@ -189,7 +187,7 @@ export default function WarehouseStockTabsContent({
                           {/* Usamos la propiedad icon para obtener el componente de icono y luego renderizamos ese componente */}
                           {(() => {
                             const IconComponent =
-                              ProductTypeLabels[currentWarehouseType ?? ProductType.COMMERCIAL].icon;
+                              WarehouseTypeLabels[currentWarehouseType ?? WarehouseType.COMMERCIAL].icon;
                             return <IconComponent />;
                           })()}
                         </div>
@@ -283,7 +281,7 @@ export default function WarehouseStockTabsContent({
                           {/* Usamos la propiedad icon para obtener el componente de icono y luego renderizamos ese componente */}
                           {(() => {
                             const IconComponent =
-                              ProductTypeLabels[currentWarehouseType ?? ProductType.COMMERCIAL].icon;
+                              WarehouseTypeLabels[currentWarehouseType ?? WarehouseType.COMMERCIAL].icon;
                             return <IconComponent />;
                           })()}
                         </div>

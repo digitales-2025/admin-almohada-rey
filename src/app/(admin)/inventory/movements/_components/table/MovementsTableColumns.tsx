@@ -20,8 +20,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { MovementsType, SummaryMovements } from "../../_types/movements";
-import { ProductType } from "../../../products/_types/products";
-import { ProductTypeLabels } from "../../../products/_utils/products.utils";
+import { WarehouseType } from "../../../warehouse/_types/warehouse";
+import { WarehouseTypeLabels } from "../../../warehouse/_utils/warehouses.utils";
 import { DeleteMovementsDialog } from "../delete/DeleteMovementsDialog";
 import { UpdateMovementsSheet } from "../update/UpdateMovementsSheet";
 import ViewMovementsDialog from "../view/ViewMovementsDialog";
@@ -94,22 +94,22 @@ export const movementsColumns = (isSuperAdmin: boolean): ColumnDef<SummaryMoveme
     },
 
     {
-      id: "tipo de producto",
+      id: "tipo de Almacén",
       accessorKey: "typeProduct",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Tipo de Producto" />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Tipo de Almacén" />,
       cell: ({ row }) => {
-        const productType = row.getValue("tipo de producto") as ProductType;
-        const productTypeConfig = ProductTypeLabels[productType];
+        const warehouseType = row.getValue("tipo de Almacén") as WarehouseType;
+        const warehouseTypeConfig = WarehouseTypeLabels[warehouseType];
 
-        if (!productTypeConfig) return <div>No definido</div>;
+        if (!warehouseTypeConfig) return <div>No definido</div>;
 
-        const Icon = productTypeConfig.icon;
+        const Icon = warehouseTypeConfig.icon;
 
         return (
           <div className="text-xs min-w-32">
-            <Badge variant="outline" className={productTypeConfig.className}>
+            <Badge variant="outline" className={warehouseTypeConfig.className}>
               <Icon className="size-4 flex-shrink-0 mr-1" aria-hidden="true" />
-              {productTypeConfig.label}
+              {warehouseTypeConfig.label}
             </Badge>
           </div>
         );
@@ -225,7 +225,11 @@ export const movementsColumns = (isSuperAdmin: boolean): ColumnDef<SummaryMoveme
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem onSelect={() => setShowEditDialog(true)} disabled={hasPaymentAssigned}>
+                <DropdownMenuItem
+                  onSelect={() => setShowEditDialog(true)}
+                  disabled={hasPaymentAssigned}
+                  className="group"
+                >
                   Editar
                   <DropdownMenuShortcut>
                     <Pencil className="size-4" aria-hidden="true" />
@@ -234,13 +238,13 @@ export const movementsColumns = (isSuperAdmin: boolean): ColumnDef<SummaryMoveme
 
                 {isSuperAdmin && (
                   <DropdownMenuItem
-                    className="text-red-700"
                     disabled={hasPaymentAssigned}
                     onSelect={() => setShowDeleteDialog(true)}
+                    variant="destructive"
                   >
                     Eliminar
                     <DropdownMenuShortcut>
-                      <Trash className="size-4" aria-hidden="true" />
+                      <Trash className="size-4 text-destructive" aria-hidden="true" />
                     </DropdownMenuShortcut>
                   </DropdownMenuItem>
                 )}

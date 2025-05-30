@@ -92,7 +92,7 @@ export function UpdateExpensesSheet({ expense, ...props }: UpdateExpensesSheetPr
 
   return (
     <Sheet {...props}>
-      <SheetContent className="flex flex-col gap-6 sm:max-w-md" tabIndex={undefined}>
+      <SheetContent className="flex flex-col gap-6 sm:max-w-md h-full overflow-hidden" tabIndex={undefined}>
         <SheetHeader className="text-left pb-0">
           <SheetTitle className="flex flex-col items-start">
             {infoSheet.title}
@@ -101,10 +101,10 @@ export function UpdateExpensesSheet({ expense, ...props }: UpdateExpensesSheetPr
           <SheetDescription>{infoSheet.description}</SheetDescription>
         </SheetHeader>
 
-        <ScrollArea className="w-full gap-4 p-4 pt-0">
+        <ScrollArea className="w-full h-[calc(100vh-150px)] p-0">
           <UpdateExpensesForm form={form} onSubmit={onSubmit}>
             <SheetFooter className="gap-2 pt-2 sm:space-x-0">
-              <div className="flex flex-row-reverse flex-wrap gap-2">
+              <div className="flex flex-row-reverse gap-2">
                 <Button disabled={isLoadingUpdateExpense}>
                   {isLoadingUpdateExpense && <RefreshCcw className="mr-2 size-4 animate-spin" aria-hidden="true" />}
                   Actualizar

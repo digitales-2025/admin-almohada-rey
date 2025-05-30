@@ -6,6 +6,7 @@ import {
   useCreateCustomerMutation,
   useDeleteCustomersMutation,
   useGetAllCustomersQuery,
+  useGetCustomerDataByDniQuery,
   useGetHistoryCustomerByIdQuery,
   useGetPaginatedCustomersQuery,
   useImportCustomersMutation,
@@ -22,15 +23,28 @@ interface UseCustomerProps {
   historyCustomerId?: string;
   historyYear?: string;
   historyStatus?: ReservationStatus;
+  dni?: string;
 }
 
 export const useCustomers = (options: UseCustomerProps = {}) => {
-  const { search, historyCustomerId, historyStatus, historyYear } = options;
+  const { search, historyCustomerId, historyStatus, historyYear, dni } = options;
 
   const { data: dataCustomersAll, error, isLoading, isSuccess, refetch } = useGetAllCustomersQuery();
 
   const searchQuery = useSearchCustomersByDocumentIdQuery(search || "None", {
     skip: !search, // Evita hacer la query si no hay id
+    refetchOnMountOrArgChange: true,
+  });
+
+  // Agregar el hook para DNI siguiendo el mismo patrón
+  const {
+    data: customerDataByDni,
+    refetch: refetchCustomerDataByDni,
+    isLoading: isLoadingCustomerDataByDni,
+    error: errorCustomerDataByDni,
+    isSuccess: isSuccessCustomerDataByDni,
+  } = useGetCustomerDataByDniQuery(dni as string, {
+    skip: !dni || dni.length < 8, // Evita hacer la query si no hay DNI o no tiene 8 dígitos
     refetchOnMountOrArgChange: true,
   });
 
@@ -175,6 +189,11 @@ export const useCustomers = (options: UseCustomerProps = {}) => {
     isLoadingImportCustomers,
     onDownloadTemplate,
     isLoadingDownloadTemplate,
+    customerDataByDni,
+    refetchCustomerDataByDni,
+    isLoadingCustomerDataByDni,
+    errorCustomerDataByDni,
+    isSuccessCustomerDataByDni,
   };
 };
 

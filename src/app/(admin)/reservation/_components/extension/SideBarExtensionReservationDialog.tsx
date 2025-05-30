@@ -32,7 +32,7 @@ export default function SideBarExtensionReservationDialog({ reservation }: SideB
         <div className="bg-white/10 dark:bg-gray-800/40 backdrop-blur-sm rounded-xl overflow-hidden border border-white/20 dark:border-gray-700/50">
           <div className="bg-primary/40 dark:bg-primary/50 px-4 py-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <User className="h-4 w-4" />
+              <User className="h-4 w-4 shrink-0" />
               <h3 className="font-medium text-sm dark:text-slate-100">Información del Cliente</h3>
             </div>
           </div>
@@ -71,7 +71,7 @@ export default function SideBarExtensionReservationDialog({ reservation }: SideB
         <div className="bg-white/10 dark:bg-gray-800/40 backdrop-blur-sm rounded-xl overflow-hidden border border-white/20 dark:border-gray-700/50">
           <div className="bg-primary/40 dark:bg-primary/50 px-4 py-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Home className="h-4 w-4" />
+              <Home className="h-4 w-4 shrink-0" />
               <h3 className="font-medium text-sm dark:text-slate-100">Detalles de Habitación</h3>
             </div>
             <div className="bg-white/20 dark:bg-gray-700/50 text-xs font-bold px-2 py-0.5 rounded-full dark:text-slate-200">
@@ -117,7 +117,7 @@ export default function SideBarExtensionReservationDialog({ reservation }: SideB
         {/* Dates Card */}
         <div className="bg-white/10 dark:bg-gray-800/40 backdrop-blur-sm rounded-xl overflow-hidden border border-white/20 dark:border-gray-700/50">
           <div className="bg-primary/40 dark:bg-primary/50 px-4 py-2 flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
+            <Calendar className="h-4 w-4 shrink-0" />
             <h3 className="font-medium text-sm dark:text-slate-100">Periodo de Estancia</h3>
           </div>
 

@@ -49,14 +49,19 @@ interface UpdateAvailabilityRoomsDialogProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   room: Room;
+  refetchPaginatedRooms: () => void;
 }
 
-export function UpdateAvailabilityRoomsDialog({ open, setOpen, room }: UpdateAvailabilityRoomsDialogProps) {
+export function UpdateAvailabilityRoomsDialog({
+  open,
+  setOpen,
+  room,
+  refetchPaginatedRooms,
+}: UpdateAvailabilityRoomsDialogProps) {
   const isDesktop = useMediaQuery("(min-width: 800px)");
   const [isCreatePending, startCreateTransition] = useTransition();
   const { onUpdateRoomStatus, isSuccessUpdateRoomStatus, onUpdateRoom, isSuccessUpdateRoom } = useRooms();
   const { onCreateRoomCleaning, isSuccessCreateRoomCleaning } = useRoomsCleaning();
-  const { refetch } = useRooms();
 
   // Form for status change
   const statusForm = useForm<UpdateStatusRoomsSchema>({
@@ -159,7 +164,7 @@ export function UpdateAvailabilityRoomsDialog({ open, setOpen, room }: UpdateAva
     // 1. Si se creó un registro de limpieza (todos los elementos marcados)
     if (isSuccessCreateRoomCleaning) {
       cleaningForm.reset();
-      refetch();
+      refetchPaginatedRooms();
       setOpen(false);
     }
     // 2. Si solo se actualizaron elementos de la habitación sin crear registro de limpieza

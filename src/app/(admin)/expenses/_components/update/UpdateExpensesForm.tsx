@@ -25,7 +25,7 @@ interface UpdateExpensesFormProps extends Omit<React.ComponentPropsWithRef<typeo
 export default function UpdateExpensesForm({ children, form, onSubmit }: UpdateExpensesFormProps) {
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4 p-2">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4 px-6">
         {/* Descripción */}
         <FormField
           control={form.control}

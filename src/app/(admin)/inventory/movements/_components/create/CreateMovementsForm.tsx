@@ -11,7 +11,7 @@ import { CreateMovementDetailDto, MovementsType, ProductAvailable } from "../../
 import { useProducts } from "../../../products/_hooks/use-products";
 import { ProductType } from "../../../products/_types/products";
 import { useWarehouse } from "../../../warehouse/_hooks/use-warehouse";
-import { StockWarehouse } from "../../../warehouse/_types/warehouse";
+import { StockWarehouse, WarehouseType } from "../../../warehouse/_types/warehouse";
 import AvailableProductsMovements from "./AvailableProductsMovements";
 import CreateHeaderMovements from "./CreateHeaderMovements";
 import SelectedProductsMovements from "./SelectedProductsMovements";
@@ -27,9 +27,43 @@ interface CreateMovementsFormProps extends Omit<React.ComponentPropsWithRef<"for
 export const CreateMovementsForm = ({ children, form, onSubmit, type, idWarehouse }: CreateMovementsFormProps) => {
   const [selectedProducts, setSelectedProducts] = useState<CreateMovementDetailDto[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [previousProductType, setPreviousProductType] = useState<WarehouseType | string | undefined>(
+    form.watch("productType")
+  );
 
-  const { productByType } = useProducts({ type: form.watch("productType") as ProductType });
+  const warehouseToProductType = (warehouseType: WarehouseType | string | undefined): ProductType | undefined => {
+    if (warehouseType === "DEPOSIT") return "INTERNAL_USE" as ProductType;
+    if (warehouseType === "COMMERCIAL") return "COMMERCIAL" as ProductType;
+    if (warehouseType === "INTERNAL_USE") return "INTERNAL_USE" as ProductType;
+    return undefined;
+  };
 
+  const currentProductType = form.watch("productType");
+
+  // Efecto para limpiar los productos seleccionados cuando cambia el tipo de producto
+  useEffect(() => {
+    if (previousProductType !== currentProductType) {
+      // Si el cambio es crítico (por ejemplo, de/a COMMERCIAL)
+      const prevType = warehouseToProductType(previousProductType);
+      const currType = warehouseToProductType(currentProductType);
+
+      if (prevType !== currType) {
+        if (selectedProducts.length > 0) {
+          toast.info("Tipo de producto cambiado", {
+            description: "Se han eliminado los productos seleccionados debido al cambio de tipo",
+            duration: 3000,
+          });
+          setSelectedProducts([]);
+        }
+      }
+
+      setPreviousProductType(currentProductType);
+    }
+  }, [currentProductType]);
+
+  const { productByType } = useProducts({
+    type: warehouseToProductType(form.watch("productType")),
+  });
   const { warehouseById } = useWarehouse({
     id: idWarehouse,
   });

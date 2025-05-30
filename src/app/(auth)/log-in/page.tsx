@@ -90,9 +90,6 @@ export default function LoginPage() {
                     <FormItem>
                       <div className="flex items-center justify-between">
                         <FormLabel className="text-gray-700 dark:text-gray-300">Contraseña</FormLabel>
-                        <a href="#" className="text-xs text-primary hover:underline">
-                          ¿Olvidó su contraseña?
-                        </a>
                       </div>
                       <FormControl>
                         <InputPassword

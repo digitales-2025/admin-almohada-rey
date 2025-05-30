@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { ExpenseDocumentType } from "../_types/movements";
-import { ProductType } from "../../products/_types/products";
+import { WarehouseType } from "../../warehouse/_types/warehouse";
 
 // Schema para un producto individual
 const productMovementsSchema = z.object({
@@ -27,7 +27,7 @@ const baseSchema = {
     .min(1, { message: "La fecha del movimiento es obligatoria" })
     .optional(),
   productType: z
-    .nativeEnum(ProductType, {
+    .nativeEnum(WarehouseType, {
       required_error: "El tipo de producto es obligatorio",
       invalid_type_error: "Tipo de producto inválido",
     })

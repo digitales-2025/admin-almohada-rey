@@ -1,4 +1,4 @@
-import { ProductType } from "../../products/_types/products";
+import { WarehouseType } from "../../warehouse/_types/warehouse";
 
 export type Movements = {
   id: string;
@@ -8,7 +8,7 @@ export type Movements = {
   description: string;
   warehouse: {
     id: string;
-    type: ProductType;
+    type: WarehouseType;
   };
   typePurchaseOrder?: ExpenseDocumentType;
   documentNumber?: string;
@@ -49,11 +49,11 @@ export type SummaryMovements = {
   description: string;
   warehouse: {
     id: string;
-    type: ProductType;
+    type: WarehouseType;
   };
   typePurchaseOrder?: ExpenseDocumentType;
   documentNumber?: string;
-  typeProduct?: ProductType;
+  typeProduct?: WarehouseType;
   hasPaymentAssigned?: boolean;
 };
 

@@ -82,10 +82,7 @@ export const roomsApi = createApi({
         params: { page, pageSize },
         credentials: "include",
       }),
-      providesTags: (result) => [
-        { type: "Rooms", id: result?.meta.page },
-        ...(result?.data.map(({ id }) => ({ type: "Rooms" as const, id })) ?? []),
-      ],
+      providesTags: ["Rooms"],
     }),
     //Eliminar habitaciones
     deleteRooms: build.mutation<void, { ids: string[] }>({

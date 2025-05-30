@@ -116,7 +116,7 @@ export function PasswordForm() {
           )}
         />
 
-        <div className=" p-3 rounded-lg border text-xs text-slate-700">
+        <div className=" p-3 rounded-lg border text-xs text-slate-700 dark:text-slate-200">
           <p
             className="font-medium m  --chart-1: oklch(0.82 0.13 84.49);
   --chart-2: oklch(0.8 0.11 203.6);

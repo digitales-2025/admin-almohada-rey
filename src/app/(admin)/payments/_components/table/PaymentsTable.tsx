@@ -4,7 +4,6 @@ import { useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Table as TableInstance } from "@tanstack/react-table";
 
-import { useProfile } from "@/app/(admin)/profile/_hooks/use-profile";
 import { DataTable } from "@/components/datatable/data-table";
 import {
   CustomPaginationTableParams,
@@ -22,7 +21,6 @@ interface PaymentsTableProps {
 }
 
 export function PaymentsTable({ data, pagination, onPaginationChange }: PaymentsTableProps) {
-  const { user } = useProfile();
   const router = useRouter();
 
   const handleManagementPaymentInterface = useCallback(
@@ -31,10 +29,7 @@ export function PaymentsTable({ data, pagination, onPaginationChange }: Payments
     },
     [router]
   );
-  const columns = useMemo(
-    () => paymentsColumns(user?.isSuperAdmin || false, handleManagementPaymentInterface),
-    [user, handleManagementPaymentInterface]
-  );
+  const columns = useMemo(() => paymentsColumns(handleManagementPaymentInterface), [handleManagementPaymentInterface]);
 
   return (
     <DataTable

@@ -19,9 +19,10 @@ interface RoomsTableProps {
   data: Room[];
   pagination: CustomPaginationTableParams;
   onPaginationChange: ServerPaginationChangeEventCallback;
+  refetchPaginatedRooms: () => void;
 }
 
-export function RoomsTable({ data, pagination, onPaginationChange }: RoomsTableProps) {
+export function RoomsTable({ data, pagination, onPaginationChange, refetchPaginatedRooms }: RoomsTableProps) {
   const { user } = useProfile();
 
   const router = useRouter();
@@ -34,8 +35,8 @@ export function RoomsTable({ data, pagination, onPaginationChange }: RoomsTableP
   );
 
   const columns = useMemo(
-    () => roomsColumns(user?.isSuperAdmin || false, handleRoomCleaningLog),
-    [user, handleRoomCleaningLog]
+    () => roomsColumns(user?.isSuperAdmin || false, handleRoomCleaningLog, refetchPaginatedRooms),
+    [user, handleRoomCleaningLog, refetchPaginatedRooms]
   );
 
   return (

@@ -367,7 +367,7 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
               </DropdownMenuItem>
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem onSelect={() => setShowEditDialog(true)} disabled={!isActive}>
+              <DropdownMenuItem onSelect={() => setShowEditDialog(true)} disabled={!isActive} className="group">
                 Editar
                 <DropdownMenuShortcut>
                   <Pencil className="size-4" aria-hidden="true" />
@@ -375,7 +375,7 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
               </DropdownMenuItem>
 
               {status === "CHECKED_IN" && (
-                <DropdownMenuItem onSelect={() => setShowExtensionDialog(true)}>
+                <DropdownMenuItem onSelect={() => setShowExtensionDialog(true)} className="group">
                   Extender reserva
                   <DropdownMenuShortcut>
                     <CalendarCog className="size-4" aria-hidden="true" />
@@ -384,16 +384,20 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
               )}
 
               {appliedLateCheckOut && (
-                <DropdownMenuItem className="text-red-700" onSelect={() => setShowDeleteLateCheckoutDialog(true)}>
+                <DropdownMenuItem variant="destructive" onSelect={() => setShowDeleteLateCheckoutDialog(true)}>
                   Eliminar Late Checkout
                   <DropdownMenuShortcut>
-                    <CalendarX2 className="size-4 text-red-700" aria-hidden="true" />
+                    <CalendarX2 className="size-4 text-destructive" aria-hidden="true" />
                   </DropdownMenuShortcut>
                 </DropdownMenuItem>
               )}
 
               {canConfirm && (
-                <DropdownMenuItem onSelect={() => setShowCreatePaymentDialog(true)} disabled={status !== "PENDING"}>
+                <DropdownMenuItem
+                  onSelect={() => setShowCreatePaymentDialog(true)}
+                  disabled={status !== "PENDING"}
+                  className="group"
+                >
                   {confirmConfig.buttonLabel}
                   <DropdownMenuShortcut>
                     <confirmConfig.icon className="size-4" aria-hidden="true" />
@@ -402,7 +406,11 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
               )}
 
               {canCheckIn && (
-                <DropdownMenuItem disabled={!enableCheckInButton} onSelect={() => setShowCheckInDialog(true)}>
+                <DropdownMenuItem
+                  disabled={!enableCheckInButton}
+                  onSelect={() => setShowCheckInDialog(true)}
+                  className="group"
+                >
                   {checkInConfig.buttonLabel}
                   <DropdownMenuShortcut>
                     <checkInConfig.icon className="size-4" aria-hidden="true" />
@@ -411,7 +419,7 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
               )}
 
               {canCheckOut && (
-                <DropdownMenuItem onSelect={() => setShowCheckOutDialog(true)}>
+                <DropdownMenuItem onSelect={() => setShowCheckOutDialog(true)} className="group">
                   {checkOutConfig.buttonLabel}
                   <DropdownMenuShortcut>
                     <checkOutConfig.icon className="size-4" aria-hidden="true" />
@@ -420,27 +428,30 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
               )}
 
               {canCancel && (
-                <DropdownMenuItem onSelect={() => setShowCancelDialog(true)} disabled={!isActive}>
+                <DropdownMenuItem onSelect={() => setShowCancelDialog(true)} disabled={!isActive} variant="destructive">
                   {cancelConfig.buttonLabel}
                   <DropdownMenuShortcut>
-                    <cancelConfig.icon className="size-4" aria-hidden="true" />
+                    <cancelConfig.icon className="size-4 text-destructive" aria-hidden="true" />
                   </DropdownMenuShortcut>
                 </DropdownMenuItem>
               )}
-              <DropdownMenuSeparator />
 
               {isSuperAdmin && (
-                <DropdownMenuItem
-                  onSelect={() => setShowDeactivateDialog(true)}
-                  /* Habilitado si: está activo y se puede desactivar, O si hay un pago pendiente de eliminar */
-                  disabled={!(isActive && canDeactivate) && !isPendingDeletePayment}
-                  className="text-red-700"
-                >
-                  Archivar
-                  <DropdownMenuShortcut>
-                    <Trash className="size-4 text-red-700" aria-hidden="true" />
-                  </DropdownMenuShortcut>
-                </DropdownMenuItem>
+                <>
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItem
+                    onSelect={() => setShowDeactivateDialog(true)}
+                    /* Habilitado si: está activo y se puede desactivar, O si hay un pago pendiente de eliminar */
+                    disabled={!(isActive && canDeactivate) && !isPendingDeletePayment}
+                    variant="destructive"
+                  >
+                    Archivar
+                    <DropdownMenuShortcut>
+                      <Trash className="size-4 text-destructive" aria-hidden="true" />
+                    </DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                </>
               )}
             </DropdownMenuContent>
           </DropdownMenu>

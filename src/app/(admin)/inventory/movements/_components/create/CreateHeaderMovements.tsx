@@ -12,8 +12,8 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Switch } from "@/components/ui/switch";
 import { CreateInventoryMovement } from "../../_schemas/createMovementsSchema";
 import { MovementsType } from "../../_types/movements";
-import { ProductType } from "../../../products/_types/products";
-import { ProductTypeLabels } from "../../../products/_utils/products.utils";
+import { WarehouseType } from "../../../warehouse/_types/warehouse";
+import { WarehouseTypeLabels } from "../../../warehouse/_utils/warehouses.utils";
 
 interface CreateHeaderMovementsProps {
   form: UseFormReturn<CreateInventoryMovement>;
@@ -142,7 +142,7 @@ export default function CreateHeaderMovements({ form, type }: CreateHeaderMoveme
             name="productType"
             render={({ field }) => (
               <FormItem>
-                <FormLabel htmlFor="type">Tipo de Producto</FormLabel>
+                <FormLabel htmlFor="type">Tipo de Almacén</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value ?? ""}>
                   <FormControl>
                     <SelectTrigger className="w-full">
@@ -151,14 +151,14 @@ export default function CreateHeaderMovements({ form, type }: CreateHeaderMoveme
                   </FormControl>
                   <SelectContent>
                     <SelectGroup>
-                      {Object.values(ProductType).map((productType) => {
-                        const productTypeConfig = ProductTypeLabels[productType];
-                        const Icon = productTypeConfig.icon;
+                      {Object.values(WarehouseType).map((warehouseType) => {
+                        const warehouseTypeConfig = WarehouseTypeLabels[warehouseType];
+                        const Icon = warehouseTypeConfig.icon;
 
                         return (
-                          <SelectItem key={productType} value={productType} className="flex items-center gap-2">
-                            <Icon className={`size-4 ${productTypeConfig.className}`} />
-                            <span>{productTypeConfig.label}</span>
+                          <SelectItem key={warehouseType} value={warehouseType} className="flex items-center gap-2">
+                            <Icon className={`size-4 ${warehouseTypeConfig.className}`} />
+                            <span>{warehouseTypeConfig.label}</span>
                           </SelectItem>
                         );
                       })}

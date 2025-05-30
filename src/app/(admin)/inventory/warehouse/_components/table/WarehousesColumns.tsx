@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { Ellipsis, PackageCheck, Warehouse } from "lucide-react";
+import { Download, Ellipsis, PackageCheck, Warehouse } from "lucide-react";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
@@ -15,9 +15,9 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SummaryWarehouse } from "../../_types/warehouse";
-import { ProductType } from "../../../products/_types/products";
-import { ProductTypeLabels } from "../../../products/_utils/products.utils";
+import { useWarehouse } from "../../_hooks/use-warehouse";
+import { SummaryWarehouse, WarehouseType } from "../../_types/warehouse";
+import { WarehouseTypeLabels } from "../../_utils/warehouses.utils";
 import { WarehouseStockDialog } from "../stock/WarehouseStockDialog";
 
 /**
@@ -74,18 +74,18 @@ export const warehousesColumns = (): ColumnDef<SummaryWarehouse>[] => [
     accessorKey: "type",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Tipo" />,
     cell: ({ row }) => {
-      const productType = row.getValue("tipo") as ProductType;
-      const productTypeConfig = ProductTypeLabels[productType];
+      const warehouseType = row.getValue("tipo") as WarehouseType;
+      const warehouseTypeConfig = WarehouseTypeLabels[warehouseType];
 
-      if (!productTypeConfig) return <div>No definido</div>;
+      if (!warehouseTypeConfig) return <div>No definido</div>;
 
-      const Icon = productTypeConfig.icon;
+      const Icon = warehouseTypeConfig.icon;
 
       return (
         <div className="text-xs min-w-32">
-          <Badge variant="outline" className={productTypeConfig.className}>
+          <Badge variant="outline" className={warehouseTypeConfig.className}>
             <Icon className="size-4 flex-shrink-0 mr-1" aria-hidden="true" />
-            {productTypeConfig.label}
+            {warehouseTypeConfig.label}
           </Badge>
         </div>
       );
@@ -163,8 +163,13 @@ export const warehousesColumns = (): ColumnDef<SummaryWarehouse>[] => [
     id: "actions",
     cell: function Cell({ row }) {
       const [showStockDialog, setShowStockDialog] = useState(false);
+      const { downloadWarehouseExcel, isDownloading } = useWarehouse();
 
-      const { type } = row.original;
+      const { id, code, type } = row.original;
+
+      const handleDownloadExcel = async () => {
+        await downloadWarehouseExcel(id, code);
+      };
 
       return (
         <div>
@@ -184,11 +189,17 @@ export const warehousesColumns = (): ColumnDef<SummaryWarehouse>[] => [
                 <Ellipsis className="size-4" aria-hidden="true" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem onSelect={() => setShowStockDialog(true)}>
+            <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuItem onSelect={() => setShowStockDialog(true)} className="group">
                 Stock
                 <DropdownMenuShortcut>
                   <PackageCheck className="size-4" aria-hidden="true" />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleDownloadExcel} disabled={isDownloading} className="group">
+                Descargar
+                <DropdownMenuShortcut>
+                  <Download className="size-4" aria-hidden="true" />
                 </DropdownMenuShortcut>
               </DropdownMenuItem>
             </DropdownMenuContent>

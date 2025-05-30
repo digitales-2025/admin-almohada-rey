@@ -9,8 +9,8 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/u
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useWarehouse } from "../../_hooks/use-warehouse";
+import { WarehouseType } from "../../_types/warehouse";
 import { getMinStockThreshold } from "../../_utils/warehouses.utils";
-import { ProductType } from "../../../products/_types/products";
 import FiltersWarehouseStock from "./FiltersWarehouseStock";
 import StatisticsWarehouseStock from "./StatisticsWarehouseStock";
 import WarehouseStockTabsContent from "./WarehouseStockTabsContent";
@@ -18,7 +18,7 @@ import WarehouseStockTabsContent from "./WarehouseStockTabsContent";
 interface WarehouseStockDialogProps extends Omit<React.ComponentPropsWithRef<typeof Dialog>, "open" | "onOpenChange"> {
   id: string;
   open: boolean;
-  currentWarehouseType: ProductType;
+  currentWarehouseType: WarehouseType;
   setOpen: (open: boolean) => void;
 }
 
@@ -103,9 +103,11 @@ export function WarehouseStockDialog({ id, open, setOpen, currentWarehouseType }
       <div>
         <div className="text-xl font-semibold">Inventario del Hotel</div>
         <div className="text-sm text-muted-foreground">
-          {currentWarehouseType === ProductType.COMMERCIAL
+          {currentWarehouseType === WarehouseType.COMMERCIAL
             ? "Productos comerciales para venta a huéspedes"
-            : "Productos de uso interno para operaciones del hotel"}
+            : currentWarehouseType === WarehouseType.DEPOSIT
+              ? "Productos de depósito controlados por administradores"
+              : "Productos de uso interno para operaciones del hotel"}
         </div>
       </div>
     </div>
@@ -118,7 +120,7 @@ export function WarehouseStockDialog({ id, open, setOpen, currentWarehouseType }
           <DialogHeader className="flex flex-row items-center justify-between px-4">
             <DialogTitle className="text-xl">{renderHeader()}</DialogTitle>
           </DialogHeader>
-          <ScrollArea className="h-full max-h-[80vh] px-0">
+          <ScrollArea className="h-[80vh] max-h-[82vh] px-0">
             <div className="px-6">{renderContent()}</div>
           </ScrollArea>
         </DialogContent>

@@ -73,6 +73,16 @@ export const warehouseApi = createApi({
       }),
       providesTags: ["Warehouse"],
     }),
+
+    // Nuevo endpoint para descargar el Excel de stock del almacén
+    downloadWarehouseStockExcel: build.query<Blob, string>({
+      query: (id) => ({
+        url: `/warehouse/${id}/excel`,
+        method: "GET",
+        credentials: "include",
+        responseHandler: (response: Response) => response.blob(),
+      }),
+    }),
   }),
 });
 
@@ -82,4 +92,6 @@ export const {
   useGetPaginatedWarehousesQuery,
   useGetWarehousesByTypeQuery,
   useGetProductsStockByTypeQuery,
+  useDownloadWarehouseStockExcelQuery,
+  useLazyDownloadWarehouseStockExcelQuery,
 } = warehouseApi;

@@ -32,7 +32,6 @@ import { CreatePaymentDetailDialog } from "../create/CreatePaymentDetailDialog";
  * @returns Columnas de la tabla de usuarios
  */
 export const paymentsColumns = (
-  isSuperAdmin: boolean,
   handleManagementPaymentInterface: (id: string) => void
 ): ColumnDef<SummaryPayment>[] => [
   {
@@ -154,7 +153,6 @@ export const paymentsColumns = (
     cell: function Cell({ row }) {
       const [createDialog, setCreateDialog] = useState(false);
       const [createPaymentDetailRoom, setCreatePaymentDetailRoom] = useState(false);
-      console.log(isSuperAdmin);
 
       return (
         <div>
@@ -185,13 +183,13 @@ export const paymentsColumns = (
                 <DropdownMenuSubTrigger>Agregar Pago</DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
                   <>
-                    <DropdownMenuItem onSelect={() => setCreatePaymentDetailRoom(true)}>
+                    <DropdownMenuItem onSelect={() => setCreatePaymentDetailRoom(true)} className="group">
                       Habitación
                       <DropdownMenuShortcut>
                         <BedDouble className="size-4" aria-hidden="true" />
                       </DropdownMenuShortcut>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => setCreateDialog(true)}>
+                    <DropdownMenuItem onSelect={() => setCreateDialog(true)} className="group">
                       Extras
                       <DropdownMenuShortcut>
                         <Utensils className="size-4" aria-hidden="true" />
