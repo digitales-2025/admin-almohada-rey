@@ -21,8 +21,11 @@ pipeline {
 		SSH_CRED = "ssh-id_docker_admin"
 
 		// ansible variables
-		// PROJECT_SERVICES  = "backend,frontend,landing"  // FIXME: reenable landing
-		PROJECT_SERVICES  = "backend,frontend"  // Comma-separated list
+		PROJECT_SERVICES  = "backend,frontend,landing"
+
+		// Docker build variables
+		NEXT_PUBLIC_BACKEND_URL = "https://almohada-backend-develop.acide.win/v1"
+		NEXT_PUBLIC_IMAGE_DOMAIN="pub-0974deb2e04246f0ba3e7ab7bad64223.r2.dev"
 	}
 	stages {
 		stage("Create ansible inventory") {
@@ -50,7 +53,7 @@ ungrouped:
 							steps {
 								script {
 									withDockerRegistry(credentialsId: "${REGISTRY_CREDENTIALS}") {
-										def image = docker.build("${FULL_REGISTRY_URL}:${BUILD_REF}", "-f +devops/docker/Dockerfile .")
+										def image = docker.build("${FULL_REGISTRY_URL}:${BUILD_NUMBER}", "--build-arg NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL} --build-arg NEXT_PUBLIC_IMAGE_DOMAIN=${NEXT_PUBLIC_IMAGE_DOMAIN} -f +devops/docker/Dockerfile .")
 										image.push()
 									}
 								}
