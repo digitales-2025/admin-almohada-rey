@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 
+import { customerReservationHistoryApi } from "@/app/(admin)/customers/_services/customerReservationHistoryApi";
 import { customersApi } from "@/app/(admin)/customers/_services/customersApi";
 import { rucApi } from "@/app/(admin)/customers/_services/rucApi";
 import { dashboardApi } from "@/app/(admin)/dashboard/_services/dashboardApi";
@@ -25,6 +26,7 @@ export const store = configureStore({
     [adminApi.reducerPath]: adminApi.reducer,
     [usersApi.reducerPath]: usersApi.reducer,
     [customersApi.reducerPath]: customersApi.reducer,
+    [customerReservationHistoryApi.reducerPath]: customerReservationHistoryApi.reducer,
     [reservationApi.reducerPath]: reservationApi.reducer,
     [productsApi.reducerPath]: productsApi.reducer,
     [roomsApi.reducerPath]: roomsApi.reducer,
@@ -66,6 +68,7 @@ export const store = configureStore({
       .concat(authApi.middleware)
       .concat(adminApi.middleware)
       .concat(usersApi.middleware)
+      .concat(customerReservationHistoryApi.middleware)
       .concat(customersApi.middleware)
       .concat(productsApi.middleware)
       .concat(reservationApi.middleware)

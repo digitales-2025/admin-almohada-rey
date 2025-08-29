@@ -605,6 +605,26 @@ export interface paths {
     patch: operations["ReservationController_extendStay_v1"];
     trace?: never;
   };
+  "/v1/reservation/all/reasons": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Obtener todas las razones únicas de las reservas
+     * @description Retorna una lista de todas las razones únicas utilizadas en las reservas, ordenadas alfabéticamente
+     */
+    get: operations["ReservationController_getAllReasons_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v1/rooms": {
     parameters: {
       query?: never;
@@ -1847,6 +1867,58 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/customer-reservation-history": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Create a new customer reservation history record */
+    post: operations["CustomerReservationHistoryController_create_v1"];
+    /** Delete multiple customer reservation history records */
+    delete: operations["CustomerReservationHistoryController_removeAll_v1"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/customer-reservation-history/customer/{customerId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get all customer reservation histories by customer ID */
+    get: operations["CustomerReservationHistoryController_findAllByCustomerId_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/customer-reservation-history/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Update a customer reservation history record */
+    patch: operations["CustomerReservationHistoryController_update_v1"];
+    trace?: never;
+  };
   "/v1/seeds": {
     parameters: {
       query?: never;
@@ -2347,13 +2419,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       updatedAt: string;
       /** @description Customer name */
@@ -2415,13 +2487,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       updatedAt: string;
       /** @description User name */
@@ -2464,13 +2536,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       updatedAt: string;
       /**
@@ -2528,13 +2600,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       updatedAt: string;
       /**
@@ -2623,13 +2695,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -2822,13 +2894,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -3098,6 +3170,13 @@ export interface components {
        */
       paymentMethod: string;
     };
+    ReasonResponseDto: {
+      /**
+       * @description Razón de la reserva
+       * @example negocios
+       */
+      reason: string;
+    };
     CreateRoomDto: {
       /**
        * @description ID del tipo de habitación
@@ -3140,13 +3219,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       updatedAt: string;
       /**
@@ -3673,13 +3752,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       updatedAt: string;
       name: string;
@@ -4054,6 +4133,83 @@ export interface components {
        */
       deletedCount: number;
     };
+    CreateCustomerReservationHistoryDto: {
+      /**
+       * @description ID del cliente
+       * @example uuid-del-cliente
+       */
+      customerId: string;
+      /**
+       * @description Fecha de la reserva anterior
+       * @example 2023-12-25
+       */
+      date: string;
+    };
+    CustomerInfoDto: {
+      /**
+       * @description ID del cliente
+       * @example uuid-del-cliente
+       */
+      id: string;
+      /**
+       * @description Nombre del cliente
+       * @example Juan Pérez
+       */
+      name: string;
+    };
+    CustomerReservationHistoryResponseDto: {
+      /**
+       * @description ID único del registro de historial
+       * @example uuid-del-registro
+       */
+      id: string;
+      /**
+       * @description ID del cliente
+       * @example uuid-del-cliente
+       */
+      customerId: string;
+      /**
+       * @description Fecha de la reserva anterior
+       * @example 2023-12-25
+       */
+      date: string;
+      /**
+       * Format: date-time
+       * @description Fecha de creación del registro
+       * @example 2024-01-15T10:30:00Z
+       */
+      createdAt: string;
+      /**
+       * Format: date-time
+       * @description Fecha de última actualización del registro
+       * @example 2024-01-15T10:30:00Z
+       */
+      updatedAt: string;
+      /** @description Información del cliente */
+      customer?: components["schemas"]["CustomerInfoDto"];
+    };
+    UpdateCustomerReservationHistoryDto: {
+      /**
+       * @description ID del cliente
+       * @example uuid-del-cliente
+       */
+      customerId?: string;
+      /**
+       * @description Fecha de la reserva anterior
+       * @example 2023-12-25
+       */
+      date?: string;
+    };
+    DeleteCustomerReservationHistoryDto: {
+      /**
+       * @description Array de IDs de registros de historial a eliminar
+       * @example [
+       *       "uuid-1",
+       *       "uuid-2"
+       *     ]
+       */
+      ids: string[];
+    };
     CreateCleaningChecklistDto: {
       /**
        * @description Fecha de la limpieza
@@ -4095,13 +4251,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       updatedAt: string;
       /**
@@ -4203,13 +4359,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       updatedAt: string;
       /**
@@ -4242,13 +4398,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       updatedAt: string;
       /**
@@ -4311,13 +4467,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-08-23T16:14:14.246Z
+       * @example 2025-08-29T16:41:05.118Z
        */
       updatedAt: string;
       /**
@@ -6363,6 +6519,40 @@ export interface operations {
       };
       /** @description Error: conflicto con otra reservación existente */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ReservationController_getAllReasons_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Lista de razones únicas de reservas */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ReasonResponseDto"][];
+        };
+      };
+      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
         headers: {
           [name: string]: unknown;
         };
@@ -9692,6 +9882,186 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["ClearCacheResponseDto"];
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  CustomerReservationHistoryController_create_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateCustomerReservationHistoryDto"];
+      };
+    };
+    responses: {
+      /** @description Customer reservation history created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CustomerReservationHistoryResponseDto"];
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  CustomerReservationHistoryController_removeAll_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DeleteCustomerReservationHistoryDto"];
+      };
+    };
+    responses: {
+      /** @description Customer reservation histories deleted successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  CustomerReservationHistoryController_findAllByCustomerId_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description ID del cliente */
+        customerId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Customer reservation histories found successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CustomerReservationHistoryResponseDto"][];
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  CustomerReservationHistoryController_update_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description ID del registro de historial */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateCustomerReservationHistoryDto"];
+      };
+    };
+    responses: {
+      /** @description Customer reservation history updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CustomerReservationHistoryResponseDto"];
         };
       };
       /** @description Bad request */
