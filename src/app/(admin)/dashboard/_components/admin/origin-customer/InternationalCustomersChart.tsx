@@ -33,7 +33,7 @@ export function InternationalCustomersChart({ top10CountriesCustomers }: Interna
 
   return (
     <ResponsiveContainer width="100%" height={350}>
-      <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 30, left: 60, bottom: 5 }}>
+      <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 30, left: 30, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
         <XAxis type="number" axisLine={false} tickLine={false} />
         <YAxis
