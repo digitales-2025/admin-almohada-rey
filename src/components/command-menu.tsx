@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import { Laptop, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 
+import { useProfile } from "@/app/(admin)/profile/_hooks/use-profile";
 import { useSearch } from "@/context/search-context";
 import { sidebarData } from "./layout/data/sidebar-data";
+import { filterSidebarData } from "./layout/utils/sidebar-filter";
 import {
   CommandDialog,
   CommandEmpty,
@@ -22,6 +24,10 @@ export function CommandMenu() {
   const navigate = useRouter();
   const { setTheme } = useTheme();
   const { open, setOpen } = useSearch();
+  const { user } = useProfile();
+
+  // Filtrar el sidebar basado en el rol del usuario
+  const filteredSidebarData = user?.userRol ? filterSidebarData(sidebarData, user.userRol) : sidebarData;
 
   const runCommand = React.useCallback(
     (command: () => unknown) => {
@@ -37,7 +43,7 @@ export function CommandMenu() {
       <CommandList>
         <ScrollArea type="hover" className="h-72 pr-1">
           <CommandEmpty>No se encontraron resultados.</CommandEmpty>
-          {sidebarData.navGroups.map((group) => (
+          {filteredSidebarData.navGroups.map((group) => (
             <CommandGroup key={group.title} heading={group.title}>
               {group.items.map((navItem, i) => {
                 if (navItem.url)
