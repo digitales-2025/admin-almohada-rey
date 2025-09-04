@@ -150,7 +150,9 @@ export default function TimelineHotelBookingHistory({
                                 </div>
                                 <div>
                                   <p className="text-muted-foreground">Motivo</p>
-                                  <p className="font-medium line-clamp-1">{booking.reason || "No especificado"}</p>
+                                  <p className="font-medium line-clamp-1 capitalize">
+                                    {booking.reason || "No especificado"}
+                                  </p>
                                 </div>
                               </div>
 

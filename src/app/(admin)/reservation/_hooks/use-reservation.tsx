@@ -16,6 +16,7 @@ import {
   PaginatedReservationParams,
   useCreateReservationMutation,
   useDeactivateReservationsMutation,
+  useGetAllReasonsQuery,
   useGetPaginatedReservationsQuery,
   useGetReservationByIdQuery,
   useReactivateReservationsMutation,
@@ -38,6 +39,7 @@ export const useReservation = () => {
       },
     });
   const useOneReservationQuery = (id: string) => useGetReservationByIdQuery(id);
+  const useAllReasonsQuery = () => useGetAllReasonsQuery();
   const [createReservation, { isSuccess: isSuccessCreateReservation, reset: resetCreateReservation }] =
     useCreateReservationMutation();
   const [updateReservation, updateReservationResponse] = useUpdateReservationMutation();
@@ -159,6 +161,7 @@ export const useReservation = () => {
   return {
     usePaginatedReservationQuery,
     useOneReservationQuery,
+    useAllReasonsQuery,
     onCreateReservation,
     isSuccessCreateReservation,
     resetCreateReservation,

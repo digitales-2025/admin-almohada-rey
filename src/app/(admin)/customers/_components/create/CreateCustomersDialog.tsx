@@ -57,6 +57,9 @@ export function CreateCustomersDialog() {
       documentNumber: "",
       maritalStatus: undefined,
       occupation: "",
+      companyName: "",
+      ruc: "",
+      companyAddress: "",
     },
   });
 

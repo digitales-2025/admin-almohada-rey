@@ -42,6 +42,7 @@ export type DetailedRoom = components["schemas"]["DetailedRoom"];
 export type ReservationStatusAvailableActions = components["schemas"]["ReservationStatusAvailableActions"];
 export type UpdateManyDto = components["schemas"]["UpdateManyDto"];
 export type UpdateManyResponse = components["schemas"]["UpdateManyResponseDto"];
+export type ReasonResponse = components["schemas"]["ReasonResponseDto"];
 export const createReservationSchema = z.object({
   customerId: z.string({
     required_error: "El cliente es requerido",

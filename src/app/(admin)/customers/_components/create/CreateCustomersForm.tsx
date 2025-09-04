@@ -23,6 +23,7 @@ import type { CreateCustomersSchema } from "../../_schema/createCustomersSchema"
 import { CustomerDocumentType, CustomerMaritalStatus } from "../../_types/customer";
 import { CustomerDocumentTypeLabels, CustomerMaritalStatusLabels } from "../../_utils/customers.utils";
 import DniLookup from "../search-dni/LookupDni";
+import RucLookup from "../search-ruc/LookupRuc";
 
 interface CreateCustomersFormProps extends Omit<React.ComponentPropsWithRef<"form">, "onSubmit"> {
   children: React.ReactNode;
@@ -428,26 +429,25 @@ export default function CreateCustomersForm({ children, form, onSubmit }: Create
             <>
               <FormField
                 control={form.control}
+                name="ruc"
+                render={() => (
+                  <FormItem className="sm:col-span-2">
+                    <FormLabel className="text-sm font-medium">RUC</FormLabel>
+                    <FormControl>
+                      <RucLookup form={form} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="companyName"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Nombre de la empresa</FormLabel>
                     <FormControl>
                       <InputWithIcon Icon={Building2} placeholder="Ejm: Almohada Rey" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="ruc"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>RUC</FormLabel>
-                    <FormControl>
-                      <InputWithIcon Icon={IdCard} placeholder="Ejm: 12345678912" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

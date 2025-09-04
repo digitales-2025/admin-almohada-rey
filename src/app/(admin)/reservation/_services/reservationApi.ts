@@ -11,6 +11,7 @@ import {
   CreateReservationInput,
   DetailedReservation,
   DetailedRoom,
+  ReasonResponse,
   Reservation,
   ReservationStatus,
   RoomAvailabilityDto,
@@ -213,6 +214,15 @@ export const reservationApi = createApi({
         credentials: "include",
       }),
     }),
+
+    getAllReasons: build.query<ReasonResponse[], void>({
+      query: () => ({
+        url: "/reservation/all/reasons",
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["Reservation"],
+    }),
   }),
 });
 
@@ -332,4 +342,5 @@ export const {
   useDeactivateReservationsMutation,
   useReactivateReservationsMutation,
   useCheckExtendedCheckoutAvailabilityQuery,
+  useGetAllReasonsQuery,
 } = reservationApi;

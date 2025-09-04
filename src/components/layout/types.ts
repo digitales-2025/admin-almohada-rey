@@ -10,6 +10,7 @@ interface BaseNavItem {
   title: string;
   badge?: string;
   icon?: React.ElementType;
+  roles?: string[]; // Roles que pueden ver este item
 }
 
 type NavLink = BaseNavItem & {
@@ -27,6 +28,7 @@ type NavItem = NavCollapsible | NavLink;
 interface NavGroup {
   title: string;
   items: NavItem[];
+  roles?: string[]; // Roles que pueden ver este grupo
 }
 
 interface SidebarData {

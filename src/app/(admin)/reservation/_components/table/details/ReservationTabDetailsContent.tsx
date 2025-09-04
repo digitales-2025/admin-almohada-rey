@@ -36,7 +36,7 @@ export default function ReservationTabDetailsContent({ row }: ReservationTabDeta
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Motivo</p>
-                <p className="text-sm font-medium">{row.reason}</p>
+                <p className="text-sm font-medium capitalize">{row.reason}</p>
               </div>
             </div>
 

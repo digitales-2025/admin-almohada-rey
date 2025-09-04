@@ -17,6 +17,7 @@ import {
   Warehouse,
 } from "lucide-react";
 
+import { UserRolType } from "@/app/(admin)/users/_types/user";
 import { type SidebarData } from "../types";
 
 export const sidebarData: SidebarData = {
@@ -117,11 +118,13 @@ export const sidebarData: SidebarData = {
           title: "Gastos",
           url: "/expenses",
           icon: HandCoins,
+          roles: [UserRolType.ADMIN], // Solo ADMIN puede ver gastos
         },
       ],
     },
     {
       title: "Administración",
+      roles: [UserRolType.ADMIN], // Solo ADMIN puede ver toda la sección de administración
       items: [
         {
           title: "Usuarios",

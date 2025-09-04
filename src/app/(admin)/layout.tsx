@@ -2,6 +2,7 @@ import AdminLayout from "@/components/layout/admin-layout";
 import { Header } from "@/components/layout/header";
 import { Main } from "@/components/layout/main";
 import { ProfileDropdown } from "@/components/profile-dropdown";
+import { RouteProtection } from "@/components/route-protection";
 import { Search } from "@/components/search";
 import { ThemeSwitch } from "@/components/theme-switch";
 
@@ -17,7 +18,9 @@ export default function AdminLayoutWrapper({ children }: { children: React.React
         </div>
       </Header>
       {/* ===== Main Content ===== */}
-      <Main>{children}</Main>
+      <Main>
+        <RouteProtection>{children}</RouteProtection>
+      </Main>
     </AdminLayout>
   );
 }

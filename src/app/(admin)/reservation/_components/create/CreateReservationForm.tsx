@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ListCheck, MapPinHouse, UserRoundCheck } from "lucide-react";
+import { ListCheck, MapPinHouse } from "lucide-react";
 import { UseFieldArrayReturn, UseFormReturn } from "react-hook-form";
 
 import { Customer } from "@/app/(admin)/customers/_types/customer";
@@ -8,12 +8,14 @@ import ErrorMessageForm from "@/components/form/ErrorMessageForm";
 import LoadingFormSkeleton from "@/components/form/LoadingFormSkeleton";
 import { TextareaWithIcon } from "@/components/form/TextareaWithIcon";
 import { InputWithIcon } from "@/components/input-with-icon";
+import { AutoComplete } from "@/components/ui/autocomplete";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { SelectOption } from "@/types/form/select-option";
+import { useReservation } from "../../_hooks/use-reservation";
 import { useAllAvailableRoomsInTimeInterval } from "../../_hooks/use-roomAvailability";
 import {
   CreateReservationInput,
@@ -53,6 +55,8 @@ export default function CreateReservationForm({
   };
   const { isLoading, isError, error, availableRooms, checkAvailability, refetch } =
     useAllAvailableRoomsInTimeInterval(defaultCheckInCheckOutDates);
+  const { useAllReasonsQuery } = useReservation();
+  const { data: reasons, isLoading: isLoadingReasons } = useAllReasonsQuery();
   const { watch, register } = form;
   const { append, remove } = controlledFieldArray;
 
@@ -304,7 +308,20 @@ export default function CreateReservationForm({
             <FormItem className="col-span-2 sm:col-span-2">
               <FormLabel>{FORMSTATICS.reason.label}</FormLabel>
               <FormControl>
-                <TextareaWithIcon {...field} Icon={UserRoundCheck} placeholder={FORMSTATICS.reason.placeholder} />
+                <AutoComplete
+                  options={
+                    reasons?.map((reason) => ({
+                      value: reason.reason,
+                      label: reason.reason,
+                    })) || []
+                  }
+                  value={field.value ? { value: field.value, label: field.value } : undefined}
+                  onValueChange={(option) => field.onChange(option.label)}
+                  placeholder={FORMSTATICS.reason.placeholder}
+                  emptyMessage="No se encontraron motivos de estancia"
+                  isLoading={isLoadingReasons}
+                  allowCustomInput={true}
+                />
               </FormControl>
               <CustomFormDescription
                 required={FORMSTATICS.reason.required}

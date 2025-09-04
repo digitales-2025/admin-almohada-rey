@@ -23,6 +23,7 @@ type AutoCompleteProps = {
   placeholder?: string;
   className?: string;
   showClearButton?: boolean;
+  allowCustomInput?: boolean; // Nuevo prop para permitir entrada manual
   renderOption?: (option: Option) => ReactNode; // Nuevo prop para personalizar el renderizado de las opciones
   renderSelectedValue?: (option: Option) => ReactNode; // Nuevo prop para personalizar el valor seleccionado
 };
@@ -39,6 +40,7 @@ const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
       isLoading = false,
       className,
       showClearButton = true,
+      allowCustomInput = false,
       renderOption,
       renderSelectedValue,
     },
@@ -82,8 +84,15 @@ const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
             setSelected(exactMatches[0]);
             onValueChange?.(exactMatches[0]);
             setOpen(false);
-          } else {
-            // Opcional: manejar caso donde no hay coincidencias
+          } else if (allowCustomInput) {
+            // Si no hay coincidencias y se permite entrada manual, crear una nueva opción
+            const customOption: Option = {
+              value: input.value.trim(),
+              label: input.value.trim(),
+            };
+            setSelected(customOption);
+            onValueChange?.(customOption);
+            setOpen(false);
           }
         }
 
@@ -91,13 +100,24 @@ const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
           input.blur();
         }
       },
-      [isOpen, options, onValueChange]
+      [isOpen, options, onValueChange, allowCustomInput]
     );
 
     const handleBlur = useCallback(() => {
       setOpen(false);
-      setInputValue(selected?.label || "");
-    }, [selected]);
+
+      // Si se permite entrada manual y hay texto en el input, crear una opción personalizada
+      if (allowCustomInput && inputValue.trim() !== "" && !selected) {
+        const customOption: Option = {
+          value: inputValue.trim(),
+          label: inputValue.trim(),
+        };
+        setSelected(customOption);
+        onValueChange?.(customOption);
+      } else {
+        setInputValue(selected?.label || "");
+      }
+    }, [selected, allowCustomInput, inputValue, onValueChange]);
 
     const handleSelectOption = useCallback(
       (selectedOption: Option) => {
@@ -128,6 +148,9 @@ const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
     const handleCommandClick = useCallback((e: React.MouseEvent) => {
       e.stopPropagation();
     }, []);
+
+    // Filtrar opciones basadas en el input
+    const filteredOptions = options.filter((option) => option.label.toLowerCase().includes(inputValue.toLowerCase()));
 
     // Crear un nuevo componente para mostrar el valor seleccionado personalizado
     const SelectedValueDisplay = () => {
@@ -216,9 +239,9 @@ const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
                     </div>
                   </CommandPrimitive.Loading>
                 )}
-                {!isLoading && options.length > 0 && (
+                {!isLoading && filteredOptions.length > 0 && (
                   <CommandGroup>
-                    {options.map((option) => {
+                    {filteredOptions.map((option) => {
                       const isSelected = selected?.value === option.value;
                       return (
                         <CommandItem
@@ -238,9 +261,18 @@ const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
                     })}
                   </CommandGroup>
                 )}
-                {!isLoading && options.length === 0 && (
+                {!isLoading && filteredOptions.length === 0 && (
                   <CommandPrimitive.Empty className="select-none rounded-sm px-2 py-3 text-center text-sm">
-                    {emptyMessage}
+                    {allowCustomInput ? (
+                      <div className="space-y-1">
+                        <p>{emptyMessage}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Presiona Enter para usar "{inputValue.trim()}" como valor personalizado
+                        </p>
+                      </div>
+                    ) : (
+                      emptyMessage
+                    )}
                   </CommandPrimitive.Empty>
                 )}
               </CommandList>
