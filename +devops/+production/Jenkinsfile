@@ -5,11 +5,10 @@ pipeline {
 
 		PROJECT_NAME    = "almohada"
 		PROJECT_SERVICE = "unset"  // MUST BE SPECIFIED
-		PROJECT_STAGE   = "develop"
-		PROJECT_TRIPLET = "..." // MUST BE SPECIFIED
+		PROJECT_STAGE   = "production"
 
 		REMOTE_USER   = "docker_admin"
-		REMOTE_IP     = "116.203.105.37"
+		REMOTE_IP     = "161.132.54.242"
 		REMOTE_FOLDER = "/opt/docker/compose/projects/${PROJECT_NAME}-${PROJECT_STAGE}/"
 
 		REGISTRY_CREDENTIALS = "dockerhub-digitalesacide-credentials"
@@ -17,16 +16,16 @@ pipeline {
 		REGISTRY_USER        = "digitalesacide"
 		FULL_REGISTRY_URL    = "..." // MUST BE SPECIFIED
 
-		// SSH credentials
 		SSH_CRED = "ssh-id_docker_admin"
 
 		// ansible variables
 		PROJECT_SERVICES  = "backend,frontend,landing"
 
 		// Docker build variables
-		NEXT_PUBLIC_BACKEND_URL = "https://almohada-backend-develop.acide.win/v1"
+		NEXT_PUBLIC_BACKEND_URL = "https://api.hotelalmohadadelrey.com/v1"
+		// FIXME: set production r2 url
 		NEXT_PUBLIC_IMAGE_DOMAIN="pub-0974deb2e04246f0ba3e7ab7bad64223.r2.dev"
-		NEXT_PUBLIC_SOCKET_URL="https://almohada-backend-develop.acide.win"
+		NEXT_PUBLIC_SOCKET_URL="https://api.hotelalmohadadelrey.com"
 	}
 	stages {
 		stage("Create ansible inventory") {
@@ -122,6 +121,7 @@ ungrouped:
 							_project_services: PROJECT_SERVICES,
 							_project_stage: PROJECT_STAGE,
 							_project_service: PROJECT_SERVICE,
+							_docker_base: "../+production",
 						],
 					)
 				}
