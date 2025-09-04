@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form";
 import { getCountries } from "react-phone-number-input";
 import es from "react-phone-number-input/locale/es.json";
 
-import UpdateCustomersForm from "@/app/(admin)/customers/_components/update/UpdateCustomersForm";
 import { useCustomers } from "@/app/(admin)/customers/_hooks/use-customers";
 import { customersSchema, type CreateCustomersSchema } from "@/app/(admin)/customers/_schema/createCustomersSchema";
 import { CountryOption } from "@/components/country-autocomplete";
@@ -27,6 +26,7 @@ import {
 import { departments } from "@/data/department";
 import { cn } from "@/lib/utils";
 import { City } from "@/types/city";
+import CreateCustomersReservationsForm from "./CreateCustomersReservationsForm";
 
 const dataForm = {
   button: "Crear cliente",
@@ -154,7 +154,7 @@ export function CreateCustomersReservationsSheet({ refetch }: CreateCustomersRes
           <SheetDescription>{dataForm.description}</SheetDescription>
         </SheetHeader>
         <ScrollArea className="w-full h-[calc(100vh-150px)] p-0">
-          <UpdateCustomersForm
+          <CreateCustomersReservationsForm
             form={form}
             onSubmit={onSubmit}
             cities={cities}
@@ -176,7 +176,7 @@ export function CreateCustomersReservationsSheet({ refetch }: CreateCustomersRes
                 </SheetClose>
               </div>
             </SheetFooter>
-          </UpdateCustomersForm>
+          </CreateCustomersReservationsForm>
         </ScrollArea>
       </SheetContent>
     </Sheet>

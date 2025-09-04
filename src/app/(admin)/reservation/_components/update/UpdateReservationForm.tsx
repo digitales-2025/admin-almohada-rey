@@ -9,11 +9,13 @@ import ErrorMessageForm from "@/components/form/ErrorMessageForm";
 import LoadingFormSkeleton from "@/components/form/LoadingFormSkeleton";
 import { TextareaWithIcon } from "@/components/form/TextareaWithIcon";
 import { InputWithIcon } from "@/components/input-with-icon";
+import { AutoComplete } from "@/components/ui/autocomplete";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { formatPeruBookingDate, getPeruStartOfToday } from "@/utils/peru-datetime";
 import { processError } from "@/utils/process-error";
+import { useReservation } from "../../_hooks/use-reservation";
 import { useAllAvailableRoomsInTimeIntervalForUpdate } from "../../_hooks/use-roomAvailability";
 import { DetailedReservation, DetailedRoom, UpdateReservationInput } from "../../_schemas/reservation.schemas";
 import { FORMSTATICS, UPDATE_FORMSTATICS } from "../../_statics/forms";
@@ -87,6 +89,10 @@ export default function UpdateReservationForm({
   // Hook para verificar disponibilidad
   const { isLoading, isError, error, availableRooms, checkAvailability, refetch } =
     useAllAvailableRoomsInTimeIntervalForUpdate(defaultCheckInCheckOutDates, reservationId);
+
+  // Hook para obtener razones
+  const { useAllReasonsQuery } = useReservation();
+  const { data: reasons, isLoading: isLoadingReasons } = useAllReasonsQuery();
 
   // Función optimizada para verificar disponibilidad (reutilizable)
   const verifyAvailability = useCallback(() => {
@@ -347,7 +353,20 @@ export default function UpdateReservationForm({
             <FormItem>
               <FormLabel>{FORMSTATICS.reason.label}</FormLabel>
               <FormControl>
-                <TextareaWithIcon {...field} Icon={UserRoundCheck} placeholder={FORMSTATICS.reason.placeholder} />
+                <AutoComplete
+                  options={
+                    reasons?.map((reason) => ({
+                      value: reason.reason,
+                      label: reason.reason,
+                    })) || []
+                  }
+                  value={field.value ? { value: field.value, label: field.value } : undefined}
+                  onValueChange={(option) => field.onChange(option.label)}
+                  placeholder={FORMSTATICS.reason.placeholder}
+                  emptyMessage="No se encontraron motivos de estancia"
+                  isLoading={isLoadingReasons}
+                  allowCustomInput={true}
+                />
               </FormControl>
               <CustomFormDescription required={FORMSTATICS.reason.required} validateOptionalField={true} />
               <FormMessage />

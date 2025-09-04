@@ -605,6 +605,26 @@ export interface paths {
     patch: operations["ReservationController_extendStay_v1"];
     trace?: never;
   };
+  "/v1/reservation/all/reasons": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Obtener todas las razones únicas de las reservas
+     * @description Retorna una lista de todas las razones únicas utilizadas en las reservas, ordenadas alfabéticamente
+     */
+    get: operations["ReservationController_getAllReasons_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v1/rooms": {
     parameters: {
       query?: never;
@@ -744,6 +764,26 @@ export interface paths {
     head?: never;
     /** Cambiar estado de habitación a limpieza */
     patch: operations["RoomController_updateStatusToCleaning_v1"];
+    trace?: never;
+  };
+  "/v1/rooms/{id}/amenities": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Actualizar amenidades de una habitación
+     * @description Actualiza las amenidades de una habitación y ajusta automáticamente su estado según las amenidades
+     */
+    patch: operations["RoomController_updateAmenities_v1"];
     trace?: never;
   };
   "/v1/room-types": {
@@ -1235,6 +1275,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/warehouse/{id}/excel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Descargar Excel de stock del almacén
+     * @description Genera y descarga un archivo Excel con el inventario actual del almacén.
+     */
+    get: operations["WarehouseController_downloadWarehouseStockExcel_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v1/dashboard/annual-statistics": {
     parameters: {
       query?: never;
@@ -1558,22 +1618,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/v1/seeds": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations["SeedsController_initSeed_v1"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/v1/customers": {
     parameters: {
       query?: never;
@@ -1744,6 +1788,135 @@ export interface paths {
     head?: never;
     /** Reactivate a customer by id */
     patch: operations["CustomersController_reactivateAll_v1"];
+    trace?: never;
+  };
+  "/v1/customers/dni/{dni}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get customer data by DNI from Peru API */
+    get: operations["CustomersController_getDataByDni_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/ruc/{ruc}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Obtener datos de RUC desde SUNAT
+     * @description Consulta datos de RUC por scraping de SUNAT y representantes legales desde API Perú. Los datos se almacenan en caché para consultas futuras.
+     */
+    get: operations["RucController_getDataByRuc_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/ruc/cache/stats": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Obtener estadísticas del caché de RUC
+     * @description Retorna estadísticas sobre el uso del caché de consultas RUC.
+     */
+    get: operations["RucController_getRucCacheStats_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/ruc/cache/clear": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Limpiar caché de RUC
+     * @description Elimina todos los registros del caché de consultas RUC.
+     */
+    delete: operations["RucController_clearRucCache_v1"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/customer-reservation-history": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Create a new customer reservation history record */
+    post: operations["CustomerReservationHistoryController_create_v1"];
+    /** Delete multiple customer reservation history records */
+    delete: operations["CustomerReservationHistoryController_removeAll_v1"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/customer-reservation-history/customer/{customerId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get all customer reservation histories by customer ID */
+    get: operations["CustomerReservationHistoryController_findAllByCustomerId_v1"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/customer-reservation-history/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Update a customer reservation history record */
+    patch: operations["CustomerReservationHistoryController_update_v1"];
     trace?: never;
   };
   "/v1/room-cleaning": {
@@ -2230,13 +2403,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       updatedAt: string;
       /** @description Customer name */
@@ -2298,13 +2471,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       updatedAt: string;
       /** @description User name */
@@ -2347,13 +2520,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       updatedAt: string;
       /**
@@ -2411,13 +2584,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       updatedAt: string;
       /**
@@ -2506,13 +2679,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -2705,13 +2878,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -2981,6 +3154,13 @@ export interface components {
        */
       paymentMethod: string;
     };
+    ReasonResponseDto: {
+      /**
+       * @description Razón de la reserva
+       * @example negocios
+       */
+      reason: string;
+    };
     CreateRoomDto: {
       /**
        * @description ID del tipo de habitación
@@ -3023,13 +3203,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       updatedAt: string;
       /**
@@ -3175,6 +3355,38 @@ export interface components {
        *     ]
        */
       ids: string[];
+    };
+    UpdateAmenitiesRoomDto: {
+      /**
+       * @description Estado del tacho de basura
+       * @example true
+       */
+      trashBin?: boolean;
+      /**
+       * @description Estado de la toalla
+       * @example true
+       */
+      towel?: boolean;
+      /**
+       * @description Estado del papel higiénico
+       * @example true
+       */
+      toiletPaper?: boolean;
+      /**
+       * @description Estado del jabón de ducha
+       * @example true
+       */
+      showerSoap?: boolean;
+      /**
+       * @description Estado del jabón de manos
+       * @example true
+       */
+      handSoap?: boolean;
+      /**
+       * @description Estado de la lámpara
+       * @example true
+       */
+      lamp?: boolean;
     };
     CreateRoomTypeWithImagesDto: {
       /**
@@ -3524,13 +3736,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       updatedAt: string;
       name: string;
@@ -3636,6 +3848,8 @@ export interface components {
        */
       hasPaymentReceipt?: boolean;
     };
+    /** @enum {string} */
+    WarehouseType: "COMMERCIAL" | "INTERNAL_USE" | "DEPOSIT";
     CreateCustomerDto: {
       /** @description Nombre del cliente */
       name: string;
@@ -3733,6 +3947,253 @@ export interface components {
     DeleteCustomerDto: {
       ids: string[];
     };
+    RepresentanteLegalDto: {
+      /**
+       * @description Tipo de documento del representante
+       * @example DNI
+       */
+      tipoDocumento?: string;
+      /**
+       * @description Número de documento del representante
+       * @example 29392418
+       */
+      numeroDocumento?: string;
+      /**
+       * @description Nombre completo del representante
+       * @example TOHALINO RIVEROS PERCY FERNANDO
+       */
+      nombre: string;
+      /**
+       * @description Cargo del representante en la empresa
+       * @example PRESIDENTE
+       */
+      cargo?: string;
+      /**
+       * @description Fecha desde que ocupa el cargo
+       * @example 31/07/2010
+       */
+      fechaDesde?: string;
+    };
+    RucResponseDto: {
+      /**
+       * @description Número de RUC
+       * @example 20454777621
+       */
+      ruc: string;
+      /**
+       * @description Nombre o razón social de la empresa
+       * @example ASOCIACION CIVIL DE INVESTIGACION PARA EL DESARROLLO Y LA EMPRESA - ACIDE
+       */
+      nombreORazonSocial: string;
+      /**
+       * @description Tipo de contribuyente
+       * @example ASOCIACION
+       */
+      tipoContribuyente?: string;
+      /**
+       * @description Nombre comercial
+       * @example -
+       */
+      nombreComercial?: string;
+      /**
+       * @description Fecha de inscripción
+       * @example 23/08/2012
+       */
+      fechaInscripcion?: string;
+      /**
+       * @description Fecha de inicio de actividades
+       * @example 23/08/2012
+       */
+      fechaInicioActividades?: string;
+      /**
+       * @description Estado del contribuyente
+       * @example ACTIVO
+       */
+      estado?: string;
+      /**
+       * @description Condición del contribuyente
+       * @example HABIDO
+       */
+      condicion?: string;
+      /**
+       * @description Domicilio fiscal
+       * @example CAL.PAZ SOLDAN NRO. 815 (3 CDRAS ARRIBA DE AV. PROGRESO) AREQUIPA - AREQUIPA - MIRAFLORES
+       */
+      domicilioFiscal?: string;
+      /**
+       * @description Sistema de emisión de comprobante
+       * @example MANUAL
+       */
+      sistemaEmisionComprobante?: string;
+      /**
+       * @description Actividad de comercio exterior
+       * @example IMPORTADOR/EXPORTADOR
+       */
+      actividadComercioExterior?: string;
+      /**
+       * @description Sistema de contabilidad
+       * @example MANUAL
+       */
+      sistemaContabilidad?: string;
+      /**
+       * @description Actividad económica principal
+       * @example ACTIVIDADES DE CONSULTORÍA DE GESTIÓN
+       */
+      actividadPrincipal?: string;
+      /**
+       * @description Actividad económica secundaria 1
+       * @example ACTIVIDADES DE INVESTIGACIÓN
+       */
+      actividadSecundaria1?: string;
+      /**
+       * @description Actividad económica secundaria 2
+       * @example ACTIVIDADES DE APOYO A LA ENSEÑANZA
+       */
+      actividadSecundaria2?: string;
+      /**
+       * @description Comprobantes autorizados
+       * @example FACTURA
+       *     BOLETA DE VENTA
+       *     NOTA DE CREDITO
+       */
+      comprobantesAutorizados?: string;
+      /**
+       * @description Sistema de emisión electrónica
+       * @example FACTURA PORTAL DESDE 31/12/2021
+       *     BOLETA PORTAL DESDE 23/11/2022
+       */
+      sistemaEmisionElectronica?: string;
+      /**
+       * @description Emisor electrónico desde
+       * @example 31/12/2021
+       */
+      emisorElectronicoDesde?: string;
+      /**
+       * @description Comprobantes electrónicos
+       * @example FACTURA (desde 31/12/2021),BOLETA (desde 23/11/2022)
+       */
+      comprobantesElectronicos?: string;
+      /**
+       * @description Afiliado al PLE desde
+       * @example -
+       */
+      afiliadoPLEDesde?: string;
+      /**
+       * @description Padrones
+       * @example NINGUNO
+       */
+      padrones?: string;
+      /** @description Lista de representantes legales */
+      representantes?: components["schemas"]["RepresentanteLegalDto"][];
+    };
+    RucCacheStatsDto: {
+      /**
+       * @description Total de registros en el caché
+       * @example 150
+       */
+      total: number;
+      /**
+       * Format: date-time
+       * @description Fecha del registro más antiguo
+       * @example 2024-01-01T00:00:00Z
+       */
+      oldestRecord?: string;
+      /**
+       * Format: date-time
+       * @description Fecha del registro más reciente
+       * @example 2024-12-31T23:59:59Z
+       */
+      newestRecord?: string;
+    };
+    ClearCacheResponseDto: {
+      /**
+       * @description Mensaje de confirmación
+       * @example Caché de RUC limpiado exitosamente
+       */
+      message: string;
+      /**
+       * @description Número de registros eliminados
+       * @example 150
+       */
+      deletedCount: number;
+    };
+    CreateCustomerReservationHistoryDto: {
+      /**
+       * @description ID del cliente
+       * @example uuid-del-cliente
+       */
+      customerId: string;
+      /**
+       * @description Fecha de la reserva anterior
+       * @example 2023-12-25
+       */
+      date: string;
+    };
+    CustomerInfoDto: {
+      /**
+       * @description ID del cliente
+       * @example uuid-del-cliente
+       */
+      id: string;
+      /**
+       * @description Nombre del cliente
+       * @example Juan Pérez
+       */
+      name: string;
+    };
+    CustomerReservationHistoryResponseDto: {
+      /**
+       * @description ID único del registro de historial
+       * @example uuid-del-registro
+       */
+      id: string;
+      /**
+       * @description ID del cliente
+       * @example uuid-del-cliente
+       */
+      customerId: string;
+      /**
+       * @description Fecha de la reserva anterior
+       * @example 2023-12-25
+       */
+      date: string;
+      /**
+       * Format: date-time
+       * @description Fecha de creación del registro
+       * @example 2024-01-15T10:30:00Z
+       */
+      createdAt: string;
+      /**
+       * Format: date-time
+       * @description Fecha de última actualización del registro
+       * @example 2024-01-15T10:30:00Z
+       */
+      updatedAt: string;
+      /** @description Información del cliente */
+      customer?: components["schemas"]["CustomerInfoDto"];
+    };
+    UpdateCustomerReservationHistoryDto: {
+      /**
+       * @description ID del cliente
+       * @example uuid-del-cliente
+       */
+      customerId?: string;
+      /**
+       * @description Fecha de la reserva anterior
+       * @example 2023-12-25
+       */
+      date?: string;
+    };
+    DeleteCustomerReservationHistoryDto: {
+      /**
+       * @description Array de IDs de registros de historial a eliminar
+       * @example [
+       *       "uuid-1",
+       *       "uuid-2"
+       *     ]
+       */
+      ids: string[];
+    };
     CreateCleaningChecklistDto: {
       /**
        * @description Fecha de la limpieza
@@ -3774,13 +4235,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       updatedAt: string;
       /**
@@ -3882,13 +4343,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       updatedAt: string;
       /**
@@ -3921,13 +4382,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       updatedAt: string;
       /**
@@ -3990,13 +4451,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-05-27T04:24:26.177Z
+       * @example 2025-09-04T19:59:54.229Z
        */
       updatedAt: string;
       /**
@@ -6049,6 +6510,40 @@ export interface operations {
       };
     };
   };
+  ReservationController_getAllReasons_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Lista de razones únicas de reservas */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ReasonResponseDto"][];
+        };
+      };
+      /** @description Bad Request - Error en la validación de datos o solicitud incorrecta */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   RoomController_findAll_v1: {
     parameters: {
       query?: never;
@@ -6476,6 +6971,47 @@ export interface operations {
       };
       /** @description Habitación no encontrada */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  RoomController_updateAmenities_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description ID de la habitación */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateAmenitiesRoomDto"];
+      };
+    };
+    responses: {
+      /** @description Amenidades de la habitación actualizadas exitosamente */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BaseApiResponse"];
+        };
+      };
+      /** @description ID inválido, habitación no encontrada o datos de amenidades inválidos */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized - No autorizado para realizar esta operación */
+      401: {
         headers: {
           [name: string]: unknown;
         };
@@ -7757,14 +8293,15 @@ export interface operations {
   };
   WarehouseController_findOne_v1: {
     parameters: {
-      query: {
-        /** @description Warehouse ID */
-        id: string;
+      query?: {
         /** @description Movement ID to filter the warehouse data */
         movementId?: string;
       };
       header?: never;
-      path?: never;
+      path: {
+        /** @description Warehouse ID */
+        id: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
@@ -7797,8 +8334,8 @@ export interface operations {
       query?: never;
       header?: never;
       path: {
-        /** @description Tipo de almacén (COMMERCIAL o INTERNAL_USE) */
-        type: components["schemas"]["ProductType"];
+        /** @description Tipo de almacén (COMMERCIAL,INTERNAL_USE o DEPOSIT) */
+        type: components["schemas"]["WarehouseType"];
       };
       cookie?: never;
     };
@@ -7835,8 +8372,8 @@ export interface operations {
       };
       header?: never;
       path: {
-        /** @description Tipo de almacén (COMMERCIAL o INTERNAL_USE) */
-        type: components["schemas"]["ProductType"];
+        /** @description Tipo de almacén (COMMERCIAL, INTERNAL_USE o DEPOSIT) */
+        type: components["schemas"]["WarehouseType"];
       };
       cookie?: never;
     };
@@ -7848,6 +8385,43 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  WarehouseController_downloadWarehouseStockExcel_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description ID del almacén */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Archivo Excel con el inventario del almacén */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
       };
       /** @description Bad Request */
       400: {
@@ -8633,23 +9207,6 @@ export interface operations {
       };
     };
   };
-  SeedsController_initSeed_v1: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
   CustomersController_findAll_v1: {
     parameters: {
       query?: never;
@@ -9136,6 +9693,360 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  CustomersController_getDataByDni_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        dni: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Customer data obtained from Peru API successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @example Juan Carlos Pérez García */
+            name?: string;
+            /** @example 12345678 */
+            dni?: string;
+          };
+        };
+      };
+      /** @description Invalid DNI or API error */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  RucController_getDataByRuc_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Número de RUC (11 dígitos) */
+        ruc: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Datos del RUC obtenidos exitosamente */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RucResponseDto"];
+        };
+      };
+      /** @description RUC inválido o error en la consulta */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  RucController_getRucCacheStats_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Estadísticas del caché obtenidas exitosamente */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RucCacheStatsDto"];
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  RucController_clearRucCache_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Caché limpiado exitosamente */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ClearCacheResponseDto"];
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  CustomerReservationHistoryController_create_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateCustomerReservationHistoryDto"];
+      };
+    };
+    responses: {
+      /** @description Customer reservation history created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CustomerReservationHistoryResponseDto"];
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  CustomerReservationHistoryController_removeAll_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DeleteCustomerReservationHistoryDto"];
+      };
+    };
+    responses: {
+      /** @description Customer reservation histories deleted successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  CustomerReservationHistoryController_findAllByCustomerId_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description ID del cliente */
+        customerId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Customer reservation histories found successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CustomerReservationHistoryResponseDto"][];
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  CustomerReservationHistoryController_update_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description ID del registro de historial */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateCustomerReservationHistoryDto"];
+      };
+    };
+    responses: {
+      /** @description Customer reservation history updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CustomerReservationHistoryResponseDto"];
+        };
       };
       /** @description Bad request */
       400: {

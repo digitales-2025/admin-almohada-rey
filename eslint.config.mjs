@@ -42,6 +42,7 @@ export default [
           jsx: "never",
         },
       ],
+      "import/no-unresolved": "off",
     },
   },
   ...compat.extends("plugin:@typescript-eslint/recommended", "prettier").map((config) => ({
@@ -52,6 +53,7 @@ export default [
     files: ["**/*.+(ts|tsx)"],
     plugins: {
       "@typescript-eslint": typescriptEslintEslintPlugin,
+      import: importPlugin,
     },
     languageOptions: {
       parser: tsParser,
@@ -64,6 +66,8 @@ export default [
       "@typescript-eslint/no-use-before-define": [1],
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-var-requires": "off",
+      "import/extensions": "off",
+      "import/no-unresolved": "off",
     },
   },
 ];

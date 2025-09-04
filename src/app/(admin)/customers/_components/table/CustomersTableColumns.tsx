@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { CalendarDays, ChevronDown, ChevronRight, Ellipsis, RefreshCcwDot, Trash } from "lucide-react";
+import { ChevronDown, ChevronRight, Clock, Ellipsis, History, RotateCcw, Trash } from "lucide-react";
 import * as RPNInput from "react-phone-number-input";
 import flags from "react-phone-number-input/flags";
 
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Customer, CustomerDocumentType, CustomerMaritalStatus } from "../../_types/customer";
 import { CustomerDocumentTypeLabels, CustomerMaritalStatusLabels } from "../../_utils/customers.utils";
+import { ManagePastReservationsDialog } from "../manage-past-reservations/ManagePastReservationsDialog";
 import { DeleteCustomersDialog } from "../state-management/DeleteCustomersDialog";
 import { ReactivateCustomersDialog } from "../state-management/ReactivateCustomersDialog";
 import { UpdateCustomerSheet } from "../update/UpdateCustomersSheet";
@@ -264,6 +265,7 @@ export const customersColumns = (
       const [showDeleteDialog, setShowDeleteDialog] = useState(false);
       const [showReactivateDialog, setShowReactivateDialog] = useState(false);
       const [showEditDialog, setShowEditDialog] = useState(false);
+      const [showManagePastReservationsDialog, setShowManagePastReservationsDialog] = useState(false);
 
       const { isActive } = row.original;
       return (
@@ -271,6 +273,14 @@ export const customersColumns = (
           <div>
             {showEditDialog && (
               <UpdateCustomerSheet open={showEditDialog} onOpenChange={setShowEditDialog} customer={row?.original} />
+            )}
+
+            {showManagePastReservationsDialog && (
+              <ManagePastReservationsDialog
+                open={showManagePastReservationsDialog}
+                onOpenChange={setShowManagePastReservationsDialog}
+                customer={row?.original}
+              />
             )}
 
             {showDeleteDialog && (
@@ -314,14 +324,24 @@ export const customersColumns = (
               >
                 Historial
                 <DropdownMenuShortcut>
-                  <CalendarDays className="size-4" aria-hidden="true" />
+                  <History className="size-4" aria-hidden="true" />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={() => setShowManagePastReservationsDialog(true)}
+                disabled={!isActive}
+                className="group"
+              >
+                Reservas pasadas
+                <DropdownMenuShortcut>
+                  <Clock className="size-4" aria-hidden="true" />
                 </DropdownMenuShortcut>
               </DropdownMenuItem>
               {isSuperAdmin && (
                 <DropdownMenuItem onSelect={() => setShowReactivateDialog(true)} disabled={isActive} className="group">
                   Reactivar
                   <DropdownMenuShortcut>
-                    <RefreshCcwDot className="size-4" aria-hidden="true" />
+                    <RotateCcw className="size-4" aria-hidden="true" />
                   </DropdownMenuShortcut>
                 </DropdownMenuItem>
               )}
