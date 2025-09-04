@@ -50,7 +50,7 @@ export const SendNewPasswordForm = ({ user }: SendNewPasswordFormProps) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <Card className="w-full border-none p-0">
+        <Card className="w-full border-none">
           <CardHeader>
             <CardDescription>Genera una nueva constraseña para el usuario y envíala por correo</CardDescription>
           </CardHeader>
