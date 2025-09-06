@@ -23,7 +23,6 @@ pipeline {
 
 		// Docker build variables
 		NEXT_PUBLIC_BACKEND_URL = "https://api.hotellaalmohadadelrey.com/v1"
-		// FIXME: set production r2 url
 		NEXT_PUBLIC_IMAGE_DOMAIN="pub-0974deb2e04246f0ba3e7ab7bad64223.r2.dev"
 		NEXT_PUBLIC_SOCKET_URL="https://api.hotellaalmohadadelrey.com"
 	}
