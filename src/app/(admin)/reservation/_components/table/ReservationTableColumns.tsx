@@ -362,9 +362,7 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem onSelect={() => setShowDetailDialog(true)} disabled={!isActive}>
-                Ver
-              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setShowDetailDialog(true)}>Ver</DropdownMenuItem>
               <DropdownMenuSeparator />
 
               <DropdownMenuItem onSelect={() => setShowEditDialog(true)} disabled={!isActive} className="group">
