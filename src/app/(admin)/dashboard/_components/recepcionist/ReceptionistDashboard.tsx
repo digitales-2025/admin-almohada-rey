@@ -7,21 +7,20 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDashboard } from "../../_hooks/use-dashboard";
 import PendingAmenitiesTabsContentDashboard from "./pending-amenities/PendingAmenitiesTabsContentDashboard";
 import RoomsTabsContentDashboard from "./rooms/RoomsTabsContentDashboard";
+import { PendingAmenitiesSkeleton } from "./skeletons/PendingAmenitiesSkeleton";
+import { RoomsSkeleton } from "./skeletons/RoomsSkeleton";
+import { TodaySkeleton } from "./skeletons/TodaySkeleton";
+import { WeekReservationsSkeleton } from "./skeletons/WeekReservationsSkeleton";
 import TodayTabsContentDashboard from "./today/TodayTabsContentDashboard";
 import WeekReservationsTabsContentDashboard from "./week-reservations/WeekReservationsTabsContentDashboard";
 
 export function ReceptionistDashboard() {
   const [activeTab, setActiveTab] = useState("hoy");
-  const {
-    todayRecepcionistStatistics,
-    top5TodayCheckIn,
-    top5TodayCheckOut,
-    top5PriorityPendingAmenities,
-    roomOccupancy,
-    amenitiesByPriority,
-    todayAvailableRooms,
-    weekReservations,
-  } = useDashboard({ activeTab });
+
+  const { data, loading } = useDashboard({
+    activeTab,
+    mode: "receptionist",
+  });
 
   return (
     <div className="flex flex-col gap-4">
@@ -57,18 +56,37 @@ export function ReceptionistDashboard() {
           </TabsTrigger>
         </TabsList>
 
-        <TodayTabsContentDashboard
-          todayRecepcionistStatistics={todayRecepcionistStatistics}
-          top5PriorityPendingAmenities={top5PriorityPendingAmenities}
-          top5TodayCheckIn={top5TodayCheckIn}
-          top5TodayCheckOut={top5TodayCheckOut}
-        />
+        {loading.today ? (
+          <TodaySkeleton />
+        ) : (
+          <TodayTabsContentDashboard
+            todayRecepcionistStatistics={data.todayRecepcionistStatistics}
+            top5PriorityPendingAmenities={data.top5PriorityPendingAmenities}
+            top5TodayCheckIn={data.top5TodayCheckIn}
+            top5TodayCheckOut={data.top5TodayCheckOut}
+          />
+        )}
 
-        <RoomsTabsContentDashboard roomOccupancy={roomOccupancy} todayAvailableRooms={todayAvailableRooms} />
+        {loading.rooms ? (
+          <RoomsSkeleton />
+        ) : (
+          <RoomsTabsContentDashboard
+            roomOccupancy={data.roomOccupancy}
+            todayAvailableRooms={data.todayAvailableRooms}
+          />
+        )}
 
-        <WeekReservationsTabsContentDashboard weekReservations={weekReservations} />
+        {loading.weekReservations ? (
+          <WeekReservationsSkeleton />
+        ) : (
+          <WeekReservationsTabsContentDashboard weekReservations={data.weekReservations} />
+        )}
 
-        <PendingAmenitiesTabsContentDashboard amenitiesByPriority={amenitiesByPriority} />
+        {loading.amenities ? (
+          <PendingAmenitiesSkeleton />
+        ) : (
+          <PendingAmenitiesTabsContentDashboard amenitiesByPriority={data.amenitiesByPriority} />
+        )}
       </Tabs>
     </div>
   );

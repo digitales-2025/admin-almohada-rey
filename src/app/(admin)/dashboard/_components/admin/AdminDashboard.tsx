@@ -9,33 +9,22 @@ import FinanceTabsContentDashboard from "./finance/FinanceTabsContentDashboard";
 import OccupancyTabsContentDashboard from "./occupancy/OccupancyTabsContentDashboard";
 import OriginCustomerTabsContentDashboard from "./origin-customer/OriginCustomerTabsContentDashboard";
 import ReservationTabsContentDashboard from "./reservation/ReservationTabsContentDashboard";
+import { FinanceSkeleton } from "./skeletons/FinanceSkeleton";
+import { OccupancySkeleton } from "./skeletons/OccupancySkeleton";
+import { OriginCustomerSkeleton } from "./skeletons/OriginCustomerSkeleton";
+import { ReservationSkeleton } from "./skeletons/ReservationSkeleton";
+import { SummarySkeleton } from "./skeletons/SummarySkeleton";
 import SummaryTabsContentDashoard from "./summary/SummaryTabsContentDashboard";
 
 export function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("resumen");
   const [year, setYear] = useState(new Date().getFullYear() as number);
-  const [yearReservation, setYearReservation] = useState(new Date().getFullYear() as number);
-  const [yearFinance, setYearFinance] = useState(new Date().getFullYear() as number);
-  const [yearOrigin, setYearOrigin] = useState(new Date().getFullYear() as number);
 
-  const { annualStatistics, monthlyEarningsExpenses, occupancyStatisticsPercentage } = useDashboard({
+  const { data, loading } = useDashboard({
     year,
+    activeTab,
+    mode: "admin",
   });
-
-  const { monthlyBookingTrend } = useDashboard({
-    yearReservation,
-  });
-
-  const { annualSummaryFinance } = useDashboard({
-    yearFinance,
-  });
-
-  const { customerOriginSummary, monthlyCustomerOrigin, top10CountriesCustomers, top10ProvincesCustomers } =
-    useDashboard({
-      yearOrigin,
-    });
-
-  const { nextPendingPayments, recentReservations, roomOccupancy } = useDashboard({ activeTab });
 
   return (
     <div className="flex flex-col gap-4">
@@ -80,47 +69,63 @@ export function AdminDashboard() {
         </TabsList>
 
         {/* Pestaña de Resumen */}
-        <SummaryTabsContentDashoard
-          annualStatistics={annualStatistics}
-          monthlyEarningsExpenses={monthlyEarningsExpenses}
-          nextPendingPayments={nextPendingPayments}
-          recentReservations={recentReservations}
-          roomOccupancy={roomOccupancy}
-          setYear={setYear}
-          year={year}
-        />
+        {loading.summary ? (
+          <SummarySkeleton />
+        ) : (
+          <SummaryTabsContentDashoard
+            annualStatistics={data.annualStatistics}
+            monthlyEarningsExpenses={data.monthlyEarningsExpenses}
+            nextPendingPayments={data.nextPendingPayments}
+            recentReservations={data.recentReservations}
+            roomOccupancy={data.roomOccupancy}
+            setYear={setYear}
+            year={year}
+          />
+        )}
 
         {/* Pestaña de Ocupación */}
-        <OccupancyTabsContentDashboard
-          roomOccupancy={roomOccupancy}
-          occupancyStatisticsPercentage={occupancyStatisticsPercentage}
-          setYear={setYear}
-          year={year}
-        />
+        {loading.occupancy ? (
+          <OccupancySkeleton />
+        ) : (
+          <OccupancyTabsContentDashboard
+            roomOccupancy={data.roomOccupancy}
+            occupancyStatisticsPercentage={data.occupancyStatisticsPercentage}
+            setYear={setYear}
+            year={year}
+          />
+        )}
 
         {/* Pestaña de Reservas */}
-        <ReservationTabsContentDashboard
-          year={yearReservation}
-          setYear={setYearReservation}
-          monthlyBookingTrend={monthlyBookingTrend}
-        />
+        {loading.reservations ? (
+          <ReservationSkeleton />
+        ) : (
+          <ReservationTabsContentDashboard
+            year={year}
+            setYear={setYear}
+            monthlyBookingTrend={data.monthlyBookingTrend}
+          />
+        )}
 
         {/* Pestaña de Finanzas */}
-        <FinanceTabsContentDashboard
-          year={yearFinance}
-          setYear={setYearFinance}
-          annualSummaryFinance={annualSummaryFinance}
-        />
+        {loading.finance ? (
+          <FinanceSkeleton />
+        ) : (
+          <FinanceTabsContentDashboard year={year} setYear={setYear} annualSummaryFinance={data.annualSummaryFinance} />
+        )}
 
         {/* Pestaña de Procedencia */}
-        <OriginCustomerTabsContentDashboard
-          year={yearOrigin}
-          setYear={setYearOrigin}
-          customerOriginSummary={customerOriginSummary}
-          monthlyCustomerOrigin={monthlyCustomerOrigin}
-          top10CountriesCustomers={top10CountriesCustomers}
-          top10ProvincesCustomers={top10ProvincesCustomers}
-        />
+        {loading.origin ? (
+          <OriginCustomerSkeleton />
+        ) : (
+          <OriginCustomerTabsContentDashboard
+            year={year}
+            setYear={setYear}
+            customerOriginSummary={data.customerOriginSummary}
+            monthlyCustomerOrigin={data.monthlyCustomerOrigin}
+            top10CountriesCustomers={data.top10CountriesCustomers}
+            top10ProvincesCustomers={data.top10ProvincesCustomers}
+          />
+        )}
       </Tabs>
     </div>
   );
