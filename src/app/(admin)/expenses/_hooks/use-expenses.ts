@@ -2,12 +2,10 @@ import { toast } from "sonner";
 
 import { runAndHandleError } from "@/utils/baseQuery";
 import {
-  PaginatedExpenseParams,
   useCreateExpenseMutation,
   useDeleteExpensesMutation,
   useGetAllExpensesQuery,
   useGetExpenseByIdQuery,
-  useGetExpensesByDateQuery,
   useUpdateExpenseMutation,
 } from "../_services/expensesApi";
 import { CreateHotelExpenseDto, DeleteHotelExpenseDto, UpdateHotelExpenseDto } from "../_types/expenses";
@@ -134,38 +132,5 @@ export const useExpenses = () => {
     isLoadingUpdateExpense,
     isSuccessDeleteExpenses,
     isLoadingDeleteExpenses,
-  };
-};
-
-interface UsePaginatedExpensesProps {
-  page?: number;
-  pageSize?: number;
-  year?: string;
-  month?: string;
-}
-
-export const usePaginatedExpenses = (options: UsePaginatedExpensesProps = {}) => {
-  const { page = 1, pageSize = 10, year, month } = options;
-
-  // Construimos los parámetros de paginación sin incluir year/month en fieldFilters
-  const paginationParams: PaginatedExpenseParams = {
-    pagination: { page, pageSize },
-    // No incluimos year/month en fieldFilters ya que no son campos de HotelExpense
-    year,
-    month,
-  };
-
-  const {
-    data: paginatedExpenses,
-    isLoading: isLoadingPaginatedExpenses,
-    refetch: refetchPaginatedExpenses,
-  } = useGetExpensesByDateQuery(paginationParams, {
-    refetchOnMountOrArgChange: true,
-  });
-
-  return {
-    paginatedExpenses,
-    isLoadingPaginatedExpenses,
-    refetchPaginatedExpenses,
   };
 };

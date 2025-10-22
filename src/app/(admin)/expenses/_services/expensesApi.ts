@@ -2,6 +2,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 
 import { PaginatedResponse } from "@/types/api/paginated-response";
 import { BaseApiResponse } from "@/types/api/types";
+import { AdvancedPaginationParams } from "@/types/query-filters/advanced-pagination";
 import { PaginatedQueryParams } from "@/types/query-filters/generic-paginated-query-params";
 import baseQueryWithReauth from "@/utils/baseQuery";
 import { CreateHotelExpenseDto, DeleteHotelExpenseDto, HotelExpense, UpdateHotelExpenseDto } from "../_types/expenses";
@@ -42,19 +43,68 @@ export const expensesApi = createApi({
       providesTags: (result, error, id) => [{ type: "Expense", id }],
     }),
 
-    // Obtener gastos por fecha
-    getExpensesByDate: build.query<PaginatedResponse<HotelExpense>, PaginatedExpenseParams>({
-      query: ({ pagination: { page = 1, pageSize = 10 }, year, month }) => ({
-        url: "/expenses/filter/date",
-        method: "GET",
-        params: {
-          page,
-          pageSize,
-          ...(year ? { year } : {}),
-          ...(month ? { month } : {}),
-        },
-        credentials: "include",
-      }),
+    // Obtener gastos por fecha (mejorado con paginación avanzada)
+    getExpensesByDate: build.query<
+      PaginatedResponse<HotelExpense>,
+      PaginatedExpenseParams | (AdvancedPaginationParams & { year?: string; month?: string })
+    >({
+      query: (params) => {
+        // Detectar si es el formato nuevo (AdvancedPaginationParams) o el formato viejo (PaginatedExpenseParams)
+        const isAdvancedFormat = "filters" in params && "sort" in params;
+
+        if (isAdvancedFormat) {
+          // Formato avanzado
+          const { pagination, filters, sort, year, month } = params as AdvancedPaginationParams & {
+            year?: string;
+            month?: string;
+          };
+          return {
+            url: "/expenses/filter/date",
+            method: "GET",
+            params: {
+              page: pagination.page,
+              pageSize: pagination.pageSize,
+              ...(year && { year }),
+              ...(month && { month }),
+              ...(filters?.search && { search: filters.search }),
+              ...(filters?.category && {
+                category: Array.isArray(filters.category) ? filters.category.join(",") : filters.category,
+              }),
+              ...(filters?.paymentMethod && {
+                paymentMethod: Array.isArray(filters.paymentMethod)
+                  ? filters.paymentMethod.join(",")
+                  : filters.paymentMethod,
+              }),
+              ...(filters?.documentType && {
+                documentType: Array.isArray(filters.documentType)
+                  ? filters.documentType.join(",")
+                  : filters.documentType,
+              }),
+              ...(sort?.sortBy && { sortBy: sort.sortBy }),
+              ...(sort?.sortOrder && { sortOrder: sort.sortOrder }),
+            },
+            credentials: "include",
+          };
+        } else {
+          // Formato original (compatibilidad hacia atrás)
+          const {
+            pagination: { page = 1, pageSize = 10 },
+            year,
+            month,
+          } = params as PaginatedExpenseParams;
+          return {
+            url: "/expenses/filter/date",
+            method: "GET",
+            params: {
+              page,
+              pageSize,
+              ...(year ? { year } : {}),
+              ...(month ? { month } : {}),
+            },
+            credentials: "include",
+          };
+        }
+      },
       providesTags: (result) => [
         { type: "Expense", id: result?.meta?.page },
         ...(result?.data?.map(({ id }) => ({ type: "Expense" as const, id })) ?? []),
