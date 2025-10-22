@@ -6,4 +6,6 @@ export type FacetedFilter<TValue> = {
     value: TValue;
     icon?: React.ComponentType<{ className?: string }>;
   }[];
+  externalFilterValue?: TValue[] | TValue;
+  onFilterChange?: (value: TValue[] | TValue | undefined) => void;
 };

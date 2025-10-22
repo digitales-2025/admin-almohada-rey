@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { Table } from "@tanstack/react-table";
 import { X } from "lucide-react";
 
@@ -11,7 +12,12 @@ interface DataTableToolbarProps<TData, TValue> {
   table: Table<TData>;
   toolbarActions?: React.ReactNode | ((table: Table<TData>) => React.ReactNode);
   filterPlaceholder?: string;
-  facetedFilters?: FacetedFilter<TValue>[];
+  facetedFilters?: (FacetedFilter<TValue> & {
+    externalFilterValue?: TValue[] | TValue;
+    onFilterChange?: (value: TValue[] | TValue | undefined) => void;
+  })[];
+  onGlobalFilterChange?: (filter: string) => void;
+  externalGlobalFilter?: string;
 }
 
 export function DataTableToolbar<TData, TValue>({
@@ -19,18 +25,45 @@ export function DataTableToolbar<TData, TValue>({
   toolbarActions,
   filterPlaceholder = "Filter...",
   facetedFilters = [],
+  onGlobalFilterChange,
+  externalGlobalFilter,
 }: DataTableToolbarProps<TData, TValue>) {
-  const isFiltered = table.getState().columnFilters.length > 0 || table.getState().globalFilter !== "";
+  const isFiltered =
+    table.getState().columnFilters.length > 0 ||
+    (externalGlobalFilter !== undefined ? externalGlobalFilter !== "" : table.getState().globalFilter !== "");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Función para manejar el cambio del input sin perder el foco
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+
+    // Si hay un callback externo, usarlo; sino usar table.setGlobalFilter
+    if (onGlobalFilterChange) {
+      onGlobalFilterChange(value);
+    } else {
+      table.setGlobalFilter(value);
+    }
+
+    // Mantener el foco en el input
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  };
 
   return (
     <div className="flex flex-col sm:flex-row gap-2">
       <div className="flex flex-1 flex-col-reverse items-start gap-y-2 sm:flex-row sm:items-center sm:space-x-2">
         <Input
+          ref={searchInputRef}
           type="search"
           placeholder={filterPlaceholder}
-          value={table.getState().globalFilter ?? ""}
-          onChange={(event) => table.setGlobalFilter(event.target.value)}
+          value={externalGlobalFilter !== undefined ? externalGlobalFilter : (table.getState().globalFilter ?? "")}
+          onChange={handleSearchChange}
           className="h-8 w-[150px] lg:w-[250px]"
+          autoComplete="off"
+          style={{
+            transition: "none", // Eliminar transiciones que puedan causar lag
+          }}
         />
         <div className="flex flex-wrap items-center gap-2">
           {facetedFilters.map((filter) => {
@@ -39,9 +72,11 @@ export function DataTableToolbar<TData, TValue>({
               column && (
                 <DataTableFacetedFilter
                   key={filter.column}
-                  column={column}
+                  column={column as any}
                   title={filter.title}
                   options={filter.options}
+                  externalFilterValue={filter.externalFilterValue}
+                  onFilterChange={filter.onFilterChange}
                 />
               )
             );
@@ -52,6 +87,9 @@ export function DataTableToolbar<TData, TValue>({
             variant="ghost"
             onClick={() => {
               table.resetColumnFilters();
+              if (onGlobalFilterChange) {
+                onGlobalFilterChange("");
+              }
               table.setGlobalFilter("");
             }}
             className="h-8 px-2 lg:px-3"
