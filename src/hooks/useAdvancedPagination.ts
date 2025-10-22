@@ -48,7 +48,7 @@ export function useAdvancedPagination({
         debouncedSearch(search);
       },
 
-      setFilter: (key: string, value: string | undefined) => {
+      setFilter: (key: string, value: string | string[] | undefined) => {
         setFiltersState((prev) => ({
           ...prev,
           filters: {

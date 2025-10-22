@@ -3,8 +3,8 @@ import { PaginationParams } from "../api/paginated-response";
 // Tipos para filtros avanzados
 export interface AdvancedFilters {
   search?: string;
-  isActive?: string; // Array booleano: "true,false"
-  [key: string]: string | undefined; // Para filtros específicos de cada módulo
+  isActive?: string | string[]; // Array booleano: "true,false" o ["true", "false"]
+  [key: string]: string | string[] | undefined; // Para filtros específicos de cada módulo
 }
 
 // Parámetros de ordenamiento
@@ -51,7 +51,7 @@ export interface FiltersState {
 // Acciones para actualizar filtros
 export interface FiltersActions {
   setSearch: (search: string) => void;
-  setFilter: (key: string, value: string | undefined) => void;
+  setFilter: (key: string, value: string | string[] | undefined) => void;
   setSort: (sort: SortParams) => void;
   setPagination: (pagination: PaginationParams) => void;
   resetFilters: () => void;
