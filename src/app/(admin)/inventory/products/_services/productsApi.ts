@@ -61,7 +61,7 @@ export const productsApi = createApi({
         // Detectar si es formato avanzado o formato original
         if ("filters" in params && "sort" in params) {
           // Formato avanzado
-          const { pagination, filters, sort, search, type } = params as AdvancedPaginationParams & {
+          const { pagination, filters, sort, type } = params as AdvancedPaginationParams & {
             type?: ProductType;
           };
           const queryParams: Record<string, any> = {
@@ -70,16 +70,16 @@ export const productsApi = createApi({
           };
 
           // Añadir búsqueda si existe
-          if (search) {
-            queryParams.search = search;
+          if (filters?.search) {
+            queryParams.search = filters.search;
           }
 
           // Añadir filtros
-          if (filters.isActive) {
+          if (filters?.isActive) {
             queryParams.isActive = Array.isArray(filters.isActive) ? filters.isActive.join(",") : filters.isActive;
           }
 
-          if (filters.type) {
+          if (filters?.type) {
             queryParams.type = Array.isArray(filters.type) ? filters.type.join(",") : filters.type;
           }
 
@@ -89,10 +89,10 @@ export const productsApi = createApi({
           }
 
           // Añadir ordenamiento
-          if (sort.sortBy) {
+          if (sort?.sortBy) {
             queryParams.sortBy = sort.sortBy;
           }
-          if (sort.sortOrder) {
+          if (sort?.sortOrder) {
             queryParams.sortOrder = sort.sortOrder;
           }
 
