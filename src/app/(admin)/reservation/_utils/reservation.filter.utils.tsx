@@ -28,28 +28,28 @@ const ReservationStatusIcons = Object.fromEntries(
 
 export const facetedFilters = [
   {
-    column: "isActive",
+    column: "isActive", // ID real de la columna en ReservationTableColumns
     title: "Estado",
     options: [
       {
         label: "Activo",
-        value: true,
+        value: "true", // Para isActive = true
         icon: ActiveIcon,
       },
       {
         label: "Archivado",
-        value: false,
+        value: "false", // Para isActive = false
         icon: InactiveIcon,
       },
       {
         label: "Pago por anular",
-        value: "payment_to_delete",
+        value: "payment_to_delete", // Caso especial para isPendingDeletePayment
         icon: PaymentToDeleteIcon,
       },
     ],
   },
   {
-    column: "E. Reserva",
+    column: "E. Reserva", // ID real de la columna en ReservationTableColumns
     title: "Status de Reserva",
     options: Object.entries(reservationStatusConfig).map(([reservationStatus, config]) => ({
       label: config.name,

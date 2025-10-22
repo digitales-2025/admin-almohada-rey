@@ -118,13 +118,17 @@ export function useAdvancedPagination({
     [filtersState]
   );
 
-  // Mapeo de columnas (constante)
+  // Mapeo de columnas (constante) - se puede sobrescribir por módulo
   const columnToBackendMapping = useMemo(
     () => ({
       estado: "isActive",
       "e. civil": "maritalStatus",
       tipo: "documentType",
       isBlacklist: "isBlacklist",
+      isActive: "isActive", // Para reservations - ID real de la columna
+      "E. Reserva": "status", // Para reservations - ID real de la columna
+      // Caso especial para "payment_to_delete" que mapea a isPendingDeletePayment
+      payment_to_delete: "isPendingDeletePayment",
     }),
     []
   );
