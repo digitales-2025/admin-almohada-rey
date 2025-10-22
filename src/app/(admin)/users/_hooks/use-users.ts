@@ -6,11 +6,9 @@ import { translateError } from "@/utils/translateError";
 import { CreateUsersSchema, UpdateUsersSchema } from "../_schema/createUsersSchema";
 import { SendNewPasswordSchema } from "../_schema/sendNewPasswordSchema";
 import {
-  PaginatedUserParams,
   useCreateUserMutation,
   useDeleteUsersMutation,
   useGeneratePasswordMutation,
-  useGetPaginatedUsersQuery,
   useGetUsersQuery,
   useReactivateUsersMutation,
   useSendNewPasswordMutation,
@@ -158,33 +156,5 @@ export const useUsers = () => {
     isSuccessSendNewPassword,
     isLoadingSendNewPasswrod,
     dataSendNewPassword,
-  };
-};
-
-interface UsePaginatedUsersProps {
-  page?: number;
-  pageSize?: number;
-}
-
-export const usePaginatedUsers = (options: UsePaginatedUsersProps = {}) => {
-  const { page = 1, pageSize = 10 } = options;
-
-  const paginationParams: PaginatedUserParams = {
-    pagination: { page, pageSize },
-  };
-
-  const {
-    data: paginatedUsers,
-    isLoading: isLoadingPaginatedUsers,
-    refetch: refetchPaginatedUsers,
-  } = useGetPaginatedUsersQuery(paginationParams, {
-    skip: !paginationParams,
-    refetchOnMountOrArgChange: true,
-  });
-
-  return {
-    paginatedUsers,
-    isLoadingPaginatedUsers,
-    refetchPaginatedUsers,
   };
 };

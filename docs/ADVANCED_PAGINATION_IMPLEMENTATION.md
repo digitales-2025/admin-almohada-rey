@@ -374,7 +374,83 @@ const columnToBackendMapping = {
 5. **Filtros facetados** → Se sincronizan con `externalFilterValue`
 6. **Paginación** → Se maneja con `serverPagination`
 
-## 9. Checklist de Implementación
+## 9. Errores Comunes y Soluciones
+
+### 9.1 Faceted Filters No Muestran Selecciones Visualmente
+
+**Síntomas:**
+- Los faceted filters no muestran checkmarks cuando se seleccionan
+- Los filtros funcionan en el backend pero no se ven visualmente
+- `getFilterValueByColumn` retorna `undefined` aunque el estado tenga valores
+
+**Causa:**
+El hook genérico `useAdvancedPagination` no siempre maneja correctamente el mapeo de columnas para todos los módulos.
+
+**Solución:**
+En el hook específico del módulo, sobrescribir `getFilterValueByColumn` para acceder directamente al estado:
+
+```typescript
+// ❌ INCORRECTO - Usar la función del hook genérico
+getFilterValueByColumn: getFilterValueByColumn,
+
+// ✅ CORRECTO - Acceso directo al estado
+getFilterValueByColumn: (columnId: string) => {
+  return filtersState.filters[columnId];
+},
+```
+
+**Implementación completa:**
+```typescript
+// Acciones personalizadas de tabla
+const customTableActions = useMemo(() => {
+  if (!tableActions) return undefined;
+  return {
+    ...tableActions,
+    setColumnFilters: (filters: Array<{ id: string; value: any }>) => {
+      if (filters.length === 0) {
+        filtersActions.setFilter("estado", undefined);
+        return;
+      }
+      filters.forEach((filter) => {
+        filtersActions.setFilter(filter.id, filter.value);
+      });
+    },
+  };
+}, [tableActions, filtersActions]);
+
+return {
+  // ... otros valores
+  tableActions: customTableActions,
+  getFilterValueByColumn: (columnId: string) => {
+    return filtersState.filters[columnId];
+  },
+};
+```
+
+### 9.2 DataTable No Conecta Callbacks Correctamente
+
+**Síntomas:**
+- Los faceted filters no responden al click
+- `setColumnFilters` nunca se llama
+- Los filtros no se aplican
+
+**Causa:**
+Faltan los callbacks `onColumnFiltersChange` en el componente DataTable.
+
+**Solución:**
+Asegurar que el componente de tabla pase todos los callbacks necesarios:
+
+```typescript
+<DataTable
+  // ... otras props
+  onSortingChange={tableActions?.setSorting}
+  onColumnFiltersChange={tableActions?.setColumnFilters} // ← CRÍTICO
+  onPaginationChange={tableActions?.setPagination}
+  onGlobalFilterChange={tableActions?.setGlobalFilter}
+/>
+```
+
+## 10. Checklist de Implementación
 
 ### Backend:
 - [ ] Interfaces en `base.repository.interfaces.ts`
@@ -385,15 +461,18 @@ const columnToBackendMapping = {
 
 ### Frontend:
 - [ ] Hook genérico `useAdvancedPagination`
-- [ ] Hook específico del módulo
+- [ ] Hook específico del módulo con `customTableActions`
+- [ ] `getFilterValueByColumn` sobrescrito para acceso directo al estado
 - [ ] Filtros facetados en `[module].filter.utils.tsx`
 - [ ] Columnas con `id` y `accessorKey` correctos
 - [ ] Página que usa el hook específico
 - [ ] Tabla que pasa `localSearch` y `externalFilters`
+- [ ] **CRÍTICO:** Todos los callbacks pasados al DataTable (`onColumnFiltersChange`, etc.)
 
 ### Testing:
 - [ ] Input de búsqueda fluido
-- [ ] Filtros facetados muestran selecciones
+- [ ] Filtros facetados muestran selecciones visualmente
 - [ ] Una sola petición por búsqueda
 - [ ] Paginación funciona correctamente
 - [ ] Sorting funciona correctamente
+- [ ] "Limpiar filtros" funciona correctamente

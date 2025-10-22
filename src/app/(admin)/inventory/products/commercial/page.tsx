@@ -1,30 +1,28 @@
 "use client";
 
-import { useCallback, useState } from "react";
-
 import { HeaderPage } from "@/components/common/HeaderPage";
 import { DataTableSkeleton } from "@/components/datatable/data-table-skeleton";
 import ErrorGeneral from "@/components/errors/general-error";
 import { ProductsTable } from "../_components/table/ProductsTable";
-import { usePaginatedProducts } from "../_hooks/use-products";
+import { useAdvancedProducts } from "../_hooks/useAdvancedProducts";
 import { ProductType } from "../_types/products";
 
 export default function CommercialProductsPage() {
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-
-  const { paginatedProducts, isLoadingPaginatedProducts } = usePaginatedProducts({
-    page,
-    pageSize,
+  const {
+    data: productsData,
+    meta: productsMeta,
+    isLoading,
+    tableState,
+    tableActions,
+    filtersState,
+    getFilterValueByColumn,
+    localSearch,
+  } = useAdvancedProducts({
     type: ProductType.COMMERCIAL,
+    initialPagination: { page: 1, pageSize: 10 },
   });
 
-  const handlePaginationChange = useCallback((newPage: number, newPageSize: number) => {
-    setPage(newPage);
-    setPageSize(newPageSize);
-  }, []);
-
-  if (isLoadingPaginatedProducts) {
+  if (isLoading) {
     return (
       <div>
         <HeaderPage
@@ -37,7 +35,7 @@ export default function CommercialProductsPage() {
     );
   }
 
-  if (!paginatedProducts) {
+  if (!productsData) {
     return (
       <div>
         <HeaderPage
@@ -59,14 +57,13 @@ export default function CommercialProductsPage() {
       />
       <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0">
         <ProductsTable
-          data={paginatedProducts.data}
-          pagination={{
-            page: paginatedProducts.meta.page,
-            pageSize: paginatedProducts.meta.pageSize,
-            total: paginatedProducts.meta.total,
-            totalPages: paginatedProducts.meta.totalPages,
-          }}
-          onPaginationChange={handlePaginationChange}
+          data={productsData as any}
+          meta={productsMeta || { total: 0, page: 1, pageSize: 10, totalPages: 0 }}
+          tableState={tableState}
+          tableActions={tableActions}
+          filtersState={filtersState}
+          getFilterValueByColumn={getFilterValueByColumn}
+          localSearch={localSearch}
         />
       </div>
     </div>

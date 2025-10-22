@@ -18,12 +18,12 @@ export const facetedFilters = [
     options: [
       {
         label: "Activo",
-        value: true,
+        value: "true",
         icon: ActiveIcon,
       },
       {
         label: "Inactivo",
-        value: false,
+        value: "false",
         icon: InactiveIcon,
       },
     ],
