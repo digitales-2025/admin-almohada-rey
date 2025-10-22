@@ -15,11 +15,11 @@ const PaymentStatusIcons = Object.fromEntries(
 export const facetedFilters = [
   {
     // Filtro para el estado de pago
-    column: "estado",
+    column: "estado", // ID de la columna (no el título)
     title: "Estado de Pago",
     options: Object.entries(PaymentStatusLabels).map(([paymentStatus, config]) => ({
       label: config.label,
-      value: paymentStatus,
+      value: paymentStatus, // Mantener como string (no necesita conversión)
       icon: PaymentStatusIcons[paymentStatus],
     })),
   },

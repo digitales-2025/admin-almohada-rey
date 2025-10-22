@@ -1,6 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 import { PaginatedResponse } from "@/types/api/paginated-response";
+import { AdvancedPaginationParams } from "@/types/query-filters/advanced-pagination";
 import { PaginatedQueryParams } from "@/types/query-filters/generic-paginated-query-params";
 import baseQueryWithReauth from "@/utils/baseQuery";
 import { Payment, PaymentDetail, PaymentDetailMethod, RoomPaymentDetails, SummaryPayment } from "../_types/payment";
@@ -121,6 +122,30 @@ export const paymentsApi = createApi({
       ],
     }),
 
+    // Nuevo endpoint con paginación avanzada
+    getAdvancedPaginatedPayments: build.query<PaginatedResponse<SummaryPayment>, AdvancedPaginationParams>({
+      query: ({ pagination, filters, sort }) => ({
+        url: "/payments/paginated/all",
+        method: "GET",
+        params: {
+          page: pagination.page,
+          pageSize: pagination.pageSize,
+          ...(filters?.search && { search: filters.search }),
+          ...(filters?.status && {
+            status: Array.isArray(filters.status) ? filters.status.join(",") : filters.status,
+          }),
+          ...(filters?.reservationId && { reservationId: filters.reservationId }),
+          ...(sort?.sortBy && { sortBy: sort.sortBy }),
+          ...(sort?.sortOrder && { sortOrder: sort.sortOrder }),
+        },
+        credentials: "include",
+      }),
+      providesTags: (result) => [
+        { type: "Payment", id: result?.meta.page },
+        ...(result?.data.map(({ id }) => ({ type: "Payment" as const, id })) ?? []),
+      ],
+    }),
+
     //Eliminar detalle de pago
     removePaymentDetail: build.mutation<{ message: string }, string>({
       query: (id) => ({
@@ -142,6 +167,7 @@ export const {
   useGetPaymentByIdQuery,
   useGetAllPaymentsQuery,
   useGetPaginatedPaymentsQuery,
+  useGetAdvancedPaginatedPaymentsQuery,
   useGetRoomPaymentDetailsQuery,
   useRemovePaymentDetailMutation,
 } = paymentsApi;
