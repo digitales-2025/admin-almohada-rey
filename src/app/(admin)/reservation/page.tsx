@@ -2,64 +2,48 @@
 
 import { useCallback, useState } from "react";
 import { FilterX } from "lucide-react";
-import { toast } from "sonner";
 
 import { HeaderPage } from "@/components/common/HeaderPage";
 import ErrorGeneral from "@/components/errors/general-error";
 import { Button } from "@/components/ui/button";
 import { FilterReservationDialog } from "./_components/filter/FilterReservationDialog";
 import { ReservationTable } from "./_components/table/ReservationTable";
-import { defaultParamConfig, usePaginatedReservation } from "./_hooks/use-reservation";
-import { PaginatedReservationParams } from "./_services/reservationApi";
+import { useAdvancedReservations } from "./_hooks/useAdvancedReservations";
 import { METADATA } from "./_statics/metadata";
 import Loading from "./loading";
 
 export default function ReservationPage() {
-  //This will be used to communicate page to the the pagination config
-  const [currentFilterConfig, setCurrentFilterConfig] = useState<PaginatedReservationParams>(defaultParamConfig);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
-  const { queryResponse, updateFilters } = usePaginatedReservation();
+  // Usar el hook avanzado
+  const {
+    data: reservationsData,
+    meta: reservationsMeta,
+    isLoading,
+    error,
+    refetch,
+    tableState,
+    tableActions,
+    filtersState,
+    filtersActions,
+    getFilterValueByColumn,
+    localSearch,
+    updateFilters,
+  } = useAdvancedReservations({
+    initialPagination: { page, pageSize },
+  });
 
-  const { data: response, isLoading, isError, isSuccess } = queryResponse;
-
-  const onSubmitFilter = useCallback(
-    (filter?: PaginatedReservationParams) => {
-      const localFilter = filter ?? defaultParamConfig;
-      setCurrentFilterConfig(localFilter);
-      updateFilters(localFilter);
-      if (isError) {
-        toast.error("Error al filtrar reservaciones");
-      }
-      if (response && isSuccess) {
-        toast.success("Reservaciones filtradas correctamente");
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [updateFilters]
-  );
-
-  // Manejar cambios de paginación
-  const handlePaginationChange = useCallback(
-    (page: number, pageSize: number) => {
-      const newFilter: PaginatedReservationParams = {
-        ...currentFilterConfig,
-        pagination: {
-          ...currentFilterConfig.pagination,
-          page,
-          pageSize,
-        },
-      };
-      setCurrentFilterConfig(newFilter);
-      updateFilters(newFilter);
-    },
-    [currentFilterConfig, updateFilters]
-  );
+  const handlePaginationChange = useCallback((newPage: number, newPageSize: number) => {
+    setPage(newPage);
+    setPageSize(newPageSize);
+  }, []);
 
   if (isLoading) {
     return <Loading></Loading>;
   }
 
-  if (!response) {
+  if (error) {
     return (
       <div>
         <HeaderPage title={METADATA.entityName} description={METADATA.description} />
@@ -68,32 +52,52 @@ export default function ReservationPage() {
     );
   }
 
+  // Pasar directamente el hook response
+  const paginatedHookResponse = {
+    data: reservationsData,
+    meta: reservationsMeta,
+    isLoading,
+    error,
+    refetch,
+    updateFilters,
+    // Incluir todas las propiedades que retorna useAdvancedReservations
+    filtersState,
+    filtersActions,
+    tableState,
+    tableActions,
+    getFilterValueByColumn,
+    localSearch,
+    reservations: reservationsData,
+    reservationsMeta,
+    isReservationsLoading: isLoading,
+    reservationsError: error,
+  };
+
   return (
     <div>
       <HeaderPage title={METADATA.entityPluralName} description={METADATA.description} />
       <div className="flex flex-col items-start space-x-2 space-y-2 py-2 sm:flex-row sm:space-x-1 lg:space-y-0">
-        <FilterReservationDialog
-          paginatedHookResponse={{
-            queryResponse,
-            updateFilters,
-          }}
-          onSaveFilter={(filters) => onSubmitFilter(filters)}
-        ></FilterReservationDialog>
-        <Button onClick={() => onSubmitFilter()} variant="outline" size="sm" className="flex items-center space-x-1">
+        <FilterReservationDialog paginatedHookResponse={paginatedHookResponse} />
+        <Button onClick={() => {}} variant="outline" size="sm" className="flex items-center space-x-1">
           <FilterX></FilterX>
           <span>Limpiar Filtros</span>
         </Button>
       </div>
       <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0">
         <ReservationTable
-          data={response.data}
+          data={reservationsData}
           pagination={{
-            page: response.meta.page,
-            pageSize: response.meta.pageSize,
-            total: response.meta.total,
-            totalPages: response.meta.totalPages,
+            page: reservationsMeta?.page || page,
+            pageSize: reservationsMeta?.pageSize || pageSize,
+            total: reservationsMeta?.total || 0,
+            totalPages: reservationsMeta?.totalPages || 0,
           }}
           onPaginationChange={handlePaginationChange}
+          tableState={tableState}
+          tableActions={tableActions}
+          filtersState={filtersState}
+          getFilterValueByColumn={getFilterValueByColumn}
+          localSearch={localSearch}
         />
       </div>
     </div>

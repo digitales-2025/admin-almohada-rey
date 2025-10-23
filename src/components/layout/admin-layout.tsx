@@ -3,7 +3,6 @@ import Cookies from "js-cookie";
 import { SearchProvider } from "@/context/search-context";
 import { ThemeProvider } from "@/context/theme-context";
 import { cn } from "@/lib/utils";
-import SkipToMain from "../skip-to-main";
 import { SidebarProvider } from "../ui/sidebar";
 import { AppSidebar } from "./app-sidebar";
 
@@ -13,7 +12,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <SearchProvider>
         <SidebarProvider defaultOpen={defaultOpen}>
-          <SkipToMain />
           <AppSidebar />
           <div
             id="content"

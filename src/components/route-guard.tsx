@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import { UserRolType } from "@/app/(admin)/users/_types/user";
 import { Unauthorized } from "@/components/errors/unauthorized";
-import { SmallLoading } from "@/components/loading/small-loading";
+import { Loading } from "@/components/loading/small-loading";
 import { useRouteProtection } from "@/hooks/use-route-protection";
 
 interface RouteGuardProps {
@@ -21,19 +23,34 @@ interface RouteGuardProps {
  */
 export function RouteGuard({ children, requiredRoles, fallback, customMessage }: RouteGuardProps) {
   const { isAuthorized, isLoading, userRole } = useRouteProtection();
+  const [showLoading, setShowLoading] = useState(true);
+
+  // Controlar el estado de loading para evitar parpadeos
+  useEffect(() => {
+    if (isLoading) {
+      setShowLoading(true);
+    } else {
+      // Pequeño delay para evitar parpadeos
+      const timer = setTimeout(() => {
+        setShowLoading(false);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading]);
 
   // Mostrar loading mientras se verifica la autorización
-  if (isLoading) {
+  if (isLoading || showLoading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <SmallLoading />
+        <Loading variant="spinner" text="Verificando permisos..." />
       </div>
     );
   }
 
   // Si se especifican roles requeridos, verificar si el usuario los tiene
   if (requiredRoles && requiredRoles.length > 0) {
-    if (!userRole || !requiredRoles.includes(userRole)) {
+    // Solo mostrar unauthorized si no está cargando y no tiene el rol requerido
+    if (!isLoading && (!userRole || !requiredRoles.includes(userRole))) {
       return (
         fallback || (
           <Unauthorized
@@ -43,11 +60,11 @@ export function RouteGuard({ children, requiredRoles, fallback, customMessage }:
         )
       );
     }
-  } else if (!isAuthorized) {
-    // Si no se especifican roles pero la ruta no está autorizada
+  } else if (!isLoading && !isAuthorized) {
+    // Si no se especifican roles pero la ruta no está autorizada (y no está cargando)
     return fallback || <Unauthorized />;
   }
 
-  // Si está autorizado, mostrar el contenido
+  // Si está autorizado o aún está cargando, mostrar el contenido
   return <>{children}</>;
 }

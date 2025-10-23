@@ -1,19 +1,15 @@
-import { ReactElement, useState } from "react";
+import { ReactElement } from "react";
 import { toast } from "sonner";
 
-import { PaginatedResponse, PaginationParams } from "@/types/api/paginated-response";
-import { RTKUseQueryHookResult } from "@/types/hooks/RTKQueryResult";
 import { runAndHandleError } from "@/utils/baseQuery";
 import { processError } from "@/utils/process-error";
 import {
   CreateReservationInput,
-  DetailedReservation,
   ReservationStatus,
   UpdateManyDto,
   UpdateReservationInput,
 } from "../_schemas/reservation.schemas";
 import {
-  PaginatedReservationParams,
   useCreateReservationMutation,
   useDeactivateReservationsMutation,
   useGetAllReasonsQuery,
@@ -173,37 +169,5 @@ export const useReservation = () => {
     deactivateReservationResponse,
     onReactivateReservations,
     reactivateReservationsResponse,
-  };
-};
-
-export type PaginatedReservationHookResponse = {
-  queryResponse: RTKUseQueryHookResult<PaginatedResponse<DetailedReservation>>;
-  updateFilters: (newParams: PaginatedReservationParams) => void;
-};
-
-export const defaultPaginationConfig: PaginationParams = {
-  page: 1,
-  pageSize: 10,
-};
-
-export const defaultParamConfig: PaginatedReservationParams = {
-  pagination: defaultPaginationConfig,
-};
-
-export const usePaginatedReservation: () => PaginatedReservationHookResponse = () => {
-  const [params, setParams] = useState<PaginatedReservationParams | null>(defaultParamConfig);
-
-  const queryResponse = useGetPaginatedReservationsQuery(params ?? defaultParamConfig, {
-    skip: !params,
-    refetchOnMountOrArgChange: true,
-  });
-
-  const updateFilters = (newParams: PaginatedReservationParams) => {
-    setParams(newParams);
-  };
-
-  return {
-    queryResponse,
-    updateFilters,
   };
 };

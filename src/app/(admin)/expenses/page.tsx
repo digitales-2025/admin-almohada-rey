@@ -8,7 +8,7 @@ import ErrorGeneral from "@/components/errors/general-error";
 import { Button } from "@/components/ui/button";
 import { DateFilterRoomCleaning } from "./_components/calendar/calendar-date-picker";
 import { ExpensesTable } from "./_components/table/ExpensesTable";
-import { usePaginatedExpenses } from "./_hooks/use-expenses";
+import { useAdvancedExpenses } from "./_hooks/useAdvancedExpenses";
 
 // Utilidades para la fecha actual
 const today = new Date();
@@ -22,10 +22,19 @@ export default function ExpensesPage() {
   const [selectedYear, setSelectedYear] = useState<string | undefined>(currentYear);
   const [selectedMonth, setSelectedMonth] = useState<string | undefined>(currentMonth);
 
-  // Obtener datos paginados usando el hook
-  const { paginatedExpenses, isLoadingPaginatedExpenses } = usePaginatedExpenses({
-    page,
-    pageSize,
+  // Usar el hook avanzado
+  const {
+    data: expensesData,
+    meta: expensesMeta,
+    isLoading,
+    error,
+    tableState,
+    tableActions,
+    filtersState,
+    getFilterValueByColumn,
+    localSearch,
+  } = useAdvancedExpenses({
+    initialPagination: { page, pageSize },
     year: selectedYear,
     month: selectedMonth,
   });
@@ -44,7 +53,7 @@ export default function ExpensesPage() {
   }, []);
 
   // Loading
-  if (isLoadingPaginatedExpenses) {
+  if (isLoading) {
     return (
       <div>
         <HeaderPage title="Gastos" description="Gastos registrados en el sistema." />
@@ -54,7 +63,7 @@ export default function ExpensesPage() {
   }
 
   // Error
-  if (!paginatedExpenses) {
+  if (error) {
     return (
       <div>
         <HeaderPage title="Gastos" description="Gastos registrados en el sistema." />
@@ -81,14 +90,19 @@ export default function ExpensesPage() {
       </div>
       <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0">
         <ExpensesTable
-          data={paginatedExpenses.data}
+          data={expensesData}
           pagination={{
-            page: paginatedExpenses.meta.page,
-            pageSize: paginatedExpenses.meta.pageSize,
-            total: paginatedExpenses.meta.total,
-            totalPages: paginatedExpenses.meta.totalPages,
+            page: expensesMeta?.page || page,
+            pageSize: expensesMeta?.pageSize || pageSize,
+            total: expensesMeta?.total || 0,
+            totalPages: expensesMeta?.totalPages || 0,
           }}
           onPaginationChange={handlePaginationChange}
+          tableState={tableState}
+          tableActions={tableActions}
+          filtersState={filtersState}
+          getFilterValueByColumn={getFilterValueByColumn}
+          localSearch={localSearch}
         />
       </div>
     </div>

@@ -195,8 +195,8 @@ export const customersColumns = (
     enableColumnFilter: true,
   },
   {
-    id: "estado",
-    accessorKey: "isActive",
+    id: "estado", // ID para el filtro
+    accessorKey: "isActive", // Campo del objeto Customer
     header: ({ column }) => <DataTableColumnHeader column={column} title="Estado" />,
     cell: ({ row }) => (
       <div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { Unauthorized } from "@/components/errors/unauthorized";
-import { SmallLoading } from "@/components/loading/small-loading";
+import { Loading } from "@/components/loading/small-loading";
 import { useRouteProtection } from "@/hooks/use-route-protection";
 
 interface RouteProtectionProps {
@@ -21,7 +21,7 @@ export function RouteProtection({ children, fallback }: RouteProtectionProps) {
   if (isLoading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <SmallLoading />
+        <Loading variant="spinner" text="Verificando acceso..." />
       </div>
     );
   }

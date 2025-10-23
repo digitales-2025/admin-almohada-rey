@@ -1,6 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 import { PaginatedResponse } from "@/types/api/paginated-response";
+import { AdvancedPaginationParams } from "@/types/query-filters/advanced-pagination";
 import { PaginatedQueryParams } from "@/types/query-filters/generic-paginated-query-params";
 import baseQueryWithReauth from "@/utils/baseQuery";
 import { CreateUsersSchema, UpdateUsersSchema } from "../_schema/createUsersSchema";
@@ -74,13 +75,45 @@ export const usersApi = createApi({
       providesTags: ["Users"],
     }),
 
-    getPaginatedUsers: build.query<PaginatedResponse<User>, PaginatedUserParams>({
-      query: ({ pagination: { page = 1, pageSize = 10 } }) => ({
-        url: "/users/paginated",
-        method: "GET",
-        params: { page, pageSize },
-        credentials: "include",
-      }),
+    getPaginatedUsers: build.query<PaginatedResponse<User>, PaginatedUserParams | AdvancedPaginationParams>({
+      query: (params) => {
+        // Detectar si es el formato nuevo (AdvancedPaginationParams) o el formato viejo (PaginatedUserParams)
+        const isAdvancedFormat = "filters" in params && "sort" in params;
+
+        if (isAdvancedFormat) {
+          // Formato avanzado
+          const { pagination, filters, sort } = params as AdvancedPaginationParams;
+          return {
+            url: "/users/paginated",
+            method: "GET",
+            params: {
+              page: pagination.page,
+              pageSize: pagination.pageSize,
+              ...(filters?.search && { search: filters.search }),
+              ...(filters?.isActive && {
+                isActive: Array.isArray(filters.isActive) ? filters.isActive.join(",") : filters.isActive,
+              }),
+              ...(filters?.userRol && {
+                userRol: Array.isArray(filters.userRol) ? filters.userRol.join(",") : filters.userRol,
+              }),
+              ...(sort?.sortBy && { sortBy: sort.sortBy }),
+              ...(sort?.sortOrder && { sortOrder: sort.sortOrder }),
+            },
+            credentials: "include",
+          };
+        } else {
+          // Formato original (compatibilidad hacia atrás)
+          const {
+            pagination: { page = 1, pageSize = 10 },
+          } = params as PaginatedUserParams;
+          return {
+            url: "/users/paginated",
+            method: "GET",
+            params: { page, pageSize },
+            credentials: "include",
+          };
+        }
+      },
       providesTags: (result) => [
         { type: "Users", id: result?.meta.page },
         ...(result?.data.map(({ id }) => ({ type: "Users" as const, id })) ?? []),

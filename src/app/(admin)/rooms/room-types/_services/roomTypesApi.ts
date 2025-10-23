@@ -2,6 +2,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 
 import { PaginatedResponse } from "@/types/api/paginated-response";
 import { BaseApiResponse } from "@/types/api/types";
+import { AdvancedPaginationParams } from "@/types/query-filters/advanced-pagination";
 import { PaginatedQueryParams } from "@/types/query-filters/generic-paginated-query-params";
 import baseQueryWithReauth from "@/utils/baseQuery";
 import {
@@ -41,6 +42,29 @@ export const roomTypeApi = createApi({
         url: "/room-types/paginated",
         method: "GET",
         params: { page, pageSize },
+        credentials: "include",
+      }),
+      providesTags: (result) => [
+        { type: "RoomType", id: result?.meta.page },
+        ...(result?.data.map(({ id }) => ({ type: "RoomType" as const, id })) ?? []),
+      ],
+    }),
+
+    // Nuevo endpoint con paginación avanzada
+    getAdvancedPaginatedRoomTypes: build.query<PaginatedResponse<RoomType>, AdvancedPaginationParams>({
+      query: ({ pagination, filters, sort }) => ({
+        url: "/room-types/paginated",
+        method: "GET",
+        params: {
+          page: pagination.page,
+          pageSize: pagination.pageSize,
+          ...(filters?.search && { search: filters.search }),
+          ...(filters?.isActive && {
+            isActive: Array.isArray(filters.isActive) ? filters.isActive.join(",") : filters.isActive,
+          }),
+          ...(sort?.sortBy && { sortBy: sort.sortBy }),
+          ...(sort?.sortOrder && { sortOrder: sort.sortOrder }),
+        },
         credentials: "include",
       }),
       providesTags: (result) => [
@@ -145,6 +169,7 @@ export const roomTypeApi = createApi({
 export const {
   useGetAllRoomTypesQuery,
   useGetPaginatedRoomTypesQuery,
+  useGetAdvancedPaginatedRoomTypesQuery,
   useGetAllSummaryRoomTypeQuery,
   useGetRoomTypeByIdQuery,
   useGetRoomTypeWithImagesByIdQuery,

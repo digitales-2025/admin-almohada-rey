@@ -7,7 +7,14 @@ import {
   useLazyDownloadProfitReportQuery,
   useLazyDownloadProfitTypeRoomReportQuery,
 } from "../_services/reportsApi";
-import { DownloadReportParams } from "../interfaces/dowloadParams";
+import {
+  DownloadReportParams,
+  DownloadReportTypeRoomParams,
+  isCompareParams,
+  isDateRangeParams,
+  isTypeRoomCompareParams,
+  isTypeRoomDateRangeParams,
+} from "../interfaces/dowloadParams";
 import { ReportType } from "../interfaces/report-type";
 
 // Hook personalizado para descargar reportes de Excel según el tipo
@@ -19,10 +26,43 @@ export function useDownloadReport() {
   const [downloadProfitTypeRoom] = useLazyDownloadProfitTypeRoomReportQuery();
   const [downloadOccupancy] = useLazyDownloadOccupancyReportQuery();
 
+  // Función para generar nombre de archivo basado en los parámetros
+  const generateFilename = (
+    type: ReportType,
+    params: DownloadReportParams | DownloadReportTypeRoomParams,
+    tituloReporte?: string
+  ): string => {
+    const safeTitle = (tituloReporte || type)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // quita acentos
+      .replace(/\s+/g, "_"); // reemplaza espacios por guiones bajos
+
+    // Generar sufijo basado en el tipo de parámetros
+    let suffix = "";
+
+    if (type === "typeRoom") {
+      const typeRoomParams = params as DownloadReportTypeRoomParams;
+      if (isTypeRoomDateRangeParams(typeRoomParams)) {
+        suffix = `${typeRoomParams.startDate}_to_${typeRoomParams.endDate}`;
+      } else if (isTypeRoomCompareParams(typeRoomParams)) {
+        suffix = `compare_${typeRoomParams.year1}_vs_${typeRoomParams.year2}`;
+      }
+    } else {
+      const reportParams = params as DownloadReportParams;
+      if (isDateRangeParams(reportParams)) {
+        suffix = `${reportParams.startDate}_to_${reportParams.endDate}`;
+      } else if (isCompareParams(reportParams)) {
+        suffix = `compare_${reportParams.year1}_vs_${reportParams.year2}`;
+      }
+    }
+
+    return `${safeTitle}_${suffix}.xlsx`;
+  };
+
   // Ahora recibe también el título del reporte
   const onDownloadReport = async (
     type: ReportType,
-    params: DownloadReportParams,
+    params: DownloadReportParams | DownloadReportTypeRoomParams,
     tituloReporte?: string // Nuevo parámetro opcional
   ): Promise<boolean> => {
     const toastId = toast.loading("Descargando reporte...");
@@ -32,31 +72,26 @@ export function useDownloadReport() {
       // Selecciona el endpoint correcto según el tipo de reporte usando switch
       switch (type) {
         case "profit":
-          blob = await downloadProfit(params).unwrap();
+          blob = await downloadProfit(params as DownloadReportParams).unwrap();
           break;
         case "expense":
-          blob = await downloadExpense(params).unwrap();
+          blob = await downloadExpense(params as DownloadReportParams).unwrap();
           break;
         case "balance":
-          blob = await downloadBalance(params).unwrap();
+          blob = await downloadBalance(params as DownloadReportParams).unwrap();
           break;
         case "typeRoom":
-          blob = await downloadProfitTypeRoom(params).unwrap();
+          blob = await downloadProfitTypeRoom(params as DownloadReportTypeRoomParams).unwrap();
           break;
         case "occupancy":
-          blob = await downloadOccupancy(params).unwrap();
+          blob = await downloadOccupancy(params as DownloadReportParams).unwrap();
           break;
         default:
           throw new Error("Tipo de reporte no soportado");
       }
 
-      // Usa el título para el nombre del archivo, quitando espacios y acentos si es necesario
-      const safeTitle = (tituloReporte || type)
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "") // quita acentos
-        .replace(/\s+/g, "_"); // reemplaza espacios por guiones bajos
-
-      const filename = `${safeTitle}_${params.year}_${params.month}.xlsx`;
+      // Generar nombre de archivo apropiado
+      const filename = generateFilename(type, params, tituloReporte);
 
       // Crea un enlace temporal para descargar el archivo
       const url = window.URL.createObjectURL(blob);

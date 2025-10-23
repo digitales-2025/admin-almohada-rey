@@ -20,9 +20,39 @@ interface RoomsTableProps {
   pagination: CustomPaginationTableParams;
   onPaginationChange: ServerPaginationChangeEventCallback;
   refetchPaginatedRooms: () => void;
+  tableState?: {
+    sorting?: Array<{ id: string; desc: boolean }>;
+    columnFilters?: Array<{ id: string; value: any }>;
+    globalFilter?: string;
+    pagination: { pageIndex: number; pageSize: number };
+  };
+  tableActions?: {
+    setSorting: (sorting: Array<{ id: string; desc: boolean }>) => void;
+    setColumnFilters: (filters: Array<{ id: string; value: any }>) => void;
+    setGlobalFilter: (filter: string) => void;
+    setPagination: (pagination: { pageIndex: number; pageSize: number }) => void;
+  };
+  filtersState?: {
+    search: string;
+    filters: Record<string, any>;
+    sort: any;
+    pagination: { page?: number; pageSize?: number };
+  };
+  getFilterValueByColumn?: (columnId: string) => any;
+  localSearch?: string;
 }
 
-export function RoomsTable({ data, pagination, onPaginationChange, refetchPaginatedRooms }: RoomsTableProps) {
+export function RoomsTable({
+  data,
+  pagination,
+  onPaginationChange,
+  refetchPaginatedRooms,
+  tableState,
+  tableActions,
+  filtersState,
+  getFilterValueByColumn,
+  localSearch,
+}: RoomsTableProps) {
   const { user } = useProfile();
 
   const router = useRouter();
@@ -39,6 +69,19 @@ export function RoomsTable({ data, pagination, onPaginationChange, refetchPagina
     [user, handleRoomCleaningLog, refetchPaginatedRooms]
   );
 
+  const serverPagination = {
+    pageIndex: tableState?.pagination.pageIndex ?? pagination.page - 1,
+    pageSize: tableState?.pagination.pageSize ?? pagination.pageSize,
+    pageCount: pagination.totalPages,
+    total: pagination.total,
+    onPaginationChange: (pageIndex: number, pageSize: number) => {
+      if (tableActions) {
+        tableActions.setPagination({ pageIndex, pageSize });
+      }
+      onPaginationChange(pageIndex + 1, pageSize);
+    },
+  };
+
   return (
     <DataTable
       data={data}
@@ -46,16 +89,16 @@ export function RoomsTable({ data, pagination, onPaginationChange, refetchPagina
       toolbarActions={(table: TableInstance<Room>) => <RoomsTableToolbarActions table={table} />}
       filterPlaceholder="Buscar habitaciones..."
       facetedFilters={facetedFilters}
-      serverPagination={{
-        pageIndex: pagination.page - 1,
-        pageSize: pagination.pageSize,
-        pageCount: pagination.totalPages,
-        total: pagination.total,
-        onPaginationChange: (pageIndex, pageSize) => {
-          // Convertir de 0-indexed a 1-indexed para el API
-          onPaginationChange(pageIndex + 1, pageSize);
-        },
-      }}
+      serverPagination={serverPagination}
+      externalGlobalFilter={localSearch}
+      externalFilters={filtersState?.filters}
+      getFilterValueByColumn={getFilterValueByColumn}
+      {...(tableActions && {
+        onSortingChange: tableActions.setSorting,
+        onColumnFiltersChange: tableActions.setColumnFilters,
+        onGlobalFilterChange: tableActions.setGlobalFilter,
+        onPaginationChange: tableActions.setPagination,
+      })}
     />
   );
 }

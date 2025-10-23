@@ -4,6 +4,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { socketService } from "@/services/socketService";
 import { PaginatedResponse } from "@/types/api/paginated-response";
 import { BaseApiResponse } from "@/types/api/types";
+import { AdvancedPaginationParams } from "@/types/query-filters/advanced-pagination";
 import { PaginatedQueryParams } from "@/types/query-filters/generic-paginated-query-params";
 import baseQueryWithReauth from "@/utils/baseQuery";
 import { CreateExtendStay, CreateLateCheckout } from "../_schemas/extension-reservation.schemas";
@@ -135,11 +136,34 @@ export const reservationApi = createApi({
       providesTags: ["Reservation"],
     }),
 
-    getPaginatedReservations: build.query<PaginatedResponse<DetailedReservation>, PaginatedReservationParams>({
-      query: ({ pagination: { page = 1, pageSize = 10 }, fieldFilters }) => ({
+    getPaginatedReservations: build.query<PaginatedResponse<DetailedReservation>, AdvancedPaginationParams>({
+      query: ({ pagination, filters, sort }) => ({
         url: "/reservation/paginated",
         method: "GET",
-        params: { page, pageSize, ...fieldFilters },
+        params: {
+          page: pagination.page,
+          pageSize: pagination.pageSize,
+          ...(filters?.search && { search: filters.search }),
+          ...(filters?.isActive && {
+            isActive: Array.isArray(filters.isActive) ? filters.isActive.join(",") : filters.isActive,
+          }),
+          ...(filters?.isPendingDeletePayment && {
+            isPendingDeletePayment: Array.isArray(filters.isPendingDeletePayment)
+              ? filters.isPendingDeletePayment
+                  .map((value) => (value === "payment_to_delete" ? "true" : value))
+                  .join(",")
+              : filters.isPendingDeletePayment === "payment_to_delete"
+                ? "true"
+                : filters.isPendingDeletePayment,
+          }),
+          ...(filters?.status && { status: Array.isArray(filters.status) ? filters.status.join(",") : filters.status }),
+          // Filtros adicionales del FilterReservationDialog
+          ...(filters?.customerId && { customerId: filters.customerId }),
+          ...(filters?.checkInDate && { checkInDate: filters.checkInDate }),
+          ...(filters?.checkOutDate && { checkOutDate: filters.checkOutDate }),
+          ...(sort?.sortBy && { sortBy: sort.sortBy }),
+          ...(sort?.sortOrder && { sortOrder: sort.sortOrder }),
+        },
         credentials: "include",
       }),
       providesTags: (result) => [

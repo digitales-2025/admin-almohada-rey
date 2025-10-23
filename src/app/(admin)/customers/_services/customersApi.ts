@@ -1,7 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 import { PaginatedResponse } from "@/types/api/paginated-response";
-import { PaginatedQueryParams } from "@/types/query-filters/generic-paginated-query-params";
+import { AdvancedPaginationParams } from "@/types/query-filters/advanced-pagination";
 import baseQueryWithReauth from "@/utils/baseQuery";
 import { ApiCustomer, Customer, HistoryCustomer, ResponseApiCustomer } from "../_types/customer";
 import { ReservationStatus } from "../../reservation/_schemas/reservation.schemas";
@@ -29,7 +29,7 @@ interface ImportCustomersResponse {
   };
 }
 
-export type PaginateCustomerParams = PaginatedQueryParams<Customer>;
+// Ya no necesitamos este tipo, usamos AdvancedPaginationParams directamente
 
 interface ImportCustomersRequest {
   file: File;
@@ -108,13 +108,37 @@ export const customersApi = createApi({
       providesTags: ["Customer"],
     }),
 
-    getPaginatedCustomers: build.query<PaginatedResponse<Customer>, PaginateCustomerParams>({
-      query: ({ pagination: { page = 1, pageSize = 10 } }) => ({
-        url: "/customers/paginated",
-        method: "GET",
-        params: { page, pageSize },
-        credentials: "include",
-      }),
+    getPaginatedCustomers: build.query<PaginatedResponse<Customer>, AdvancedPaginationParams>({
+      query: ({ pagination, filters, sort }) => {
+        const params = new URLSearchParams();
+
+        // Parámetros de paginación
+        params.append("page", String(pagination.page || 1));
+        params.append("pageSize", String(pagination.pageSize || 10));
+
+        // Parámetros de filtros
+        if (filters) {
+          Object.entries(filters).forEach(([key, value]) => {
+            if (value !== undefined && value !== "") {
+              params.append(key, String(value));
+            }
+          });
+        }
+
+        // Parámetros de ordenamiento
+        if (sort?.sortBy) {
+          params.append("sortBy", sort.sortBy);
+        }
+        if (sort?.sortOrder) {
+          params.append("sortOrder", sort.sortOrder);
+        }
+
+        return {
+          url: `/customers/paginated?${params.toString()}`,
+          method: "GET",
+          credentials: "include",
+        };
+      },
       providesTags: (result) => [
         { type: "Customer", id: result?.meta.page },
         ...(result?.data.map(({ id }) => ({ type: "Customer" as const, id })) ?? []),

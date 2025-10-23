@@ -25,28 +25,28 @@ const RoleIcons = Object.fromEntries(
 
 export const facetedFilters = [
   {
-    column: "estado",
+    column: "estado", // ID de la columna (no el título)
     title: "Estado",
     options: [
       {
         label: "Activo",
-        value: true,
+        value: "true", // Mantener como string para compatibilidad
         icon: ActiveIcon,
       },
       {
         label: "Inactivo",
-        value: false,
+        value: "false", // Mantener como string para compatibilidad
         icon: InactiveIcon,
       },
     ],
   },
   // Filtro para roles generado dinámicamente
   {
-    column: "rol",
+    column: "rol", // ID de la columna (no el título)
     title: "Rol",
     options: Object.entries(UserRolTypeLabels).map(([role, config]) => ({
       label: config.label,
-      value: role,
+      value: role, // Mantener como string (no necesita conversión)
       icon: RoleIcons[role],
     })),
   },

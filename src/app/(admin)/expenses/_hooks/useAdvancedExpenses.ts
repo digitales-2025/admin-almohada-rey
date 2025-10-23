@@ -1,0 +1,133 @@
+import { useCallback, useMemo } from "react";
+
+import { useAdvancedPagination } from "@/hooks/useAdvancedPagination";
+import { AdvancedFilters, SortParams } from "@/types/query-filters/advanced-pagination";
+import { useGetExpensesByDateQuery } from "../_services/expensesApi";
+
+interface UseAdvancedExpensesOptions {
+  initialPagination?: { page?: number; pageSize?: number };
+  initialFilters?: AdvancedFilters;
+  initialSort?: SortParams;
+  initialSearch?: string;
+  year?: string;
+  month?: string;
+}
+
+export function useAdvancedExpenses({
+  initialPagination,
+  initialFilters = {},
+  initialSort = {},
+  initialSearch = "",
+  year,
+  month,
+}: UseAdvancedExpensesOptions) {
+  // Mapeo de IDs de columnas a campos del backend (constante)
+  const columnToBackendMapping = useMemo(
+    () => ({
+      categoría: "category",
+      "Método de pago": "paymentMethod",
+      "Tipo de documento": "documentType",
+    }),
+    []
+  );
+
+  // Usar el hook genérico
+  const { filtersState, filtersActions, tableState, tableActions, localSearch } = useAdvancedPagination({
+    initialPagination: {
+      page: initialPagination?.page || 1,
+      pageSize: initialPagination?.pageSize || 10,
+    },
+    initialFilters,
+    initialSort,
+    initialSearch,
+  });
+
+  // Sobrescribir setColumnFilters para mantener los columnId originales
+  const customTableActions = useMemo(() => {
+    if (!tableActions) return undefined;
+
+    return {
+      ...tableActions,
+      setColumnFilters: (filters: Array<{ id: string; value: any }>) => {
+        if (filters.length === 0) {
+          // Limpiar todos los filtros facetados
+          filtersActions.setFilter("categoría", undefined);
+          filtersActions.setFilter("Método de pago", undefined);
+          filtersActions.setFilter("Tipo de documento", undefined);
+          return;
+        }
+
+        // Mapear cada filtro manteniendo el columnId original
+        filters.forEach((filter) => {
+          filtersActions.setFilter(filter.id, filter.value);
+        });
+      },
+    };
+  }, [tableActions, filtersActions]);
+
+  // Transformar filtros de IDs de columnas a campos del backend
+  const transformedFilters = useMemo(() => {
+    const backendFilters: any = {};
+
+    // Mapear cada filtro de columna a campo del backend
+    Object.entries(filtersState.filters).forEach(([columnId, value]) => {
+      const backendField = columnToBackendMapping[columnId as keyof typeof columnToBackendMapping];
+      if (backendField && value !== undefined) {
+        // Para expenses, mantener como array de strings (no necesita conversión)
+        backendFilters[backendField] = value;
+      }
+    });
+
+    // Agregar búsqueda si existe
+    if (filtersState.search) {
+      backendFilters.search = filtersState.search;
+    }
+
+    return backendFilters;
+  }, [filtersState.filters, filtersState.search, columnToBackendMapping]);
+
+  // Query específica para expenses
+  const queryParams = {
+    pagination: {
+      page: filtersState.pagination.page || 1,
+      pageSize: filtersState.pagination.pageSize || 10,
+    },
+    filters: transformedFilters,
+    sort: filtersState.sort,
+    year,
+    month,
+  };
+
+  const { data: queryData, isLoading, error, refetch } = useGetExpensesByDateQuery(queryParams);
+
+  // Función personalizada para obtener el valor del filtro por columna
+  const getFilterValueByColumnExpenses = useCallback(
+    (columnId: string) => {
+      // Buscar directamente por el ID de la columna en los filtros
+      const value = (filtersState.filters as any)[columnId];
+      return value;
+    },
+    [filtersState.filters]
+  );
+
+  // Función para refetch manual
+  const manualRefetch = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
+  return {
+    // Datos
+    data: queryData?.data || [],
+    meta: queryData?.meta,
+    isLoading,
+    error,
+    refetch: manualRefetch,
+    // Estado y acciones para la tabla
+    filtersState,
+    filtersActions,
+    tableState,
+    tableActions: customTableActions,
+    localSearch,
+    getFilterValueByColumn: getFilterValueByColumnExpenses,
+  };
+}
