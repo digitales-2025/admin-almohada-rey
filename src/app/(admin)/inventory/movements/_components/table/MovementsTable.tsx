@@ -18,14 +18,42 @@ interface MovementsTableProps {
   type: MovementsType;
   pagination: CustomPaginationTableParams;
   onPaginationChange: ServerPaginationChangeEventCallback;
+  tableState?: any;
+  tableActions?: any;
+  filtersState?: any;
+  getFilterValueByColumn?: (columnId: string) => any;
+  localSearch?: string;
 }
 
-export function MovementsTable({ data, type, pagination, onPaginationChange }: MovementsTableProps) {
+export function MovementsTable({
+  data,
+  type,
+  pagination,
+  onPaginationChange,
+  tableState,
+  tableActions,
+  filtersState,
+  getFilterValueByColumn,
+  localSearch,
+}: MovementsTableProps) {
   const { user } = useProfile();
 
   const columns = useMemo(() => movementsColumns(user?.isSuperAdmin || false), [user]);
 
   const placeholderText = type === MovementsType.INPUT ? "Buscar ingresos..." : "Buscar salidas...";
+
+  const serverPagination = {
+    pageIndex: tableState?.pagination.pageIndex ?? pagination.page - 1,
+    pageSize: tableState?.pagination.pageSize ?? pagination.pageSize,
+    pageCount: pagination.totalPages,
+    total: pagination.total,
+    onPaginationChange: (pageIndex: number, pageSize: number) => {
+      if (tableActions) {
+        tableActions.setPagination({ pageIndex, pageSize });
+      }
+      onPaginationChange(pageIndex + 1, pageSize);
+    },
+  };
 
   return (
     <DataTable
@@ -34,16 +62,16 @@ export function MovementsTable({ data, type, pagination, onPaginationChange }: M
       toolbarActions={<MovementsTableToolbarActions type={type} />}
       facetedFilters={facetedFilters}
       filterPlaceholder={placeholderText}
-      serverPagination={{
-        pageIndex: pagination.page - 1,
-        pageSize: pagination.pageSize,
-        pageCount: pagination.totalPages,
-        total: pagination.total,
-        onPaginationChange: (pageIndex, pageSize) => {
-          // Convertir de 0-indexed a 1-indexed para el API
-          onPaginationChange(pageIndex + 1, pageSize);
-        },
-      }}
+      serverPagination={serverPagination}
+      externalGlobalFilter={localSearch}
+      externalFilters={filtersState?.filters}
+      getFilterValueByColumn={getFilterValueByColumn}
+      {...(tableActions && {
+        onSortingChange: tableActions.setSorting,
+        onColumnFiltersChange: tableActions.setColumnFilters,
+        onGlobalFilterChange: tableActions.setGlobalFilter,
+        onPaginationChange: tableActions.setPagination,
+      })}
     />
   );
 }
