@@ -20,6 +20,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/health": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["AppController_getHealthCheck"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v1/profile": {
     parameters: {
       query?: never;
@@ -139,7 +155,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get paginated users */
+    /**
+     * Get paginated users with advanced filters
+     * @description Get users with advanced filtering by role, isActive status, and search in user fields
+     */
     get: operations["UsersController_findAllPaginated_v1"];
     put?: never;
     post?: never;
@@ -290,7 +309,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get paginated products */
+    /**
+     * Get paginated products with advanced filters
+     * @description Get products with advanced filtering by type, isActive status, and search in product fields
+     */
     get: operations["ProductController_findAllPaginated_v1"];
     put?: never;
     post?: never;
@@ -651,8 +673,8 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Obtener habitaciones paginadas con información detallada
-     * @description Devuelve una lista paginada de habitaciones con sus tipos e imagen principal
+     * Obtener habitaciones paginadas con filtros avanzados
+     * @description Devuelve una lista paginada de habitaciones con filtros por estado, tipo de piso, estado activo y búsqueda en habitación y tipo de habitación
      */
     get: operations["RoomController_findAllPaginated_v1"];
     put?: never;
@@ -811,8 +833,8 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Obtener tipos de habitaciones paginados con sus imágenes
-     * @description Devuelve una lista paginada de tipos de habitaciones con sus imágenes asociadas
+     * Obtener tipos de habitaciones paginados con filtros avanzados
+     * @description Devuelve una lista paginada de tipos de habitaciones con filtros por estado activo y búsqueda en campos del tipo de habitación
      */
     get: operations["RoomTypeController_findAllPaginated_v1"];
     put?: never;
@@ -1006,7 +1028,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get paginated payments */
+    /**
+     * Get paginated payments with advanced filters
+     * @description Get payments with advanced filtering by status, reservation ID, and search in customer and payment data
+     */
     get: operations["PaymentsController_findAllPaginated_v1"];
     put?: never;
     post?: never;
@@ -1180,8 +1205,11 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get paginated movements by type */
-    get: operations["MovementsController_findByTypePaginated_v1"];
+    /**
+     * Get paginated movements with advanced filters
+     * @description Get movements with advanced filtering by warehouse type, search in movements details and products
+     */
+    get: operations["MovementsController_findAllPaginated_v1"];
     put?: never;
     post?: never;
     delete?: never;
@@ -1214,7 +1242,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get paginated warehouses */
+    /**
+     * Get paginated warehouses with advanced filters
+     * @description Get warehouses with advanced filtering by type and search in stock products. Only super admin can see DEPOSIT warehouses.
+     */
     get: operations["WarehouseController_findAllPaginated_v1"];
     put?: never;
     post?: never;
@@ -1677,7 +1708,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get paginated customers */
+    /** Get paginated customers with advanced search */
     get: operations["CustomersController_findAllPaginated_v1"];
     put?: never;
     post?: never;
@@ -2157,7 +2188,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Obtener gastos por fecha (paginado y filtrado) */
+    /**
+     * Obtener gastos por fecha con filtros avanzados
+     * @description Obtiene gastos paginados con filtros por fecha, categoría, método de pago, tipo de documento y búsqueda
+     */
     get: operations["ExpenseController_findByDate_v1"];
     put?: never;
     post?: never;
@@ -2192,8 +2226,8 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Descargar Excel de profit mensual
-     * @description Genera y descarga un archivo Excel con el profit para un mes y año específicos.
+     * Descargar Excel de profit por rango de fechas o comparación de años
+     * @description Genera y descarga un archivo Excel con el profit. Puede ser por rango de fechas específico o comparación entre dos años.
      */
     get: operations["ReportsController_downloadProfitExcel_v1"];
     put?: never;
@@ -2212,8 +2246,8 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Descargar Excel de expense mensual
-     * @description Genera y descarga un archivo Excel con el expense para un mes y año específicos.
+     * Descargar Excel de expense por rango de fechas o comparación de años
+     * @description Genera y descarga un archivo Excel con el expense. Puede ser por rango de fechas específico o comparación entre dos años.
      */
     get: operations["ReportsController_downloadExpenseExcel_v1"];
     put?: never;
@@ -2232,8 +2266,8 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Descargar Excel de balance mensual
-     * @description Genera y descarga un archivo Excel con el balance para un mes y año específicos.
+     * Descargar Excel de balance por rango de fechas o comparación de años
+     * @description Genera y descarga un archivo Excel con el balance. Puede ser por rango de fechas específico o comparación entre dos años.
      */
     get: operations["ReportsController_downloadBalanceExcel_v1"];
     put?: never;
@@ -2253,7 +2287,7 @@ export interface paths {
     };
     /**
      * Descargar Excel de ganancias por tipo de habitación
-     * @description Genera y descarga un archivo Excel con el profit para un mes, año y tipo de habitación específicos.
+     * @description Genera y descarga un archivo Excel con el profit por tipo de habitación. Puede ser por rango de fechas específico o comparación entre dos años.
      */
     get: operations["ReportsController_downloadProfitTypeRoomExcel_v1"];
     put?: never;
@@ -2273,12 +2307,48 @@ export interface paths {
     };
     /**
      * Descargar Excel de estadísticas de ocupación
-     * @description Genera y descarga un archivo Excel con estadísticas de ocupación por tipo de habitación para un mes y año específicos.
+     * @description Genera y descarga un archivo Excel con estadísticas de ocupación por tipo de habitación. Puede ser por rango de fechas específico o comparación entre dos años.
      */
     get: operations["ReportsController_downloadOccupancyExcel_v1"];
     put?: never;
     post?: never;
     delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/import/excel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["ImportController_importExcel"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/import/cleanup": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Limpiar todos los datos importados
+     * @description Elimina todos los datos creados por la importación de Excel (reservas, pagos, clientes temporales, etc.)
+     */
+    delete: operations["ImportController_cleanupImportedData"];
     options?: never;
     head?: never;
     patch?: never;
@@ -2403,13 +2473,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       updatedAt: string;
       /** @description Customer name */
@@ -2455,6 +2525,27 @@ export interface components {
        * @default false
        */
       createdByLandingPage: boolean;
+      /**
+       * @description Indicates if the customer is blacklisted
+       * @default false
+       */
+      isBlacklist: boolean;
+      /** @description Reason for blacklisting the customer */
+      blacklistReason?: string;
+      /**
+       * Format: date-time
+       * @description Date when the customer was blacklisted
+       */
+      blacklistDate?: string;
+      /** @description ID of the user who blacklisted the customer */
+      blacklistedById?: string;
+      /** @description User who blacklisted the customer */
+      blacklistedBy?: Record<string, never>;
+      /**
+       * @description Indicates if the admin needs to complete missing data
+       * @default false
+       */
+      mustCompleteData: boolean;
     };
     User: {
       /**
@@ -2471,13 +2562,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       updatedAt: string;
       /** @description User name */
@@ -2520,13 +2611,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       updatedAt: string;
       /**
@@ -2584,13 +2675,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       updatedAt: string;
       /**
@@ -2679,13 +2770,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -2878,13 +2969,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -3203,13 +3294,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       updatedAt: string;
       /**
@@ -3736,13 +3827,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       updatedAt: string;
       name: string;
@@ -4235,13 +4326,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       updatedAt: string;
       /**
@@ -4343,13 +4434,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       updatedAt: string;
       /**
@@ -4382,13 +4473,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       updatedAt: string;
       /**
@@ -4451,13 +4542,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-09-04T19:59:54.229Z
+       * @example 2025-10-22T17:27:33.621Z
        */
       updatedAt: string;
       /**
@@ -4790,6 +4881,23 @@ export interface components {
 export type $defs = Record<string, never>;
 export interface operations {
   AppController_getHello: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AppController_getHealthCheck: {
     parameters: {
       query?: never;
       header?: never;
@@ -5217,6 +5325,16 @@ export interface operations {
         page?: number;
         /** @description Number of items per page */
         pageSize?: number;
+        /** @description Search term for user name, email, or phone */
+        search?: string;
+        /** @description Filter by user role (array) */
+        userRol?: string;
+        /** @description Filter by active status (array) */
+        isActive?: string;
+        /** @description Field to sort by */
+        sortBy?: string;
+        /** @description Sort order */
+        sortOrder?: "asc" | "desc";
       };
       header?: never;
       path?: never;
@@ -5586,8 +5704,16 @@ export interface operations {
         page?: number;
         /** @description Number of items per page */
         pageSize?: number;
-        /** @description Product type filter */
-        type?: "COMMERCIAL" | "INTERNAL_USE";
+        /** @description Search term for product name, code, or description */
+        search?: string;
+        /** @description Filter by product type (array) */
+        type?: string;
+        /** @description Filter by active status (array) */
+        isActive?: string;
+        /** @description Field to sort by */
+        sortBy?: string;
+        /** @description Sort order */
+        sortOrder?: "asc" | "desc";
       };
       header?: never;
       path?: never;
@@ -5595,6 +5721,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description Products paginated retrieved successfully */
       200: {
         headers: {
           [name: string]: unknown;
@@ -6154,6 +6281,18 @@ export interface operations {
         checkInDate?: string;
         /** @description Check-out date to filter reservations */
         checkOutDate?: string;
+        /** @description Search term to filter reservations by customer fields (name, email, phone, address, birthPlace, country, department, province, occupation, documentNumber, companyName, ruc, companyAddress, blacklistReason), room fields (number, room type name), and user fields (receptionist name, email) */
+        search?: string;
+        /** @description Filter by active status (true/false). Can pass multiple values comma-separated */
+        isActive?: string;
+        /** @description Filter by pending delete payment status (true/false). Can pass multiple values comma-separated */
+        isPendingDeletePayment?: string;
+        /** @description Filter by reservation status. Can pass multiple values comma-separated */
+        status?: string;
+        /** @description Field to sort by */
+        sortBy?: string;
+        /** @description Sort order (asc/desc) */
+        sortOrder?: string;
       };
       header?: never;
       path?: never;
@@ -6623,6 +6762,18 @@ export interface operations {
         page?: number;
         /** @description Cantidad de elementos por página */
         pageSize?: number;
+        /** @description Término de búsqueda en número de habitación y nombre del tipo de habitación */
+        search?: string;
+        /** @description Filtro por estado activo (array) */
+        isActive?: string;
+        /** @description Filtro por estado de habitación (array) */
+        status?: string;
+        /** @description Filtro por tipo de piso (array) */
+        floorType?: string;
+        /** @description Campo para ordenar */
+        sortBy?: string;
+        /** @description Orden de clasificación */
+        sortOrder?: "asc" | "desc";
       };
       header?: never;
       path?: never;
@@ -6641,10 +6792,11 @@ export interface operations {
               id?: string;
               number?: number;
               /** @enum {string} */
-              status?: "AVAILABLE" | "OCCUPIED" | "CLEANING" | "MAINTENANCE";
+              status?: "AVAILABLE" | "OCCUPIED" | "CLEANING" | "INCOMPLETE";
               tv?: boolean;
               area?: number;
-              floorType?: string;
+              /** @enum {string} */
+              floorType?: "LAMINATING" | "CARPETING";
               isActive?: boolean;
               RoomTypes?: {
                 id?: string;
@@ -7060,6 +7212,14 @@ export interface operations {
         page?: number;
         /** @description Cantidad de elementos por página */
         pageSize?: number;
+        /** @description Término de búsqueda en nombre y descripción del tipo de habitación */
+        search?: string;
+        /** @description Filtro por estado activo (array) */
+        isActive?: string;
+        /** @description Campo para ordenar */
+        sortBy?: string;
+        /** @description Orden de clasificación */
+        sortOrder?: "asc" | "desc";
       };
       header?: never;
       path?: never;
@@ -7553,6 +7713,16 @@ export interface operations {
         page?: number;
         /** @description Number of items per page */
         pageSize?: number;
+        /** @description Search term for customer name, email, phone, document, department, province, country, payment code, or observations */
+        search?: string;
+        /** @description Filter by payment status (array) */
+        status?: string;
+        /** @description Filter by specific reservation ID */
+        reservationId?: string;
+        /** @description Field to sort by */
+        sortBy?: string;
+        /** @description Sort order */
+        sortOrder?: "asc" | "desc";
       };
       header?: never;
       path?: never;
@@ -8138,15 +8308,23 @@ export interface operations {
       };
     };
   };
-  MovementsController_findByTypePaginated_v1: {
+  MovementsController_findAllPaginated_v1: {
     parameters: {
-      query: {
-        /** @description Type of movement (INPUT or OUTPUT) */
-        type: "INPUT" | "OUTPUT";
+      query?: {
         /** @description Page number */
         page?: number;
         /** @description Number of items per page */
         pageSize?: number;
+        /** @description Search term for movements details and products */
+        search?: string;
+        /** @description Filter by warehouse type */
+        warehouseType?: "COMMERCIAL" | "INTERNAL_USE" | "DEPOSIT";
+        /** @description Filter by movement type */
+        type?: "INPUT" | "OUTPUT";
+        /** @description Field to sort by */
+        sortBy?: string;
+        /** @description Sort order */
+        sortOrder?: "asc" | "desc";
       };
       header?: never;
       path?: never;
@@ -8154,7 +8332,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Paginated list of movements by type */
+      /** @description Paginated list of movements with filters applied */
       200: {
         headers: {
           [name: string]: unknown;
@@ -8172,7 +8350,7 @@ export interface operations {
               warehouse?: {
                 id?: string;
                 /** @enum {string} */
-                type?: "CENTRAL" | "LOCAL";
+                type?: "COMMERCIAL" | "INTERNAL_USE" | "DEPOSIT";
               };
               typePurchaseOrder?: string | null;
               documentNumber?: string | null;
@@ -8243,6 +8421,14 @@ export interface operations {
         page?: number;
         /** @description Number of items per page */
         pageSize?: number;
+        /** @description Search term for stock products (name, code) */
+        search?: string;
+        /** @description Filter by warehouse type (array) */
+        type?: string;
+        /** @description Field to sort by */
+        sortBy?: string;
+        /** @description Sort order */
+        sortOrder?: "asc" | "desc";
       };
       header?: never;
       path?: never;
@@ -8260,7 +8446,8 @@ export interface operations {
             data?: {
               id?: string;
               /** @enum {string} */
-              type?: "CENTRAL" | "LOCAL";
+              type?: "COMMERCIAL" | "INTERNAL_USE" | "DEPOSIT";
+              code?: string;
               quantityProducts?: number;
               totalCost?: number;
             }[];
@@ -9378,6 +9565,20 @@ export interface operations {
         page?: number;
         /** @description Number of items per page */
         pageSize?: number;
+        /** @description Search term to filter customers by name, email, phone, address, birthPlace, country, department, province, occupation, documentNumber, companyName, ruc, companyAddress */
+        search?: string;
+        /** @description Filter by active status (true/false). Can pass multiple values comma-separated */
+        isActive?: string;
+        /** @description Filter by document type (DNI, PASSPORT, FOREIGNER_CARD). Can pass multiple values comma-separated */
+        documentType?: string;
+        /** @description Filter by marital status (SINGLE, MARRIED, DIVORCED, WIDOWED). Can pass multiple values comma-separated */
+        maritalStatus?: string;
+        /** @description Filter by blacklist status (true/false). Can pass multiple values comma-separated */
+        isBlacklist?: string;
+        /** @description Field to sort by (name, createdAt, documentNumber, etc.) */
+        sortBy?: string;
+        /** @description Sort order (asc or desc) */
+        sortOrder?: string;
       };
       header?: never;
       path?: never;
@@ -10692,10 +10893,22 @@ export interface operations {
   ExpenseController_findByDate_v1: {
     parameters: {
       query?: {
-        /** @description Mes para filtrar (ejemplo: enero, febrero, etc.) */
+        /** @description Mes para filtrar (ejemplo: 01, 02, etc.) */
         month?: string;
         /** @description Año para filtrar (ejemplo: 2023, 2024, etc.) */
         year?: string;
+        /** @description Término de búsqueda en descripción y número de documento */
+        search?: string;
+        /** @description Filtro por categoría (array) */
+        category?: string;
+        /** @description Filtro por método de pago (array) */
+        paymentMethod?: string;
+        /** @description Filtro por tipo de documento (array) */
+        documentType?: string;
+        /** @description Campo para ordenar */
+        sortBy?: string;
+        /** @description Orden de clasificación */
+        sortOrder?: "asc" | "desc";
         /** @description Número de página */
         page?: number;
         /** @description Cantidad de elementos por página */
@@ -10775,11 +10988,15 @@ export interface operations {
   };
   ReportsController_downloadProfitExcel_v1: {
     parameters: {
-      query: {
-        /** @description Mes numérico (1-12) */
-        month: number;
-        /** @description Año en formato YYYY */
-        year: number;
+      query?: {
+        /** @description Fecha de inicio en formato YYYY-MM-DD (requerido si no se usa year1/year2) */
+        startDate?: string;
+        /** @description Fecha de fin en formato YYYY-MM-DD (requerido si no se usa year1/year2) */
+        endDate?: string;
+        /** @description Primer año a comparar (requerido si no se usa startDate/endDate) */
+        year1?: number;
+        /** @description Segundo año a comparar (requerido si no se usa startDate/endDate) */
+        year2?: number;
       };
       header?: never;
       path?: never;
@@ -10787,7 +11004,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Archivo Excel con el profit mensual */
+      /** @description Archivo Excel con el profit del rango de fechas */
       200: {
         headers: {
           [name: string]: unknown;
@@ -10800,11 +11017,15 @@ export interface operations {
   };
   ReportsController_downloadExpenseExcel_v1: {
     parameters: {
-      query: {
-        /** @description Mes numérico (1-12) */
-        month: number;
-        /** @description Año en formato YYYY */
-        year: number;
+      query?: {
+        /** @description Fecha de inicio en formato YYYY-MM-DD (requerido si no se usa year1/year2) */
+        startDate?: string;
+        /** @description Fecha de fin en formato YYYY-MM-DD (requerido si no se usa year1/year2) */
+        endDate?: string;
+        /** @description Primer año a comparar (requerido si no se usa startDate/endDate) */
+        year1?: number;
+        /** @description Segundo año a comparar (requerido si no se usa startDate/endDate) */
+        year2?: number;
       };
       header?: never;
       path?: never;
@@ -10812,7 +11033,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Archivo Excel con el expense mensual */
+      /** @description Archivo Excel con el expense del rango de fechas */
       200: {
         headers: {
           [name: string]: unknown;
@@ -10825,11 +11046,15 @@ export interface operations {
   };
   ReportsController_downloadBalanceExcel_v1: {
     parameters: {
-      query: {
-        /** @description Mes numérico (1-12) */
-        month: number;
-        /** @description Año en formato YYYY */
-        year: number;
+      query?: {
+        /** @description Fecha de inicio en formato YYYY-MM-DD (requerido si no se usa year1/year2) */
+        startDate?: string;
+        /** @description Fecha de fin en formato YYYY-MM-DD (requerido si no se usa year1/year2) */
+        endDate?: string;
+        /** @description Primer año a comparar (requerido si no se usa startDate/endDate) */
+        year1?: number;
+        /** @description Segundo año a comparar (requerido si no se usa startDate/endDate) */
+        year2?: number;
       };
       header?: never;
       path?: never;
@@ -10837,7 +11062,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Archivo Excel con el balance mensual */
+      /** @description Archivo Excel con el balance del rango de fechas */
       200: {
         headers: {
           [name: string]: unknown;
@@ -10851,12 +11076,16 @@ export interface operations {
   ReportsController_downloadProfitTypeRoomExcel_v1: {
     parameters: {
       query: {
-        /** @description Mes numérico (1-12) */
-        month: number;
-        /** @description Año en formato YYYY */
-        year: number;
         /** @description ID del tipo de habitación */
         typeRoomId: string;
+        /** @description Fecha de inicio en formato YYYY-MM-DD (requerido si no se usa year1/year2) */
+        startDate?: string;
+        /** @description Fecha de fin en formato YYYY-MM-DD (requerido si no se usa year1/year2) */
+        endDate?: string;
+        /** @description Primer año a comparar (requerido si no se usa startDate/endDate) */
+        year1?: number;
+        /** @description Segundo año a comparar (requerido si no se usa startDate/endDate) */
+        year2?: number;
       };
       header?: never;
       path?: never;
@@ -10877,11 +11106,15 @@ export interface operations {
   };
   ReportsController_downloadOccupancyExcel_v1: {
     parameters: {
-      query: {
-        /** @description Mes numérico (1-12) */
-        month: number;
-        /** @description Año en formato YYYY */
-        year: number;
+      query?: {
+        /** @description Fecha de inicio en formato YYYY-MM-DD (requerido si no se usa year1/year2) */
+        startDate?: string;
+        /** @description Fecha de fin en formato YYYY-MM-DD (requerido si no se usa year1/year2) */
+        endDate?: string;
+        /** @description Primer año a comparar (requerido si no se usa startDate/endDate) */
+        year1?: number;
+        /** @description Segundo año a comparar (requerido si no se usa startDate/endDate) */
+        year2?: number;
       };
       header?: never;
       path?: never;
@@ -10897,6 +11130,64 @@ export interface operations {
         content: {
           "application/json": string;
         };
+      };
+    };
+  };
+  ImportController_importExcel: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Archivo Excel con datos de importación */
+    requestBody: {
+      content: {
+        "multipart/form-data": components["schemas"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ImportController_cleanupImportedData: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Limpieza completada exitosamente */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            success?: boolean;
+            message?: string;
+            deletedCounts?: {
+              payments?: number;
+              reservations?: number;
+              customers?: number;
+              auditLogs?: number;
+            };
+          };
+        };
+      };
+      /** @description Error en la limpieza */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

@@ -1,15 +1,13 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 import { PaginatedResponse } from "@/types/api/paginated-response";
-import { PaginatedQueryParams } from "@/types/query-filters/generic-paginated-query-params";
+import { AdvancedPaginationParams } from "@/types/query-filters/advanced-pagination";
 import baseQueryWithReauth from "@/utils/baseQuery";
 import { Payment, PaymentDetail, PaymentDetailMethod, RoomPaymentDetails, SummaryPayment } from "../_types/payment";
 
 interface GetPaymentByIdProps {
   id: string;
 }
-
-export type PaginatedPaymentParams = PaginatedQueryParams<SummaryPayment>;
 
 export const paymentsApi = createApi({
   reducerPath: "paymentsApi",
@@ -108,11 +106,22 @@ export const paymentsApi = createApi({
       providesTags: ["Payment"],
     }),
 
-    getPaginatedPayments: build.query<PaginatedResponse<SummaryPayment>, PaginatedPaymentParams>({
-      query: ({ pagination: { page = 1, pageSize = 10 } }) => ({
+    // Nuevo endpoint con paginación avanzada
+    getAdvancedPaginatedPayments: build.query<PaginatedResponse<SummaryPayment>, AdvancedPaginationParams>({
+      query: ({ pagination, filters, sort }) => ({
         url: "/payments/paginated/all",
         method: "GET",
-        params: { page, pageSize },
+        params: {
+          page: pagination.page,
+          pageSize: pagination.pageSize,
+          ...(filters?.search && { search: filters.search }),
+          ...(filters?.status && {
+            status: Array.isArray(filters.status) ? filters.status.join(",") : filters.status,
+          }),
+          ...(filters?.reservationId && { reservationId: filters.reservationId }),
+          ...(sort?.sortBy && { sortBy: sort.sortBy }),
+          ...(sort?.sortOrder && { sortOrder: sort.sortOrder }),
+        },
         credentials: "include",
       }),
       providesTags: (result) => [
@@ -141,7 +150,7 @@ export const {
   useUpdatePaymentDetailsBatchMutation,
   useGetPaymentByIdQuery,
   useGetAllPaymentsQuery,
-  useGetPaginatedPaymentsQuery,
+  useGetAdvancedPaginatedPaymentsQuery,
   useGetRoomPaymentDetailsQuery,
   useRemovePaymentDetailMutation,
 } = paymentsApi;

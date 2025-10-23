@@ -25,15 +25,19 @@ interface DataTableFacetedFilterProps<TData, TValue> {
     value: TValue; // Usamos TValue directamente
     icon?: React.ComponentType<{ className?: string }>;
   }[];
+  externalFilterValue?: TValue[] | TValue;
+  onFilterChange?: (value: TValue[] | TValue | undefined) => void;
 }
 
 export function DataTableFacetedFilter<TData, TValue>({
   column,
   title,
   options,
+  externalFilterValue,
+  onFilterChange,
 }: DataTableFacetedFilterProps<TData, TValue>) {
-  // Modificamos esta parte para manejar diferentes tipos de valores
-  const filterValue = column?.getFilterValue(); // Extraemos esto fuera del useMemo
+  // Usamos el valor externo si está disponible, sino el del column
+  const filterValue = externalFilterValue !== undefined ? externalFilterValue : column?.getFilterValue();
 
   const selectedValues = React.useMemo(() => {
     // Si no hay valor de filtro
@@ -100,12 +104,20 @@ export function DataTableFacetedFilter<TData, TValue>({
                         filterValues.add(option.value);
                       }
 
+                      const newFilterValue = filterValues.size ? Array.from(filterValues) : undefined;
+
                       // Si solo hay un valor booleano seleccionado, enviamos el valor directamente
                       // en lugar de un array, para que funcione mejor con el filtro booleano
-                      if (filterValues.size === 1 && typeof Array.from(filterValues)[0] === "boolean") {
-                        column?.setFilterValue(Array.from(filterValues)[0]);
+                      const finalValue =
+                        filterValues.size === 1 && typeof Array.from(filterValues)[0] === "boolean"
+                          ? Array.from(filterValues)[0]
+                          : newFilterValue;
+
+                      // Usar callback externo si está disponible
+                      if (onFilterChange) {
+                        onFilterChange(finalValue);
                       } else {
-                        column?.setFilterValue(filterValues.size ? Array.from(filterValues) : undefined);
+                        column?.setFilterValue(finalValue);
                       }
                     }}
                   >
@@ -128,7 +140,13 @@ export function DataTableFacetedFilter<TData, TValue>({
                 <CommandSeparator />
                 <CommandGroup>
                   <CommandItem
-                    onSelect={() => column?.setFilterValue(undefined)}
+                    onSelect={() => {
+                      if (onFilterChange) {
+                        onFilterChange(undefined);
+                      } else {
+                        column?.setFilterValue(undefined);
+                      }
+                    }}
                     className="justify-center text-center"
                   >
                     Limpiar filtros

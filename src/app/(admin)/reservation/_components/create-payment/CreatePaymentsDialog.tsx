@@ -29,7 +29,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useServices } from "@/hooks/use-services";
 import { calculateStayNights } from "@/utils/peru-datetime";
-import { usePaginatedReservation } from "../../_hooks/use-reservation";
+import { useAdvancedReservations } from "../../_hooks/useAdvancedReservations";
 import { DetailedReservation } from "../../_schemas/reservation.schemas";
 import CreatePaymentsForm from "./CreatePaymentsForm";
 import { PaymentHeader } from "./PaymentHeader";
@@ -46,9 +46,10 @@ export function CreatePaymentDialog({ open, setOpen, reservation }: CreatePaymen
   const { dataServicesAll } = useServices();
   const [isCreatePending, startCreateTransition] = useTransition();
   const { onCreatePayment, isSuccessCreatePayment } = usePayments();
-  const { queryResponse } = usePaginatedReservation();
-
-  const { refetch } = queryResponse;
+  // Usar el hook avanzado para obtener el refetch
+  const { refetch } = useAdvancedReservations({
+    initialPagination: { page: 1, pageSize: 10 },
+  });
   const [step, setStep] = useState(1);
 
   const nights = calculateStayNights(reservation.checkInDate, reservation.checkOutDate);

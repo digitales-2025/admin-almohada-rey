@@ -35,24 +35,24 @@ const FloorTypeIcons = Object.fromEntries(
 
 export const facetedFilters = [
   {
-    column: "estado",
+    column: "estado", // ID de la columna (no el título)
     title: "Estado",
     options: [
       {
         label: "Activo",
-        value: true,
+        value: "true", // Para isActive = true
         icon: ActiveIcon,
       },
       {
         label: "Inactivo",
-        value: false,
+        value: "false", // Para isActive = false
         icon: InactiveIcon,
       },
     ],
   },
   {
     // Filtro para la disponibilidad generado dinámicamente
-    column: "disponibilidad",
+    column: "disponibilidad", // ID de la columna
     title: "Disponibilidad",
     options: Object.entries(RoomStatusLabels).map(([roomStatus, config]) => ({
       label: config.label,
@@ -60,10 +60,9 @@ export const facetedFilters = [
       icon: RoomStatusIcons[roomStatus],
     })),
   },
-
   {
     // Filtro para el tipo de piso generado dinamicamente
-    column: "piso",
+    column: "piso", // ID de la columna
     title: "Piso",
     options: Object.entries(FloorTypeLabels).map(([floorType, config]) => ({
       label: config.label,

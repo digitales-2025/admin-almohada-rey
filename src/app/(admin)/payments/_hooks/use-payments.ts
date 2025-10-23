@@ -2,11 +2,9 @@ import { toast } from "sonner";
 
 import { runAndHandleError } from "@/utils/baseQuery";
 import {
-  PaginatedPaymentParams,
   useCreatePaymentDetailsMutation,
   useCreatePaymentMutation,
   useGetAllPaymentsQuery,
-  useGetPaginatedPaymentsQuery,
   useGetPaymentByIdQuery,
   useGetRoomPaymentDetailsQuery,
   useRemovePaymentDetailMutation,
@@ -168,33 +166,5 @@ export const usePayments = (options: UsePaymentsProps = {}) => {
     onRemovePaymentDetail,
     isSuccessRemovePaymentDetail,
     isLoadingRemovePaymentDetail,
-  };
-};
-
-interface UsePaginatedPaymentsProps {
-  page?: number;
-  pageSize?: number;
-}
-
-export const usePaginatedPayments = (options: UsePaginatedPaymentsProps = {}) => {
-  const { page = 1, pageSize = 10 } = options;
-
-  const paginationParams: PaginatedPaymentParams = {
-    pagination: { page, pageSize },
-  };
-
-  const {
-    data: paginatedPayments,
-    isLoading: isLoadingPaginatedPayments,
-    refetch: refetchPaginatedPayments,
-  } = useGetPaginatedPaymentsQuery(paginationParams, {
-    skip: !paginationParams,
-    refetchOnMountOrArgChange: true,
-  });
-
-  return {
-    paginatedPayments,
-    isLoadingPaginatedPayments,
-    refetchPaginatedPayments,
   };
 };

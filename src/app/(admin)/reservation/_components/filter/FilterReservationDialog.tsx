@@ -33,12 +33,16 @@ import { Form, FormDescription, FormField, FormItem, FormLabel, FormMessage } fr
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { PaginationParams } from "@/types/api/paginated-response";
 import { createPeruBookingDateTime } from "@/utils/peru-datetime";
-import { PaginatedReservationHookResponse } from "../../_hooks/use-reservation";
+import { useAdvancedReservations } from "../../_hooks/useAdvancedReservations";
 import { FilterByCustomerCheckInOutInput, FilterByCustomerCheckInOutSchema } from "../../_schemas/reservation.schemas";
 import { PaginatedReservationParams } from "../../_services/reservationApi";
 import { SearchCustomerCombobox } from "../search/SearchCustomerCombobox";
 
 type CurrentFilterOptions = PaginatedReservationParams;
+
+// Tipo basado en el retorno de useAdvancedReservations
+type PaginatedReservationHookResponse = ReturnType<typeof useAdvancedReservations>;
+
 interface FilterReservationDialogProps {
   paginatedHookResponse: PaginatedReservationHookResponse;
   onSaveFilter?: (params: CurrentFilterOptions) => void;
@@ -83,8 +87,9 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
     },
   });
 
-  const { queryResponse, updateFilters } = paginatedHookResponse;
-  const { data, isLoading, isError, isSuccess } = queryResponse;
+  const { data, isLoading, error, updateFilters } = paginatedHookResponse;
+  const isError = !!error;
+  const isSuccess = !isLoading && !error;
   const isDesktop = useMediaQuery("(min-width: 640px)");
 
   const handleClose = useCallback(() => {
@@ -115,13 +120,13 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
     }
   }, [selectedCustomer, filterForm]);
 
-  const defaultPaginationConfig: PaginationParams = {
-    page: 1,
-    pageSize: 10,
-  };
-
   const onSubmit = useCallback(
     (input: FilterByCustomerCheckInOutInput) => {
+      const defaultPaginationConfig: PaginationParams = {
+        page: 1,
+        pageSize: 10,
+      };
+
       // Creamos un objeto vacío para los filtros
       const fieldFilters: Record<string, any> = {};
 
@@ -156,7 +161,7 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
         }
       }
     },
-    [updateFilters, onSaveFilter, defaultPaginationConfig, isSuccess, isError, data, handleClose]
+    [updateFilters, onSaveFilter, isSuccess, isError, data, handleClose]
   );
 
   const DialogFooterContent = () => (

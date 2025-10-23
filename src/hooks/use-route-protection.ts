@@ -19,12 +19,12 @@ interface UseRouteProtectionReturn {
  */
 export function useRouteProtection(): UseRouteProtectionReturn {
   const pathname = usePathname();
-  const { user, isLoading } = useProfile();
+  const { user, isLoadingProfile } = useProfile();
 
-  // Si está cargando, no bloquear el acceso aún
-  if (isLoading) {
+  // Si está cargando, retornar estado de carga
+  if (isLoadingProfile) {
     return {
-      isAuthorized: true,
+      isAuthorized: false, // Cambiar a false para que RouteGuard muestre loading
       isLoading: true,
       userRole: null,
       currentPath: pathname,

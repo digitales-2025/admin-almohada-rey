@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { WarehouseTypeLabels } from "./warehouses.utils";
 
-// Generar componentes de icono a partir de ProductTypeLabels
+// Generar componentes de icono a partir de WarehouseTypeLabels
 const WarehouseTypeIcons = Object.fromEntries(
   Object.entries(WarehouseTypeLabels).map(([warehouseType, config]) => {
     const IconComponent: React.FC<{ className?: string }> = ({ className }) => {
@@ -14,7 +14,7 @@ const WarehouseTypeIcons = Object.fromEntries(
 
 export const facetedFilters = [
   {
-    // Filtro para el tipo de producto
+    // Filtro para el tipo de almacén
     column: "tipo",
     title: "Tipo de Almacén",
     options: Object.entries(WarehouseTypeLabels).map(([warehouseType, config]) => ({

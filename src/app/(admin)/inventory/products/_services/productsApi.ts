@@ -1,6 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 import { PaginatedResponse } from "@/types/api/paginated-response";
+import { AdvancedPaginationParams } from "@/types/query-filters/advanced-pagination";
 import { PaginatedQueryParams } from "@/types/query-filters/generic-paginated-query-params";
 import baseQueryWithReauth from "@/utils/baseQuery";
 import { Product, ProductType } from "../_types/products";
@@ -55,21 +56,72 @@ export const productsApi = createApi({
       providesTags: ["Product"],
     }),
 
-    getPaginatedProducts: build.query<PaginatedResponse<Product>, PaginatedProductParams>({
-      query: ({ pagination: { page = 1, pageSize = 10 }, fieldFilters }) => {
-        const params: Record<string, any> = { page, pageSize };
+    getPaginatedProducts: build.query<PaginatedResponse<Product>, PaginatedProductParams | AdvancedPaginationParams>({
+      query: (params) => {
+        // Detectar si es formato avanzado o formato original
+        if ("filters" in params && "sort" in params) {
+          // Formato avanzado
+          const { pagination, filters, sort, type } = params as AdvancedPaginationParams & {
+            type?: ProductType;
+          };
+          const queryParams: Record<string, any> = {
+            page: pagination.page,
+            pageSize: pagination.pageSize,
+          };
 
-        // Añadir el filtro de tipo si existe
-        if (fieldFilters?.type) {
-          params.type = fieldFilters.type;
+          // Añadir búsqueda si existe
+          if (filters?.search) {
+            queryParams.search = filters.search;
+          }
+
+          // Añadir filtros
+          if (filters?.isActive) {
+            queryParams.isActive = Array.isArray(filters.isActive) ? filters.isActive.join(",") : filters.isActive;
+          }
+
+          if (filters?.type) {
+            queryParams.type = Array.isArray(filters.type) ? filters.type.join(",") : filters.type;
+          }
+
+          // Añadir tipo específico si existe
+          if (type) {
+            queryParams.type = type;
+          }
+
+          // Añadir ordenamiento
+          if (sort?.sortBy) {
+            queryParams.sortBy = sort.sortBy;
+          }
+          if (sort?.sortOrder) {
+            queryParams.sortOrder = sort.sortOrder;
+          }
+
+          return {
+            url: "/product/paginated",
+            method: "GET",
+            params: queryParams,
+            credentials: "include",
+          };
+        } else {
+          // Formato original (compatibilidad hacia atrás)
+          const {
+            pagination: { page = 1, pageSize = 10 },
+            fieldFilters,
+          } = params as PaginatedProductParams;
+          const queryParams: Record<string, any> = { page, pageSize };
+
+          // Añadir el filtro de tipo si existe
+          if (fieldFilters?.type) {
+            queryParams.type = fieldFilters.type;
+          }
+
+          return {
+            url: "/product/paginated",
+            method: "GET",
+            params: queryParams,
+            credentials: "include",
+          };
         }
-
-        return {
-          url: "/product/paginated",
-          method: "GET",
-          params,
-          credentials: "include",
-        };
       },
       providesTags: (result) => [
         { type: "Product", id: result?.meta.page },

@@ -6,20 +6,34 @@ import { HeaderPage } from "@/components/common/HeaderPage";
 import { DataTableSkeleton } from "@/components/datatable/data-table-skeleton";
 import ErrorGeneral from "@/components/errors/general-error";
 import { RoomsTable } from "./_components/table/RoomsTable";
-import { usePaginatedRooms } from "./_hooks/use-rooms";
+import { useAdvancedRooms } from "./_hooks/useAdvancedRooms";
 
 export default function RoomsPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const { paginatedRooms, isLoadingPaginatedRooms, refetchPaginatedRooms } = usePaginatedRooms({ page, pageSize });
+  // Usar el hook avanzado
+  const {
+    data: roomsData,
+    meta: roomsMeta,
+    isLoading,
+    error,
+    refetch,
+    tableState,
+    tableActions,
+    filtersState,
+    getFilterValueByColumn,
+    localSearch,
+  } = useAdvancedRooms({
+    initialPagination: { page, pageSize },
+  });
 
   const handlePaginationChange = useCallback((newPage: number, newPageSize: number) => {
     setPage(newPage);
     setPageSize(newPageSize);
   }, []);
 
-  if (isLoadingPaginatedRooms) {
+  if (isLoading) {
     return (
       <div>
         <HeaderPage title="Habitaciones" description="Habitaciones registrados en el sistema." />
@@ -28,7 +42,7 @@ export default function RoomsPage() {
     );
   }
 
-  if (!paginatedRooms) {
+  if (error) {
     return (
       <div>
         <HeaderPage title="Habitaciones" description="Habitaciones registrados en el sistema." />
@@ -42,15 +56,20 @@ export default function RoomsPage() {
       <HeaderPage title="Habitaciones" description="Habitaciones registrados en el sistema." />
       <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0">
         <RoomsTable
-          data={paginatedRooms.data}
+          data={roomsData}
           pagination={{
-            page: paginatedRooms.meta.page,
-            pageSize: paginatedRooms.meta.pageSize,
-            total: paginatedRooms.meta.total,
-            totalPages: paginatedRooms.meta.totalPages,
+            page: roomsMeta?.page || page,
+            pageSize: roomsMeta?.pageSize || pageSize,
+            total: roomsMeta?.total || 0,
+            totalPages: roomsMeta?.totalPages || 0,
           }}
           onPaginationChange={handlePaginationChange}
-          refetchPaginatedRooms={refetchPaginatedRooms}
+          refetchPaginatedRooms={refetch}
+          tableState={tableState}
+          tableActions={tableActions}
+          filtersState={filtersState}
+          getFilterValueByColumn={getFilterValueByColumn}
+          localSearch={localSearch}
         />
       </div>
     </div>

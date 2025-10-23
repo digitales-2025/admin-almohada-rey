@@ -10,7 +10,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { SmallErrorMessage } from "../errors/small-error-message";
-import { SmallLoading } from "../loading/small-loading";
+import { Loading } from "../loading/small-loading";
 import { NotFoundSearchResults } from "./not-found-search-comboox";
 
 import "@reduxjs/toolkit";
@@ -141,7 +141,7 @@ export function SearchCombobox<T = unknown>({
             {isLoadingError && <CommandEmpty>{warningsMessages.loadingError}</CommandEmpty>}
             {isLoading && (
               <CommandGroup>
-                <SmallLoading></SmallLoading>
+                <Loading variant="dots" size="sm" text="Buscando..." />
               </CommandGroup>
             )}
             {isError && (

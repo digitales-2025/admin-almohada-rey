@@ -2,11 +2,9 @@ import { toast } from "sonner";
 
 import { runAndHandleError } from "@/utils/baseQuery";
 import {
-  PaginatedProductParams,
   useCreateProductMutation,
   useDeleteProductsMutation,
   useGetAllProductsQuery,
-  useGetPaginatedProductsQuery,
   useGetProductsByTypeQuery,
   useReactivateProductsMutation,
   useUpdateProductMutation,
@@ -110,41 +108,5 @@ export const useProducts = (options: UseProductProps = {}) => {
     onReactivateProducts,
     isSuccessReactivateProducts,
     isLoadingReactivateProducts,
-  };
-};
-
-interface UsePaginatedProductsProps {
-  page?: number;
-  pageSize?: number;
-  type?: ProductType;
-}
-
-export const usePaginatedProducts = (options: UsePaginatedProductsProps = {}) => {
-  const { page = 1, pageSize = 10, type } = options;
-
-  const paginationParams: PaginatedProductParams = {
-    pagination: { page, pageSize },
-    fieldFilters: type ? { type } : undefined,
-  };
-
-  const {
-    data: paginatedProducts,
-    isLoading: isLoadingPaginatedProducts,
-    refetch: refetchPaginatedProducts,
-    error,
-    isSuccess,
-  } = useGetPaginatedProductsQuery(paginationParams, {
-    refetchOnMountOrArgChange: true,
-  });
-
-  return {
-    paginatedProducts,
-    isLoadingPaginatedProducts,
-    refetchPaginatedProducts,
-    error,
-    isSuccess,
-    currentPage: page,
-    currentPageSize: pageSize,
-    currentType: type,
   };
 };

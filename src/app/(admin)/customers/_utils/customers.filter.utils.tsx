@@ -36,24 +36,24 @@ const CustomerDocumentTypeIcons = Object.fromEntries(
 
 export const facetedFilters = [
   {
-    column: "estado",
+    column: "estado", // ID de la columna existente
     title: "Estado",
     options: [
       {
         label: "Activo",
-        value: true,
+        value: "true", // Enviar como string al backend
         icon: ActiveIcon,
       },
       {
         label: "Inactivo",
-        value: false,
+        value: "false", // Enviar como string al backend
         icon: InactiveIcon,
       },
     ],
   },
   {
     // Filtro para el estado civil generado dinámicamente
-    column: "e. civil",
+    column: "e. civil", // ID de la columna existente
     title: "Estado Civil",
     options: Object.entries(CustomerMaritalStatusLabels).map(([maritalStatus, config]) => ({
       label: config.label,
@@ -63,7 +63,7 @@ export const facetedFilters = [
   },
   // Filtro para el tipo de documento generado dinámicamente
   {
-    column: "tipo",
+    column: "tipo", // ID de la columna existente
     title: "Tipo de Documento",
     options: Object.entries(CustomerDocumentTypeLabels).map(([documentType, config]) => ({
       label: config.label,
