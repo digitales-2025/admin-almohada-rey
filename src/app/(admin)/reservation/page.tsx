@@ -22,9 +22,11 @@ export default function ReservationPage() {
     meta: reservationsMeta,
     isLoading,
     error,
+    refetch,
     tableState,
     tableActions,
     filtersState,
+    filtersActions,
     getFilterValueByColumn,
     localSearch,
     updateFilters,
@@ -50,28 +52,25 @@ export default function ReservationPage() {
     );
   }
 
-  // Crear objeto compatible con FilterReservationDialog
+  // Pasar directamente el hook response
   const paginatedHookResponse = {
-    queryResponse: {
-      data: {
-        data: reservationsData,
-        meta: reservationsMeta || {
-          total: 0,
-          page: 1,
-          pageSize: 10,
-          totalPages: 0,
-          hasNext: false,
-          hasPrevious: false,
-        },
-      },
-      isLoading,
-      isError: !!error,
-      isSuccess: !isLoading && !error,
-      isFetching: isLoading,
-      isUninitialized: false,
-      refetch: () => {},
-    },
-    updateFilters, // Usar la función del hook directamente
+    data: reservationsData,
+    meta: reservationsMeta,
+    isLoading,
+    error,
+    refetch,
+    updateFilters,
+    // Incluir todas las propiedades que retorna useAdvancedReservations
+    filtersState,
+    filtersActions,
+    tableState,
+    tableActions,
+    getFilterValueByColumn,
+    localSearch,
+    reservations: reservationsData,
+    reservationsMeta,
+    isReservationsLoading: isLoading,
+    reservationsError: error,
   };
 
   return (
