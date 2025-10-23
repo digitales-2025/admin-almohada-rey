@@ -2,15 +2,13 @@ import { toast } from "sonner";
 
 import { runAndHandleError } from "@/utils/baseQuery";
 import {
-  PaginatedMovementParams,
   useCreateMovementsMutation,
   useDeleteMovementsMutation,
   useGetAllMovementsQuery,
   useGetMovementsByIdQuery,
-  useGetMovementsByTypePaginatedQuery,
   useUpdateMovementsMutation,
 } from "../_services/movementsApi";
-import { MovementCreate, Movements, MovementsType } from "../_types/movements";
+import { MovementCreate, Movements } from "../_types/movements";
 
 interface UseMovementsProps {
   id?: string;
@@ -82,34 +80,5 @@ export const useMovements = (options: UseMovementsProps = {}) => {
     isSuccessUpdateMovements,
     onDeleteMovements,
     isSuccessDeleteMovements,
-  };
-};
-
-interface UsePaginatedMovementsProps {
-  page?: number;
-  pageSize?: number;
-  type?: MovementsType;
-}
-
-export const usePaginatedMovements = (options: UsePaginatedMovementsProps = {}) => {
-  const { page = 1, pageSize = 10, type } = options;
-
-  const paginationParams: PaginatedMovementParams = {
-    pagination: { page, pageSize },
-    fieldFilters: type ? { type } : undefined,
-  };
-
-  const {
-    data: paginatedMovements,
-    isLoading: isLoadingPaginatedMovements,
-    refetch: refetchPaginatedMovements,
-  } = useGetMovementsByTypePaginatedQuery(paginationParams, {
-    refetchOnMountOrArgChange: true,
-  });
-
-  return {
-    paginatedMovements,
-    isLoadingPaginatedMovements,
-    refetchPaginatedMovements,
   };
 };

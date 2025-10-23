@@ -1,7 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
-import { PaginatedResponse } from "@/types/api/paginated-response";
-import { PaginatedQueryParams } from "@/types/query-filters/generic-paginated-query-params";
+import { PaginatedResponse, PaginationParams } from "@/types/api/paginated-response";
 import baseQueryWithReauth from "@/utils/baseQuery";
 import { MovementCreate, Movements, SummaryMovements } from "../_types/movements";
 
@@ -9,7 +8,18 @@ interface GetMovementsByIdProps {
   id: string;
 }
 
-export type PaginatedMovementParams = PaginatedQueryParams<SummaryMovements>;
+export type PaginatedMovementParams = {
+  pagination: PaginationParams;
+  fieldFilters?: {
+    type?: string;
+    search?: string;
+    warehouseType?: string;
+  };
+  sort?: {
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  };
+};
 
 export const movementsApi = createApi({
   reducerPath: "movementsApi",
@@ -47,12 +57,30 @@ export const movementsApi = createApi({
     }),
     // Obtener movimientos por tipo paginados
     getMovementsByTypePaginated: build.query<PaginatedResponse<SummaryMovements>, PaginatedMovementParams>({
-      query: ({ pagination: { page = 1, pageSize = 10 }, fieldFilters }) => {
+      query: ({ pagination: { page = 1, pageSize = 10 }, fieldFilters, sort }) => {
         const params: Record<string, any> = { page, pageSize };
 
         // Añadir el filtro de tipo si existe
         if (fieldFilters?.type) {
           params.type = fieldFilters.type;
+        }
+
+        // Añadir búsqueda si existe
+        if (fieldFilters?.search) {
+          params.search = fieldFilters.search;
+        }
+
+        // Añadir filtros de almacén si existen
+        if (fieldFilters?.warehouseType) {
+          params.warehouseType = fieldFilters.warehouseType;
+        }
+
+        // Añadir ordenamiento si existe
+        if (sort?.sortBy) {
+          params.sortBy = sort.sortBy;
+        }
+        if (sort?.sortOrder) {
+          params.sortOrder = sort.sortOrder;
         }
 
         return {
