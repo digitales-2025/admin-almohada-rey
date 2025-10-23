@@ -49,6 +49,14 @@ export function useAdvancedProducts({
     refetch();
   }, [refetch]);
 
+  // Mapeo específico para products
+  const productColumnMapping = useMemo(
+    () => ({
+      estado: "isActive", // Mapear "estado" a "isActive" para products
+    }),
+    []
+  );
+
   // Acciones personalizadas de tabla para manejar filtros correctamente
   const customTableActions = useMemo(() => {
     if (!tableActions) return undefined;
@@ -56,16 +64,22 @@ export function useAdvancedProducts({
       ...tableActions,
       setColumnFilters: (filters: Array<{ id: string; value: any }>) => {
         if (filters.length === 0) {
-          filtersActions.setFilter("estado", undefined);
+          // Limpiar todos los filtros
+          Object.keys(productColumnMapping).forEach((columnId) => {
+            const backendField = productColumnMapping[columnId as keyof typeof productColumnMapping];
+            filtersActions.setFilter(backendField, undefined);
+          });
           return;
         }
 
         filters.forEach((filter) => {
-          filtersActions.setFilter(filter.id, filter.value);
+          // Usar el mapeo específico de products o el ID original
+          const backendField = productColumnMapping[filter.id as keyof typeof productColumnMapping] || filter.id;
+          filtersActions.setFilter(backendField, filter.value);
         });
       },
     };
-  }, [tableActions, filtersActions]);
+  }, [tableActions, filtersActions, productColumnMapping]);
 
   return {
     // Datos
@@ -83,9 +97,10 @@ export function useAdvancedProducts({
     tableState,
     tableActions: customTableActions,
 
-    // Función para obtener valores de filtros por columna (del hook genérico)
+    // Función para obtener valores de filtros por columna (específica para products)
     getFilterValueByColumn: (columnId: string) => {
-      return filtersState.filters[columnId];
+      const backendField = productColumnMapping[columnId as keyof typeof productColumnMapping] || columnId;
+      return filtersState.filters[backendField];
     },
 
     // Estado local del input para mostrar en la UI (del hook genérico)

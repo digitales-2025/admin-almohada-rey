@@ -45,7 +45,13 @@ export function useAdvancedPagination({
           setFiltersState((prev) => ({ ...prev, search: "" }));
           return;
         }
-        debouncedSearch(search);
+        // Solo buscar si tiene al menos 2 caracteres, sino limpiar la búsqueda
+        if (search.trim().length >= 2) {
+          debouncedSearch(search);
+        } else {
+          // Si tiene menos de 2 caracteres, limpiar la búsqueda inmediatamente
+          setFiltersState((prev) => ({ ...prev, search: "" }));
+        }
       },
 
       setFilter: (key: string, value: string | string[] | undefined) => {

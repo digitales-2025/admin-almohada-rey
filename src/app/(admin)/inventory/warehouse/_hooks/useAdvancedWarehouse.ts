@@ -2,49 +2,36 @@ import { useCallback, useMemo } from "react";
 
 import { useAdvancedPagination } from "@/hooks/useAdvancedPagination";
 import { AdvancedFilters, SortParams } from "@/types/query-filters/advanced-pagination";
-import { useGetAdvancedPaginatedRoomsQuery } from "../_services/roomsApi";
+import { useGetPaginatedWarehousesQuery } from "../_services/warehouseApi";
 
-interface UseAdvancedRoomsOptions {
-  initialPagination?: { page?: number; pageSize?: number };
+interface UseAdvancedWarehouseOptions {
+  initialPagination: { page: number; pageSize: number };
   initialFilters?: AdvancedFilters;
   initialSort?: SortParams;
   initialSearch?: string;
 }
 
-export function useAdvancedRooms({
+export function useAdvancedWarehouse({
   initialPagination,
   initialFilters = {},
   initialSort = {},
   initialSearch = "",
-}: UseAdvancedRoomsOptions) {
+}: UseAdvancedWarehouseOptions) {
   // Usar el hook genérico
   const { filtersState, filtersActions, tableState, tableActions, localSearch } = useAdvancedPagination({
-    initialPagination: {
-      page: initialPagination?.page || 1,
-      pageSize: initialPagination?.pageSize || 10,
-    },
+    initialPagination,
     initialFilters,
     initialSort,
     initialSearch,
   });
 
-  // Mapeo específico para rooms
-  const roomColumnMapping = useMemo(
-    () => ({
-      estado: "isActive", // Mapear "estado" a "isActive" para rooms
-      disponibilidad: "status", // Mapear "disponibilidad" a "status" para rooms
-      piso: "floorType", // Mapear "piso" a "floorType" para rooms
-    }),
-    []
-  );
-
-  // Query específica para rooms
+  // Query específica para warehouses
   const {
     data: queryData,
     isLoading,
     error,
     refetch,
-  } = useGetAdvancedPaginatedRoomsQuery({
+  } = useGetPaginatedWarehousesQuery({
     pagination: filtersState.pagination,
     filters: {
       ...filtersState.filters,
@@ -58,6 +45,14 @@ export function useAdvancedRooms({
     refetch();
   }, [refetch]);
 
+  // Mapeo específico para warehouses
+  const warehouseColumnMapping = useMemo(
+    () => ({
+      tipo: "type", // Mapear "tipo" a "type" para warehouses
+    }),
+    []
+  );
+
   // Acciones personalizadas de tabla para manejar filtros correctamente
   const customTableActions = useMemo(() => {
     if (!tableActions) return undefined;
@@ -66,21 +61,21 @@ export function useAdvancedRooms({
       setColumnFilters: (filters: Array<{ id: string; value: any }>) => {
         if (filters.length === 0) {
           // Limpiar todos los filtros
-          Object.keys(roomColumnMapping).forEach((columnId) => {
-            const backendField = roomColumnMapping[columnId as keyof typeof roomColumnMapping];
+          Object.keys(warehouseColumnMapping).forEach((columnId) => {
+            const backendField = warehouseColumnMapping[columnId as keyof typeof warehouseColumnMapping];
             filtersActions.setFilter(backendField, undefined);
           });
           return;
         }
 
         filters.forEach((filter) => {
-          // Usar el mapeo específico de rooms o el ID original
-          const backendField = roomColumnMapping[filter.id as keyof typeof roomColumnMapping] || filter.id;
+          // Usar el mapeo específico de warehouses o el ID original
+          const backendField = warehouseColumnMapping[filter.id as keyof typeof warehouseColumnMapping] || filter.id;
           filtersActions.setFilter(backendField, filter.value);
         });
       },
     };
-  }, [tableActions, filtersActions, roomColumnMapping]);
+  }, [tableActions, filtersActions, warehouseColumnMapping]);
 
   return {
     // Datos
@@ -98,19 +93,19 @@ export function useAdvancedRooms({
     tableState,
     tableActions: customTableActions,
 
-    // Función para obtener valores de filtros por columna (específica para rooms)
+    // Función para obtener valores de filtros por columna (específica para warehouses)
     getFilterValueByColumn: (columnId: string) => {
-      const backendField = roomColumnMapping[columnId as keyof typeof roomColumnMapping] || columnId;
+      const backendField = warehouseColumnMapping[columnId as keyof typeof warehouseColumnMapping] || columnId;
       return filtersState.filters[backendField];
     },
 
     // Estado local del input para mostrar en la UI (del hook genérico)
     localSearch,
 
-    // Datos específicos de rooms (alias para compatibilidad)
-    roomsData: queryData?.data || [],
-    roomsMeta: queryData?.meta,
-    isRoomsLoading: isLoading,
-    roomsError: error,
+    // Datos específicos de warehouses (alias para compatibilidad)
+    warehousesData: queryData?.data || [],
+    warehousesMeta: queryData?.meta,
+    isWarehousesLoading: isLoading,
+    warehousesError: error,
   };
 }
