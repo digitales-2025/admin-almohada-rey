@@ -5,6 +5,7 @@
  * VERSIÓN HÍBRIDA: Combina las mejoras de date-fns-tz con la lógica robusta original
  */
 // Importaciones no utilizadas removidas
+import { parse } from "date-fns";
 import { format, fromZonedTime, toZonedTime } from "date-fns-tz";
 import { es } from "date-fns/locale";
 
@@ -69,44 +70,15 @@ export function peruDateTimeToDate(dateStr: string, timeStr: string): Date {
   const formatString = "yyyy-MM-dd hh:mm a";
 
   try {
-    // Método 1: Intentar con fromZonedTime
-    let result = fromZonedTime(combinedString, formatString, { timeZone: LIMA_TIME_ZONE });
+    // Primero parsear la fecha en la zona horaria local
+    const localDate = parse(combinedString, formatString, new Date());
+
+    // Luego convertir a UTC usando fromZonedTime
+    const result = fromZonedTime(localDate, LIMA_TIME_ZONE);
 
     // Validar que la fecha sea válida
     if (isNaN(result.getTime())) {
-      // Método 2: Crear fecha local y ajustar a zona horaria de Perú
-      try {
-        // Parsear la fecha y hora manualmente
-        const [datePart, timePart] = combinedString.split(" ");
-        const [year, month, day] = datePart.split("-").map(Number);
-        const [time, period] = timePart.split(" ");
-        const [hours, minutes] = time.split(":").map(Number);
-
-        // Convertir a formato 24h
-        let hour24 = hours;
-        if (period === "PM" && hours !== 12) {
-          hour24 = hours + 12;
-        } else if (period === "AM" && hours === 12) {
-          hour24 = 0;
-        }
-
-        // Crear fecha en zona horaria local
-        const localDate = new Date(year, month - 1, day, hour24, minutes, 0, 0);
-
-        // Convertir a UTC considerando la zona horaria de Perú (UTC-5)
-        const peruOffset = -5 * 60; // -5 horas en minutos
-        const utcDate = new Date(localDate.getTime() - peruOffset * 60 * 1000);
-
-        result = utcDate;
-      } catch (altError) {
-        console.error("peruDateTimeToDate: Método alternativo también falló", { altError });
-        return new Date(); // Retornar fecha actual como fallback
-      }
-    }
-
-    // Validar que la fecha final sea válida
-    if (isNaN(result.getTime())) {
-      console.error("peruDateTimeToDate: Todos los métodos fallaron", {
+      console.error("peruDateTimeToDate: Fecha inválida generada", {
         dateStr,
         timeStr,
         combinedString,

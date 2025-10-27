@@ -108,8 +108,14 @@ export function SearchCombobox<T = unknown>({
   }, 300) as (value: string) => void;
 
   function setOpen(isOpen: boolean) {
-    if (!isOpen) handleOnSearchChange("None"); //When the popover is closed, the search is reset
     setOpenState(isOpen);
+    // Solo resetear la búsqueda cuando se cierra el popover, pero sin causar re-renderizados
+    if (!isOpen) {
+      // Usar setTimeout para evitar el bucle infinito
+      setTimeout(() => {
+        handleOnSearchChange("None");
+      }, 0);
+    }
   }
 
   return (

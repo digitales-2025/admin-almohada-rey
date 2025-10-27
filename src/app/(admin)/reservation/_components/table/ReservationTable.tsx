@@ -80,23 +80,25 @@ export function ReservationTable({
   };
 
   return (
-    <DataTable
-      data={data}
-      columns={columns}
-      toolbarActions={(table: TableInstance<DetailedReservation>) => <ReservationTableToolbarActions table={table} />}
-      filterPlaceholder="Buscar reservaciones..."
-      facetedFilters={facetedFilters}
-      enableExpansion={true}
-      serverPagination={serverPagination}
-      externalGlobalFilter={localSearch}
-      externalFilters={filtersState?.filters}
-      getFilterValueByColumn={getFilterValueByColumn}
-      {...(tableActions && {
-        onSortingChange: tableActions.setSorting,
-        onColumnFiltersChange: tableActions.setColumnFilters,
-        onGlobalFilterChange: tableActions.setGlobalFilter,
-        onPaginationChange: tableActions.setPagination,
-      })}
-    />
+    <div className="space-y-2">
+      <DataTable
+        data={data}
+        columns={columns}
+        toolbarActions={(table: TableInstance<DetailedReservation>) => <ReservationTableToolbarActions table={table} />}
+        filterPlaceholder="Buscar reservaciones..."
+        facetedFilters={facetedFilters}
+        enableExpansion={true}
+        serverPagination={serverPagination}
+        externalGlobalFilter={localSearch}
+        externalFilters={filtersState?.filters}
+        getFilterValueByColumn={getFilterValueByColumn}
+        {...(tableActions && {
+          onSortingChange: tableActions.setSorting,
+          onColumnFiltersChange: tableActions.setColumnFilters,
+          onGlobalFilterChange: tableActions.setGlobalFilter,
+          onPaginationChange: tableActions.setPagination,
+        })}
+      />
+    </div>
   );
 }

@@ -257,7 +257,9 @@ export const setupReservationWebsockets = (dispatch: any) => {
 
   // Control para evitar bucles
   let isUpdating = false;
+  let isAvailabilityUpdating = false;
   const updateTimeout = 1000; // 1 segundo de cooldown
+  const availabilityTimeout = 2000; // 2 segundos de cooldown para disponibilidad
 
   // Definimos los handlers primero para poder referenciarlos después
   const handleNewReservation = (reservation: DetailedReservation) => {
@@ -365,42 +367,38 @@ export const setupReservationWebsockets = (dispatch: any) => {
     }, updateTimeout);
   };
 
-  // DESHABILITADOS para evitar bucles en available-rooms
-  const handleAvailabilityChanged = ({ checkInDate, checkOutDate }: { checkInDate: string; checkOutDate: string }) => {
-    // NO invalidar tags para evitar bucles
-    console.log("Availability changed:", { checkInDate, checkOutDate });
+  const handleAvailabilityChanged = () => {
+    // Evitar bucles con debouncing
+    if (isAvailabilityUpdating) return;
+
+    isAvailabilityUpdating = true;
+
+    // Invalidar tags de disponibilidad para forzar re-verificación
+    dispatch(reservationApi.util.invalidateTags(["RoomAvailability", "Rooms"]));
+
+    // Resetear el flag después del timeout
+    setTimeout(() => {
+      isAvailabilityUpdating = false;
+    }, availabilityTimeout);
   };
 
-  const handleRoomAvailabilityChecked = ({
-    roomId,
-    checkInDate,
-    checkOutDate,
-    isAvailable,
-  }: {
-    roomId: string;
-    checkInDate: string;
-    checkOutDate: string;
-    isAvailable: boolean;
-    timestamp: string;
-  }) => {
-    // NO invalidar tags para evitar bucles
-    console.log("Room availability checked:", { roomId, checkInDate, checkOutDate, isAvailable });
+  const handleRoomAvailabilityChecked = () => {
+    // Evitar bucles con debouncing
+    if (isAvailabilityUpdating) return;
+
+    isAvailabilityUpdating = true;
+
+    // Invalidar tags de disponibilidad
+    dispatch(reservationApi.util.invalidateTags(["RoomAvailability"]));
+
+    // Resetear el flag después del timeout
+    setTimeout(() => {
+      isAvailabilityUpdating = false;
+    }, availabilityTimeout);
   };
 
-  const handleCheckoutAvailabilityChecked = ({
-    roomId,
-    originalCheckoutDate,
-    newCheckoutDate,
-    isAvailable,
-  }: {
-    roomId: string;
-    originalCheckoutDate: string;
-    newCheckoutDate: string;
-    isAvailable: boolean;
-    timestamp: string;
-  }) => {
+  const handleCheckoutAvailabilityChecked = () => {
     // NO invalidar tags para evitar bucles
-    console.log("Checkout availability checked:", { roomId, originalCheckoutDate, newCheckoutDate, isAvailable });
   };
 
   // Registramos los listeners usando tus métodos existentes
