@@ -394,7 +394,7 @@ export const reservationColumns = (
               )}
 
               {/* Mostrar Pagos - Solo para estados diferentes de PENDING y CONFIRMED */}
-              {status !== "PENDING" && status !== "CONFIRMED" && (
+              {status !== "PENDING" && (
                 <DropdownMenuItem onSelect={() => handleManagementPaymentInterface(row.original.id)} className="group">
                   Mostrar Pagos
                   <DropdownMenuShortcut>
