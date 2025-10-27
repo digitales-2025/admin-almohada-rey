@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { CalendarCog, CalendarX2, Ellipsis, Pencil, Trash } from "lucide-react";
+import { CalendarCog, CalendarX2, CreditCard, Ellipsis, Pencil, Trash } from "lucide-react";
 import { toast } from "sonner";
 
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { formatPeruBookingDate, formatTimeToHHMMAMPM, formDateToPeruISO } from "@/utils/peru-datetime";
+import { formatPeruBookingDate, getCurrentPeruDateTime } from "@/utils/peru-datetime";
 import {
   DetailedReservation,
   ReservationGuest,
@@ -41,7 +41,10 @@ import { GuestsDetailsDialog } from "./dialogs/GuestDialog";
  * @param isSuperAdmin Valor si el usuario es super administrador
  * @returns Columnas de la tabla de usuarios
  */
-export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedReservation>[] => [
+export const reservationColumns = (
+  isSuperAdmin: boolean,
+  handleManagementPaymentInterface: (id: string) => void
+): ColumnDef<DetailedReservation>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -251,7 +254,6 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
     },
     enableColumnFilter: true,
   },
-
   {
     id: "actions",
     cell: function Cell({ row }) {
@@ -274,12 +276,13 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
       const { canCancel, canCheckIn, canCheckOut, canConfirm, canDeactivate }: ReservationStatusAvailableActions =
         getAvailableActions(status);
 
-      const today = new Date();
-      const todayFormatted = today.toISOString().split("T")[0];
-      const peruDateFormatted = formDateToPeruISO(todayFormatted, true, formatTimeToHHMMAMPM(new Date()));
-      const peruDate = new Date(peruDateFormatted);
-      const checkInDateObj = new Date(row.original.checkInDate);
-      const hasCheckInDateArrived = checkInDateObj.getDay() <= peruDate.getDay();
+      // Usar las utilidades existentes para obtener la fecha actual en Perú
+      const todayPeruDate = getCurrentPeruDateTime("date") as string; // "2025-03-31"
+      const checkInDate = row.original.checkInDate.split("T")[0]; // Extraer solo la fecha "2025-03-31"
+
+      // Comparación simple de strings de fecha (yyyy-MM-dd)
+      const hasCheckInDateArrived = checkInDate <= todayPeruDate;
+
       const enableCheckInButton = hasCheckInDateArrived && canCheckIn;
 
       return (
@@ -386,6 +389,16 @@ export const reservationColumns = (isSuperAdmin: boolean): ColumnDef<DetailedRes
                   Eliminar Late Checkout
                   <DropdownMenuShortcut>
                     <CalendarX2 className="size-4 text-destructive" aria-hidden="true" />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              )}
+
+              {/* Mostrar Pagos - Solo para estados diferentes de PENDING y CONFIRMED */}
+              {status !== "PENDING" && status !== "CONFIRMED" && (
+                <DropdownMenuItem onSelect={() => handleManagementPaymentInterface(row.original.id)} className="group">
+                  Mostrar Pagos
+                  <DropdownMenuShortcut>
+                    <CreditCard className="size-4" aria-hidden="true" />
                   </DropdownMenuShortcut>
                 </DropdownMenuItem>
               )}

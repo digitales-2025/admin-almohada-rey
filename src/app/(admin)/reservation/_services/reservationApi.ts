@@ -167,6 +167,7 @@ export const reservationApi = createApi({
         credentials: "include",
       }),
       providesTags: (result) => [
+        { type: "Reservation", id: "PAGINATED" },
         { type: "Reservation", id: result?.meta.page },
         ...(result?.data.map(({ id }) => ({ type: "Reservation" as const, id })) ?? []),
       ],
@@ -254,46 +255,127 @@ export const reservationApi = createApi({
 export const setupReservationWebsockets = (dispatch: any) => {
   socketService.connect();
 
+  // Control para evitar bucles
+  let isUpdating = false;
+  const updateTimeout = 1000; // 1 segundo de cooldown
+
   // Definimos los handlers primero para poder referenciarlos después
   const handleNewReservation = (reservation: DetailedReservation) => {
+    if (isUpdating) return;
+
+    isUpdating = true;
+
+    // Actualización optimista: agregar directamente al cache sin invalidar tags
+    const updateCache = (draft: any) => {
+      if (draft?.data && Array.isArray(draft.data)) {
+        // Solo agregar si no existe ya
+        const exists = draft.data.some((r: DetailedReservation) => r.id === reservation.id);
+        if (!exists) {
+          draft.data.unshift(reservation);
+          if (draft.meta) {
+            draft.meta.total += 1;
+          }
+        }
+      }
+    };
+
+    // Actualizar solo la primera página (sin filtros)
     dispatch(
-      reservationApi.util.invalidateTags([
-        { type: "Reservation", id: "ALL" },
-        { type: "Reservation", id: reservation.id },
-        {
-          type: "RoomAvailability",
-          id: `${reservation.roomId}_${reservation.checkInDate}_${reservation.checkOutDate}`,
-        },
-      ])
+      reservationApi.util.updateQueryData(
+        "getPaginatedReservations",
+        { pagination: { page: 1, pageSize: 10 }, filters: {}, sort: {} },
+        updateCache
+      )
     );
+
+    // NO invalidar tags de RoomAvailability para evitar bucles
+    // Solo invalidar el tag específico de la nueva reservación
+    dispatch(reservationApi.util.invalidateTags([{ type: "Reservation", id: reservation.id }]));
+
+    // Resetear el flag después del timeout
+    setTimeout(() => {
+      isUpdating = false;
+    }, updateTimeout);
   };
 
   const handleUpdatedReservation = (reservation: DetailedReservation) => {
+    if (isUpdating) return;
+
+    isUpdating = true;
+
+    // Actualización optimista: actualizar directamente en el cache
+    const updateReservationInQuery = (draft: any) => {
+      if (draft?.data && Array.isArray(draft.data)) {
+        const index = draft.data.findIndex((r: DetailedReservation) => r.id === reservation.id);
+        if (index !== -1) {
+          draft.data[index] = reservation;
+        }
+      }
+    };
+
+    // Actualizar solo la primera página (sin filtros)
     dispatch(
-      reservationApi.util.invalidateTags([
-        { type: "Reservation", id: reservation.id },
-        {
-          type: "RoomAvailability",
-          id: `${reservation.roomId}_${reservation.checkInDate}_${reservation.checkOutDate}`,
-        },
-      ])
+      reservationApi.util.updateQueryData(
+        "getPaginatedReservations",
+        { pagination: { page: 1, pageSize: 10 }, filters: {}, sort: {} },
+        updateReservationInQuery
+      )
     );
+
+    // Solo invalidar el tag específico de la reservación actualizada
+    dispatch(reservationApi.util.invalidateTags([{ type: "Reservation", id: reservation.id }]));
+
+    setTimeout(() => {
+      isUpdating = false;
+    }, updateTimeout);
   };
 
   const handleDeletedReservation = ({ id }: { id: string }) => {
-    dispatch(reservationApi.util.invalidateTags([{ type: "Reservation", id }]));
+    if (isUpdating) return;
+
+    isUpdating = true;
+
+    // Actualización optimista: remover directamente del cache
+    const removeReservationFromQuery = (draft: any) => {
+      if (draft?.data && Array.isArray(draft.data)) {
+        const index = draft.data.findIndex((r: DetailedReservation) => r.id === id);
+        if (index !== -1) {
+          draft.data.splice(index, 1);
+          if (draft.meta) {
+            draft.meta.total -= 1;
+          }
+        }
+      }
+    };
+
+    // Actualizar solo la primera página (sin filtros)
+    dispatch(
+      reservationApi.util.updateQueryData(
+        "getPaginatedReservations",
+        { pagination: { page: 1, pageSize: 10 }, filters: {}, sort: {} },
+        removeReservationFromQuery
+      )
+    );
+
+    // Solo invalidar el tag específico de la reservación eliminada
+    dispatch(reservationApi.util.invalidateTags([{ type: "Reservation", id: id }]));
+
+    setTimeout(() => {
+      isUpdating = false;
+    }, updateTimeout);
   };
 
+  // DESHABILITADOS para evitar bucles en available-rooms
   const handleAvailabilityChanged = ({ checkInDate, checkOutDate }: { checkInDate: string; checkOutDate: string }) => {
-    dispatch(
-      reservationApi.util.invalidateTags([{ type: "RoomAvailability", id: `GLOBAL_${checkInDate}_${checkOutDate}` }])
-    );
+    // NO invalidar tags para evitar bucles
+    console.log("Availability changed:", { checkInDate, checkOutDate });
   };
 
   const handleRoomAvailabilityChecked = ({
     roomId,
     checkInDate,
     checkOutDate,
+    isAvailable,
   }: {
     roomId: string;
     checkInDate: string;
@@ -301,15 +383,15 @@ export const setupReservationWebsockets = (dispatch: any) => {
     isAvailable: boolean;
     timestamp: string;
   }) => {
-    dispatch(
-      reservationApi.util.invalidateTags([{ type: "RoomAvailability", id: `${roomId}_${checkInDate}_${checkOutDate}` }])
-    );
+    // NO invalidar tags para evitar bucles
+    console.log("Room availability checked:", { roomId, checkInDate, checkOutDate, isAvailable });
   };
 
   const handleCheckoutAvailabilityChecked = ({
     roomId,
     originalCheckoutDate,
     newCheckoutDate,
+    isAvailable,
   }: {
     roomId: string;
     originalCheckoutDate: string;
@@ -317,12 +399,8 @@ export const setupReservationWebsockets = (dispatch: any) => {
     isAvailable: boolean;
     timestamp: string;
   }) => {
-    dispatch(
-      reservationApi.util.invalidateTags([
-        { type: "RoomAvailability", id: `${roomId}_${originalCheckoutDate}_${newCheckoutDate}` },
-        "RoomAvailability",
-      ])
-    );
+    // NO invalidar tags para evitar bucles
+    console.log("Checkout availability checked:", { roomId, originalCheckoutDate, newCheckoutDate, isAvailable });
   };
 
   // Registramos los listeners usando tus métodos existentes

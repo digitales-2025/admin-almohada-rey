@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Table as TableInstance } from "@tanstack/react-table";
 
 import { useProfile } from "@/app/(admin)/profile/_hooks/use-profile";
@@ -51,7 +52,19 @@ export function ReservationTable({
   localSearch,
 }: ReservationTableProps) {
   const { user } = useProfile();
-  const columns = useMemo(() => reservationColumns(user?.isSuperAdmin || false), []);
+  const router = useRouter();
+
+  const handleManagementPaymentInterface = useCallback(
+    (id: string) => {
+      router.push(`/reservation/${id}/payment`);
+    },
+    [router]
+  );
+
+  const columns = useMemo(
+    () => reservationColumns(user?.isSuperAdmin || false, handleManagementPaymentInterface),
+    [user?.isSuperAdmin, handleManagementPaymentInterface]
+  );
 
   const serverPagination = {
     pageIndex: tableState?.pagination.pageIndex ?? pagination.page - 1,
