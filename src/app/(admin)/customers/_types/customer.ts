@@ -15,6 +15,7 @@ export type Customer = {
   documentType: CustomerDocumentType;
   documentNumber: string;
   email?: string;
+  isBlacklist?: boolean;
   birthDate?: string;
   maritalStatus: CustomerMaritalStatus;
   companyName?: string;
