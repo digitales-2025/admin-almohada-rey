@@ -9,6 +9,7 @@ import { UseFormReturn } from "react-hook-form";
 import { CalendarBig } from "@/components/form/CalendarBig";
 import { TimeInput } from "@/components/ui/time-input";
 import {
+  createPersistentData,
   DEFAULT_CHECKIN_TIME,
   DEFAULT_CHECKOUT_TIME,
   formDateToPeruISO,
@@ -17,7 +18,6 @@ import {
   getFormattedCheckInTimeValue,
   getFormattedCheckOutTimeValue,
   getPeruStartOfToday,
-  persistentData,
   peruDateTimeToUTC,
 } from "@/utils/peru-datetime";
 import { useRoomAvailability } from "../../_hooks/use-roomAvailability";
@@ -39,42 +39,42 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
   // Referencia para bloquear actualizaciones mientras están en progreso
   const isUpdating = useRef(false);
 
-  if (!persistentData.initialized) {
+  if (!createPersistentData.initialized) {
     const initialCheckInDate = getAppropriateCheckInDate();
     const initialCheckOutDate = addDays(initialCheckInDate, 1);
     const initialCheckInTime = getAppropriateCheckInTime();
 
-    persistentData.initialValues = {
+    createPersistentData.initialValues = {
       checkInDate: initialCheckInDate,
       checkOutDate: initialCheckOutDate,
       checkInTime: initialCheckInTime,
       checkOutTime: DEFAULT_CHECKOUT_TIME,
     };
 
-    persistentData.currentValues = {
+    createPersistentData.currentValues = {
       activeTab: "checkin",
       checkInDate: initialCheckInDate,
       checkOutDate: initialCheckOutDate,
       checkInTime: initialCheckInTime,
       checkOutTime: DEFAULT_CHECKOUT_TIME,
     };
-    persistentData.initialized = true;
+    createPersistentData.initialized = true;
   }
 
   // Usamos la función de inicialización de useState para evitar recálculos
   const [calendarState, setCalendarState] = useState(() => ({
-    checkInDate: persistentData.currentValues.checkInDate,
-    checkOutDate: persistentData.currentValues.checkOutDate,
-    checkInTime: persistentData.currentValues.checkInTime,
-    checkOutTime: persistentData.currentValues.checkOutTime,
+    checkInDate: createPersistentData.currentValues.checkInDate,
+    checkOutDate: createPersistentData.currentValues.checkOutDate,
+    checkInTime: createPersistentData.currentValues.checkInTime,
+    checkOutTime: createPersistentData.currentValues.checkOutTime,
     formInitialized: false,
-    renderCount: persistentData.renderCount,
+    renderCount: createPersistentData.renderCount,
   }));
 
   // Estado para el rango de fechas seleccionado
   const [selectedRange, setSelectedRange] = useState<DateRange | undefined>(() => ({
-    from: persistentData.currentValues.checkInDate,
-    to: persistentData.currentValues.checkOutDate,
+    from: createPersistentData.currentValues.checkInDate,
+    to: createPersistentData.currentValues.checkOutDate,
   }));
 
   // Hook para verificar disponibilidad
@@ -376,8 +376,8 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
         }
 
         // Actualizar datos persistentes
-        persistentData.currentValues.checkInDate = checkInDate;
-        persistentData.currentValues.checkOutDate = checkOutDate;
+        createPersistentData.currentValues.checkInDate = checkInDate;
+        createPersistentData.currentValues.checkOutDate = checkOutDate;
 
         // Actualizar formulario
         const checkInISO = formDateToPeruISO(
@@ -398,7 +398,7 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
         form.setValue("checkOutDate", checkOutISO, { shouldValidate: false });
 
         // Incrementar contador de renderizado
-        persistentData.renderCount += 1;
+        createPersistentData.renderCount += 1;
 
         // Actualizar estados
         setSelectedRange({ from: checkInDate, to: checkOutDate });
@@ -406,7 +406,7 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
           ...prev,
           checkInDate,
           checkOutDate,
-          renderCount: persistentData.renderCount,
+          renderCount: createPersistentData.renderCount,
         }));
       } finally {
         // Resetear inmediatamente después de completar
@@ -425,7 +425,7 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
 
       try {
         // Primero actualizamos los datos persistentes
-        persistentData.currentValues.checkInTime = timeStr;
+        createPersistentData.currentValues.checkInTime = timeStr;
 
         // Actualizar formulario
         const checkInISO = formDateToPeruISO(
@@ -438,13 +438,13 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
         form.setValue("checkInDate", checkInISO, { shouldValidate: false });
 
         // Incrementar contador de renderizado
-        persistentData.renderCount += 1;
+        createPersistentData.renderCount += 1;
 
         // Actualizar estado central
         setCalendarState((prev) => ({
           ...prev,
           checkInTime: timeStr,
-          renderCount: persistentData.renderCount,
+          renderCount: createPersistentData.renderCount,
         }));
       } finally {
         // Resetear inmediatamente después de completar
@@ -463,7 +463,7 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
 
       try {
         // Primero actualizamos los datos persistentes
-        persistentData.currentValues.checkOutTime = timeStr;
+        createPersistentData.currentValues.checkOutTime = timeStr;
 
         // Actualizar formulario
         const checkOutISO = formDateToPeruISO(
@@ -476,13 +476,13 @@ export default function BookingCalendarTime({ form, roomId, onRoomAvailabilityCh
         form.setValue("checkOutDate", checkOutISO, { shouldValidate: false });
 
         // Incrementar contador de renderizado
-        persistentData.renderCount += 1;
+        createPersistentData.renderCount += 1;
 
         // Actualizar estado central
         setCalendarState((prev) => ({
           ...prev,
           checkOutTime: timeStr,
-          renderCount: persistentData.renderCount,
+          renderCount: createPersistentData.renderCount,
         }));
       } finally {
         // Resetear inmediatamente después de completar

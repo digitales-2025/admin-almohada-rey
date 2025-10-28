@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RefreshCcw } from "lucide-react";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -18,7 +18,12 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { formatPeruBookingDate, formatTimeToHHMMAMPM, formDateToPeruISO } from "@/utils/peru-datetime";
+import {
+  formatPeruBookingDate,
+  formatTimeToHHMMAMPM,
+  formDateToPeruISO,
+  updatePersistentData,
+} from "@/utils/peru-datetime";
 import { UpdateParams, useReservation } from "../../_hooks/use-reservation";
 import {
   DetailedReservation,
@@ -53,19 +58,22 @@ export function UpdateReservationSheet({ reservation, open, onOpenChange }: Upda
 
   const { onUpdateReservation, updateReservationResponse } = useReservation();
 
-  const defaultFormValues = {
-    status: reservation.status ?? "PENDING",
-    customerId: reservation.customerId ?? undefined,
-    roomId: reservation.roomId ?? undefined,
-    userId: reservation.userId ?? undefined,
-    reservationDate: reservation.reservationDate ?? reservation.createdAt ?? reservationDateISO,
-    checkInDate: reservation.checkInDate ?? undefined,
-    checkOutDate: reservation.checkOutDate ?? undefined,
-    guests: reservation.guests ? (JSON.parse(reservation.guests) as ReservationGuest[]) : [],
-    origin: reservation.origin ?? undefined,
-    reason: reservation.reason ?? undefined,
-    observations: reservation.observations ?? undefined,
-  };
+  const defaultFormValues = useMemo(
+    () => ({
+      status: reservation.status ?? "PENDING",
+      customerId: reservation.customerId ?? undefined,
+      roomId: reservation.roomId ?? undefined,
+      userId: reservation.userId ?? undefined,
+      reservationDate: reservation.reservationDate ?? reservation.createdAt ?? reservationDateISO,
+      checkInDate: reservation.checkInDate ?? undefined,
+      checkOutDate: reservation.checkOutDate ?? undefined,
+      guests: reservation.guests ? (JSON.parse(reservation.guests) as ReservationGuest[]) : [],
+      origin: reservation.origin ?? undefined,
+      reason: reservation.reason ?? undefined,
+      observations: reservation.observations ?? undefined,
+    }),
+    [reservation, reservationDateISO]
+  );
 
   const form = useForm<UpdateReservationInput>({
     resolver: zodResolver(updateReservationSchema, undefined, {
@@ -84,31 +92,47 @@ export function UpdateReservationSheet({ reservation, open, onOpenChange }: Upda
     },
   });
 
-  const customOnOpenChange = (open: boolean) => {
-    form.reset();
-    fieldArray.remove();
-    onOpenChange(open);
-  };
+  const customOnOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open) {
+        // Reset completo del formulario
+        form.reset(defaultFormValues);
+        // Limpiar field array
+        fieldArray.remove();
+      } else {
+        // Cuando se abre el diálogo, resetear el estado persistente para esta reserva específica
+        // Esto asegura que cada reserva tenga sus propias fechas
+        updatePersistentData.initialized = false;
+        updatePersistentData.currentReservationId = null;
+      }
+      onOpenChange(open);
+    },
+    [form, fieldArray, defaultFormValues, onOpenChange, reservation.id]
+  );
 
   useEffect(() => {
     if (updateReservationResponse.isSuccess) {
-      form.reset();
+      form.reset(defaultFormValues);
       fieldArray.remove();
       customOnOpenChange(false);
-      // setOpen(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [updateReservationResponse.isSuccess]);
+  }, [updateReservationResponse.isSuccess, form, fieldArray, defaultFormValues, customOnOpenChange]);
 
-  const onSubmit = async (input: UpdateReservationInput) => {
-    const params: UpdateParams = {
-      id: reservation.id,
-      data: input,
-    };
-    onUpdateReservation(params);
-  };
+  const onSubmit = useCallback(
+    async (input: UpdateReservationInput) => {
+      const params: UpdateParams = {
+        id: reservation.id,
+        data: input,
+      };
+      onUpdateReservation(params);
+    },
+    [reservation.id, onUpdateReservation]
+  );
 
-  const formattedReservationDate = formatPeruBookingDate(reservation.reservationDate);
+  const formattedReservationDate = useMemo(
+    () => formatPeruBookingDate(reservation.reservationDate),
+    [reservation.reservationDate]
+  );
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -133,7 +157,7 @@ export function UpdateReservationSheet({ reservation, open, onOpenChange }: Upda
             reservation={reservation}
           >
             <SheetFooter className="gap-2 pt-2 sm:space-x-0">
-              <div className="flex flex-row-reverse gap-2 justify-center">
+              <div className="flex flex-col-reverse gap-2 justify-center">
                 <Button type="submit" disabled={updateReservationResponse.isLoading}>
                   {updateReservationResponse.isLoading && (
                     <RefreshCcw className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
