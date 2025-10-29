@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import { useAdvancedPagination } from "@/hooks/useAdvancedPagination";
 import { AdvancedFilters, SortParams } from "@/types/query-filters/advanced-pagination";
@@ -18,13 +18,38 @@ export function useAdvancedCustomers({
   initialSearch = "",
 }: UseAdvancedCustomersOptions) {
   // Usar el hook genérico
-  const { filtersState, filtersActions, tableState, tableActions, localSearch, getFilterValueByColumn } =
-    useAdvancedPagination({
-      initialPagination,
-      initialFilters,
-      initialSort,
-      initialSearch,
+  const { filtersState, filtersActions, tableState, tableActions, localSearch } = useAdvancedPagination({
+    initialPagination,
+    initialFilters,
+    initialSort,
+    initialSearch,
+  });
+
+  // Mapear filtros de columnas a parámetros de API
+  const mapFiltersToApiParams = (filters: Record<string, any>) => {
+    const mappedFilters: Record<string, any> = {};
+
+    Object.entries(filters).forEach(([key, value]) => {
+      switch (key) {
+        case "estado":
+          mappedFilters.isActive = value;
+          break;
+        case "lista negra":
+          mappedFilters.isBlacklist = value;
+          break;
+        case "e. civil":
+          mappedFilters.maritalStatus = value;
+          break;
+        case "tipo":
+          mappedFilters.documentType = value;
+          break;
+        default:
+          mappedFilters[key] = value;
+      }
     });
+
+    return mappedFilters;
+  };
 
   // Query específica para customers
   const {
@@ -35,7 +60,7 @@ export function useAdvancedCustomers({
   } = useGetPaginatedCustomersQuery({
     pagination: filtersState.pagination,
     filters: {
-      ...filtersState.filters,
+      ...mapFiltersToApiParams(filtersState.filters),
       ...(filtersState.search && { search: filtersState.search }),
     },
     sort: filtersState.sort,
@@ -45,6 +70,27 @@ export function useAdvancedCustomers({
   const manualRefetch = useCallback(() => {
     refetch();
   }, [refetch]);
+
+  // Acciones personalizadas de tabla para manejar filtros correctamente
+  const customTableActions = useMemo(() => {
+    if (!tableActions) return undefined;
+    return {
+      ...tableActions,
+      setColumnFilters: (filters: Array<{ id: string; value: any }>) => {
+        if (filters.length === 0) {
+          // Limpiar todos los filtros
+          filtersActions.setFilter("estado", undefined);
+          filtersActions.setFilter("lista negra", undefined);
+          filtersActions.setFilter("e. civil", undefined);
+          filtersActions.setFilter("tipo", undefined);
+          return;
+        }
+        filters.forEach((filter) => {
+          filtersActions.setFilter(filter.id, filter.value);
+        });
+      },
+    };
+  }, [tableActions, filtersActions]);
 
   return {
     // Datos
@@ -58,12 +104,14 @@ export function useAdvancedCustomers({
     filtersState,
     filtersActions,
 
-    // Estado para TanStack Table (del hook genérico)
+    // Estado para TanStack Table (con acciones personalizadas)
     tableState,
-    tableActions,
+    tableActions: customTableActions,
 
-    // Función para obtener valores de filtros por columna (del hook genérico)
-    getFilterValueByColumn,
+    // Función para obtener valores de filtros por columna (acceso directo al estado)
+    getFilterValueByColumn: (columnId: string) => {
+      return filtersState.filters[columnId];
+    },
 
     // Estado local del input para mostrar en la UI (del hook genérico)
     localSearch,

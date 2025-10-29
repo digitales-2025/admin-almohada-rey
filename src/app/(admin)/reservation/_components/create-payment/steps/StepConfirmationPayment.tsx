@@ -75,6 +75,17 @@ export default function StepConfirmationPayment({ form, reservation }: StepConfi
                 <span className="text-sm text-muted-foreground">Precio por noche:</span>
                 <span className="font-medium text-sm">S/. {form.getValues("unitPrice").toFixed(2)}</span>
               </div>
+
+              {(() => {
+                const discount = form.getValues("discount");
+                return discount && discount > 0 ? (
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Descuento:</span>
+                    <span className="font-medium text-sm text-green-600">-S/. {discount.toFixed(2)}</span>
+                  </div>
+                ) : null;
+              })()}
+
               <Separator />
 
               <div className="flex justify-between pt-1">

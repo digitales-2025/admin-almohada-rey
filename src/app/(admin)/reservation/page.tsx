@@ -6,6 +6,7 @@ import { FilterX } from "lucide-react";
 import { HeaderPage } from "@/components/common/HeaderPage";
 import ErrorGeneral from "@/components/errors/general-error";
 import { Button } from "@/components/ui/button";
+import { WebSocketConnectionIndicator } from "@/components/websocket-connection-indicator";
 import { FilterReservationDialog } from "./_components/filter/FilterReservationDialog";
 import { ReservationTable } from "./_components/table/ReservationTable";
 import { useAdvancedReservations } from "./_hooks/useAdvancedReservations";
@@ -75,7 +76,10 @@ export default function ReservationPage() {
 
   return (
     <div>
-      <HeaderPage title={METADATA.entityPluralName} description={METADATA.description} />
+      <div className="flex flex-col sm:flex-row justify-between gap-2">
+        <HeaderPage title={METADATA.entityPluralName} description={METADATA.description} />
+        <WebSocketConnectionIndicator showDetails={true} />
+      </div>
       <div className="flex flex-col items-start space-x-2 space-y-2 py-2 sm:flex-row sm:space-x-1 lg:space-y-0">
         <FilterReservationDialog paginatedHookResponse={paginatedHookResponse} />
         <Button onClick={() => {}} variant="outline" size="sm" className="flex items-center space-x-1">

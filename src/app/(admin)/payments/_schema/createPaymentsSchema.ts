@@ -21,6 +21,7 @@ export const paymentSchema = z.object({
   days: z.number().min(1, "Se registraro el pago de todas las noches"),
   unitPrice: z.number().min(0, "El precio de la habitación debe ser al menos 0"),
   subtotal: z.number().min(0, "El subtotal de la habitación debe ser al menos 0"),
+  discount: z.number().min(0, "El descuento debe ser al menos 0").optional(),
   // Servicios extra (array opcional)
   extraServices: z.array(extraServiceSchema).optional().default([]),
   method: z.nativeEnum(PaymentDetailMethod, {

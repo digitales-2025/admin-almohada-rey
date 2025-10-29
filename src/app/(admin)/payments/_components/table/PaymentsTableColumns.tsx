@@ -6,6 +6,7 @@ import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { Banknote, BedDouble, CalendarDays, Ellipsis, Utensils } from "lucide-react";
 
+import { getRoomTypeKey, RoomTypeLabels } from "@/app/(admin)/rooms/list/_utils/rooms.utils";
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -72,6 +73,41 @@ export const paymentsColumns = (
     accessorKey: "reservation.customer.name",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Cliente" />,
     cell: ({ row }) => <div className="min-w-40 truncate capitalize">{row.getValue("cliente")}</div>,
+  },
+
+  {
+    id: "habitacion",
+    accessorKey: "reservation.room",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Habitación" />,
+    cell: ({ row }) => {
+      const room = row.original.reservation.room;
+
+      if (!room) {
+        return <div className="text-muted-foreground text-sm">Sin habitación</div>;
+      }
+
+      const roomTypeKey = getRoomTypeKey(room.RoomTypes.name);
+      const roomTypeConfig = RoomTypeLabels[roomTypeKey];
+      const Icon = roomTypeConfig.icon;
+
+      return (
+        <div className="flex items-center space-x-2">
+          <div
+            className={`p-1 rounded-full ${roomTypeConfig.className
+              .replace("text-", "bg-")
+              .replace("-700", "-100")} dark:${roomTypeConfig.className
+              .replace("text-", "bg-")
+              .replace("-700", "-900")}`}
+          >
+            <Icon className={`h-3 w-3 ${roomTypeConfig.className}`} strokeWidth={2} />
+          </div>
+          <div className="flex flex-col">
+            <span className="font-medium text-sm">#{room.number}</span>
+            <span className="text-xs text-muted-foreground capitalize">{room.RoomTypes.name}</span>
+          </div>
+        </div>
+      );
+    },
   },
 
   {

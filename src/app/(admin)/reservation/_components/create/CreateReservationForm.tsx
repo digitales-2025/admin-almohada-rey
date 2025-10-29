@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { ListCheck, MapPinHouse } from "lucide-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { AlertCircle, CheckCircle, Clock, ListCheck, MapPinHouse } from "lucide-react";
 import { UseFieldArrayReturn, UseFormReturn } from "react-hook-form";
 
 import { Customer } from "@/app/(admin)/customers/_types/customer";
@@ -46,6 +46,7 @@ export default function CreateReservationForm({
   const [selectedRoom, setSelectedRoom] = useState<DetailedRoom | undefined>(undefined);
   const [guestNumber, setGuestNumber] = useState<number>(0);
   const [isRoomAvailable, setIsRoomAvailable] = useState(true);
+  const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
 
   const initialLoadCompleted = useRef(false);
 
@@ -53,8 +54,17 @@ export default function CreateReservationForm({
     checkInDate: form.getValues("checkInDate"),
     checkOutDate: form.getValues("checkOutDate"),
   };
-  const { isLoading, isError, error, availableRooms, checkAvailability, refetch } =
-    useAllAvailableRoomsInTimeInterval(defaultCheckInCheckOutDates);
+  const {
+    isLoading,
+    isError,
+    error,
+    availableRooms,
+    checkAvailability: checkAvailabilityOriginal,
+    refetch,
+  } = useAllAvailableRoomsInTimeInterval(defaultCheckInCheckOutDates);
+
+  // Estabilizar la función checkAvailability para evitar bucles infinitos
+  const checkAvailability = useCallback(checkAvailabilityOriginal, [checkAvailabilityOriginal]);
   const { useAllReasonsQuery } = useReservation();
   const { data: reasons, isLoading: isLoadingReasons } = useAllReasonsQuery();
   const { watch, register } = form;
@@ -73,41 +83,130 @@ export default function CreateReservationForm({
     setSelectedRoom(room);
   };
 
+  // Componente para mostrar el estado de disponibilidad
+  const AvailabilityStatus = () => {
+    if (!roomId) return null;
+
+    if (isCheckingAvailability) {
+      return (
+        <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <Clock className="h-4 w-4 text-blue-600 animate-spin" />
+          <span className="text-sm font-medium text-blue-800">Verificando disponibilidad de la habitación...</span>
+        </div>
+      );
+    }
+
+    if (isRoomAvailable) {
+      return (
+        <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+          <CheckCircle className="h-4 w-4 text-green-600" />
+          <span className="text-sm font-medium text-green-800">
+            Habitación disponible para las fechas seleccionadas
+          </span>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+        <AlertCircle className="h-4 w-4 text-red-600" />
+        <div className="flex-1">
+          <span className="text-sm font-medium text-red-800 block">Habitación no disponible</span>
+          <span className="text-xs text-red-600">
+            La habitación seleccionada no está disponible para estas fechas. Por favor, selecciona otras fechas o una
+            habitación diferente.
+          </span>
+        </div>
+      </div>
+    );
+  };
+
   // Referencia para controlar las llamadas a verificación de disponibilidad
   const availabilityCheckRef = useRef({
     lastCheckInDate: "",
     lastCheckOutDate: "",
     isChecking: false,
+    timeoutId: null as NodeJS.Timeout | null,
+    lastWebSocketEvent: "",
+    forceCheck: false, // Flag para forzar verificación por WebSocket
   });
 
   // Ejecutar solo cuando cambian las fechas relevantes
   useEffect(() => {
+    // Copiar referencia para el cleanup
+    const currentRef = availabilityCheckRef.current;
+
+    // Limpiar timeout anterior si existe
+    if (currentRef.timeoutId) {
+      clearTimeout(currentRef.timeoutId);
+    }
+
+    // Resetear flag de checking cuando cambian las fechas
+    if (currentRef.isChecking) {
+      currentRef.isChecking = false;
+      setIsCheckingAvailability(false);
+    }
+
     // Solo verificar disponibilidad cuando ambos valores estén presentes
     if (checkInDate && checkOutDate) {
+      // Convertir las fechas a strings ISO para la comparación
+      const checkInDateStr =
+        checkInDate && typeof checkInDate === "object" && "toISOString" in checkInDate
+          ? (checkInDate as Date).toISOString()
+          : String(checkInDate);
+      const checkOutDateStr =
+        checkOutDate && typeof checkOutDate === "object" && "toISOString" in checkOutDate
+          ? (checkOutDate as Date).toISOString()
+          : String(checkOutDate);
+
       // Verificar si ya hemos procesado esta combinación de fechas
       if (
-        availabilityCheckRef.current.lastCheckInDate === checkInDate &&
-        availabilityCheckRef.current.lastCheckOutDate === checkOutDate
+        currentRef.lastCheckInDate === checkInDateStr &&
+        currentRef.lastCheckOutDate === checkOutDateStr &&
+        !currentRef.forceCheck
       ) {
-        // Ya hemos procesado esta combinación, no hacer nada
+        return;
+      }
+
+      // Si es un force check, resetear el flag
+      if (currentRef.forceCheck) {
+        currentRef.forceCheck = false;
+      }
+
+      // Si ya está verificando, no hacer nada
+      if (currentRef.isChecking) {
         return;
       }
 
       // Actualizar referencias antes de la verificación
-      availabilityCheckRef.current.lastCheckInDate = checkInDate;
-      availabilityCheckRef.current.lastCheckOutDate = checkOutDate;
-      availabilityCheckRef.current.isChecking = true;
+      currentRef.lastCheckInDate = checkInDateStr;
+      currentRef.lastCheckOutDate = checkOutDateStr;
+      currentRef.isChecking = true;
 
-      // Realizar la verificación
-      checkAvailability({
-        checkInDate,
-        checkOutDate,
-      });
+      // Mostrar estado de carga
+      setIsCheckingAvailability(true);
 
-      // Marcar como completada la verificación
-      availabilityCheckRef.current.isChecking = false;
+      // Debounce: esperar 500ms antes de verificar
+      currentRef.timeoutId = setTimeout(() => {
+        // Realizar la verificación con las fechas convertidas
+        checkAvailability({
+          checkInDate: checkInDateStr,
+          checkOutDate: checkOutDateStr,
+        });
+
+        // Marcar como completada la verificación inmediatamente
+        currentRef.isChecking = false;
+        setIsCheckingAvailability(false);
+      }, 500);
     }
-  }, [checkInDate, checkOutDate]);
+
+    // Cleanup
+    return () => {
+      if (currentRef.timeoutId) {
+        clearTimeout(currentRef.timeoutId);
+      }
+    };
+  }, [checkInDate, checkOutDate, checkAvailability, roomId]);
 
   // --- Efecto para marcar cuando la carga inicial se ha completado ---
   useEffect(() => {
@@ -115,6 +214,122 @@ export default function CreateReservationForm({
       initialLoadCompleted.current = true;
     }
   }, [isLoading]);
+
+  // --- Escuchar eventos WebSocket de disponibilidad ---
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout | null = null;
+
+    const handleAvailabilityChange = (data: { checkInDate: string; checkOutDate: string }) => {
+      // Crear un identificador único para este evento
+      const eventId = `${data.checkInDate}_${data.checkOutDate}`;
+      const lastEventId = availabilityCheckRef.current.lastWebSocketEvent;
+
+      // Evitar procesar el mismo evento múltiples veces
+      if (lastEventId === eventId) {
+        return;
+      }
+
+      // Verificar si hay conflicto de rangos de fechas
+      if (checkInDate && checkOutDate) {
+        const myCheckIn = new Date(checkInDate);
+        const myCheckOut = new Date(checkOutDate);
+        const eventCheckIn = new Date(data.checkInDate);
+        const eventCheckOut = new Date(data.checkOutDate);
+
+        // Verificar si los rangos se solapan
+        const hasConflict = myCheckIn < eventCheckOut && myCheckOut > eventCheckIn;
+
+        if (!hasConflict) {
+          return;
+        }
+      }
+
+      // Activar flag para forzar verificación
+      availabilityCheckRef.current.forceCheck = true;
+
+      // Debounce: esperar 1 segundo antes de procesar
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+
+      timeoutId = setTimeout(() => {
+        // Forzar una nueva verificación si tenemos fechas y habitación
+        if (checkInDate && checkOutDate && roomId) {
+          // Resetear flags para permitir nueva verificación
+          availabilityCheckRef.current.isChecking = false;
+          availabilityCheckRef.current.lastCheckInDate = "";
+          availabilityCheckRef.current.lastCheckOutDate = "";
+
+          // Ejecutar verificación inmediatamente
+          const checkInDateStr =
+            checkInDate && typeof checkInDate === "object" && "toISOString" in checkInDate
+              ? (checkInDate as Date).toISOString()
+              : String(checkInDate);
+          const checkOutDateStr =
+            checkOutDate && typeof checkOutDate === "object" && "toISOString" in checkOutDate
+              ? (checkOutDate as Date).toISOString()
+              : String(checkOutDate);
+
+          checkAvailability({
+            checkInDate: checkInDateStr,
+            checkOutDate: checkOutDateStr,
+          });
+
+          // Actualizar la referencia del último evento WebSocket DESPUÉS de procesar
+          availabilityCheckRef.current.lastWebSocketEvent = eventId;
+        }
+      }, 1000);
+    };
+
+    // Importar socketService dinámicamente para evitar problemas de SSR
+    import("@/services/socketService").then(({ socketService }) => {
+      const unsubscribe = socketService.onAvailabilityChanged(handleAvailabilityChange);
+
+      return () => {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+        unsubscribe();
+      };
+    });
+  }, [checkInDate, checkOutDate, roomId, checkAvailability]);
+
+  // --- Escuchar eventos de habitación liberada por cancelación ---
+  useEffect(() => {
+    const handleRoomFreed = (event: CustomEvent) => {
+      const { roomId: freedRoomId, action } = event.detail;
+
+      // Solo procesar si es la habitación actual y la acción es 'freed'
+      if (freedRoomId === roomId && action === "freed") {
+        // Forzar nueva verificación de disponibilidad
+        availabilityCheckRef.current.forceCheck = true;
+
+        // Ejecutar verificación inmediatamente si tenemos fechas
+        if (checkInDate && checkOutDate) {
+          const checkInDateStr =
+            checkInDate && typeof checkInDate === "object" && "toISOString" in checkInDate
+              ? (checkInDate as Date).toISOString()
+              : String(checkInDate);
+          const checkOutDateStr =
+            checkOutDate && typeof checkOutDate === "object" && "toISOString" in checkOutDate
+              ? (checkOutDate as Date).toISOString()
+              : String(checkOutDate);
+
+          checkAvailability({
+            checkInDate: checkInDateStr,
+            checkOutDate: checkOutDateStr,
+          });
+        }
+      }
+    };
+
+    // Escuchar el evento personalizado
+    window.addEventListener("roomAvailabilityChanged", handleRoomFreed as EventListener);
+
+    return () => {
+      window.removeEventListener("roomAvailabilityChanged", handleRoomFreed as EventListener);
+    };
+  }, [roomId, checkInDate, checkOutDate, checkAvailability]);
 
   const handleAddGuest = () => {
     append({
@@ -177,18 +392,21 @@ export default function CreateReservationForm({
             required={FORMSTATICS.observations.required}
             validateOptionalField={false}
           ></CustomFormDescription>
+          {/* Errores de validación de fechas */}
           {form.formState.errors.checkInDate || form.formState.errors.checkOutDate ? (
-            <FormMessage className="text-destructive">
-              {form.formState.errors.checkInDate?.message || form.formState.errors.checkOutDate?.message}
-            </FormMessage>
+            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <AlertCircle className="h-4 w-4 text-red-600" />
+              <div className="flex-1">
+                <span className="text-sm font-medium text-red-800 block">Error en las fechas seleccionadas</span>
+                <span className="text-xs text-red-600">
+                  {form.formState.errors.checkInDate?.message || form.formState.errors.checkOutDate?.message}
+                </span>
+              </div>
+            </div>
           ) : null}
 
-          {!isRoomAvailable && roomId && (
-            <FormMessage className="text-destructive">
-              La habitación seleccionada no está disponible para estas fechas. Por favor, selecciona otras fechas o una
-              habitación diferente.
-            </FormMessage>
-          )}
+          {/* Estado de disponibilidad mejorado */}
+          <AvailabilityStatus />
         </div>
 
         <Separator className="col-span-2" />
@@ -349,6 +567,7 @@ export default function CreateReservationForm({
             </FormItem>
           )}
         />
+
         {children}
       </form>
     </Form>

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { isBefore, isSameDay } from "date-fns";
-import { ListCheck, MapPinHouse, UserRoundCheck } from "lucide-react";
+import { AlertCircle, CheckCircle, Clock, ListCheck, MapPinHouse, UserRoundCheck } from "lucide-react";
 import { UseFieldArrayReturn, UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -13,7 +12,6 @@ import { AutoComplete } from "@/components/ui/autocomplete";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { formatPeruBookingDate, getPeruStartOfToday } from "@/utils/peru-datetime";
 import { processError } from "@/utils/process-error";
 import { useReservation } from "../../_hooks/use-reservation";
 import { useAllAvailableRoomsInTimeIntervalForUpdate } from "../../_hooks/use-roomAvailability";
@@ -32,19 +30,6 @@ interface UpdateReservationFormProps {
   onSubmit: (data: UpdateReservationInput) => void;
 }
 
-// Singleton para controlar las verificaciones de disponibilidad entre todos los componentes
-const availabilityControlSingleton = {
-  lastCheckedValues: new Map<
-    string,
-    {
-      roomId: string;
-      checkInDate: string;
-      checkOutDate: string;
-    }
-  >(),
-  isChecking: new Set<string>(),
-};
-
 export default function UpdateReservationForm({
   children,
   form,
@@ -55,6 +40,14 @@ export default function UpdateReservationForm({
   // Referencias para optimizar verificaciones y estados
   const initialLoadCompleted = useRef(false);
   const reservationId = reservation.id;
+  const availabilityCheckRef = useRef({
+    lastCheckInDate: "",
+    lastCheckOutDate: "",
+    lastRoomId: "",
+    isChecking: false,
+    timeoutId: null as NodeJS.Timeout | null,
+    forceCheck: false,
+  });
 
   // Estados de UI
   const [allowGuests, setAllowGuests] = useState(true);
@@ -63,13 +56,6 @@ export default function UpdateReservationForm({
 
   // Estado para coordinar verificaciones entre padre e hijo
   const [isParentCheckingAvailability, setIsParentCheckingAvailability] = useState(false);
-
-  // Determinación de reservación en el pasado (memoizada)
-  const reservationCheckInIsInThePast = useMemo(() => {
-    const today = getPeruStartOfToday();
-    const reservationDate = new Date(reservation.checkInDate);
-    return isBefore(reservationDate, today) || isSameDay(reservationDate, today);
-  }, [reservation.checkInDate]);
 
   // Extraer utilidades del formulario
   const { watch, register } = form;
@@ -94,64 +80,87 @@ export default function UpdateReservationForm({
   const { useAllReasonsQuery } = useReservation();
   const { data: reasons, isLoading: isLoadingReasons } = useAllReasonsQuery();
 
-  // Función optimizada para verificar disponibilidad (reutilizable)
-  const verifyAvailability = useCallback(() => {
-    // Solo verificar si hay valores válidos y no estamos en el pasado
-    if (!roomId || !checkInDate || !checkOutDate || reservationCheckInIsInThePast) {
+  // Efecto que ejecuta la verificación cuando cambian los valores importantes
+  useEffect(() => {
+    // Solo verificar si hay valores válidos
+    if (!roomId || !checkInDate || !checkOutDate) {
       return;
     }
 
-    // Crear ID único para esta verificación
-    const verificationId = `${reservationId}-${roomId}`;
+    // Copiar referencia para el cleanup
+    const currentRef = availabilityCheckRef.current;
 
-    // Evitar verificaciones simultáneas
-    if (availabilityControlSingleton.isChecking.has(verificationId)) {
-      return;
+    // Limpiar timeout anterior si existe
+    if (currentRef.timeoutId) {
+      clearTimeout(currentRef.timeoutId);
     }
 
-    // Verificar si esta combinación ya se procesó
-    const lastCheckedValue = availabilityControlSingleton.lastCheckedValues.get(verificationId);
+    // Resetear flag de checking cuando cambian los valores
+    if (currentRef.isChecking) {
+      currentRef.isChecking = false;
+      setIsParentCheckingAvailability(false);
+    }
+
+    // Convertir las fechas a strings ISO para la comparación
+    const checkInDateStr =
+      checkInDate && typeof checkInDate === "object" && "toISOString" in checkInDate
+        ? (checkInDate as Date).toISOString()
+        : String(checkInDate);
+    const checkOutDateStr =
+      checkOutDate && typeof checkOutDate === "object" && "toISOString" in checkOutDate
+        ? (checkOutDate as Date).toISOString()
+        : String(checkOutDate);
+
+    // Verificar si ya hemos procesado esta combinación
     if (
-      lastCheckedValue &&
-      lastCheckedValue.roomId === roomId &&
-      lastCheckedValue.checkInDate === checkInDate &&
-      lastCheckedValue.checkOutDate === checkOutDate
+      currentRef.lastCheckInDate === checkInDateStr &&
+      currentRef.lastCheckOutDate === checkOutDateStr &&
+      currentRef.lastRoomId === roomId &&
+      !currentRef.forceCheck
     ) {
       return;
     }
 
-    // Marcar como verificando
-    availabilityControlSingleton.isChecking.add(verificationId);
-    // Señalar que estamos verificando (para coordinar con el componente hijo)
+    // Si es un force check, resetear el flag
+    if (currentRef.forceCheck) {
+      currentRef.forceCheck = false;
+    }
+
+    // Si ya está verificando, no hacer nada
+    if (currentRef.isChecking) {
+      return;
+    }
+
+    // Actualizar referencias antes de la verificación
+    currentRef.lastCheckInDate = checkInDateStr;
+    currentRef.lastCheckOutDate = checkOutDateStr;
+    currentRef.lastRoomId = roomId;
+    currentRef.isChecking = true;
+
+    // Señalar que estamos verificando
     setIsParentCheckingAvailability(true);
 
-    try {
-      // Actualizar registro de valores verificados
-      availabilityControlSingleton.lastCheckedValues.set(verificationId, {
-        roomId,
-        checkInDate,
-        checkOutDate,
-      });
-
+    // Debounce: esperar 500ms antes de verificar
+    currentRef.timeoutId = setTimeout(() => {
       // Realizar la verificación
       checkAvailability({
-        checkInDate,
-        checkOutDate,
+        checkInDate: checkInDateStr,
+        checkOutDate: checkOutDateStr,
         reservationId,
       });
-    } finally {
-      // Quitar marca de verificación después de un tiempo
-      setTimeout(() => {
-        availabilityControlSingleton.isChecking.delete(verificationId);
-        setIsParentCheckingAvailability(false);
-      }, 300);
-    }
-  }, [roomId, checkInDate, checkOutDate, reservationId, reservationCheckInIsInThePast, checkAvailability]);
 
-  // Efecto que ejecuta la verificación cuando cambian los valores importantes
-  useEffect(() => {
-    verifyAvailability();
-  }, [verifyAvailability]);
+      // Marcar como completada la verificación
+      currentRef.isChecking = false;
+      setIsParentCheckingAvailability(false);
+    }, 500);
+
+    // Cleanup
+    return () => {
+      if (currentRef.timeoutId) {
+        clearTimeout(currentRef.timeoutId);
+      }
+    };
+  }, [roomId, checkInDate, checkOutDate, reservationId, checkAvailability]);
 
   // Manejo de errores en la verificación
   useEffect(() => {
@@ -168,8 +177,8 @@ export default function UpdateReservationForm({
     }
   }, [isLoading]);
 
-  // Funciones de manejo de huéspedes
-  const handleAddGuest = () => {
+  // Funciones de manejo de huéspedes optimizadas
+  const handleAddGuest = useCallback(() => {
     controlledFieldArray.append({
       name: "",
       age: 0,
@@ -179,11 +188,14 @@ export default function UpdateReservationForm({
       email: undefined,
       additionalInfo: undefined,
     });
-  };
+  }, [controlledFieldArray]);
 
-  const handleRemoveGuest = (index: number) => {
-    controlledFieldArray.remove(index);
-  };
+  const handleRemoveGuest = useCallback(
+    (index: number) => {
+      controlledFieldArray.remove(index);
+    },
+    [controlledFieldArray]
+  );
 
   // Opciones de habitaciones
   const roomOptions = useMemo(
@@ -210,6 +222,44 @@ export default function UpdateReservationForm({
     setSelectedRoom(room);
   }, []);
 
+  // Componente para mostrar el estado de disponibilidad
+  const AvailabilityStatus = () => {
+    if (!roomId) return null;
+
+    if (isParentCheckingAvailability) {
+      return (
+        <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <Clock className="h-4 w-4 text-blue-600 animate-spin" />
+          <span className="text-sm font-medium text-blue-800">Verificando disponibilidad de la habitación...</span>
+        </div>
+      );
+    }
+
+    if (isRoomAvailable) {
+      return (
+        <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+          <CheckCircle className="h-4 w-4 text-green-600" />
+          <span className="text-sm font-medium text-green-800">
+            Habitación disponible para las fechas seleccionadas
+          </span>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+        <AlertCircle className="h-4 w-4 text-red-600" />
+        <div className="flex-1">
+          <span className="text-sm font-medium text-red-800 block">Habitación no disponible</span>
+          <span className="text-xs text-red-600">
+            La habitación seleccionada no está disponible para estas fechas. Por favor, selecciona otras fechas o una
+            habitación diferente.
+          </span>
+        </div>
+      </div>
+    );
+  };
+
   // Estados de carga y error - Solo mostrar loading skeleton en la carga inicial
   if (isLoading && !initialLoadCompleted.current) {
     return <LoadingFormSkeleton />;
@@ -235,55 +285,31 @@ export default function UpdateReservationForm({
         <Separator />
 
         {/* Selección de fechas - Solo visible si la reserva no está en el pasado */}
-        <div>
-          {!reservationCheckInIsInThePast ? (
-            <div className="space-y-2">
-              <UpdateBookingCalendarTime
-                form={form}
-                roomId={roomId}
-                onRoomAvailabilityChange={setIsRoomAvailable}
-                reservation={reservation}
-                parentIsCheckingAvailability={isParentCheckingAvailability}
-              />
-              <CustomFormDescription
-                required={UPDATE_FORMSTATICS.observations.required}
-                validateOptionalField={false}
-              />
-              {form.formState.errors.checkInDate || form.formState.errors.checkOutDate ? (
-                <FormMessage className="text-destructive">
-                  {form.formState.errors.checkInDate?.message || form.formState.errors.checkOutDate?.message}
-                </FormMessage>
-              ) : null}
+        <div className="space-y-4">
+          <UpdateBookingCalendarTime
+            form={form}
+            roomId={roomId}
+            onRoomAvailabilityChange={setIsRoomAvailable}
+            reservation={reservation}
+            parentIsCheckingAvailability={isParentCheckingAvailability}
+          />
+          <CustomFormDescription required={UPDATE_FORMSTATICS.observations.required} validateOptionalField={false} />
 
-              {!isRoomAvailable && roomId && (
-                <FormMessage className="text-destructive">
-                  La habitación seleccionada no está disponible para estas fechas. Por favor, selecciona otras fechas o
-                  una habitación diferente.
-                </FormMessage>
-              )}
-            </div>
-          ) : (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-              <div className="space-y-0.5">
-                <FormLabel>Reserva en el pasado</FormLabel>
-                <FormDescription>
-                  La reserva no puede ser editada o reprogramada porque la fecha de check-in es anterior a la fecha
-                  actual.
-                </FormDescription>
-                <FormDescription>
-                  <span className="block">
-                    Fecha de check-in: {formatPeruBookingDate(reservation.checkInDate).localeDateString}
-                  </span>
-                  <span className="block">
-                    Fecha de check-out: {formatPeruBookingDate(reservation.checkOutDate).localeDateString}
-                  </span>
-                </FormDescription>
+          {/* Errores de validación de fechas */}
+          {form.formState.errors.checkInDate || form.formState.errors.checkOutDate ? (
+            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <AlertCircle className="h-4 w-4 text-red-600" />
+              <div className="flex-1">
+                <span className="text-sm font-medium text-red-800 block">Error en las fechas seleccionadas</span>
+                <span className="text-xs text-red-600">
+                  {form.formState.errors.checkInDate?.message || form.formState.errors.checkOutDate?.message}
+                </span>
               </div>
-              <FormControl>
-                <UserRoundCheck className="text-primary shrink-0" />
-              </FormControl>
-            </FormItem>
-          )}
+            </div>
+          ) : null}
+
+          {/* Estado de disponibilidad mejorado */}
+          <AvailabilityStatus />
         </div>
 
         <Separator />
@@ -305,9 +331,9 @@ export default function UpdateReservationForm({
 
         <Separator />
 
-        {/* Sección de huéspedes - Siempre ocupa 2 columnas */}
-        <div>
-          {selectedRoom?.RoomTypes?.guests && (
+        {/* Sección de huéspedes - Solo mostrar si la habitación permite más de 1 huésped */}
+        {selectedRoom?.RoomTypes?.guests && selectedRoom.RoomTypes.guests > 1 && (
+          <div>
             <div className="mb-4">
               <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                 <div className="space-y-0.5">
@@ -328,20 +354,38 @@ export default function UpdateReservationForm({
                 </FormControl>
               </FormItem>
             </div>
-          )}
 
-          {allowGuests && selectedRoom?.RoomTypes?.guests && (
-            <UpdateReservationGuestTable
-              controlledFieldArray={controlledFieldArray}
-              form={form}
-              handleAddGuest={handleAddGuest}
-              handleRemoveGuest={handleRemoveGuest}
-              register={register}
-              selectedRoom={selectedRoom}
-              watch={watch}
-            />
-          )}
-        </div>
+            {allowGuests && (
+              <UpdateReservationGuestTable
+                controlledFieldArray={controlledFieldArray}
+                form={form}
+                handleAddGuest={handleAddGuest}
+                handleRemoveGuest={handleRemoveGuest}
+                register={register}
+                selectedRoom={selectedRoom}
+                watch={watch}
+              />
+            )}
+          </div>
+        )}
+
+        {/* Mensaje informativo para habitaciones de 1 huésped */}
+        {selectedRoom?.RoomTypes?.guests && selectedRoom.RoomTypes.guests === 1 && (
+          <div>
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+              <div className="space-y-0.5">
+                <FormLabel>Información del Huésped</FormLabel>
+                <FormDescription>
+                  Esta habitación es para 1 huésped únicamente. La información del huésped principal se encuentra en la
+                  sección de datos del cliente.
+                </FormDescription>
+              </div>
+              <FormControl>
+                <UserRoundCheck className="text-primary shrink-0" />
+              </FormControl>
+            </FormItem>
+          </div>
+        )}
 
         <Separator />
 
