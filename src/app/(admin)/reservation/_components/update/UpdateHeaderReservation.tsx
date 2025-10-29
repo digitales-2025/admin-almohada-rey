@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
@@ -35,67 +35,127 @@ export default function UpdateHeaderReservation({
   // Estado local para seguir las habitaciones que ya no están disponibles
   const [unavailableRoomIds, setUnavailableRoomIds] = useState<string[]>([]);
 
+  // Ref para evitar bucles infinitos
+  const selectedRoomIdRef = useRef<string>(reservation.roomId);
+
   // Crear una versión filtrada de roomOptions que excluye las habitaciones no disponibles
   // Pero siempre incluir la habitación actual de la reserva
-  const filteredRoomOptions = roomOptions.filter(
-    (room) => !unavailableRoomIds.includes(room.value) || room.value === reservation.roomId
+  const filteredRoomOptions = useMemo(() => {
+    return roomOptions.filter((room) => !unavailableRoomIds.includes(room.value) || room.value === reservation.roomId);
+  }, [roomOptions, unavailableRoomIds, reservation.roomId]);
+
+  // Crear opciones de cliente (solo el cliente actual) - memoizado
+  const customerOptions = useMemo(
+    () => [
+      {
+        label:
+          reservation.customer.name +
+          " " +
+          documentTypeStatusConfig[reservation.customer.documentType].name +
+          ` (${reservation.customer.documentNumber})`,
+        value: reservation.customerId,
+      },
+    ],
+    [
+      reservation.customer.name,
+      reservation.customer.documentType,
+      reservation.customer.documentNumber,
+      reservation.customerId,
+    ]
   );
 
-  // Crear opciones de cliente (solo el cliente actual)
-  const customerOptions: SelectOption<string>[] = [
-    {
-      label:
-        reservation.customer.name +
-        " " +
-        documentTypeStatusConfig[reservation.customer.documentType].name +
-        ` (${reservation.customer.documentNumber})`,
-      value: reservation.customerId,
-    },
-  ];
-
-  // Escuchar los eventos de WebSocket para habitaciones reservadas
+  // Actualizar la ref cuando cambia la habitación seleccionada
   useEffect(() => {
-    // Verificar si hay una habitación seleccionada
-    const selectedRoomId = form.watch("roomId");
+    const roomId = form.watch("roomId");
+    selectedRoomIdRef.current = roomId;
+  }, [form]);
 
-    // Función para manejar habitaciones que ya no están disponibles
-    const handleUnavailableRoom = (roomId: string) => {
+  // Función para manejar habitaciones que vuelven a estar disponibles (cancelaciones)
+  const handleAvailableRoom = useCallback((roomId: string) => {
+    // Remover la habitación de la lista de no disponibles
+    setUnavailableRoomIds((prev) => prev.filter((id) => id !== roomId));
+
+    // Si esta habitación está seleccionada actualmente, forzar nueva verificación
+    if (roomId === selectedRoomIdRef.current) {
+      // Disparar un evento personalizado para forzar verificación
+      window.dispatchEvent(
+        new CustomEvent("roomAvailabilityChanged", {
+          detail: { roomId, action: "freed" },
+        })
+      );
+    }
+  }, []);
+
+  // Función para manejar cuando una habitación se vuelve no disponible
+  const handleRoomBecameUnavailable = useCallback(
+    (roomId: string) => {
       // Si la habitación que se acaba de reservar es la misma que estamos editando, ignorar
       if (roomId === reservation.roomId) return;
 
-      if (roomId === selectedRoomId) {
-        // Si es una habitación diferente a la original y ya fue tomada, deseleccionarla
-        if (roomId !== reservation.roomId) {
-          // Volver a la habitación original
-          form.setValue("roomId", reservation.roomId);
-          onRoomSelected(reservation.room);
-        }
-
-        // Añadir la habitación a la lista de no disponibles
-        setUnavailableRoomIds((prev) => [...prev, roomId]);
+      // Si esta habitación está seleccionada, volver a la original
+      if (roomId === selectedRoomIdRef.current && roomId !== reservation.roomId) {
+        form.setValue("roomId", reservation.roomId);
+        onRoomSelected(reservation.room);
       }
-    };
 
+      // Añadir a la lista de no disponibles
+      setUnavailableRoomIds((prev) => {
+        if (prev.includes(roomId)) return prev;
+        return [...prev, roomId];
+      });
+    },
+    [form, onRoomSelected, reservation]
+  );
+
+  // Escuchar los eventos de WebSocket para habitaciones reservadas
+  useEffect(() => {
     // Establecer listener para cuando una habitación es reservada
     const unsubscribe = socketService.onNewReservation((newReservation) => {
       // No bloquear la habitación actual si es de la misma reservación
       if (newReservation.id === reservation.id) return;
-      handleUnavailableRoom(newReservation.roomId);
+      handleRoomBecameUnavailable(newReservation.roomId);
     });
 
-    // También escuchar actualizaciones de reservaciones
+    // Escuchar actualizaciones de reservaciones
     const unsubscribeUpdates = socketService.onReservationUpdated((updatedReservation) => {
       // No bloquear la habitación actual si es de la misma reservación
       if (updatedReservation.id === reservation.id) return;
-      handleUnavailableRoom(updatedReservation.roomId);
+
+      // Si la reservación fue cancelada, liberar la habitación
+      if (updatedReservation.status === "CANCELED") {
+        handleAvailableRoom(updatedReservation.roomId);
+      } else {
+        // Para otros cambios de estado, marcar como no disponible
+        handleRoomBecameUnavailable(updatedReservation.roomId);
+      }
+    });
+
+    // Escuchar cambios de disponibilidad general
+    const unsubscribeAvailability = socketService.onAvailabilityChanged(() => {
+      // Obtener la habitación actualmente seleccionada
+      const currentRoomId = selectedRoomIdRef.current;
+
+      // Limpiar todas las habitaciones no disponibles para forzar re-verificación
+      setUnavailableRoomIds([]);
+
+      // Si hay una habitación seleccionada, verificar si sigue disponible
+      if (currentRoomId) {
+        // Disparar evento personalizado para forzar verificación de disponibilidad
+        window.dispatchEvent(
+          new CustomEvent("roomAvailabilityChanged", {
+            detail: { roomId: currentRoomId, action: "refresh" },
+          })
+        );
+      }
     });
 
     // Limpieza al desmontar
     return () => {
       unsubscribe();
       unsubscribeUpdates();
+      unsubscribeAvailability();
     };
-  }, [form, onRoomSelected, reservation]);
+  }, [handleAvailableRoom, handleRoomBecameUnavailable, reservation]);
 
   return (
     <>

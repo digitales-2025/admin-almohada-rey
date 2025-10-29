@@ -155,17 +155,17 @@ export default function ExtendedBookingCalendar({
 
   // Manejar cambio de fecha seleccionada
   const handleDateChange = useCallback(
-    (date: Date | undefined) => {
-      if (!date) return;
+    (selectedDate: Date | undefined) => {
+      if (!selectedDate) return;
 
       // Aplicar el cambio al formulario
-      extendStayForm.setValue("newCheckoutDate", date, {
+      extendStayForm.setValue("newCheckoutDate", selectedDate, {
         shouldValidate: true,
         shouldDirty: true,
       });
 
       // Verificamos si ya tenemos esta fecha en caché
-      const formattedDate = formatDateForAPI(date);
+      const formattedDate = formatDateForAPI(selectedDate);
       const cacheKey = `${idReservation}-${formattedDate}`;
       const cached = availabilityCache.get(cacheKey);
 
@@ -175,7 +175,7 @@ export default function ExtendedBookingCalendar({
 
         // Mostrar toast con resultado de caché
         setTimeout(() => {
-          showAvailabilityToast(cached.isAvailable, date);
+          showAvailabilityToast(cached.isAvailable, selectedDate);
         }, 1000);
       }
 
@@ -205,7 +205,12 @@ export default function ExtendedBookingCalendar({
                   locale={es}
                   mode="single"
                   selected={field.value}
-                  onSelect={handleDateChange}
+                  onSelect={(date) => {
+                    // Manejar solo Date | undefined (ignorar DateRange)
+                    if (date instanceof Date || date === undefined) {
+                      handleDateChange(date);
+                    }
+                  }}
                   disabled={(date) => isDateDisabled(date)}
                   defaultMonth={field.value || addDays(originalCheckoutDate, 1)}
                   className="rounded-md border border-border"

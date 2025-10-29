@@ -84,10 +84,19 @@ export type SummaryPayment = {
   amount: number;
   amountPaid: number;
   status: PaymentStatus;
+  observations?: string;
   reservation: {
     customer: {
       id: string;
       name: string;
+    };
+    room?: {
+      id: string;
+      number: number;
+      RoomTypes: {
+        id: string;
+        name: string;
+      };
     };
   };
 };

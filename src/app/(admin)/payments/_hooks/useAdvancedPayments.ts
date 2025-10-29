@@ -9,6 +9,7 @@ interface UseAdvancedPaymentsOptions {
   initialFilters?: AdvancedFilters;
   initialSort?: SortParams;
   initialSearch?: string;
+  reservationId?: string;
 }
 
 export function useAdvancedPayments({
@@ -16,6 +17,7 @@ export function useAdvancedPayments({
   initialFilters = {},
   initialSort = {},
   initialSearch = "",
+  reservationId,
 }: UseAdvancedPaymentsOptions) {
   // Mapeo de IDs de columnas a campos del backend (constante)
   const columnToBackendMapping = useMemo(
@@ -74,8 +76,13 @@ export function useAdvancedPayments({
       backendFilters.search = filtersState.search;
     }
 
+    // Agregar reservationId si existe
+    if (reservationId) {
+      backendFilters.reservationId = reservationId;
+    }
+
     return backendFilters;
-  }, [filtersState.filters, filtersState.search, columnToBackendMapping]);
+  }, [filtersState.filters, filtersState.search, columnToBackendMapping, reservationId]);
 
   // Query específica para payments
   const queryParams = {

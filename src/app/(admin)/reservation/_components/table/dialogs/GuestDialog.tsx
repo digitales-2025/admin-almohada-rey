@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Users, type LucideIcon } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -122,7 +122,6 @@ export function GuestsDetailsDialog({
                     key={guest?.documentId ?? index}
                     className={`border-2 border-background w-9 h-9 ${getAvatarColor(index + 1)} text-white`}
                   >
-                    <AvatarImage src={`/placeholder.svg?height=24&width=24`} alt={guest.name} />
                     <AvatarFallback className={`text-xs text-white ${extraAvatarColor}`}>
                       {guest.name
                         .split(" ")

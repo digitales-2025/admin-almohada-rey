@@ -18,6 +18,7 @@ interface DataTableToolbarProps<TData, TValue> {
   })[];
   onGlobalFilterChange?: (filter: string) => void;
   externalGlobalFilter?: string;
+  onColumnFiltersChange?: (filters: Array<{ id: string; value: any }>) => void;
 }
 
 export function DataTableToolbar<TData, TValue>({
@@ -27,6 +28,7 @@ export function DataTableToolbar<TData, TValue>({
   facetedFilters = [],
   onGlobalFilterChange,
   externalGlobalFilter,
+  onColumnFiltersChange,
 }: DataTableToolbarProps<TData, TValue>) {
   const isFiltered =
     table.getState().columnFilters.length > 0 ||
@@ -86,11 +88,16 @@ export function DataTableToolbar<TData, TValue>({
           <Button
             variant="ghost"
             onClick={() => {
-              table.resetColumnFilters();
+              if (onColumnFiltersChange) {
+                onColumnFiltersChange([]);
+              } else {
+                table.resetColumnFilters();
+              }
               if (onGlobalFilterChange) {
                 onGlobalFilterChange("");
+              } else {
+                table.setGlobalFilter("");
               }
-              table.setGlobalFilter("");
             }}
             className="h-8 px-2 lg:px-3"
           >

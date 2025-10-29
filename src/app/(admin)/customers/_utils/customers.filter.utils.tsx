@@ -1,4 +1,4 @@
-import { CheckCircle2, XCircle } from "lucide-react";
+import { Ban, CheckCircle, CheckCircle2, XCircle } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { CustomerDocumentTypeLabels, CustomerMaritalStatusLabels } from "./customers.utils";
@@ -10,6 +10,14 @@ const ActiveIcon: React.FC<{ className?: string }> = ({ className }) => (
 
 const InactiveIcon: React.FC<{ className?: string }> = ({ className }) => (
   <XCircle className={cn(className, "text-red-500")} />
+);
+
+const BlacklistIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <Ban className={cn(className, "text-red-600")} />
+);
+
+const NormalIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <CheckCircle className={cn(className, "text-blue-500")} />
 );
 
 // Generar componentes de icono a partir de CustomerMaritalStatusLabels
@@ -70,5 +78,22 @@ export const facetedFilters = [
       value: documentType,
       icon: CustomerDocumentTypeIcons[documentType],
     })),
+  },
+  // Filtro para lista negra
+  {
+    column: "lista negra", // ID de la columna existente
+    title: "Lista Negra",
+    options: [
+      {
+        label: "Lista Negra",
+        value: "true", // Enviar como string al backend
+        icon: BlacklistIcon,
+      },
+      {
+        label: "Normal",
+        value: "false", // Enviar como string al backend
+        icon: NormalIcon,
+      },
+    ],
   },
 ];

@@ -5,6 +5,7 @@
  * VERSIÓN HÍBRIDA: Combina las mejoras de date-fns-tz con la lógica robusta original
  */
 // Importaciones no utilizadas removidas
+import { parse } from "date-fns";
 import { format, fromZonedTime, toZonedTime } from "date-fns-tz";
 import { es } from "date-fns/locale";
 
@@ -69,44 +70,15 @@ export function peruDateTimeToDate(dateStr: string, timeStr: string): Date {
   const formatString = "yyyy-MM-dd hh:mm a";
 
   try {
-    // Método 1: Intentar con fromZonedTime
-    let result = fromZonedTime(combinedString, formatString, { timeZone: LIMA_TIME_ZONE });
+    // Primero parsear la fecha en la zona horaria local
+    const localDate = parse(combinedString, formatString, new Date());
+
+    // Luego convertir a UTC usando fromZonedTime
+    const result = fromZonedTime(localDate, LIMA_TIME_ZONE);
 
     // Validar que la fecha sea válida
     if (isNaN(result.getTime())) {
-      // Método 2: Crear fecha local y ajustar a zona horaria de Perú
-      try {
-        // Parsear la fecha y hora manualmente
-        const [datePart, timePart] = combinedString.split(" ");
-        const [year, month, day] = datePart.split("-").map(Number);
-        const [time, period] = timePart.split(" ");
-        const [hours, minutes] = time.split(":").map(Number);
-
-        // Convertir a formato 24h
-        let hour24 = hours;
-        if (period === "PM" && hours !== 12) {
-          hour24 = hours + 12;
-        } else if (period === "AM" && hours === 12) {
-          hour24 = 0;
-        }
-
-        // Crear fecha en zona horaria local
-        const localDate = new Date(year, month - 1, day, hour24, minutes, 0, 0);
-
-        // Convertir a UTC considerando la zona horaria de Perú (UTC-5)
-        const peruOffset = -5 * 60; // -5 horas en minutos
-        const utcDate = new Date(localDate.getTime() - peruOffset * 60 * 1000);
-
-        result = utcDate;
-      } catch (altError) {
-        console.error("peruDateTimeToDate: Método alternativo también falló", { altError });
-        return new Date(); // Retornar fecha actual como fallback
-      }
-    }
-
-    // Validar que la fecha final sea válida
-    if (isNaN(result.getTime())) {
-      console.error("peruDateTimeToDate: Todos los métodos fallaron", {
+      console.error("peruDateTimeToDate: Fecha inválida generada", {
         dateStr,
         timeStr,
         combinedString,
@@ -213,11 +185,35 @@ export function getAppropriateCheckInDate(): Date {
 }
 
 /**
- * Sugiere una hora de check-in apropiada.
- * @returns Hora de check-in por defecto
+ * Sugiere una hora de check-in apropiada basada en la hora actual.
+ * Redondea hacia arriba a la siguiente hora.
+ * @returns Hora de check-in dinámica
  */
 export function getAppropriateCheckInTime(): string {
-  return DEFAULT_CHECKIN_TIME;
+  // Obtenemos la hora actual en Lima
+  const nowInLima = toZonedTime(new Date(), LIMA_TIME_ZONE);
+  const currentHour = nowInLima.getHours();
+  const currentMinute = nowInLima.getMinutes();
+
+  // Si hay minutos, redondear hacia arriba
+  let nextHour = currentMinute > 0 ? currentHour + 1 : currentHour;
+
+  // Asegurar que no sea muy tarde (máximo 11 PM)
+  if (nextHour > 23) {
+    nextHour = 23;
+  }
+
+  // Asegurar que no sea muy temprano (mínimo 1 PM)
+  if (nextHour < 13) {
+    nextHour = 13; // 1 PM
+  }
+
+  // Convertir a formato 12 horas con AM/PM
+  const isPM = nextHour >= 12;
+  const hour12 = nextHour > 12 ? nextHour - 12 : nextHour === 0 ? 12 : nextHour;
+  const amPm = isPM ? "PM" : "AM";
+
+  return `${hour12}:00 ${amPm}`;
 }
 
 /**
@@ -638,8 +634,8 @@ export const getPeruCurrentDatetime = () => {
   };
 };
 
-// Estado persistente para el componente (temporal hasta refactorizar)
-export const persistentData = {
+// Estado persistente para el componente de CREAR (temporal hasta refactorizar)
+export const createPersistentData = {
   initialized: false,
   renderCount: 0,
   initialValues: {
@@ -656,3 +652,26 @@ export const persistentData = {
     checkOutTime: DEFAULT_CHECKOUT_TIME,
   },
 };
+
+// Estado persistente para el componente de ACTUALIZAR (temporal hasta refactorizar)
+export const updatePersistentData = {
+  initialized: false,
+  renderCount: 0,
+  currentReservationId: null as string | null,
+  initialValues: {
+    checkInDate: new Date(),
+    checkOutDate: new Date(),
+    checkInTime: DEFAULT_CHECKIN_TIME,
+    checkOutTime: DEFAULT_CHECKOUT_TIME,
+  },
+  currentValues: {
+    activeTab: "checkin" as "checkin" | "checkout",
+    checkInDate: new Date(),
+    checkOutDate: new Date(),
+    checkInTime: DEFAULT_CHECKIN_TIME,
+    checkOutTime: DEFAULT_CHECKOUT_TIME,
+  },
+};
+
+// Mantener el nombre original para compatibilidad (usar createPersistentData)
+export const persistentData = createPersistentData;

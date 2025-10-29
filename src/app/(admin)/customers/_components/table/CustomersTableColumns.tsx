@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { ChevronDown, ChevronRight, Clock, Ellipsis, History, RotateCcw, Trash } from "lucide-react";
+import { Ban, CheckCircle, ChevronDown, ChevronRight, Clock, Ellipsis, History, RotateCcw, Trash } from "lucide-react";
 import * as RPNInput from "react-phone-number-input";
 import flags from "react-phone-number-input/flags";
 
@@ -214,6 +214,56 @@ export const customersColumns = (
         )}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      const rowValue = row.getValue(id);
+
+      // Si value es un array, comprobamos si contiene el valor de la fila
+      if (Array.isArray(value)) {
+        // Si el array está vacío, no filtramos
+        if (value.length === 0) return true;
+
+        // Convertimos cada elemento del array según sea necesario
+        return value.some((v) => {
+          // Si es string "true"/"false", convertimos a booleano
+          if (typeof v === "string") return v === String(rowValue);
+          // Si ya es booleano, comparamos directamente
+          return v === rowValue;
+        });
+      }
+
+      // Si es un valor único, hacemos la comparación directa
+      return rowValue === value;
+    },
+    enableColumnFilter: true,
+  },
+  {
+    id: "lista negra", // ID para el filtro
+    accessorKey: "isBlacklist", // Campo del objeto Customer
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Lista Negra" />,
+    cell: ({ row }) => {
+      const isBlacklist = row.getValue("lista negra") as boolean;
+      return (
+        <div className="flex items-center gap-2">
+          {isBlacklist ? (
+            <Badge
+              variant="secondary"
+              className="bg-red-100 text-red-700 border-red-300 hover:bg-red-200 flex items-center gap-1 font-medium"
+            >
+              <Ban className="size-3" />
+              Lista Negra
+            </Badge>
+          ) : (
+            <Badge
+              variant="secondary"
+              className="bg-blue-100 text-blue-700 border-blue-300 hover:bg-blue-200 flex items-center gap-1"
+            >
+              <CheckCircle className="size-3" />
+              Normal
+            </Badge>
+          )}
+        </div>
+      );
+    },
     filterFn: (row, id, value) => {
       const rowValue = row.getValue(id);
 

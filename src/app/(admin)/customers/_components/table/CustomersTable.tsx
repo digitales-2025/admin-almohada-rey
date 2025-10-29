@@ -95,6 +95,9 @@ export function CustomersTable({
       externalGlobalFilter={localSearch}
       externalFilters={filtersState?.filters}
       getFilterValueByColumn={getFilterValueByColumn}
+      // Funcionalidad de tachado para clientes en blacklist
+      shouldStrikeRow={(customer) => customer.isBlacklist === true}
+      strikeRowClassName="line-through opacity-60 text-red-500"
       // Integración con el hook avanzado (solo si está disponible)
       {...(tableActions && {
         onSortingChange: tableActions.setSorting,

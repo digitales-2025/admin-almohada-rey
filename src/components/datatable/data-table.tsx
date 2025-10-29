@@ -65,6 +65,10 @@ interface DataTableProps<TData extends Record<string, unknown>, TValue = unknown
   externalGlobalFilter?: string;
   externalFilters?: Record<string, any>;
   getFilterValueByColumn?: (columnId: string) => any;
+
+  // Props para funcionalidad de tachado de filas
+  shouldStrikeRow?: (row: TData) => boolean;
+  strikeRowClassName?: string;
 }
 
 export function DataTable<TData extends Record<string, unknown>, TValue = unknown>({
@@ -86,6 +90,8 @@ export function DataTable<TData extends Record<string, unknown>, TValue = unknow
   externalGlobalFilter,
   externalFilters,
   getFilterValueByColumn,
+  shouldStrikeRow,
+  strikeRowClassName = "line-through opacity-60",
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(
@@ -249,6 +255,7 @@ export function DataTable<TData extends Record<string, unknown>, TValue = unknow
         })}
         onGlobalFilterChange={onGlobalFilterChange}
         externalGlobalFilter={externalGlobalFilter}
+        onColumnFiltersChange={onColumnFiltersChange}
       />
       <div className="rounded-md border">
         <Table>
@@ -272,33 +279,41 @@ export function DataTable<TData extends Record<string, unknown>, TValue = unknow
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <React.Fragment key={row.id}>
-                  <TableRow
-                    data-state={row.getIsSelected() && "selected"}
-                    onClick={() => {
-                      if (onClickRow) onClickRow(row.original as TData);
-                    }}
-                  >
-                    {row.getVisibleCells().map((cell) => {
-                      const { column } = cell;
-                      return (
-                        <TableCell key={cell.id} style={getCommonPinningStyles(column as Column<TData, TValue>)}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                  {enableExpansion && row.getIsExpanded() && renderExpandedRow && (
+              table.getRowModel().rows.map((row) => {
+                const shouldStrike = shouldStrikeRow ? shouldStrikeRow(row.original as TData) : false;
+                return (
+                  <React.Fragment key={row.id}>
                     <TableRow
-                      data-state={row.getIsExpanded() ? "expanded" : "collapsed"}
-                      className="animate-fade-down animate-duration-500 animate-ease-in-out animate-fill-forwards data-[state=collapsed]:animate-out data-[state=collapsed]:fade-out-0"
+                      data-state={row.getIsSelected() && "selected"}
+                      onClick={() => {
+                        if (onClickRow) onClickRow(row.original as TData);
+                      }}
+                      className={shouldStrike ? strikeRowClassName : undefined}
                     >
-                      <TableCell colSpan={columns.length}>{renderExpandedRow(row.original as TData)}</TableCell>
+                      {row.getVisibleCells().map((cell) => {
+                        const { column } = cell;
+                        return (
+                          <TableCell
+                            key={cell.id}
+                            style={getCommonPinningStyles(column as Column<TData, TValue>)}
+                            className={shouldStrike ? strikeRowClassName : undefined}
+                          >
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </TableCell>
+                        );
+                      })}
                     </TableRow>
-                  )}
-                </React.Fragment>
-              ))
+                    {enableExpansion && row.getIsExpanded() && renderExpandedRow && (
+                      <TableRow
+                        data-state={row.getIsExpanded() ? "expanded" : "collapsed"}
+                        className="animate-fade-down animate-duration-500 animate-ease-in-out animate-fill-forwards data-[state=collapsed]:animate-out data-[state=collapsed]:fade-out-0"
+                      >
+                        <TableCell colSpan={columns.length}>{renderExpandedRow(row.original as TData)}</TableCell>
+                      </TableRow>
+                    )}
+                  </React.Fragment>
+                );
+              })
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">

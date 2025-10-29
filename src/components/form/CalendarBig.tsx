@@ -3,14 +3,17 @@
 import type * as React from "react";
 import { isSameDay } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { DayPicker } from "react-day-picker";
+import { DateRange, DayPicker } from "react-day-picker";
 
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker> & {
+export type CalendarProps = Omit<React.ComponentProps<typeof DayPicker>, "mode" | "selected" | "onSelect"> & {
   showAvailableDays?: boolean;
   availableDays?: Date[];
+  mode?: "single" | "range";
+  selected?: Date | DateRange | undefined;
+  onSelect?: (date: Date | DateRange | undefined) => void;
 };
 
 function CalendarBig({
@@ -21,6 +24,9 @@ function CalendarBig({
   availableDays,
   onMonthChange,
   disabled,
+  mode = "single",
+  selected,
+  onSelect,
   ...props
 }: CalendarProps & { onMonthChange?: (date: Date) => void }) {
   const isDayAvailable = (date: Date) => {
@@ -40,6 +46,17 @@ function CalendarBig({
 
   return (
     <DayPicker
+      {...(mode === "range"
+        ? {
+            mode: "range" as const,
+            selected: selected as DateRange | undefined,
+            onSelect: onSelect as ((range: DateRange | undefined) => void) | undefined,
+          }
+        : {
+            mode: "single" as const,
+            selected: selected as Date | undefined,
+            onSelect: onSelect as ((date: Date | undefined) => void) | undefined,
+          })}
       showOutsideDays={showOutsideDays}
       className={cn("sm:p-3", className)}
       classNames={{
