@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { addDays, format, isBefore, isSameDay, startOfDay } from "date-fns";
+import { addDays, format, isSameDay } from "date-fns";
 import { es } from "date-fns/locale";
 import { DateRange } from "react-day-picker";
 import { UseFormReturn } from "react-hook-form";
@@ -538,11 +538,16 @@ export default function UpdateBookingCalendarTime({
     (date: Date) => {
       // Para actualizaciones, solo bloquear fechas anteriores a la fecha original de check-in
       // Esto permite editar reservas que están en el pasado, pero no cambiar a fechas anteriores
-      const originalCheckInDate = new Date(reservation.checkInDate);
-      const originalCheckInStartOfDay = startOfDay(originalCheckInDate);
 
-      // Bloquear fechas anteriores a la fecha original de check-in
-      return isBefore(startOfDay(date), originalCheckInStartOfDay);
+      // Usar la utilidad de Perú para manejar correctamente la zona horaria
+      const originalCheckInDate = new Date(reservation.checkInDate);
+
+      // Extraer solo la fecha (yyyy-MM-dd) de ambas fechas para comparación pura
+      const originalDateStr = format(originalCheckInDate, "yyyy-MM-dd");
+      const currentDateStr = format(date, "yyyy-MM-dd");
+
+      // Comparar las cadenas de fecha directamente
+      return currentDateStr < originalDateStr;
     },
     [reservation.checkInDate]
   );

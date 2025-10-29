@@ -63,6 +63,7 @@ export function CreatePaymentDialog({ open, setOpen, reservation }: CreatePaymen
       days: nights > 0 ? nights : 1,
       unitPrice: reservation.room.RoomTypes.price,
       subtotal: 0,
+      discount: 0,
       extraServices: [],
       method: PaymentDetailMethod.CREDIT_CARD,
       totalAmount: 0,
@@ -72,7 +73,9 @@ export function CreatePaymentDialog({ open, setOpen, reservation }: CreatePaymen
   // Watch values for calculations
   const watchRoomUnitPrice = form.watch("unitPrice");
   const watchDays = form.watch("days");
+  const watchDiscount = form.watch("discount");
   const watchExtraServices = form.watch("extraServices");
+  const watchTotalAmount = form.watch("totalAmount");
 
   // Calculate total amount (room + extras)
   const calculateTotalAmount = () => {
@@ -83,7 +86,9 @@ export function CreatePaymentDialog({ open, setOpen, reservation }: CreatePaymen
 
   // Calculate room subtotal
   const calculateRoomSubtotal = () => {
-    const subtotal = watchRoomUnitPrice * watchDays;
+    const baseAmount = watchRoomUnitPrice * watchDays;
+    const discount = watchDiscount || 0;
+    const subtotal = Math.max(0, baseAmount - discount); // No permitir subtotal negativo
     form.setValue("subtotal", subtotal);
     calculateTotalAmount();
   };
@@ -92,7 +97,7 @@ export function CreatePaymentDialog({ open, setOpen, reservation }: CreatePaymen
   useEffect(() => {
     calculateRoomSubtotal();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watchRoomUnitPrice, watchDays]);
+  }, [watchRoomUnitPrice, watchDays, watchDiscount]);
 
   useEffect(() => {
     calculateTotalAmount();
@@ -100,14 +105,11 @@ export function CreatePaymentDialog({ open, setOpen, reservation }: CreatePaymen
   }, [watchExtraServices, form.getValues("subtotal")]);
 
   const onSubmit = async (values: CreatePaymentSchema) => {
-    // Calcular el monto total de la reserva (habitación)
-    const roomAmount = nights * reservation.room.RoomTypes.price;
+    // Calcular el monto total de la reserva (habitación) - usar el subtotal ya calculado con descuento
+    const roomAmount = values.subtotal;
 
     // Calcular el monto total de los servicios extra
-    const extraServicesAmount = values.extraServices.reduce(
-      (sum, service) => sum + service.quantity * service.unitPrice,
-      0
-    );
+    const extraServicesAmount = values.extraServices.reduce((sum, service) => sum + service.subtotal, 0);
 
     // Monto total que incluye habitación + servicios extra
     const totalReservationAmount = roomAmount + extraServicesAmount;
@@ -139,6 +141,8 @@ export function CreatePaymentDialog({ open, setOpen, reservation }: CreatePaymen
       unitPrice: values.unitPrice,
       // Si es pago pendiente, el subtotal es 0
       subtotal: isPendingPayment ? 0 : values.subtotal,
+      // Incluir descuento si existe
+      ...(values.discount && values.discount > 0 && { discount: values.discount }),
     };
 
     // Transformar datos al formato esperado por la API
@@ -257,6 +261,7 @@ export function CreatePaymentDialog({ open, setOpen, reservation }: CreatePaymen
                     calculateTotalAmount={calculateTotalAmount}
                     nights={nights}
                     watchExtraServices={watchExtraServices}
+                    watchTotalAmount={watchTotalAmount}
                   >
                     <DialogFooter>
                       <NavigationButtons />
@@ -295,6 +300,7 @@ export function CreatePaymentDialog({ open, setOpen, reservation }: CreatePaymen
                   calculateTotalAmount={calculateTotalAmount}
                   nights={nights}
                   watchExtraServices={watchExtraServices}
+                  watchTotalAmount={watchTotalAmount}
                 >
                   <DrawerFooter className="px-0">
                     <NavigationButtons />

@@ -17,6 +17,7 @@ interface CreatePaymentsFormProps extends Omit<React.ComponentPropsWithRef<"form
   nights: number;
   dataServicesAll: Service[] | undefined;
   watchExtraServices: ExtraServiceItem[];
+  watchTotalAmount: number;
   calculateTotalAmount: () => void;
 }
 
@@ -29,6 +30,7 @@ export default function CreatePaymentsForm({
   nights,
   dataServicesAll,
   watchExtraServices,
+  watchTotalAmount,
   calculateTotalAmount,
 }: CreatePaymentsFormProps) {
   // Set up field array for extra services
@@ -81,6 +83,7 @@ export default function CreatePaymentsForm({
             reservation={reservation}
             nights={nights}
             watchExtraServices={watchExtraServices}
+            watchTotalAmount={watchTotalAmount}
             addExtraService={addExtraService}
             remove={remove}
             updateExtraServiceSubtotal={updateExtraServiceSubtotal}

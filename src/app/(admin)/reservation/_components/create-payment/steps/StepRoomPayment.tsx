@@ -21,6 +21,7 @@ interface StepRoomPaymentProps {
   dataServicesAll: Service[] | undefined;
   nights: number;
   watchExtraServices: ExtraServiceItem[];
+  watchTotalAmount: number;
   fields: ReturnType<typeof useFieldArray<CreatePaymentSchema, "extraServices">>["fields"];
   updateExtraServiceSubtotal: (index: number) => void;
   addExtraService: (serviceTemplate: Service) => void;
@@ -32,6 +33,7 @@ export default function StepRoomPayment({
   dataServicesAll,
   nights,
   watchExtraServices,
+  watchTotalAmount,
   fields,
   updateExtraServiceSubtotal,
   addExtraService,
@@ -170,7 +172,7 @@ export default function StepRoomPayment({
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <FormField
               control={form.control}
               name="unitPrice"
@@ -182,6 +184,30 @@ export default function StepRoomPayment({
                       Icon={Banknote}
                       placeholder="Ingrese el precio por noche"
                       type={"number"}
+                      readOnly
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(Number(e.target.value) || 0);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="discount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium mb-1.5">Descuento (S/.)</FormLabel>
+                  <FormControl>
+                    <InputWithIcon
+                      Icon={Banknote}
+                      placeholder="Ingrese descuento"
+                      type={"number"}
+                      min={0}
                       {...field}
                       onChange={(e) => {
                         field.onChange(Number(e.target.value) || 0);
@@ -371,7 +397,7 @@ export default function StepRoomPayment({
       {/* Total Amount */}
       <div className="bg-primary/5 border-2 rounded-lg p-4 flex justify-between items-center">
         <div className="text-base font-semibold">Monto Total:</div>
-        <div className="text-xl font-bold text-primary">S/. {form.getValues("totalAmount").toFixed(2)}</div>
+        <div className="text-xl font-bold text-primary">S/. {watchTotalAmount.toFixed(2)}</div>
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ interface GetPaymentByIdProps {
 export const paymentsApi = createApi({
   reducerPath: "paymentsApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["Payment"],
+  tagTypes: ["Payment", "Reservation"], // Reservation ya incluido
   endpoints: (build) => ({
     //Crear pagos
     createPayment: build.mutation<Payment, Partial<Payment>>({
@@ -22,7 +22,7 @@ export const paymentsApi = createApi({
         body,
         credentials: "include",
       }),
-      invalidatesTags: ["Payment"],
+      invalidatesTags: ["Payment", "Reservation"], // Crear pago afecta el estado de la reserva
     }),
 
     //Crear detalles de pagos
@@ -33,7 +33,7 @@ export const paymentsApi = createApi({
         body,
         credentials: "include",
       }),
-      invalidatesTags: ["Payment"],
+      invalidatesTags: ["Payment", "Reservation"], // Agregar detalles afecta la reserva
     }),
 
     //Actualizar pagos
@@ -44,7 +44,7 @@ export const paymentsApi = createApi({
         body,
         credentials: "include",
       }),
-      invalidatesTags: ["Payment"],
+      invalidatesTags: ["Payment", "Reservation"], // Invalidar reservas porque los pagos están asociados
     }),
 
     //Actualizar detalle de pago
@@ -55,7 +55,7 @@ export const paymentsApi = createApi({
         body,
         credentials: "include",
       }),
-      invalidatesTags: ["Payment"],
+      invalidatesTags: ["Payment", "Reservation"],
     }),
 
     //Actualizar múltiples detalles de pago en lote
@@ -73,7 +73,7 @@ export const paymentsApi = createApi({
         body,
         credentials: "include",
       }),
-      invalidatesTags: ["Payment"],
+      invalidatesTags: ["Payment", "Reservation"],
     }),
 
     //Obtener pago por id
@@ -125,9 +125,13 @@ export const paymentsApi = createApi({
         credentials: "include",
       }),
       providesTags: (result) => [
+        "Payment", // Tag general para invalidar todo el query cuando se hace un cambio general
+        "Reservation", // También escuchar cambios en reservas que puedan afectar pagos
         { type: "Payment", id: result?.meta.page },
         ...(result?.data.map(({ id }) => ({ type: "Payment" as const, id })) ?? []),
       ],
+      // Configurar keepUnusedDataFor para asegurar que se refresque cuando sea necesario
+      keepUnusedDataFor: 30, // 30 segundos
     }),
 
     //Eliminar detalle de pago
@@ -137,7 +141,7 @@ export const paymentsApi = createApi({
         method: "DELETE",
         credentials: "include",
       }),
-      invalidatesTags: ["Payment"],
+      invalidatesTags: ["Payment", "Reservation"],
     }),
   }),
 });

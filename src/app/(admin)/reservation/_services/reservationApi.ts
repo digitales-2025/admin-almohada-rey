@@ -51,7 +51,19 @@ export const reservationApi = createApi({
         body: data,
         credentials: "include",
       }),
-      invalidatesTags: ["Reservation"],
+      async onQueryStarted(_args, { dispatch, queryFulfilled }) {
+        try {
+          // Esperar a que la mutación se complete
+          await queryFulfilled;
+
+          // Invalidar tags después de un pequeño delay para asegurar que el backend haya procesado
+          setTimeout(() => {
+            dispatch(reservationApi.util.invalidateTags(["Reservation", "Payment"]));
+          }, 500); // 500ms delay
+        } catch {
+          // Si hay error, no invalidar
+        }
+      },
     }),
 
     applyLateCheckout: build.mutation<ApplyLateCheckoutReduxResponse, { id: string; data: CreateLateCheckout }>({
@@ -62,6 +74,16 @@ export const reservationApi = createApi({
         credentials: "include",
       }),
       invalidatesTags: (result, error, { id }) => [{ type: "Reservation", id }, "Reservation", "RoomAvailability"],
+      async onQueryStarted(_args, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          setTimeout(() => {
+            dispatch(reservationApi.util.invalidateTags(["Payment"]));
+          }, 500);
+        } catch {
+          // Si hay error, no invalidar
+        }
+      },
     }),
 
     removeLateCheckout: build.mutation<RemoveLateCheckoutReduxResponse, string>({
@@ -71,6 +93,16 @@ export const reservationApi = createApi({
         credentials: "include",
       }),
       invalidatesTags: (result, error, id) => [{ type: "Reservation", id }, "Reservation", "RoomAvailability"],
+      async onQueryStarted(_id, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          setTimeout(() => {
+            dispatch(reservationApi.util.invalidateTags(["Payment"]));
+          }, 500);
+        } catch {
+          // Si hay error, no invalidar
+        }
+      },
     }),
 
     extendStay: build.mutation<ExtendStayReduxResponse, { id: string; data: CreateExtendStay }>({
@@ -81,6 +113,16 @@ export const reservationApi = createApi({
         credentials: "include",
       }),
       invalidatesTags: (result, error, { id }) => [{ type: "Reservation", id }, "Reservation", "RoomAvailability"],
+      async onQueryStarted(_args, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          setTimeout(() => {
+            dispatch(reservationApi.util.invalidateTags(["Payment"]));
+          }, 500);
+        } catch {
+          // Si hay error, no invalidar
+        }
+      },
     }),
 
     transitionReservationStatus: build.mutation<
@@ -97,6 +139,16 @@ export const reservationApi = createApi({
         { type: "Reservation", id },
         "Rooms", // Añadir este tag para invalidar todas las consultas con providesTags: ["Rooms"]
       ],
+      async onQueryStarted(_args, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          setTimeout(() => {
+            dispatch(reservationApi.util.invalidateTags(["Payment"]));
+          }, 500);
+        } catch {
+          // Si hay error, no invalidar
+        }
+      },
     }),
     deactivateReservations: build.mutation<BaseApiResponse<UpdateManyResponse>, UpdateManyDto>({
       query: (dto) => ({
@@ -105,7 +157,17 @@ export const reservationApi = createApi({
         body: dto,
         credentials: "include",
       }),
-      invalidatesTags: ["Reservation", "Payment"],
+      invalidatesTags: ["Reservation"],
+      async onQueryStarted(_dto, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          setTimeout(() => {
+            dispatch(reservationApi.util.invalidateTags(["Payment"]));
+          }, 500);
+        } catch {
+          // Si hay error, no invalidar
+        }
+      },
     }),
 
     reactivateReservations: build.mutation<BaseApiResponse<UpdateManyResponse>, UpdateManyDto>({
@@ -116,6 +178,16 @@ export const reservationApi = createApi({
         credentials: "include",
       }),
       invalidatesTags: ["Reservation"],
+      async onQueryStarted(_dto, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          setTimeout(() => {
+            dispatch(reservationApi.util.invalidateTags(["Payment"]));
+          }, 500);
+        } catch {
+          // Si hay error, no invalidar
+        }
+      },
     }),
 
     getReservationById: build.query<Reservation, string>({

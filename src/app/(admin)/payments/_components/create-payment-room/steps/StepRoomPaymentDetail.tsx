@@ -145,7 +145,7 @@ export default function StepRoomPaymentDetail({
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <FormField
               control={form.control}
               name="unitPrice"
@@ -157,6 +157,30 @@ export default function StepRoomPaymentDetail({
                       Icon={Banknote}
                       placeholder="Ingrese el precio por noche"
                       type={"number"}
+                      readOnly
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(Number(e.target.value) || 0);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="discount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium mb-1.5">Descuento (S/.)</FormLabel>
+                  <FormControl>
+                    <InputWithIcon
+                      Icon={Banknote}
+                      placeholder="Ingrese descuento"
+                      type={"number"}
+                      min={0}
                       {...field}
                       onChange={(e) => {
                         field.onChange(Number(e.target.value) || 0);
