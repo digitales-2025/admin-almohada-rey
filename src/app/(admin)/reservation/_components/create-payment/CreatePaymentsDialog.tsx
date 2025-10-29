@@ -105,8 +105,12 @@ export function CreatePaymentDialog({ open, setOpen, reservation }: CreatePaymen
   }, [watchExtraServices, form.getValues("subtotal")]);
 
   const onSubmit = async (values: CreatePaymentSchema) => {
-    // Calcular el monto total de la reserva (habitación) - usar el subtotal ya calculado con descuento
-    const roomAmount = values.subtotal;
+    // Calcular el monto total de la reserva (habitación)
+    // El amount debe ser el total de TODAS las noches CON el descuento aplicado
+    const totalNights = nights; // Total de noches de la reserva
+    const roomAmountWithoutDiscount = values.unitPrice * totalNights; // Monto sin descuento
+    const discount = values.discount || 0;
+    const roomAmount = roomAmountWithoutDiscount - discount; // Monto con descuento aplicado
 
     // Calcular el monto total de los servicios extra
     const extraServicesAmount = values.extraServices.reduce((sum, service) => sum + service.subtotal, 0);
