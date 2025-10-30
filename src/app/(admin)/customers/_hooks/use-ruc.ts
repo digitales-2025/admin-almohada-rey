@@ -14,6 +14,7 @@ export const useRuc = (options: UseRucProps = {}) => {
     data: rucData,
     refetch: refetchRucData,
     isLoading: isLoadingRucData,
+    isFetching: isFetchingRucData,
     error: errorRucData,
     isSuccess: isSuccessRucData,
   } = useGetDataByRucQuery(ruc as string, {
@@ -40,6 +41,7 @@ export const useRuc = (options: UseRucProps = {}) => {
     rucData,
     refetchRucData,
     isLoadingRucData,
+    isFetchingRucData,
     errorRucData,
     isSuccessRucData,
     onGetRucData,
