@@ -39,6 +39,7 @@ export const useCustomers = (options: UseCustomerProps = {}) => {
     data: customerDataByDni,
     refetch: refetchCustomerDataByDni,
     isLoading: isLoadingCustomerDataByDni,
+    isFetching: isFetchingCustomerDataByDni,
     error: errorCustomerDataByDni,
     isSuccess: isSuccessCustomerDataByDni,
   } = useGetCustomerDataByDniQuery(dni as string, {
@@ -190,6 +191,7 @@ export const useCustomers = (options: UseCustomerProps = {}) => {
     customerDataByDni,
     refetchCustomerDataByDni,
     isLoadingCustomerDataByDni,
+    isFetchingCustomerDataByDni,
     errorCustomerDataByDni,
     isSuccessCustomerDataByDni,
   };

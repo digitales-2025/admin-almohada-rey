@@ -61,6 +61,7 @@ export function CreatePaymentDetailRoomDialog({ open, setOpen, payment }: Create
       days: nights,
       unitPrice: Number(roomPaymentDetailsByPaymentId?.reservation?.room?.RoomTypes?.price) || 0,
       subtotal: 0,
+      discount: 0,
       method: PaymentDetailMethod.CREDIT_CARD,
       totalAmount: 0,
     },
@@ -69,12 +70,15 @@ export function CreatePaymentDetailRoomDialog({ open, setOpen, payment }: Create
   // Watch values for calculations
   const watchRoomUnitPrice = form.watch("unitPrice");
   const watchDays = form.watch("days");
+  const watchDiscount = form.watch("discount");
 
   // Calculate room subtotal
   const calculateRoomSubtotal = () => {
     const unitPrice = Number(watchRoomUnitPrice) || 0;
     const days = Number(watchDays) || 0;
-    const subtotal = unitPrice * days;
+    const discount = Number(watchDiscount) || 0;
+    const baseAmount = unitPrice * days;
+    const subtotal = Math.max(0, baseAmount - discount); // No permitir subtotal negativo
 
     // Sólo actualiza si es un número válido
     if (!isNaN(subtotal)) {
@@ -87,7 +91,7 @@ export function CreatePaymentDetailRoomDialog({ open, setOpen, payment }: Create
   useEffect(() => {
     calculateRoomSubtotal();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watchRoomUnitPrice, watchDays]);
+  }, [watchRoomUnitPrice, watchDays, watchDiscount]);
 
   // Añade este useEffect después de declarar el form
   useEffect(() => {
@@ -95,7 +99,8 @@ export function CreatePaymentDetailRoomDialog({ open, setOpen, payment }: Create
       // Forzar el cálculo inicial cuando se abre el diálogo
       const price = Number(roomPaymentDetailsByPaymentId?.reservation?.room?.RoomTypes?.price) || 0;
       const days = Number(roomPaymentDetailsByPaymentId?.missingDays) || 0;
-      const initialSubtotal = price * days;
+      const discount = Number(form.getValues("discount")) || 0;
+      const initialSubtotal = Math.max(0, price * days - discount);
 
       form.setValue("unitPrice", price);
       form.setValue("days", days);
@@ -103,6 +108,7 @@ export function CreatePaymentDetailRoomDialog({ open, setOpen, payment }: Create
       form.setValue("totalAmount", initialSubtotal);
       form.setValue("roomId", roomPaymentDetailsByPaymentId?.reservation?.room?.id || "");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, roomPaymentDetailsByPaymentId]);
 
   const onSubmit = async (values: CreateRoomPaymentDetailSchema) => {
@@ -110,7 +116,7 @@ export function CreatePaymentDetailRoomDialog({ open, setOpen, payment }: Create
     const isPendingPayment = values.method === PaymentDetailMethod.PENDING_PAYMENT;
 
     // Detalle de pago para la habitación como un array con un solo elemento
-    const paymentDetail = [
+    const paymentDetail: any[] = [
       {
         paymentDate: values.paymentDate,
         description: values.description || "Pago por habitación",
@@ -123,6 +129,11 @@ export function CreatePaymentDetailRoomDialog({ open, setOpen, payment }: Create
         subtotal: isPendingPayment ? 0 : Number(values.subtotal) || 0,
       },
     ];
+
+    // Agregar descuento si existe y es mayor a 0
+    if (values.discount && values.discount > 0) {
+      paymentDetail[0].discount = values.discount;
+    }
 
     startCreateTransition(() => {
       onCreatePaymentDetails({

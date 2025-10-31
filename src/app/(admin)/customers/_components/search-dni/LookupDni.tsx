@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { AlertCircle, CheckCircle, Info, Loader2, Search, User } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCustomers } from "../../_hooks/use-customers";
@@ -18,25 +17,36 @@ interface DniLookupProps {
 export default function DniLookup({ form }: DniLookupProps) {
   const [dniInput, setDniInput] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
-  const [lastSearchedDni, setLastSearchedDni] = useState("");
+  // Se permite consultar el mismo DNI múltiples veces; no se necesita recordar el último buscado
   const [dniToSearch, setDniToSearch] = useState("");
 
-  const { customerDataByDni, isLoadingCustomerDataByDni, errorCustomerDataByDni, isSuccessCustomerDataByDni } =
-    useCustomers({ dni: dniToSearch });
+  const {
+    customerDataByDni,
+    isLoadingCustomerDataByDni,
+    isFetchingCustomerDataByDni,
+    errorCustomerDataByDni,
+    isSuccessCustomerDataByDni,
+    refetchCustomerDataByDni,
+  } = useCustomers({ dni: dniToSearch });
 
   // Validar si el DNI es válido (8 dígitos)
   const isDniValid = dniInput.length === 8 && /^\d{8}$/.test(dniInput);
 
   // Determinar si el botón debe estar deshabilitado
-  const isButtonDisabled = isLoadingCustomerDataByDni || dniInput === lastSearchedDni || !isDniValid;
+  const isQueryLoading = isLoadingCustomerDataByDni || isFetchingCustomerDataByDni;
+  const isButtonDisabled = isQueryLoading || !isDniValid;
 
   // Manejar la búsqueda del DNI - Solo cuando se presiona el botón
   const handleDniSearch = async () => {
     if (isButtonDisabled) return;
 
     setHasSearched(true);
-    setLastSearchedDni(dniInput);
-    setDniToSearch(dniInput);
+    if (dniInput === dniToSearch) {
+      // Forzar refetch cuando se busca el mismo DNI
+      refetchCustomerDataByDni();
+    } else {
+      setDniToSearch(dniInput);
+    }
   };
 
   // Auto-llenar el formulario cuando se encuentren datos
@@ -113,7 +123,7 @@ export default function DniLookup({ form }: DniLookupProps) {
             size="default"
             className="px-4"
           >
-            {isLoadingCustomerDataByDni ? (
+            {isQueryLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <>
@@ -137,11 +147,7 @@ export default function DniLookup({ form }: DniLookupProps) {
               )}
             </div>
 
-            {dniInput === lastSearchedDni && hasSearched && (
-              <Badge variant="secondary" className="text-xs">
-                Consultado
-              </Badge>
-            )}
+            {/* Ya no mostramos "Consultado"; se permite consultar repetidamente */}
           </div>
         )}
       </div>

@@ -72,10 +72,12 @@ export const calculateSubtotal = (detailForm: UseFormReturn<PaymentDetailFormVal
   const unitPrice = detailForm.getValues("unitPrice") || 0;
   const quantity = detailForm.getValues("quantity") || 0;
   const days = detailForm.getValues("days") || 0;
+  const discount = detailForm.getValues("discount") || 0;
 
   let subtotal = 0;
   if (watchDetailType === "ROOM" && days > 0) {
-    subtotal = unitPrice * days;
+    // Aplica descuento solo para habitación. El descuento es monto absoluto, no porcentaje
+    subtotal = Math.max(0, unitPrice * days - discount);
   } else if ((watchDetailType === "SERVICE" || watchDetailType === "PRODUCT") && quantity > 0) {
     subtotal = unitPrice * quantity;
   } else {

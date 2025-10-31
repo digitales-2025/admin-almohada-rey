@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { AlertCircle, Building2, CheckCircle, Info, Loader2, Search } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRuc } from "../../_hooks/use-ruc";
@@ -18,24 +17,31 @@ interface RucLookupProps {
 export default function RucLookup({ form }: RucLookupProps) {
   const [rucInput, setRucInput] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
-  const [lastSearchedRuc, setLastSearchedRuc] = useState("");
+  // Se permite consultar el mismo RUC múltiples veces; no se necesita recordar el último buscado
   const [rucToSearch, setRucToSearch] = useState("");
 
-  const { rucData, isLoadingRucData, errorRucData, isSuccessRucData } = useRuc({ ruc: rucToSearch });
+  const { rucData, isLoadingRucData, isFetchingRucData, errorRucData, isSuccessRucData, refetchRucData } = useRuc({
+    ruc: rucToSearch,
+  });
 
   // Validar si el RUC es válido (11 dígitos)
   const isRucValid = rucInput.length === 11 && /^\d{11}$/.test(rucInput);
 
   // Determinar si el botón debe estar deshabilitado
-  const isButtonDisabled = isLoadingRucData || rucInput === lastSearchedRuc || !isRucValid;
+  const isQueryLoading = isLoadingRucData || isFetchingRucData;
+  const isButtonDisabled = isQueryLoading || !isRucValid;
 
   // Manejar la búsqueda del RUC - Solo cuando se presiona el botón
   const handleRucSearch = async () => {
     if (isButtonDisabled) return;
 
     setHasSearched(true);
-    setLastSearchedRuc(rucInput);
-    setRucToSearch(rucInput);
+    if (rucInput === rucToSearch) {
+      // Forzar refetch cuando se busca el mismo RUC
+      refetchRucData();
+    } else {
+      setRucToSearch(rucInput);
+    }
   };
 
   // Auto-llenar el formulario cuando se encuentren datos
@@ -114,7 +120,7 @@ export default function RucLookup({ form }: RucLookupProps) {
             size="default"
             className="px-4"
           >
-            {isLoadingRucData ? (
+            {isQueryLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <>
@@ -138,11 +144,7 @@ export default function RucLookup({ form }: RucLookupProps) {
               )}
             </div>
 
-            {rucInput === lastSearchedRuc && hasSearched && (
-              <Badge variant="secondary" className="text-xs">
-                Consultado
-              </Badge>
-            )}
+            {/* Ya no mostramos "Consultado"; se permite consultar repetidamente */}
           </div>
         )}
       </div>

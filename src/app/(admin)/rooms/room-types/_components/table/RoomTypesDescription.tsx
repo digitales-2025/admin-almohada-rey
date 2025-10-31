@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { Maximize } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -29,7 +28,7 @@ export const RoomTypeDescription = ({ row }: RoomTypeDescriptionProps) => {
                 {row.imagesRoomType.map((image) => (
                   <CarouselItem key={image.id} className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
                     <div className="p-1 relative group">
-                      <Image
+                      <img
                         src={image.url}
                         alt={`${row.name} - Imagen`}
                         className="w-full aspect-video object-cover rounded-lg cursor-pointer"
@@ -66,7 +65,7 @@ export const RoomTypeDescription = ({ row }: RoomTypeDescriptionProps) => {
             <DialogTitle>Vista Ampliada - {row.name}</DialogTitle>
           </DialogHeader>
           {selectedImage && (
-            <Image
+            <img
               src={selectedImage}
               alt={`${row.name} - Vista ampliada`}
               className="w-full object-contain max-h-[70vh] rounded-lg"
