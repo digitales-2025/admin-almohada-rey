@@ -59,6 +59,7 @@ export default function PaymentDetailGroups({ paymentDetails, missingDays, payme
       quantity: 1,
       days: 1,
       subtotal: 0,
+      discount: 0,
       detailType: "ROOM",
       productId: undefined,
       serviceId: undefined,
@@ -78,6 +79,7 @@ export default function PaymentDetailGroups({ paymentDetails, missingDays, payme
   const watchUnitPrice = detailForm.watch("unitPrice");
   const watchQuantity = detailForm.watch("quantity");
   const watchDays = detailForm.watch("days");
+  const watchDiscount = detailForm.watch("discount");
 
   const handleEditGroup = (items: PaymentDetail[]) => {
     setSelectedDetails(items);
@@ -116,6 +118,12 @@ export default function PaymentDetailGroups({ paymentDetails, missingDays, payme
     detailForm.setValue("quantity", detail.quantity || 1);
     detailForm.setValue("days", detail.days || 1);
     detailForm.setValue("subtotal", detail.subtotal);
+    // Cargar descuento si existe (solo aplica a ROOM/LATE_CHECKOUT en nuestro modelo)
+    if (typeof (detail as any).discount === "number") {
+      detailForm.setValue("discount", (detail as any).discount ?? 0);
+    } else {
+      detailForm.setValue("discount", 0);
+    }
     detailForm.setValue("detailType", type);
 
     if (detail.product) {
@@ -184,6 +192,9 @@ export default function PaymentDetailGroups({ paymentDetails, missingDays, payme
     if (data.detailType === "ROOM" && data.roomId) {
       updatePayload.roomId = data.roomId;
       updatePayload.days = data.days;
+      if (typeof data.discount === "number" && data.discount > 0) {
+        updatePayload.discount = data.discount;
+      }
     } else if (data.detailType === "PRODUCT" && data.productId) {
       updatePayload.productId = data.productId;
       updatePayload.quantity = data.quantity;
@@ -215,7 +226,7 @@ export default function PaymentDetailGroups({ paymentDetails, missingDays, payme
   // Update subtotal when relevant fields change
   useEffect(() => {
     calculateSubtotal(detailForm, watchDetailType);
-  }, [watchUnitPrice, watchQuantity, watchDays, watchDetailType]);
+  }, [detailForm, watchUnitPrice, watchQuantity, watchDays, watchDiscount, watchDetailType]);
 
   const getCurrentDetailTypeConfig = () => {
     return PaymentDetailTypesConfigs.find((type) => type.value === watchDetailType) || PaymentDetailTypesConfigs[0];

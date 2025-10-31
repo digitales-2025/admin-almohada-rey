@@ -85,7 +85,7 @@ export default function UpdatePaymentDetailRoom({
           }}
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {!isLateCheckout && (
             <FormField
               control={detailForm.control}
@@ -181,22 +181,54 @@ export default function UpdatePaymentDetailRoom({
                       min={0}
                       step={0.01}
                       className="pl-9"
-                      disabled={isLateCheckout}
+                      disabled
                       {...field}
                       onChange={(e) => field.onChange(Number(e.target.value))}
                     />
                   </div>
                 </FormControl>
-                {isLateCheckout && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    El precio por late checkout no puede ser modificado
-                  </p>
-                )}
                 <FormMessage />
               </FormItem>
             )}
           />
+
+          {!isLateCheckout && (
+            <FormField
+              control={detailForm.control}
+              name="discount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Descuento (S/.)</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <Banknote className="h-4 w-4" />
+                      </div>
+                      <Input
+                        type="number"
+                        min={0}
+                        step={0.01}
+                        className="pl-9"
+                        placeholder="0.00"
+                        {...field}
+                        value={field.value ?? 0}
+                        onChange={(e) => field.onChange(Number(e.target.value) || 0)}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
         </div>
+
+        {!isLateCheckout && (detailForm.watch("discount") ?? 0) > 0 && (
+          <div className="mt-3 flex justify-between items-center text-green-600">
+            <span className="text-sm font-medium">Descuento:</span>
+            <span className="font-semibold">-S/ {(detailForm.watch("discount") ?? 0).toFixed(2)}</span>
+          </div>
+        )}
 
         <div className="mt-4 pt-3 border-t flex justify-between items-center">
           <span className="text-sm font-medium">{isLateCheckout ? "Tarifa de Late Checkout:" : "Subtotal:"}</span>

@@ -9,6 +9,8 @@ export const paymentDetailSchema = z.object({
   quantity: z.number().nullable(),
   days: z.number().nullable(),
   subtotal: z.number().min(0, { message: "El subtotal debe ser mayor o igual a 0" }),
+  // Descuento aplicado solo para detalles de habitación (opcional)
+  discount: z.number().min(0, { message: "El descuento debe ser mayor o igual a 0" }).optional(),
   detailType: z.enum(["ROOM", "SERVICE", "PRODUCT", "LATE_CHECKOUT"]),
   productId: z.string().optional(),
   serviceId: z.string().optional(),

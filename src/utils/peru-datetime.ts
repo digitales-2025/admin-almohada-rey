@@ -565,7 +565,7 @@ export function formatTimeToHHMMAMPM(date: Date): string {
  * MANTIENE tu lógica original completa
  */
 export function getCurrentPeruDateTime(
-  format: "iso" | "date" | "time" | "full" | "object" = "object"
+  formatType: "iso" | "date" | "time" | "full" | "object" = "object"
 ): string | PeruDateTime | Date {
   // Obtener la fecha actual en UTC
   const now = new Date();
@@ -573,14 +573,14 @@ export function getCurrentPeruDateTime(
   // Obtener representación en zona horaria de Perú
   const peruNow = new Date(now.toLocaleString("en-US", { timeZone: LIMA_TIME_ZONE }));
 
-  switch (format) {
+  switch (formatType) {
     case "iso":
       // Formato ISO pero con la zona horaria de Perú
       return now.toISOString();
 
     case "date":
-      // Solo la fecha en formato yyyy-MM-dd
-      return peruNow.toISOString().split("T")[0];
+      // Solo la fecha en formato yyyy-MM-dd usando date-fns-tz para precisión
+      return format(now, "yyyy-MM-dd", { timeZone: LIMA_TIME_ZONE });
 
     case "time":
       // Solo la hora en formato hh:mm AM/PM
