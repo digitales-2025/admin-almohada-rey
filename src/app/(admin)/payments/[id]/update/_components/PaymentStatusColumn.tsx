@@ -299,6 +299,14 @@ export function PaymentStatusColumn({
                               S/ {detail.unitPrice.toFixed(2)}
                             </span>
                           </div>
+                          {typeof (detail as any).discount === "number" && (detail as any).discount > 0 && (
+                            <div className="flex items-center justify-between border-b border-dashed border-purple-100 py-1.5">
+                              <span className="text-xs text-muted-foreground">Descuento</span>
+                              <span className="text-xs font-semibold text-green-600">
+                                -S/ {(detail as any).discount.toFixed(2)}
+                              </span>
+                            </div>
+                          )}
                           <div className="flex items-center justify-between py-1.5">
                             <span className="text-xs text-muted-foreground">Total</span>
                             <span className="text-xs font-bold text-foreground">S/ {detail.subtotal.toFixed(2)}</span>

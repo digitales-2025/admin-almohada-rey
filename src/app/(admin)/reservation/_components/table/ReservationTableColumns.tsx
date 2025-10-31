@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { formatPeruBookingDate, getCurrentPeruDateTime } from "@/utils/peru-datetime";
+import { formatPeruBookingDate, getCurrentPeruDateTime, utcToPeruDateTime } from "@/utils/peru-datetime";
 import {
   DetailedReservation,
   ReservationGuest,
@@ -276,14 +276,15 @@ export const reservationColumns = (
       const { canCancel, canCheckIn, canCheckOut, canConfirm, canDeactivate }: ReservationStatusAvailableActions =
         getAvailableActions(status);
 
-      // Usar las utilidades existentes para obtener la fecha actual en Perú
-      const todayPeruDate = getCurrentPeruDateTime("date") as string; // "2025-03-31"
-      const checkInDate = row.original.checkInDate.split("T")[0]; // Extraer solo la fecha "2025-03-31"
+      // Obtener la fecha actual en Perú (yyyy-MM-dd)
+      const todayPeruDate = getCurrentPeruDateTime("date") as string;
+      // Convertir el check-in de UTC a fecha de Perú (yyyy-MM-dd)
+      const peruCheckInDate = utcToPeruDateTime(row.original.checkInDate).date;
 
-      // Comparación simple de strings de fecha (yyyy-MM-dd)
-      const hasCheckInDateArrived = checkInDate <= todayPeruDate;
+      // Habilitar solo si es el mismo día en Perú (sin importar la hora)
+      const isSameDayCheckIn = peruCheckInDate === todayPeruDate;
 
-      const enableCheckInButton = hasCheckInDateArrived && canCheckIn;
+      const enableCheckInButton = isSameDayCheckIn && canCheckIn;
 
       return (
         <div>
