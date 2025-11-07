@@ -23,6 +23,7 @@ export const extendStaySchema = z.object({
     errorMap: () => ({ message: "Método de pago inválido" }),
   }),
   paymentDate: z.string().min(1, "La fecha de pago es requerida"),
+  discount: z.number().min(0, "El descuento debe ser mayor o igual a 0").optional(),
 });
 
 // Esquema combinado con discriminador para el tipo de extensión

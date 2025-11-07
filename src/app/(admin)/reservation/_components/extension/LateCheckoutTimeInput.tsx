@@ -53,12 +53,33 @@ export default function LateCheckoutTimeInput({
       // Formatear la fecha base como YYYY-MM-DD
       const dateString = format(originalCheckoutDate, "yyyy-MM-dd");
 
-      // Convertir hora de formato HH:MM a formato 12h para la función formDateToPeruISO
+      // Convertir hora de formato HH:MM (24h) a formato 12h para la función formDateToPeruISO
+      // La función espera formato "hh:mm a" donde hh es 01-12
       const [hours, minutes] = time.split(":").map(Number);
-      const is12HourFormat = hours < 12;
-      const formattedHour = is12HourFormat ? hours : hours - 12;
-      const ampm = is12HourFormat ? "AM" : "PM";
-      const timeString = `${formattedHour}:${minutes.toString().padStart(2, "0")} ${ampm}`;
+
+      let formattedHour: number;
+      let ampm: string;
+
+      if (hours === 0) {
+        // Medianoche (00:XX) -> 12:XX AM
+        formattedHour = 12;
+        ampm = "AM";
+      } else if (hours === 12) {
+        // Mediodía (12:XX) -> 12:XX PM
+        formattedHour = 12;
+        ampm = "PM";
+      } else if (hours < 12) {
+        // 01:XX - 11:XX -> 1:XX AM - 11:XX AM
+        formattedHour = hours;
+        ampm = "AM";
+      } else {
+        // 13:XX - 23:XX -> 1:XX PM - 11:XX PM
+        formattedHour = hours - 12;
+        ampm = "PM";
+      }
+
+      // Formatear con dos dígitos para las horas (01-12)
+      const timeString = `${formattedHour.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")} ${ampm}`;
 
       // Generar ISO string con hora peruana
       return formDateToPeruISO(

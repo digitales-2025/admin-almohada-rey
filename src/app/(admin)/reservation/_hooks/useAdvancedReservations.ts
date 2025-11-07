@@ -26,7 +26,7 @@ export function useAdvancedReservations({
       initialSearch,
     });
 
-  // Procesar filtros para manejar el caso especial de "payment_to_delete"
+  // Procesar filtros para manejar el caso especial de "payment_to_delete" y filtros de fecha
   const processedFilters = useMemo(() => {
     const filters = { ...filtersState.filters };
 
@@ -45,6 +45,9 @@ export function useAdvancedReservations({
         filters.isPendingDeletePayment = ["true"] as any; // Siempre true para payment_to_delete
       }
     }
+
+    // Procesar filtros de fecha (checkInDate y checkOutDate ya vienen del sistema de filtros)
+    // No necesitamos procesarlos aquí, ya que vienen directamente de tableActions.setColumnFilters
 
     return filters;
   }, [filtersState.filters]);

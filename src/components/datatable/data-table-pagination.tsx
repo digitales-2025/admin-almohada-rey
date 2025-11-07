@@ -39,7 +39,12 @@ export function DataTablePagination<TData>({ table, serverPagination }: DataTabl
           </Select>
         </div>
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-          Página {table.getState().pagination.pageIndex + 1} de {serverPagination?.pageCount ?? table.getPageCount()}
+          Página{" "}
+          {Math.min(
+            table.getState().pagination.pageIndex + 1,
+            (serverPagination?.pageCount ?? table.getPageCount()) || 1
+          )}{" "}
+          de {(serverPagination?.pageCount ?? table.getPageCount()) || 1}
         </div>
         <div className="flex items-center space-x-2">
           <Button
