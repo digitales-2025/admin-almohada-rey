@@ -38,12 +38,16 @@ class SocketService {
 
   connect() {
     if (!this.socket) {
-      // USAR LA URL de ENV
-      const socketUrl = `${process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000"}/reservations`;
+      // USAR LA URL de ENV (sin el namespace, se especifica en la URL completa)
+      const baseUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
+      // El namespace personalizado se especifica en la URL: /api/websocket/reservations
+      const socketUrl = `${baseUrl}/api/websocket/reservations`;
 
       console.log("🔌 [SOCKET SERVICE] Creando conexión:", {
+        baseUrl,
         socketUrl,
         envVar: process.env.NEXT_PUBLIC_SOCKET_URL,
+        namespace: "/api/websocket/reservations",
         timestamp: new Date().toISOString(),
       });
 
@@ -56,6 +60,7 @@ class SocketService {
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
+        path: "/socket.io", // Path de Socket.IO (debe coincidir con el servidor)
       });
 
       console.log("📡 [SOCKET SERVICE] Socket creado, estado inicial:", {
