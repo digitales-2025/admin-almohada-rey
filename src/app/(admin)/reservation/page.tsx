@@ -1,13 +1,10 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { FilterX } from "lucide-react";
 
 import { HeaderPage } from "@/components/common/HeaderPage";
 import ErrorGeneral from "@/components/errors/general-error";
-import { Button } from "@/components/ui/button";
 import { WebSocketConnectionIndicator } from "@/components/websocket-connection-indicator";
-import { FilterReservationDialog } from "./_components/filter/FilterReservationDialog";
 import { ReservationTable } from "./_components/table/ReservationTable";
 import { useAdvancedReservations } from "./_hooks/useAdvancedReservations";
 import { METADATA } from "./_statics/metadata";
@@ -23,14 +20,11 @@ export default function ReservationPage() {
     meta: reservationsMeta,
     isLoading,
     error,
-    refetch,
     tableState,
     tableActions,
     filtersState,
-    filtersActions,
     getFilterValueByColumn,
     localSearch,
-    updateFilters,
   } = useAdvancedReservations({
     initialPagination: { page, pageSize },
   });
@@ -53,39 +47,11 @@ export default function ReservationPage() {
     );
   }
 
-  // Pasar directamente el hook response
-  const paginatedHookResponse = {
-    data: reservationsData,
-    meta: reservationsMeta,
-    isLoading,
-    error,
-    refetch,
-    updateFilters,
-    // Incluir todas las propiedades que retorna useAdvancedReservations
-    filtersState,
-    filtersActions,
-    tableState,
-    tableActions,
-    getFilterValueByColumn,
-    localSearch,
-    reservations: reservationsData,
-    reservationsMeta,
-    isReservationsLoading: isLoading,
-    reservationsError: error,
-  };
-
   return (
     <div>
       <div className="flex flex-col sm:flex-row justify-between gap-2">
         <HeaderPage title={METADATA.entityPluralName} description={METADATA.description} />
         <WebSocketConnectionIndicator showDetails={true} />
-      </div>
-      <div className="flex flex-col items-start space-x-2 space-y-2 py-2 sm:flex-row sm:space-x-1 lg:space-y-0">
-        <FilterReservationDialog paginatedHookResponse={paginatedHookResponse} />
-        <Button onClick={() => {}} variant="outline" size="sm" className="flex items-center space-x-1">
-          <FilterX></FilterX>
-          <span>Limpiar Filtros</span>
-        </Button>
       </div>
       <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0">
         <ReservationTable

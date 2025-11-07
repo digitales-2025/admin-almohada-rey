@@ -7,7 +7,6 @@ import { DateRange } from "react-day-picker";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { Customer } from "@/app/(admin)/customers/_types/customer";
 import { CustomFormDescription } from "@/components/form/CustomFormDescription";
 import { Button } from "@/components/ui/button";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
@@ -29,14 +28,13 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Form, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { PaginationParams } from "@/types/api/paginated-response";
 import { createPeruBookingDateTime } from "@/utils/peru-datetime";
 import { useAdvancedReservations } from "../../_hooks/useAdvancedReservations";
 import { FilterByCustomerCheckInOutInput, FilterByCustomerCheckInOutSchema } from "../../_schemas/reservation.schemas";
 import { PaginatedReservationParams } from "../../_services/reservationApi";
-import { SearchCustomerCombobox } from "../search/SearchCustomerCombobox";
 
 type CurrentFilterOptions = PaginatedReservationParams;
 
@@ -67,10 +65,6 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
   const { checkIn, checkOut } = createPeruBookingDateTime(todayFormatted, tomorrowFormatted);
 
   const [open, setOpen] = useState(false);
-
-  // Guardamos la referencia al cliente seleccionado y su información de visualización
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-  const [customerDisplayInfo, setCustomerDisplayInfo] = useState<string | undefined>(undefined);
 
   // Estado para manejar el rango de fechas
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -111,14 +105,6 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
       filterForm.setValue("checkOutDate", undefined);
     }
   }, [dateRange, filterForm]);
-
-  // Efecto para conservar el cliente seleccionado
-  useEffect(() => {
-    // Mantener el ID del cliente cuando se tiene seleccionado uno
-    if (selectedCustomer && selectedCustomer.id) {
-      filterForm.setValue("customerId", selectedCustomer.id);
-    }
-  }, [selectedCustomer, filterForm]);
 
   const onSubmit = useCallback(
     (input: FilterByCustomerCheckInOutInput) => {
@@ -202,33 +188,6 @@ export function FilterReservationDialog({ paginatedHookResponse, onSaveFilter }:
     <div>
       <Form {...filterForm}>
         <form onSubmit={filterForm.handleSubmit(onSubmit)} className="space-y-4 flex flex-col items-center">
-          <FormField
-            control={filterForm.control}
-            name="customerId"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel>Seleccionar cliente</FormLabel>
-                <div className="w-full">
-                  <SearchCustomerCombobox
-                    onValueChange={(_val, c) => {
-                      const customer = c as Customer;
-                      field.onChange(customer.id);
-                      // Guardar el cliente seleccionado y su información de visualización
-                      setSelectedCustomer(customer);
-                      // Construir el texto para mostrar
-                      const displayText = `${customer.name} - ${customer.documentNumber || ""}`;
-                      setCustomerDisplayInfo(displayText);
-                    }}
-                    // Usar el customerDisplayInfo si está disponible, sino usar el documentNumber
-                    defaultValue={customerDisplayInfo || selectedCustomer?.documentNumber}
-                    className="!w-full"
-                  />
-                </div>
-                <FormMessage />
-                <FormDescription>Solo visualizará clientes activos</FormDescription>
-              </FormItem>
-            )}
-          />
           <FormItem className="w-full">
             <FormLabel>Fechas de check-in y check-out</FormLabel>
             <DateRangePicker

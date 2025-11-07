@@ -160,12 +160,46 @@ export function DataTable<TData extends Record<string, unknown>, TValue = unknow
     (updaterOrValue: string | ((old: string) => string)) => {
       const newFilter = typeof updaterOrValue === "function" ? updaterOrValue(globalFilter) : updaterOrValue;
       setGlobalFilter(newFilter);
+
+      // Resetear paginación a página 1 cuando cambia la búsqueda
+      if (serverPagination) {
+        setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+        if (serverPagination.onPaginationChange) {
+          serverPagination.onPaginationChange(0, pagination.pageSize);
+        }
+      }
+
       if (onGlobalFilterChange) {
         onGlobalFilterChange(newFilter);
       }
     },
-    [globalFilter, onGlobalFilterChange]
+    [globalFilter, onGlobalFilterChange, serverPagination, pagination.pageSize]
   );
+
+  // Ref para rastrear el valor anterior de externalGlobalFilter
+  const prevExternalGlobalFilterRef = React.useRef<string | undefined>(externalGlobalFilter);
+  const isFirstRenderRef = React.useRef(true);
+
+  // Efecto para resetear paginación cuando cambia externalGlobalFilter
+  React.useEffect(() => {
+    if (externalGlobalFilter !== undefined && serverPagination) {
+      // Saltar el primer render
+      if (isFirstRenderRef.current) {
+        isFirstRenderRef.current = false;
+        prevExternalGlobalFilterRef.current = externalGlobalFilter;
+        return;
+      }
+
+      // Solo resetear si realmente cambió el valor
+      if (prevExternalGlobalFilterRef.current !== externalGlobalFilter) {
+        setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+        if (serverPagination.onPaginationChange) {
+          serverPagination.onPaginationChange(0, pagination.pageSize);
+        }
+        prevExternalGlobalFilterRef.current = externalGlobalFilter;
+      }
+    }
+  }, [externalGlobalFilter, serverPagination, pagination.pageSize]);
 
   const table = useReactTable({
     data,
@@ -232,22 +266,54 @@ export function DataTable<TData extends Record<string, unknown>, TValue = unknow
         toolbarActions={toolbarActions}
         filterPlaceholder={filterPlaceholder}
         facetedFilters={facetedFilters?.map((filter) => {
+          const filterType = filter.type || "faceted";
+
+          // Para filtros de fecha, obtener el valor del rango de fechas
+          const externalFilterValue =
+            filterType === "dateRange"
+              ? externalFilters?.dateRange ||
+                (externalFilters?.checkInDate && externalFilters?.checkOutDate
+                  ? {
+                      from: new Date(externalFilters.checkInDate),
+                      to: new Date(externalFilters.checkOutDate),
+                    }
+                  : undefined)
+              : getFilterValueByColumn
+                ? getFilterValueByColumn(filter.column)
+                : externalFilters?.[filter.column];
+
           const enhancedFilter = {
             ...filter,
-            externalFilterValue: getFilterValueByColumn
-              ? getFilterValueByColumn(filter.column)
-              : externalFilters?.[filter.column],
+            externalFilterValue,
             onFilterChange: (value: any) => {
               if (onColumnFiltersChange) {
-                // Obtener filtros existentes y actualizar solo el filtro específico
-                const currentFilters = table.getState().columnFilters;
-                const updatedFilters = currentFilters.filter((f) => f.id !== filter.column);
+                // Para filtros de fecha, manejar checkInDate y checkOutDate
+                if (filterType === "dateRange" && value) {
+                  const currentFilters = table.getState().columnFilters;
+                  const updatedFilters = currentFilters.filter(
+                    (f) => f.id !== "checkInDate" && f.id !== "checkOutDate" && f.id !== "dateRange"
+                  );
 
-                if (value !== undefined) {
-                  updatedFilters.push({ id: filter.column, value });
+                  if (value.from && value.to) {
+                    updatedFilters.push(
+                      { id: "checkInDate", value: value.from.toISOString() },
+                      { id: "checkOutDate", value: value.to.toISOString() },
+                      { id: "dateRange", value }
+                    );
+                  }
+
+                  onColumnFiltersChange(updatedFilters);
+                } else {
+                  // Para filtros normales, manejar como antes
+                  const currentFilters = table.getState().columnFilters;
+                  const updatedFilters = currentFilters.filter((f) => f.id !== filter.column);
+
+                  if (value !== undefined) {
+                    updatedFilters.push({ id: filter.column, value });
+                  }
+
+                  onColumnFiltersChange(updatedFilters);
                 }
-
-                onColumnFiltersChange(updatedFilters);
               }
             },
           };

@@ -86,6 +86,7 @@ export function ExtensionReservationDialog({ open, onOpenChange, reservation }: 
       additionalNotes: reservation.observations ?? "",
       paymentMethod: PaymentDetailMethod.CASH,
       paymentDate: format(new Date(), "yyyy-MM-dd"),
+      discount: 0,
     },
   });
 

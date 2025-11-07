@@ -57,4 +57,14 @@ export const facetedFilters = [
       icon: ReservationStatusIcons[reservationStatus],
     })),
   },
+  // Filtro de fecha para check-in y check-out
+  {
+    column: "dateRange", // ID especial para el filtro de fecha
+    title: "Fechas",
+    type: "dateRange" as const,
+    options: [], // No se usa para filtros de fecha
+    dateRangeConfig: {
+      numberOfMonths: 2 as const,
+    },
+  },
 ];
