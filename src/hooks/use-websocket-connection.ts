@@ -19,6 +19,8 @@ export function useWebSocketConnection() {
       socketId: socket.id || "sin ID aún",
       connected: socket.connected,
       disconnected: socket.disconnected,
+      hasTransport: !!socket.io?.engine?.transport,
+      transportName: socket.io?.engine?.transport?.name,
     });
 
     // Función para actualizar el estado
@@ -110,6 +112,10 @@ export function useWebSocketConnection() {
     socket.io.on("reconnect_error", handleReconnectError);
     socket.io.on("reconnect_failed", handleReconnectFailed);
 
+    // Variables para timeouts de diagnóstico
+    let timeout3s: NodeJS.Timeout | null = null;
+    let timeout5s: NodeJS.Timeout | null = null;
+
     // Verificar estado inicial
     if (socket.connected) {
       console.log("✅ [WEBSOCKET HOOK] Socket ya estaba conectado al inicializar");
@@ -117,11 +123,35 @@ export function useWebSocketConnection() {
     } else {
       console.log("⏳ [WEBSOCKET HOOK] Socket no conectado aún, esperando conexión...");
       updateStatus("connecting");
+
+      // Verificar estado después de 3 segundos para diagnosticar si se queda en connecting
+      timeout3s = setTimeout(() => {
+        console.log("🔍 [WEBSOCKET HOOK] Estado después de 3s:", {
+          socketId: socket.id || "sin ID aún",
+          connected: socket.connected,
+          disconnected: socket.disconnected,
+          hasTransport: !!socket.io?.engine?.transport,
+          transportName: socket.io?.engine?.transport?.name,
+        });
+      }, 3000);
+
+      // Verificar estado después de 5 segundos
+      timeout5s = setTimeout(() => {
+        console.log("🔍 [WEBSOCKET HOOK] Estado después de 5s:", {
+          socketId: socket.id || "sin ID aún",
+          connected: socket.connected,
+          disconnected: socket.disconnected,
+          hasTransport: !!socket.io?.engine?.transport,
+          transportName: socket.io?.engine?.transport?.name,
+        });
+      }, 5000);
     }
 
     // Cleanup
     return () => {
       console.log("🧹 [WEBSOCKET HOOK] Limpiando listeners del hook...");
+      if (timeout3s) clearTimeout(timeout3s);
+      if (timeout5s) clearTimeout(timeout5s);
       socket.off("connect", handleConnect);
       socket.off("disconnect", handleDisconnect);
       socket.off("connect_error", handleConnectError);

@@ -1,4 +1,4 @@
-import { differenceInDays, isBefore, parseISO } from "date-fns";
+import { differenceInDays, isAfter, isBefore, isSameDay, parseISO } from "date-fns";
 import { Bed, Clock } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
@@ -35,19 +35,32 @@ export default function ExtensionReservationForm({
   onSubmitExtendStay,
   renderCount,
 }: ExtensionReservationFormProps) {
-  // Function to disable dates before checkout date
-  const isDateDisabled = (date: Date) => {
-    return isBefore(date, originalCheckoutDate) || isBefore(date, new Date());
-  };
   const roomPrice = reservation.room.RoomTypes.price;
 
+  const originalCheckInDate = reservation.checkInDate ? parseISO(reservation.checkInDate) : new Date();
   const originalCheckoutDate = reservation.checkOutDate ? parseISO(reservation.checkOutDate) : new Date();
+
+  // Function to disable only dates within the current reservation period (check-in to check-out)
+  // All dates after check-out should be available, even if they are before today
+  const isDateDisabled = (date: Date) => {
+    // Bloquear fechas desde check-in hasta check-out (inclusive)
+    // Esto incluye el check-in y el check-out
+    // Verificar si la fecha es igual o después del check-in
+    const isOnOrAfterCheckIn = isSameDay(date, originalCheckInDate) || isAfter(date, originalCheckInDate);
+    // Verificar si la fecha es igual o antes del check-out
+    const isOnOrBeforeCheckOut = isSameDay(date, originalCheckoutDate) || isBefore(date, originalCheckoutDate);
+
+    // Si la fecha está dentro del rango de la reserva actual (check-in a check-out), bloquearla
+    return isOnOrAfterCheckIn && isOnOrBeforeCheckOut;
+  };
 
   // Calculate costs
   const lateCheckoutCost = roomPrice / 2;
-  const extendedStayCost = extendStayForm.watch("newCheckoutDate")
-    ? roomPrice * differenceInDays(extendStayForm.watch("newCheckoutDate"), originalCheckoutDate)
+  const additionalNights = extendStayForm.watch("newCheckoutDate")
+    ? differenceInDays(extendStayForm.watch("newCheckoutDate"), originalCheckoutDate)
     : 0;
+  const discount = extendStayForm.watch("discount") ?? 0;
+  const extendedStayCost = additionalNights > 0 ? Math.max(0, roomPrice * additionalNights - discount) : 0;
 
   // Si late checkout fue aplicado, forzar la selección del tab "extend-stay"
   if (lateCheckoutApplied && selectedTab === "late-checkout") {

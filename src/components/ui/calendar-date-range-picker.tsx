@@ -15,13 +15,15 @@ import {
 } from "date-fns";
 import { formatInTimeZone, toDate } from "date-fns-tz";
 import { es } from "date-fns/locale";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, PlusCircle, X } from "lucide-react";
 import { DateRange } from "react-day-picker";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 const months = [
@@ -101,6 +103,7 @@ const multiSelectVariants = cva(
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground text-background",
         link: "text-primary underline-offset-4 hover:underline text-background",
+        faceted: "h-8 border-dashed",
       },
     },
     defaultVariants: {
@@ -119,6 +122,11 @@ interface CalendarDatePickerProps
   numberOfMonths?: 1 | 2;
   yearsRange?: number;
   onDateSelect: (range: { from: Date; to: Date }) => void;
+  // Opcional: diseño similar a DataTableFacetedFilter
+  facetedFilterStyle?: boolean;
+  title?: string;
+  // Opcional: callback para limpiar el filtro
+  onClear?: () => void;
 }
 
 export const CalendarDatePicker = React.forwardRef<HTMLButtonElement, CalendarDatePickerProps>(
@@ -132,6 +140,9 @@ export const CalendarDatePicker = React.forwardRef<HTMLButtonElement, CalendarDa
       yearsRange = 10,
       onDateSelect,
       variant,
+      facetedFilterStyle = false,
+      title,
+      onClear,
       ...props
     },
     ref
@@ -155,6 +166,21 @@ export const CalendarDatePicker = React.forwardRef<HTMLButtonElement, CalendarDa
     };
 
     const handleTogglePopover = () => setIsPopoverOpen((prev) => !prev);
+
+    const handleClear = React.useCallback(
+      (e: React.MouseEvent) => {
+        e.stopPropagation(); // Evitar que se abra el popover
+        if (onClear) {
+          onClear();
+        } else {
+          // Si no hay onClear, limpiar llamando a onDateSelect con undefined
+          onDateSelect({ from: undefined as any, to: undefined as any });
+        }
+        setTempDateRange({ from: undefined, to: undefined });
+        setSelectedRange(null);
+      },
+      [onClear, onDateSelect]
+    );
 
     const handleConfirm = () => {
       if (tempDateRange?.from) {
@@ -520,110 +546,147 @@ export const CalendarDatePicker = React.forwardRef<HTMLButtonElement, CalendarDa
         </style>
         <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
           <PopoverTrigger asChild>
-            <Button
-              id="date"
-              variant="outline"
-              ref={ref}
-              {...props}
-              className={cn("w-auto", multiSelectVariants({ variant, className }))}
-              onClick={handleTogglePopover}
-              suppressHydrationWarning
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              <span>
-                {date?.from ? (
-                  date.to ? (
-                    <>
-                      <span
-                        id={`firstDay-${_id}`}
-                        className={cn("date-part", highlightedPart === "firstDay" && "underline font-bold")}
-                        onMouseOver={() => handleMouseOver("firstDay")}
-                        onMouseLeave={handleMouseLeave}
-                      >
-                        {formatWithTz(date.from, "d")}
-                      </span>{" "}
-                      de{" "}
-                      <span
-                        id={`firstMonth-${_id}`}
-                        className={cn("date-part", highlightedPart === "firstMonth" && "underline font-bold")}
-                        onMouseOver={() => handleMouseOver("firstMonth")}
-                        onMouseLeave={handleMouseLeave}
-                      >
-                        {formatWithTz(date.from, "LLLL")}
-                      </span>{" "}
-                      <span
-                        id={`firstYear-${_id}`}
-                        className={cn("date-part", highlightedPart === "firstYear" && "underline font-bold")}
-                        onMouseOver={() => handleMouseOver("firstYear")}
-                        onMouseLeave={handleMouseLeave}
-                      >
-                        {formatWithTz(date.from, "y")}
-                      </span>
-                      {numberOfMonths === 2 && (
-                        <>
-                          {" - "}
-                          <span
-                            id={`secondDay-${_id}`}
-                            className={cn("date-part", highlightedPart === "secondDay" && "underline font-bold")}
-                            onMouseOver={() => handleMouseOver("secondDay")}
-                            onMouseLeave={handleMouseLeave}
-                          >
-                            {formatWithTz(date.to, "d")}
-                          </span>{" "}
-                          de{" "}
-                          <span
-                            id={`secondMonth-${_id}`}
-                            className={cn("date-part", highlightedPart === "secondMonth" && "underline font-bold")}
-                            onMouseOver={() => handleMouseOver("secondMonth")}
-                            onMouseLeave={handleMouseLeave}
-                          >
-                            {formatWithTz(date.to, "LLLL")}
-                          </span>{" "}
-                          <span
-                            id={`secondYear-${_id}`}
-                            className={cn("date-part", highlightedPart === "secondYear" && "underline font-bold")}
-                            onMouseOver={() => handleMouseOver("secondYear")}
-                            onMouseLeave={handleMouseLeave}
-                          >
-                            {formatWithTz(date.to, "y")}
-                          </span>
-                        </>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <span
-                        id={`day-${_id}`}
-                        className={cn("date-part", highlightedPart === "day" && "underline font-bold")}
-                        onMouseOver={() => handleMouseOver("day")}
-                        onMouseLeave={handleMouseLeave}
-                      >
-                        {formatWithTz(date.from, "d")}
-                      </span>{" "}
-                      de{" "}
-                      <span
-                        id={`month-${_id}`}
-                        className={cn("date-part", highlightedPart === "month" && "underline font-bold")}
-                        onMouseOver={() => handleMouseOver("month")}
-                        onMouseLeave={handleMouseLeave}
-                      >
-                        {formatWithTz(date.from, "LLLL")}
-                      </span>{" "}
-                      <span
-                        id={`year-${_id}`}
-                        className={cn("date-part", highlightedPart === "year" && "underline font-bold")}
-                        onMouseOver={() => handleMouseOver("year")}
-                        onMouseLeave={handleMouseLeave}
-                      >
-                        {formatWithTz(date.from, "y")}
-                      </span>
-                    </>
-                  )
-                ) : (
-                  <span>Seleccionar fecha</span>
+            <div className={cn("flex items-center gap-2", facetedFilterStyle && "inline-flex")}>
+              <Button
+                id="date"
+                variant="outline"
+                size={facetedFilterStyle ? "sm" : undefined}
+                ref={ref}
+                {...props}
+                className={cn(
+                  facetedFilterStyle ? "h-8 border-dashed" : "w-auto",
+                  multiSelectVariants({ variant, className })
                 )}
-              </span>
-            </Button>
+                onClick={handleTogglePopover}
+                suppressHydrationWarning
+              >
+                {facetedFilterStyle ? (
+                  <>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    {title || "Fechas"}
+                    {date?.from && date?.to && (
+                      <>
+                        <Separator orientation="vertical" className="mx-2 h-4" />
+                        <Badge variant="secondary" className="rounded-sm px-1 font-normal">
+                          {formatWithTz(date.from, "d MMM")} - {formatWithTz(date.to, "d MMM")}
+                        </Badge>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    <span>
+                      {date?.from ? (
+                        date.to ? (
+                          <>
+                            <span
+                              id={`firstDay-${_id}`}
+                              className={cn("date-part", highlightedPart === "firstDay" && "underline font-bold")}
+                              onMouseOver={() => handleMouseOver("firstDay")}
+                              onMouseLeave={handleMouseLeave}
+                            >
+                              {formatWithTz(date.from, "d")}
+                            </span>{" "}
+                            de{" "}
+                            <span
+                              id={`firstMonth-${_id}`}
+                              className={cn("date-part", highlightedPart === "firstMonth" && "underline font-bold")}
+                              onMouseOver={() => handleMouseOver("firstMonth")}
+                              onMouseLeave={handleMouseLeave}
+                            >
+                              {formatWithTz(date.from, "LLLL")}
+                            </span>{" "}
+                            <span
+                              id={`firstYear-${_id}`}
+                              className={cn("date-part", highlightedPart === "firstYear" && "underline font-bold")}
+                              onMouseOver={() => handleMouseOver("firstYear")}
+                              onMouseLeave={handleMouseLeave}
+                            >
+                              {formatWithTz(date.from, "y")}
+                            </span>
+                            {numberOfMonths === 2 && (
+                              <>
+                                {" - "}
+                                <span
+                                  id={`secondDay-${_id}`}
+                                  className={cn("date-part", highlightedPart === "secondDay" && "underline font-bold")}
+                                  onMouseOver={() => handleMouseOver("secondDay")}
+                                  onMouseLeave={handleMouseLeave}
+                                >
+                                  {formatWithTz(date.to, "d")}
+                                </span>{" "}
+                                de{" "}
+                                <span
+                                  id={`secondMonth-${_id}`}
+                                  className={cn(
+                                    "date-part",
+                                    highlightedPart === "secondMonth" && "underline font-bold"
+                                  )}
+                                  onMouseOver={() => handleMouseOver("secondMonth")}
+                                  onMouseLeave={handleMouseLeave}
+                                >
+                                  {formatWithTz(date.to, "LLLL")}
+                                </span>{" "}
+                                <span
+                                  id={`secondYear-${_id}`}
+                                  className={cn("date-part", highlightedPart === "secondYear" && "underline font-bold")}
+                                  onMouseOver={() => handleMouseOver("secondYear")}
+                                  onMouseLeave={handleMouseLeave}
+                                >
+                                  {formatWithTz(date.to, "y")}
+                                </span>
+                              </>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <span
+                              id={`day-${_id}`}
+                              className={cn("date-part", highlightedPart === "day" && "underline font-bold")}
+                              onMouseOver={() => handleMouseOver("day")}
+                              onMouseLeave={handleMouseLeave}
+                            >
+                              {formatWithTz(date.from, "d")}
+                            </span>{" "}
+                            de{" "}
+                            <span
+                              id={`month-${_id}`}
+                              className={cn("date-part", highlightedPart === "month" && "underline font-bold")}
+                              onMouseOver={() => handleMouseOver("month")}
+                              onMouseLeave={handleMouseLeave}
+                            >
+                              {formatWithTz(date.from, "LLLL")}
+                            </span>{" "}
+                            <span
+                              id={`year-${_id}`}
+                              className={cn("date-part", highlightedPart === "year" && "underline font-bold")}
+                              onMouseOver={() => handleMouseOver("year")}
+                              onMouseLeave={handleMouseLeave}
+                            >
+                              {formatWithTz(date.from, "y")}
+                            </span>
+                          </>
+                        )
+                      ) : (
+                        <span>Seleccionar fecha</span>
+                      )}
+                    </span>
+                  </>
+                )}
+              </Button>
+              {facetedFilterStyle && date?.from && date?.to && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 px-2"
+                  onClick={handleClear}
+                  title="Limpiar filtro de fechas"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </PopoverTrigger>
           {isPopoverOpen && (
             <PopoverContent
@@ -744,7 +807,7 @@ export const CalendarDatePicker = React.forwardRef<HTMLButtonElement, CalendarDa
                       </div>
                     )}
                   </div>
-                  <div className="flex">
+                  <div className="flex items-center justify-center">
                     <Calendar
                       mode="range"
                       defaultMonth={monthFrom}
@@ -761,7 +824,7 @@ export const CalendarDatePicker = React.forwardRef<HTMLButtonElement, CalendarDa
                       selected={tempDateRange}
                       onSelect={handleDateSelect}
                       numberOfMonths={numberOfMonths}
-                      showOutsideDays={false}
+                      showOutsideDays={true}
                       className={className}
                     />
                   </div>

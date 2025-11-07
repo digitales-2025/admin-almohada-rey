@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
+import { format } from "date-fns-tz";
 import { CalendarCog, CalendarX2, CreditCard, Ellipsis, Pencil, Trash } from "lucide-react";
 import { toast } from "sonner";
 
@@ -18,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { formatPeruBookingDate, getCurrentPeruDateTime, utcToPeruDateTime } from "@/utils/peru-datetime";
+import { formatPeruBookingDate, getCurrentPeruDateTime, LIMA_TIME_ZONE } from "@/utils/peru-datetime";
 import {
   DetailedReservation,
   ReservationGuest,
@@ -276,10 +277,12 @@ export const reservationColumns = (
       const { canCancel, canCheckIn, canCheckOut, canConfirm, canDeactivate }: ReservationStatusAvailableActions =
         getAvailableActions(status);
 
-      // Obtener la fecha actual en Perú (yyyy-MM-dd)
+      // Obtener la fecha actual en Perú (yyyy-MM-dd) usando date-fns-tz directamente
       const todayPeruDate = getCurrentPeruDateTime("date") as string;
-      // Convertir el check-in de UTC a fecha de Perú (yyyy-MM-dd)
-      const peruCheckInDate = utcToPeruDateTime(row.original.checkInDate).date;
+      // Convertir el check-in de UTC a fecha de Perú (yyyy-MM-dd) usando date-fns-tz
+      // Esto es más robusto que utcToPeruDateTime que usa toLocaleString
+      const checkInDate = new Date(row.original.checkInDate);
+      const peruCheckInDate = format(checkInDate, "yyyy-MM-dd", { timeZone: LIMA_TIME_ZONE });
 
       // Habilitar solo si es el mismo día en Perú (sin importar la hora)
       const isSameDayCheckIn = peruCheckInDate === todayPeruDate;

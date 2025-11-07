@@ -1,9 +1,11 @@
 import { useRef } from "react";
 import { Table } from "@tanstack/react-table";
 import { X } from "lucide-react";
+import { DateRange } from "react-day-picker";
 
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import { DataTableDateRangeFilter } from "./data-table-date-range-filter";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 import { DataTableViewOptions } from "./data-table-view-options";
 import { FacetedFilter } from "./facetedFilters";
@@ -13,8 +15,8 @@ interface DataTableToolbarProps<TData, TValue> {
   toolbarActions?: React.ReactNode | ((table: Table<TData>) => React.ReactNode);
   filterPlaceholder?: string;
   facetedFilters?: (FacetedFilter<TValue> & {
-    externalFilterValue?: TValue[] | TValue;
-    onFilterChange?: (value: TValue[] | TValue | undefined) => void;
+    externalFilterValue?: TValue[] | TValue | DateRange | { from: Date; to: Date };
+    onFilterChange?: (value: TValue[] | TValue | { from: Date; to: Date } | undefined) => void;
   })[];
   onGlobalFilterChange?: (filter: string) => void;
   externalGlobalFilter?: string;
@@ -69,6 +71,28 @@ export function DataTableToolbar<TData, TValue>({
         />
         <div className="flex flex-wrap items-center gap-2">
           {facetedFilters.map((filter) => {
+            const filterType = filter.type || "faceted";
+
+            // Renderizar filtro de fecha si el tipo es "dateRange"
+            if (filterType === "dateRange") {
+              // Para filtros de fecha, no necesitamos una columna de la tabla
+              return (
+                <DataTableDateRangeFilter
+                  key={filter.column}
+                  column={undefined}
+                  title={filter.title}
+                  externalFilterValue={filter.externalFilterValue as DateRange | { from: Date; to: Date } | undefined}
+                  onFilterChange={(value) => {
+                    if (filter.onFilterChange) {
+                      filter.onFilterChange(value);
+                    }
+                  }}
+                  numberOfMonths={filter.dateRangeConfig?.numberOfMonths || 2}
+                />
+              );
+            }
+
+            // Renderizar filtro facetado por defecto (requiere columna)
             const column = table.getColumn(filter.column);
             return (
               column && (
@@ -77,8 +101,8 @@ export function DataTableToolbar<TData, TValue>({
                   column={column as any}
                   title={filter.title}
                   options={filter.options}
-                  externalFilterValue={filter.externalFilterValue}
-                  onFilterChange={filter.onFilterChange}
+                  externalFilterValue={filter.externalFilterValue as TValue[] | TValue | undefined}
+                  onFilterChange={filter.onFilterChange as (value: TValue[] | TValue | undefined) => void}
                 />
               )
             );

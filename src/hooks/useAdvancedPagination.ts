@@ -173,8 +173,18 @@ export function useAdvancedPagination({
 
         const newFilters: AdvancedFilters = {};
         filters.forEach((filter) => {
-          const backendField = columnToBackendMapping[filter.id as keyof typeof columnToBackendMapping] || filter.id;
-          newFilters[backendField] = filter.value;
+          // Manejar filtros de fecha (checkInDate y checkOutDate se mapean directamente)
+          if (filter.id === "checkInDate" || filter.id === "checkOutDate" || filter.id === "dateRange") {
+            // Los filtros de fecha se mapean directamente sin usar columnToBackendMapping
+            if (filter.id !== "dateRange") {
+              // dateRange es solo para UI, no se envía al backend
+              newFilters[filter.id] = filter.value;
+            }
+          } else {
+            // Para otros filtros, usar el mapeo de columnas
+            const backendField = columnToBackendMapping[filter.id as keyof typeof columnToBackendMapping] || filter.id;
+            newFilters[backendField] = filter.value;
+          }
         });
 
         setFiltersState((prev) => ({
@@ -196,7 +206,29 @@ export function useAdvancedPagination({
   // Función para obtener el valor del filtro por columna
   const getFilterValueByColumn = useCallback(
     (columnId: string) => {
-      const backendField = columnToBackendMapping[columnId as keyof typeof columnToBackendMapping];
+      // Manejar filtros de fecha
+      if (columnId === "dateRange") {
+        const checkInDate = filtersState.filters.checkInDate;
+        const checkOutDate = filtersState.filters.checkOutDate;
+        // Asegurarse de que sean strings (no arrays)
+        const checkInDateStr = Array.isArray(checkInDate) ? checkInDate[0] : checkInDate;
+        const checkOutDateStr = Array.isArray(checkOutDate) ? checkOutDate[0] : checkOutDate;
+        if (
+          checkInDateStr &&
+          checkOutDateStr &&
+          typeof checkInDateStr === "string" &&
+          typeof checkOutDateStr === "string"
+        ) {
+          return {
+            from: new Date(checkInDateStr),
+            to: new Date(checkOutDateStr),
+          };
+        }
+        return undefined;
+      }
+
+      // Para otros filtros, usar el mapeo de columnas
+      const backendField = columnToBackendMapping[columnId as keyof typeof columnToBackendMapping] || columnId;
       const value = (filtersState.filters as any)[backendField];
       return value;
     },

@@ -41,6 +41,12 @@ class SocketService {
       // USAR LA URL de ENV
       const socketUrl = `${process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000"}/reservations`;
 
+      console.log("🔌 [SOCKET SERVICE] Creando conexión:", {
+        socketUrl,
+        envVar: process.env.NEXT_PUBLIC_SOCKET_URL,
+        timestamp: new Date().toISOString(),
+      });
+
       // Opciones de conexión optimizadas
       this.socket = io(socketUrl, {
         withCredentials: true,
@@ -52,7 +58,21 @@ class SocketService {
         reconnectionDelayMax: 5000,
       });
 
+      console.log("📡 [SOCKET SERVICE] Socket creado, estado inicial:", {
+        socketId: this.socket.id || "sin ID",
+        connected: this.socket.connected,
+        disconnected: this.socket.disconnected,
+        hasTransport: !!this.socket.io?.engine?.transport,
+        transportName: this.socket.io?.engine?.transport?.name,
+      });
+
       this.socket.on("connect", () => {
+        console.log("✅ [SOCKET SERVICE] Evento 'connect' recibido:", {
+          socketId: this.socket?.id,
+          connected: this.socket?.connected,
+          timestamp: new Date().toISOString(),
+        });
+
         // Limpiar timer de reconexión si existe
         if (this.reconnectTimer) {
           clearTimeout(this.reconnectTimer);
@@ -74,7 +94,13 @@ class SocketService {
         }
       });
 
-      this.socket.on("connect_error", () => {
+      this.socket.on("connect_error", (error) => {
+        console.error("🚨 [SOCKET SERVICE] Evento 'connect_error' recibido:", {
+          error: error.message,
+          socketId: this.socket?.id,
+          connected: this.socket?.connected,
+          timestamp: new Date().toISOString(),
+        });
         // Si falla, intentar con polling
         if (this.socket) {
           this.socket.io.opts.transports = ["polling", "websocket"];
