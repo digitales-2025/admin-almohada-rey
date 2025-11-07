@@ -44,14 +44,7 @@ class SocketService {
       // Construir la URL completa con el namespace
       const socketUrl = `${baseUrl}${namespace}`;
 
-      console.log("🔌 [SOCKET SERVICE] Creando conexión:", {
-        baseUrl,
-        namespace,
-        socketUrl,
-        envVar: process.env.NEXT_PUBLIC_SOCKET_URL,
-        timestamp: new Date().toISOString(),
-      });
-
+      // Conectar al namespace específico usando io.of() o URL completa
       // Opciones de conexión optimizadas
       this.socket = io(socketUrl, {
         withCredentials: true,
@@ -64,21 +57,7 @@ class SocketService {
         path: "/socket.io", // Path de Socket.IO (debe coincidir con el servidor)
       });
 
-      console.log("📡 [SOCKET SERVICE] Socket creado, estado inicial:", {
-        socketId: this.socket.id || "sin ID",
-        connected: this.socket.connected,
-        disconnected: this.socket.disconnected,
-        hasTransport: !!this.socket.io?.engine?.transport,
-        transportName: this.socket.io?.engine?.transport?.name,
-      });
-
       this.socket.on("connect", () => {
-        console.log("✅ [SOCKET SERVICE] Evento 'connect' recibido:", {
-          socketId: this.socket?.id,
-          connected: this.socket?.connected,
-          timestamp: new Date().toISOString(),
-        });
-
         // Limpiar timer de reconexión si existe
         if (this.reconnectTimer) {
           clearTimeout(this.reconnectTimer);
