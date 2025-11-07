@@ -65,12 +65,8 @@ export function useWebSocketConnection() {
     };
 
     const handleConnectError = (error: Error) => {
-      console.error("🚨 [WEBSOCKET HOOK] Evento 'connect_error' recibido:", {
-        errorMessage: error.message,
-        errorStack: error.stack,
-        socketId: socket.id,
-        connected: socket.connected,
-        ioTransport: socket.io?.engine?.transport?.name,
+      console.error("🚨 [WEBSOCKET HOOK] Error de conexión:", {
+        error: error.message,
         timestamp: new Date().toISOString(),
       });
       updateStatus("error");
@@ -87,10 +83,9 @@ export function useWebSocketConnection() {
     };
 
     const handleReconnectError = (error: Error) => {
-      console.error("🚨 [WEBSOCKET HOOK] Evento 'reconnect_error' recibido:", {
-        errorMessage: error.message,
-        errorStack: error.stack,
-        socketId: socket.id,
+      console.error("🚨 [WEBSOCKET HOOK] Error en reconexión:", {
+        error: error.message,
+        attempts: reconnectAttempts,
         timestamp: new Date().toISOString(),
       });
       updateStatus("error");

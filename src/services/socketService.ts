@@ -38,16 +38,17 @@ class SocketService {
 
   connect() {
     if (!this.socket) {
-      // USAR LA URL de ENV (sin el namespace, se especifica en la URL completa)
+      // USAR LA URL de ENV (solo la URL base, sin namespace)
       const baseUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
-      // El namespace personalizado se especifica en la URL: /api/websocket/reservations
-      const socketUrl = `${baseUrl}/api/websocket/reservations`;
+      const namespace = "/reservations";
+      // Construir la URL completa con el namespace
+      const socketUrl = `${baseUrl}${namespace}`;
 
       console.log("🔌 [SOCKET SERVICE] Creando conexión:", {
         baseUrl,
+        namespace,
         socketUrl,
         envVar: process.env.NEXT_PUBLIC_SOCKET_URL,
-        namespace: "/api/websocket/reservations",
         timestamp: new Date().toISOString(),
       });
 
@@ -100,10 +101,9 @@ class SocketService {
       });
 
       this.socket.on("connect_error", (error) => {
-        console.error("🚨 [SOCKET SERVICE] Evento 'connect_error' recibido:", {
+        console.error("🚨 [SOCKET SERVICE] Error de conexión:", {
           error: error.message,
-          socketId: this.socket?.id,
-          connected: this.socket?.connected,
+          socketUrl,
           timestamp: new Date().toISOString(),
         });
         // Si falla, intentar con polling
