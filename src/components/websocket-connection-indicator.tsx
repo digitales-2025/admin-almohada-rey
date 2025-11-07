@@ -61,7 +61,6 @@ export function WebSocketConnectionIndicator({
             variant="outline"
             size="sm"
             onClick={() => {
-              console.log("🖱️ [WEBSOCKET UI] Botón 'Reconectar' clickeado desde vista detallada");
               reconnect();
             }}
             className="h-6 px-2 text-xs"
@@ -83,7 +82,6 @@ export function WebSocketConnectionIndicator({
             onClick={
               hasError
                 ? () => {
-                    console.log("🖱️ [WEBSOCKET UI] Botón de reconexión clickeado desde tooltip");
                     reconnect();
                   }
                 : undefined

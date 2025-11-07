@@ -10,25 +10,12 @@ export function useWebSocketConnection() {
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
 
   useEffect(() => {
-    console.log("🚀 [WEBSOCKET HOOK] Inicializando hook, conectando al WebSocket...");
-
     // Conectar al WebSocket
     const socket = socketService.connect();
 
-    console.log("📡 [WEBSOCKET HOOK] Socket inicial creado:", {
-      socketId: socket.id || "sin ID aún",
-      connected: socket.connected,
-      disconnected: socket.disconnected,
-      hasTransport: !!socket.io?.engine?.transport,
-      transportName: socket.io?.engine?.transport?.name,
-    });
-
     // Función para actualizar el estado
     const updateStatus = (newStatus: WebSocketConnectionStatus) => {
-      setStatus((prevStatus) => {
-        console.log(`🔄 [WEBSOCKET HOOK] Actualizando estado: ${prevStatus} → ${newStatus}`);
-        return newStatus;
-      });
+      setStatus(newStatus);
       if (newStatus === "connected") {
         setLastConnected(new Date());
         setReconnectAttempts(0);
@@ -37,28 +24,16 @@ export function useWebSocketConnection() {
 
     // Listeners de eventos del socket
     const handleConnect = () => {
-      console.log("✅ [WEBSOCKET HOOK] Evento 'connect' recibido:", {
-        socketId: socket.id,
-        connected: socket.connected,
-        timestamp: new Date().toISOString(),
-      });
       updateStatus("connected");
     };
 
     const handleDisconnect = (reason: string) => {
-      console.log("❌ [WEBSOCKET HOOK] Evento 'disconnect' recibido:", {
-        reason,
-        socketId: socket.id,
-        wasConnected: socket.connected,
-        timestamp: new Date().toISOString(),
-      });
       if (reason === "io client disconnect") {
         updateStatus("disconnected");
       } else {
         updateStatus("connecting");
         setReconnectAttempts((prev) => {
           const newAttempts = prev + 1;
-          console.log(`⚠️ [WEBSOCKET HOOK] Intento de reconexión automática #${newAttempts}`);
           return newAttempts;
         });
       }
@@ -73,12 +48,7 @@ export function useWebSocketConnection() {
       setReconnectAttempts((prev) => prev + 1);
     };
 
-    const handleReconnect = (attemptNumber: number) => {
-      console.log(`🔄 [WEBSOCKET HOOK] Evento 'reconnect_attempt' recibido:`, {
-        attemptNumber,
-        socketId: socket.id,
-        timestamp: new Date().toISOString(),
-      });
+    const handleReconnect = () => {
       updateStatus("connecting");
     };
 
@@ -108,43 +78,18 @@ export function useWebSocketConnection() {
     socket.io.on("reconnect_failed", handleReconnectFailed);
 
     // Variables para timeouts de diagnóstico
-    let timeout3s: NodeJS.Timeout | null = null;
-    let timeout5s: NodeJS.Timeout | null = null;
+    const timeout3s: NodeJS.Timeout | null = null;
+    const timeout5s: NodeJS.Timeout | null = null;
 
     // Verificar estado inicial
     if (socket.connected) {
-      console.log("✅ [WEBSOCKET HOOK] Socket ya estaba conectado al inicializar");
       updateStatus("connected");
     } else {
-      console.log("⏳ [WEBSOCKET HOOK] Socket no conectado aún, esperando conexión...");
       updateStatus("connecting");
-
-      // Verificar estado después de 3 segundos para diagnosticar si se queda en connecting
-      timeout3s = setTimeout(() => {
-        console.log("🔍 [WEBSOCKET HOOK] Estado después de 3s:", {
-          socketId: socket.id || "sin ID aún",
-          connected: socket.connected,
-          disconnected: socket.disconnected,
-          hasTransport: !!socket.io?.engine?.transport,
-          transportName: socket.io?.engine?.transport?.name,
-        });
-      }, 3000);
-
-      // Verificar estado después de 5 segundos
-      timeout5s = setTimeout(() => {
-        console.log("🔍 [WEBSOCKET HOOK] Estado después de 5s:", {
-          socketId: socket.id || "sin ID aún",
-          connected: socket.connected,
-          disconnected: socket.disconnected,
-          hasTransport: !!socket.io?.engine?.transport,
-          transportName: socket.io?.engine?.transport?.name,
-        });
-      }, 5000);
     }
 
     // Cleanup
     return () => {
-      console.log("🧹 [WEBSOCKET HOOK] Limpiando listeners del hook...");
       if (timeout3s) clearTimeout(timeout3s);
       if (timeout5s) clearTimeout(timeout5s);
       socket.off("connect", handleConnect);
@@ -158,51 +103,23 @@ export function useWebSocketConnection() {
 
   // Función para reconectar manualmente
   const reconnect = () => {
-    console.log("🔄 [WEBSOCKET RECONNECT] Iniciando reconexión manual");
-    console.log("📊 [WEBSOCKET RECONNECT] Estado antes de desconectar:", {
-      status,
-      reconnectAttempts,
-      lastConnected: lastConnected?.toISOString(),
-      socketServiceConnected: socketService.isConnected(),
-    });
-
     socketService.disconnect();
-
-    console.log("🔌 [WEBSOCKET RECONNECT] Socket desconectado, esperando 100ms antes de reconectar...");
 
     // Pequeña pausa para asegurar que el disconnect se complete
     setTimeout(() => {
-      console.log("🔗 [WEBSOCKET RECONNECT] Intentando crear nueva conexión...");
       setStatus("connecting");
       setReconnectAttempts(0);
 
       const newSocket = socketService.connect();
 
-      console.log("📡 [WEBSOCKET RECONNECT] Nueva instancia de socket creada:", {
-        socketId: newSocket.id || "sin ID aún",
-        connected: newSocket.connected,
-        disconnected: newSocket.disconnected,
-      });
-
       // Re-registrar listeners en el nuevo socket
       const handleConnect = () => {
-        console.log("✅ [WEBSOCKET RECONNECT] Conexión establecida exitosamente:", {
-          socketId: newSocket.id,
-          connected: newSocket.connected,
-          timestamp: new Date().toISOString(),
-        });
         setStatus("connected");
         setLastConnected(new Date());
         setReconnectAttempts(0);
       };
 
       const handleDisconnect = (reason: string) => {
-        console.log("❌ [WEBSOCKET RECONNECT] Socket desconectado durante reconexión:", {
-          reason,
-          socketId: newSocket.id,
-          wasConnected: newSocket.connected,
-          timestamp: new Date().toISOString(),
-        });
         if (reason === "io client disconnect") {
           setStatus("disconnected");
         } else {
@@ -223,7 +140,6 @@ export function useWebSocketConnection() {
         setStatus("error");
         setReconnectAttempts((prev) => {
           const newAttempts = prev + 1;
-          console.log(`⚠️ [WEBSOCKET RECONNECT] Intento ${newAttempts} de reconexión falló`);
           return newAttempts;
         });
       };
@@ -231,17 +147,6 @@ export function useWebSocketConnection() {
       newSocket.on("connect", handleConnect);
       newSocket.on("disconnect", handleDisconnect);
       newSocket.on("connect_error", handleConnectError);
-
-      // Verificar estado inmediato después de crear el socket
-      setTimeout(() => {
-        console.log("🔍 [WEBSOCKET RECONNECT] Estado después de 500ms:", {
-          socketId: newSocket.id || "sin ID aún",
-          connected: newSocket.connected,
-          disconnected: newSocket.disconnected,
-          hasActiveTransport: !!newSocket.io?.engine?.transport,
-          transportName: newSocket.io?.engine?.transport?.name,
-        });
-      }, 500);
     }, 100);
   };
 
