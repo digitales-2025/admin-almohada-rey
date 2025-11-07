@@ -210,10 +210,18 @@ export function useAdvancedPagination({
       if (columnId === "dateRange") {
         const checkInDate = filtersState.filters.checkInDate;
         const checkOutDate = filtersState.filters.checkOutDate;
-        if (checkInDate && checkOutDate) {
+        // Asegurarse de que sean strings (no arrays)
+        const checkInDateStr = Array.isArray(checkInDate) ? checkInDate[0] : checkInDate;
+        const checkOutDateStr = Array.isArray(checkOutDate) ? checkOutDate[0] : checkOutDate;
+        if (
+          checkInDateStr &&
+          checkOutDateStr &&
+          typeof checkInDateStr === "string" &&
+          typeof checkOutDateStr === "string"
+        ) {
           return {
-            from: new Date(checkInDate),
-            to: new Date(checkOutDate),
+            from: new Date(checkInDateStr),
+            to: new Date(checkOutDateStr),
           };
         }
         return undefined;
