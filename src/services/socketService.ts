@@ -57,6 +57,12 @@ class SocketService {
       });
 
       this.socket.on("connect", () => {
+        console.log("✅ [SOCKET SERVICE] Socket conectado:", {
+          socketId: this.socket?.id,
+          connected: this.socket?.connected,
+          transport: this.socket?.io?.engine?.transport?.name,
+          timestamp: new Date().toISOString(),
+        });
         // Limpiar timer de reconexión si existe
         if (this.reconnectTimer) {
           clearTimeout(this.reconnectTimer);
@@ -72,8 +78,15 @@ class SocketService {
       });
 
       this.socket.on("disconnect", (reason) => {
+        console.log("🔌 [SOCKET SERVICE] Socket desconectado:", {
+          reason,
+          socketId: this.socket?.id,
+          connected: this.socket?.connected,
+          timestamp: new Date().toISOString(),
+        });
         // Si la desconexión no fue intencional, iniciar reconexión manual
         if (reason === "io server disconnect" || reason === "transport close") {
+          console.log("🔄 [SOCKET SERVICE] Iniciando reconexión manual...");
           this.manualReconnect();
         }
       });
@@ -90,12 +103,35 @@ class SocketService {
         }
       });
 
-      this.socket.io.on("reconnect_attempt", () => {});
+      this.socket.io.on("reconnect_attempt", () => {
+        console.log("🔄 [SOCKET SERVICE] Intento de reconexión:", {
+          socketId: this.socket?.id,
+          timestamp: new Date().toISOString(),
+        });
+      });
 
-      this.socket.io.on("reconnect_error", () => {});
+      this.socket.io.on("reconnect_error", (error) => {
+        console.error("❌ [SOCKET SERVICE] Error en reconexión:", {
+          error: error.message || error,
+          socketId: this.socket?.id,
+          timestamp: new Date().toISOString(),
+        });
+      });
 
       this.socket.io.on("reconnect_failed", () => {
+        console.error("🚨 [SOCKET SERVICE] Reconexión fallida, iniciando reconexión manual");
         this.manualReconnect();
+      });
+
+      // Escuchar TODOS los eventos para diagnóstico
+      this.socket.onAny((eventName, ...args) => {
+        console.log("📨 [SOCKET SERVICE] Evento recibido:", {
+          event: eventName,
+          data: args.length > 0 ? args[0] : undefined,
+          socketId: this.socket?.id,
+          connected: this.socket?.connected,
+          timestamp: new Date().toISOString(),
+        });
       });
     }
     return this.socket;
