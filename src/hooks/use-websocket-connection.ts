@@ -15,13 +15,7 @@ export function useWebSocketConnection() {
 
     // Función para actualizar el estado
     const updateStatus = (newStatus: WebSocketConnectionStatus) => {
-      console.log("🔄 [WEBSOCKET HOOK] Cambiando estado:", {
-        from: status,
-        to: newStatus,
-        socketId: socket.id,
-        socketConnected: socket.connected,
-        timestamp: new Date().toISOString(),
-      });
+      console.log("🔄 [WEBSOCKET HOOK] Estado:", status, "→", newStatus, "- SocketID:", socket.id);
       setStatus(newStatus);
       if (newStatus === "connected") {
         setLastConnected(new Date());
@@ -31,42 +25,31 @@ export function useWebSocketConnection() {
 
     // Listeners de eventos del socket
     const handleConnect = () => {
-      console.log("✅ [WEBSOCKET HOOK] handleConnect llamado:", {
-        socketId: socket.id,
-        socketConnected: socket.connected,
-        currentStatus: status,
-        timestamp: new Date().toISOString(),
-      });
+      console.log("✅ [WEBSOCKET HOOK] Conectado - SocketID:", socket.id);
       updateStatus("connected");
     };
 
     const handleDisconnect = (reason: string) => {
-      console.log("🔌 [WEBSOCKET HOOK] handleDisconnect llamado:", {
-        reason,
-        socketId: socket.id,
-        socketConnected: socket.connected,
-        currentStatus: status,
-        timestamp: new Date().toISOString(),
-      });
+      console.log("🔌 [WEBSOCKET HOOK] Desconectado - Razón:", reason, "- SocketID:", socket.id);
       if (reason === "io client disconnect") {
-        console.log("📴 [WEBSOCKET HOOK] Desconexión intencional del cliente");
+        console.log("📴 [WEBSOCKET HOOK] Desconexión intencional");
         updateStatus("disconnected");
+      } else if (reason === "io server disconnect") {
+        console.log("🚨 [WEBSOCKET HOOK] Servidor desconectó al cliente");
+        updateStatus("error");
       } else {
-        console.log("⚠️ [WEBSOCKET HOOK] Desconexión no intencional, intentando reconectar...");
+        console.log("⚠️ [WEBSOCKET HOOK] Desconexión no intencional, reconectando...");
         updateStatus("connecting");
         setReconnectAttempts((prev) => {
           const newAttempts = prev + 1;
-          console.log("🔄 [WEBSOCKET HOOK] Intentos de reconexión:", newAttempts);
+          console.log("🔄 [WEBSOCKET HOOK] Intentos:", newAttempts);
           return newAttempts;
         });
       }
     };
 
     const handleConnectError = (error: Error) => {
-      console.error("🚨 [WEBSOCKET HOOK] Error de conexión:", {
-        error: error.message,
-        timestamp: new Date().toISOString(),
-      });
+      console.error("🚨 [WEBSOCKET HOOK] Error de conexión:", error.message);
       updateStatus("error");
       setReconnectAttempts((prev) => prev + 1);
     };
@@ -76,19 +59,12 @@ export function useWebSocketConnection() {
     };
 
     const handleReconnectError = (error: Error) => {
-      console.error("🚨 [WEBSOCKET HOOK] Error en reconexión:", {
-        error: error.message,
-        attempts: reconnectAttempts,
-        timestamp: new Date().toISOString(),
-      });
+      console.error("🚨 [WEBSOCKET HOOK] Error en reconexión:", error.message, "- Intentos:", reconnectAttempts);
       updateStatus("error");
     };
 
     const handleReconnectFailed = () => {
-      console.error("🚨 [WEBSOCKET HOOK] Evento 'reconnect_failed' recibido:", {
-        socketId: socket.id,
-        timestamp: new Date().toISOString(),
-      });
+      console.error("🚨 [WEBSOCKET HOOK] Reconexión fallida - SocketID:", socket.id);
       updateStatus("error");
     };
 
@@ -105,60 +81,29 @@ export function useWebSocketConnection() {
     const timeout5s: NodeJS.Timeout | null = null;
 
     // Verificar estado inicial
-    console.log("🔍 [WEBSOCKET HOOK] Verificando estado inicial:", {
-      socketId: socket.id,
-      socketConnected: socket.connected,
-      currentStatus: status,
-      timestamp: new Date().toISOString(),
-    });
+    console.log("🔍 [WEBSOCKET HOOK] Estado inicial - SocketID:", socket.id, "- Conectado:", socket.connected);
     if (socket.connected) {
-      console.log("✅ [WEBSOCKET HOOK] Socket ya conectado, actualizando estado a 'connected'");
+      console.log("✅ [WEBSOCKET HOOK] Ya conectado");
       updateStatus("connected");
     } else {
-      console.log("⏳ [WEBSOCKET HOOK] Socket no conectado, actualizando estado a 'connecting'");
+      console.log("⏳ [WEBSOCKET HOOK] Conectando...");
       updateStatus("connecting");
     }
 
-    // Escuchar eventos personalizados del servidor (onPong, onNoPing)
-    socket.on("onPong", (data: unknown) => {
-      console.warn("⚠️ [WEBSOCKET HOOK] Evento 'onPong' recibido:", {
-        data,
-        socketId: socket.id,
-        socketConnected: socket.connected,
-        currentStatus: status,
-        timestamp: new Date().toISOString(),
-      });
+    // Escuchar eventos del servidor para manejo de estado
+    socket.on("onPong", (data) => {
+      console.warn("⚠️ [WEBSOCKET HOOK] Conexión inestable:", data?.message);
     });
 
-    socket.on("onNoPing", (data: unknown) => {
-      console.error("🚨 [WEBSOCKET HOOK] Evento 'onNoPing' recibido:", {
-        data,
-        socketId: socket.id,
-        socketConnected: socket.connected,
-        currentStatus: status,
-        timestamp: new Date().toISOString(),
-      });
-      // Cuando el servidor cancela la conexión, actualizar estado a error
+    socket.on("onNoPing", (data) => {
+      console.error("🚨 [WEBSOCKET HOOK] Conexión CANCELADA:", data?.message, "- Razón:", data?.reason);
       updateStatus("error");
       setReconnectAttempts((prev) => prev + 1);
     });
 
-    // Escuchar evento ping del servidor
-    socket.on("ping", () => {
-      console.log("🏓 [WEBSOCKET HOOK] Ping recibido del servidor:", {
-        socketId: socket.id,
-        socketConnected: socket.connected,
-        currentStatus: status,
-        timestamp: new Date().toISOString(),
-      });
-    });
-
     // Cleanup
     return () => {
-      console.log("🧹 [WEBSOCKET HOOK] Limpiando listeners:", {
-        socketId: socket.id,
-        timestamp: new Date().toISOString(),
-      });
+      console.log("🧹 [WEBSOCKET HOOK] Limpiando listeners - SocketID:", socket.id);
       if (timeout3s) clearTimeout(timeout3s);
       if (timeout5s) clearTimeout(timeout5s);
       socket.off("connect", handleConnect);
@@ -166,7 +111,6 @@ export function useWebSocketConnection() {
       socket.off("connect_error", handleConnectError);
       socket.off("onPong");
       socket.off("onNoPing");
-      socket.off("ping");
       socket.io.off("reconnect_attempt", handleReconnect);
       socket.io.off("reconnect_error", handleReconnectError);
       socket.io.off("reconnect_failed", handleReconnectFailed);
@@ -222,19 +166,10 @@ export function useWebSocketConnection() {
     }, 100);
   };
 
-  // Log del estado actual cuando cambia
+  // Log del estado cuando cambia (solo informativo)
   useEffect(() => {
-    console.log("📊 [WEBSOCKET HOOK] Estado actualizado:", {
-      status,
-      isConnected: status === "connected",
-      isConnecting: status === "connecting",
-      isDisconnected: status === "disconnected",
-      hasError: status === "error",
-      lastConnected,
-      reconnectAttempts,
-      timestamp: new Date().toISOString(),
-    });
-  }, [status, lastConnected, reconnectAttempts]);
+    console.log("📊 [WEBSOCKET HOOK] Estado:", status, "- Intentos:", reconnectAttempts);
+  }, [status, reconnectAttempts]);
 
   return {
     status,
