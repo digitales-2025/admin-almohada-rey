@@ -10,12 +10,34 @@ export function useWebSocketConnection() {
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
 
   useEffect(() => {
+    // Log inicial para diagnosticar diferencias entre entornos
+    console.log("🚀 [WEBSOCKET HOOK] Inicializando conexión WebSocket", {
+      env: process.env.NODE_ENV,
+      socketUrl: process.env.NEXT_PUBLIC_SOCKET_URL,
+      timestamp: new Date().toISOString(),
+      userAgent: typeof window !== "undefined" ? window.navigator.userAgent : "SSR",
+      protocol: typeof window !== "undefined" ? window.location.protocol : "unknown",
+      hostname: typeof window !== "undefined" ? window.location.hostname : "unknown",
+    });
+
     // Conectar al WebSocket
     const socket = socketService.connect();
 
     // Función para actualizar el estado
     const updateStatus = (newStatus: WebSocketConnectionStatus) => {
       console.log("🔄 [WEBSOCKET HOOK] Estado:", status, "→", newStatus, "- SocketID:", socket.id);
+      // Log adicional cuando hay error para diagnosticar
+      if (newStatus === "error") {
+        console.log("🔍 [DIAG] Estado cambió a ERROR - Info adicional:", {
+          lastConnected,
+          reconnectAttempts: reconnectAttempts + 1,
+          socketConnected: socket.connected,
+          transport: socket.io?.engine?.transport?.name,
+          timestamp: new Date().toISOString(),
+          env: process.env.NODE_ENV,
+          socketUrl: process.env.NEXT_PUBLIC_SOCKET_URL,
+        });
+      }
       setStatus(newStatus);
       if (newStatus === "connected") {
         setLastConnected(new Date());
@@ -31,6 +53,19 @@ export function useWebSocketConnection() {
 
     const handleDisconnect = (reason: string) => {
       console.log("🔌 [WEBSOCKET HOOK] Desconectado - Razón:", reason, "- SocketID:", socket.id);
+
+      // Log detallado para diagnosticar desconexiones
+      console.log("🔍 [DIAG] Desconexión detallada:", {
+        reason,
+        socketId: socket.id,
+        socketConnected: socket.connected,
+        transport: socket.io?.engine?.transport?.name,
+        engineState: socket.io?.engine?.readyState,
+        timestamp: new Date().toISOString(),
+        env: process.env.NODE_ENV,
+        socketUrl: process.env.NEXT_PUBLIC_SOCKET_URL,
+      });
+
       if (reason === "io client disconnect") {
         console.log("📴 [WEBSOCKET HOOK] Desconexión intencional");
         updateStatus("disconnected");
