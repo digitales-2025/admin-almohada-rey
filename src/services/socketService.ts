@@ -56,13 +56,11 @@ class SocketService {
         path: "/socket.io", // Path de Socket.IO (debe coincidir con el servidor)
       });
 
+      // Configurar listeners de heartbeat antes de conectar
+      this.setupHeartbeatListeners();
+
       this.socket.on("connect", () => {
-        console.log("✅ [SOCKET SERVICE] Socket conectado:", {
-          socketId: this.socket?.id,
-          connected: this.socket?.connected,
-          transport: this.socket?.io?.engine?.transport?.name,
-          timestamp: new Date().toISOString(),
-        });
+        console.log("✅ [SOCKET SERVICE] Conectado - SocketID:", this.socket?.id);
         // Limpiar timer de reconexión si existe
         if (this.reconnectTimer) {
           clearTimeout(this.reconnectTimer);
@@ -78,12 +76,7 @@ class SocketService {
       });
 
       this.socket.on("disconnect", (reason) => {
-        console.log("🔌 [SOCKET SERVICE] Socket desconectado:", {
-          reason,
-          socketId: this.socket?.id,
-          connected: this.socket?.connected,
-          timestamp: new Date().toISOString(),
-        });
+        console.log("🔌 [SOCKET SERVICE] Desconectado - Razón:", reason, "- SocketID:", this.socket?.id);
         // Si la desconexión no fue intencional, iniciar reconexión manual
         if (reason === "io server disconnect" || reason === "transport close") {
           console.log("🔄 [SOCKET SERVICE] Iniciando reconexión manual...");
@@ -92,11 +85,7 @@ class SocketService {
       });
 
       this.socket.on("connect_error", (error) => {
-        console.error("🚨 [SOCKET SERVICE] Error de conexión:", {
-          error: error.message,
-          socketUrl,
-          timestamp: new Date().toISOString(),
-        });
+        console.error("🚨 [SOCKET SERVICE] Error de conexión:", error.message, "- URL:", socketUrl);
         // Si falla, intentar con polling
         if (this.socket) {
           this.socket.io.opts.transports = ["polling", "websocket"];
@@ -104,18 +93,11 @@ class SocketService {
       });
 
       this.socket.io.on("reconnect_attempt", () => {
-        console.log("🔄 [SOCKET SERVICE] Intento de reconexión:", {
-          socketId: this.socket?.id,
-          timestamp: new Date().toISOString(),
-        });
+        console.log("🔄 [SOCKET SERVICE] Intentando reconectar...");
       });
 
       this.socket.io.on("reconnect_error", (error) => {
-        console.error("❌ [SOCKET SERVICE] Error en reconexión:", {
-          error: error.message || error,
-          socketId: this.socket?.id,
-          timestamp: new Date().toISOString(),
-        });
+        console.error("❌ [SOCKET SERVICE] Error en reconexión:", error.message || error);
       });
 
       this.socket.io.on("reconnect_failed", () => {
@@ -123,18 +105,56 @@ class SocketService {
         this.manualReconnect();
       });
 
-      // Escuchar TODOS los eventos para diagnóstico
+      // Escuchar eventos importantes para diagnóstico (solo errores y eventos críticos)
       this.socket.onAny((eventName, ...args) => {
-        console.log("📨 [SOCKET SERVICE] Evento recibido:", {
-          event: eventName,
-          data: args.length > 0 ? args[0] : undefined,
-          socketId: this.socket?.id,
-          connected: this.socket?.connected,
-          timestamp: new Date().toISOString(),
-        });
+        if (
+          eventName === "connect" ||
+          eventName === "disconnect" ||
+          eventName === "connect_error" ||
+          eventName === "onPong" ||
+          eventName === "onNoPing"
+        ) {
+          console.log("📨 [SOCKET SERVICE] Evento importante:", eventName, args.length > 0 ? args[0] : "");
+        }
       });
     }
     return this.socket;
+  }
+
+  // Método para configurar listeners de heartbeat
+  private setupHeartbeatListeners() {
+    if (!this.socket) return;
+
+    console.log("🔄 [SOCKET SERVICE] Configurando heartbeat para SocketID:", this.socket.id);
+
+    // Escuchar ping del servidor y responder con pong
+    this.socket.on("ping", () => {
+      console.log("🏓 [SOCKET SERVICE] Ping recibido, enviando pong...");
+      if (this.socket?.connected && this.socket.id) {
+        this.socket.emit("pong", {
+          clientId: this.socket.id,
+          timestamp: Date.now(),
+        });
+        console.log("✅ [SOCKET SERVICE] Pong enviado");
+      } else {
+        console.warn("⚠️ [SOCKET SERVICE] No se puede enviar pong - socket desconectado");
+      }
+    });
+
+    // Escuchar onPong (advertencia de conexión inestable)
+    this.socket.on("onPong", (data) => {
+      console.warn("⚠️ [SOCKET SERVICE] Conexión inestable:", data.message);
+    });
+
+    // Escuchar onNoPing (conexión cancelada por el servidor)
+    this.socket.on("onNoPing", (data) => {
+      console.error("🚨 [SOCKET SERVICE] Conexión CANCELADA por servidor:", data.message, "- Razón:", data.reason);
+      // Desconectar el socket ya que el servidor lo canceló
+      if (this.socket) {
+        console.log("🔌 [SOCKET SERVICE] Desconectando socket por cancelación del servidor");
+        this.socket.disconnect();
+      }
+    });
   }
 
   // Método para reconexión manual después de fallo
