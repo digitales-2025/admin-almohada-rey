@@ -38,15 +38,12 @@ class SocketService {
 
   connect() {
     if (!this.socket) {
-      // USAR LA URL de ENV
-      const socketUrl = `${process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000"}/reservations`;
+      // USAR LA URL de ENV (solo la URL base, sin namespace)
+      const baseUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
+      // Construir la URL completa con el namespace
+      const socketUrl = `${baseUrl}`;
 
-      console.log("🔌 [SOCKET SERVICE] Creando conexión:", {
-        socketUrl,
-        envVar: process.env.NEXT_PUBLIC_SOCKET_URL,
-        timestamp: new Date().toISOString(),
-      });
-
+      // Conectar al namespace específico usando io.of() o URL completa
       // Opciones de conexión optimizadas
       this.socket = io(socketUrl, {
         withCredentials: true,
@@ -56,23 +53,10 @@ class SocketService {
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
-      });
-
-      console.log("📡 [SOCKET SERVICE] Socket creado, estado inicial:", {
-        socketId: this.socket.id || "sin ID",
-        connected: this.socket.connected,
-        disconnected: this.socket.disconnected,
-        hasTransport: !!this.socket.io?.engine?.transport,
-        transportName: this.socket.io?.engine?.transport?.name,
+        path: "/socket.io", // Path de Socket.IO (debe coincidir con el servidor)
       });
 
       this.socket.on("connect", () => {
-        console.log("✅ [SOCKET SERVICE] Evento 'connect' recibido:", {
-          socketId: this.socket?.id,
-          connected: this.socket?.connected,
-          timestamp: new Date().toISOString(),
-        });
-
         // Limpiar timer de reconexión si existe
         if (this.reconnectTimer) {
           clearTimeout(this.reconnectTimer);
@@ -95,10 +79,9 @@ class SocketService {
       });
 
       this.socket.on("connect_error", (error) => {
-        console.error("🚨 [SOCKET SERVICE] Evento 'connect_error' recibido:", {
+        console.error("🚨 [SOCKET SERVICE] Error de conexión:", {
           error: error.message,
-          socketId: this.socket?.id,
-          connected: this.socket?.connected,
+          socketUrl,
           timestamp: new Date().toISOString(),
         });
         // Si falla, intentar con polling
