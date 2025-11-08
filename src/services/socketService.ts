@@ -40,9 +40,8 @@ class SocketService {
     if (!this.socket) {
       // USAR LA URL de ENV (solo la URL base, sin namespace)
       const baseUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
-      const namespace = "/reservations";
       // Construir la URL completa con el namespace
-      const socketUrl = `${baseUrl}${namespace}`;
+      const socketUrl = `${baseUrl}`;
 
       // Conectar al namespace específico usando io.of() o URL completa
       // Opciones de conexión optimizadas
