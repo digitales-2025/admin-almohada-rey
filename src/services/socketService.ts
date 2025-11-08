@@ -125,17 +125,18 @@ class SocketService {
   private setupHeartbeatListeners() {
     if (!this.socket) return;
 
-    console.log("🔄 [SOCKET SERVICE] Configurando heartbeat para SocketID:", this.socket.id);
+    console.log("🔄 [SOCKET SERVICE] Configurando heartbeat listeners");
 
     // Escuchar ping del servidor y responder con pong
     this.socket.on("ping", () => {
-      console.log("🏓 [SOCKET SERVICE] Ping recibido, enviando pong...");
+      console.log("🏓 [SOCKET SERVICE] Ping recibido del servidor - SocketID:", this.socket?.id);
       if (this.socket?.connected && this.socket.id) {
+        // Responder con evento pong personalizado (no el pong automático de socket.io)
         this.socket.emit("pong", {
           clientId: this.socket.id,
           timestamp: Date.now(),
         });
-        console.log("✅ [SOCKET SERVICE] Pong enviado");
+        console.log("✅ [SOCKET SERVICE] Pong enviado al servidor - ClientID:", this.socket.id);
       } else {
         console.warn("⚠️ [SOCKET SERVICE] No se puede enviar pong - socket desconectado");
       }
@@ -143,13 +144,33 @@ class SocketService {
 
     // Escuchar onPong (advertencia de conexión inestable)
     this.socket.on("onPong", (data) => {
-      console.warn("⚠️ [SOCKET SERVICE] Conexión inestable:", data.message);
+      console.warn("⚠️ [SOCKET SERVICE] Conexión inestable:", data?.message, "- Razón:", data?.reason);
+      // Log detallado para diagnosticar problemas
+      console.log("🔍 [DIAG] Evento onPong completo:", {
+        data,
+        socketId: this.socket?.id,
+        connected: this.socket?.connected,
+        transport: this.socket?.io?.engine?.transport?.name,
+        timestamp: new Date().toISOString(),
+        env: process.env.NODE_ENV,
+        userAgent: navigator?.userAgent,
+      });
     });
 
     // Escuchar onNoPing (conexión cancelada por el servidor)
     this.socket.on("onNoPing", (data) => {
-      console.error("🚨 [SOCKET SERVICE] Conexión CANCELADA por servidor:", data.message, "- Razón:", data.reason);
-      // Desconectar el socket ya que el servidor lo canceló
+      console.error("🚨 [SOCKET SERVICE] Conexión CANCELADA:", data?.message, "- Razón:", data?.reason);
+      // Log detallado para diagnosticar problemas
+      console.log("🔍 [DIAG] Evento onNoPing completo:", {
+        data,
+        socketId: this.socket?.id,
+        connected: this.socket?.connected,
+        transport: this.socket?.io?.engine?.transport?.name,
+        timestamp: new Date().toISOString(),
+        env: process.env.NODE_ENV,
+        userAgent: navigator?.userAgent,
+      });
+      // Desconectar el socket
       if (this.socket) {
         console.log("🔌 [SOCKET SERVICE] Desconectando socket por cancelación del servidor");
         this.socket.disconnect();
