@@ -16,6 +16,14 @@ export type Customer = {
   documentNumber: string;
   email?: string;
   isBlacklist?: boolean;
+  blacklistReason?: string;
+  blacklistDate?: string;
+  blacklistedById?: string;
+  blacklistedBy?: {
+    id: string;
+    name: string;
+    email: string;
+  };
   birthDate?: string;
   maritalStatus: CustomerMaritalStatus;
   companyName?: string;

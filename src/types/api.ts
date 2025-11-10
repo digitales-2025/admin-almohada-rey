@@ -311,7 +311,7 @@ export interface paths {
     };
     /**
      * Get paginated products with advanced filters
-     * @description Get products with advanced filtering by type, isActive status, and search in product fields
+     * @description Get products with advanced filtering by type, isActive status, and search in product fields (name, code, unit cost)
      */
     get: operations["ProductController_findAllPaginated_v1"];
     put?: never;
@@ -674,7 +674,7 @@ export interface paths {
     };
     /**
      * Obtener habitaciones paginadas con filtros avanzados
-     * @description Devuelve una lista paginada de habitaciones con filtros por estado, tipo de piso, estado activo y búsqueda en habitación y tipo de habitación
+     * @description Devuelve una lista paginada de habitaciones con filtros por estado, tipo de piso, estado activo y búsqueda en número, área y tipo de habitación
      */
     get: operations["RoomController_findAllPaginated_v1"];
     put?: never;
@@ -834,7 +834,7 @@ export interface paths {
     };
     /**
      * Obtener tipos de habitaciones paginados con filtros avanzados
-     * @description Devuelve una lista paginada de tipos de habitaciones con filtros por estado activo y búsqueda en campos del tipo de habitación
+     * @description Devuelve una lista paginada de tipos de habitaciones con filtros por estado activo y búsqueda flexible en nombre, descripción y precio (OR)
      */
     get: operations["RoomTypeController_findAllPaginated_v1"];
     put?: never;
@@ -1030,7 +1030,7 @@ export interface paths {
     };
     /**
      * Get paginated payments with advanced filters
-     * @description Get payments with advanced filtering by status, reservation ID, and search in customer and payment data
+     * @description Get payments with advanced filtering by status, reservation ID, and flexible search in customer, payment, room, room type, and product data (OR search)
      */
     get: operations["PaymentsController_findAllPaginated_v1"];
     put?: never;
@@ -1207,7 +1207,7 @@ export interface paths {
     };
     /**
      * Get paginated movements with advanced filters
-     * @description Get movements with advanced filtering by warehouse type, search in movements details and products
+     * @description Get movements with advanced filtering by warehouse type, movement type, and flexible search in movements details, products, code, description, and document number (OR search)
      */
     get: operations["MovementsController_findAllPaginated_v1"];
     put?: never;
@@ -1787,6 +1787,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/customers/{id}/blacklist": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Toggle blacklist status of a customer by id */
+    patch: operations["CustomersController_toggleBlacklist_v1"];
+    trace?: never;
+  };
   "/v1/customers/remove/all": {
     parameters: {
       query?: never;
@@ -2318,42 +2335,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/import/excel": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations["ImportController_importExcel"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/import/cleanup": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    /**
-     * Limpiar todos los datos importados
-     * @description Elimina todos los datos creados por la importación de Excel (reservas, pagos, clientes temporales, etc.)
-     */
-    delete: operations["ImportController_cleanupImportedData"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2473,13 +2454,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       updatedAt: string;
       /** @description Customer name */
@@ -2562,13 +2543,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       updatedAt: string;
       /** @description User name */
@@ -2611,13 +2592,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       updatedAt: string;
       /**
@@ -2675,13 +2656,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       updatedAt: string;
       /**
@@ -2770,13 +2751,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -2969,13 +2950,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the reservation was created
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       createdAt?: string;
       /**
        * Format: date-time
        * @description Timestamp when the reservation was last updated
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       updatedAt?: string;
       /** @description Customer ID associated with the reservation */
@@ -3222,6 +3203,11 @@ export interface components {
        * @example CREDIT_CARD
        */
       paymentMethod: string;
+      /**
+       * @description Descuento aplicado (opcional, solo para habitaciones)
+       * @example 5.00
+       */
+      discount?: number;
     };
     ExtendStayDto: {
       /**
@@ -3244,6 +3230,11 @@ export interface components {
        * @example CREDIT_CARD
        */
       paymentMethod: string;
+      /**
+       * @description Descuento aplicado (opcional, solo para habitaciones)
+       * @example 5.00
+       */
+      discount?: number;
     };
     ReasonResponseDto: {
       /**
@@ -3294,13 +3285,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       updatedAt: string;
       /**
@@ -3792,6 +3783,11 @@ export interface components {
        * @example 100.00
        */
       subtotal?: number;
+      /**
+       * @description Descuento aplicado (opcional, solo para habitaciones)
+       * @example 5.00
+       */
+      discount?: number;
     };
     UpdatePaymentDetailsBatchDto: {
       /**
@@ -3827,13 +3823,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       updatedAt: string;
       name: string;
@@ -4034,6 +4030,23 @@ export interface components {
       companyAddress?: string;
       /** @description Indica si el cliente tiene una empresa asociada */
       hasCompany?: boolean;
+    };
+    ToggleBlacklistDto: {
+      /**
+       * @description Indica si el cliente debe estar en blacklist
+       * @example true
+       */
+      isBlacklist: boolean;
+      /**
+       * @description Razón del blacklist (requerido si isBlacklist es true)
+       * @example Cliente con comportamiento inadecuado
+       */
+      blacklistReason?: string;
+      /**
+       * @description Fecha del blacklist (requerido si isBlacklist es true)
+       * @example 2024-01-15
+       */
+      blacklistDate?: string;
     };
     DeleteCustomerDto: {
       ids: string[];
@@ -4326,13 +4339,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       updatedAt: string;
       /**
@@ -4434,13 +4447,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       updatedAt: string;
       /**
@@ -4473,13 +4486,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       updatedAt: string;
       /**
@@ -4542,13 +4555,13 @@ export interface components {
       /**
        * Format: date-time
        * @description Timestamp when the entity was created
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       createdAt: string;
       /**
        * Format: date-time
        * @description Timestamp when the entity was last updated
-       * @example 2025-10-22T17:27:33.621Z
+       * @example 2025-11-10T10:14:51.027Z
        */
       updatedAt: string;
       /**
@@ -5704,7 +5717,7 @@ export interface operations {
         page?: number;
         /** @description Number of items per page */
         pageSize?: number;
-        /** @description Search term for product name, code, or description */
+        /** @description Search term for product name, code, or unit cost (price) */
         search?: string;
         /** @description Filter by product type (array) */
         type?: string;
@@ -6762,7 +6775,7 @@ export interface operations {
         page?: number;
         /** @description Cantidad de elementos por página */
         pageSize?: number;
-        /** @description Término de búsqueda en número de habitación y nombre del tipo de habitación */
+        /** @description Término de búsqueda en número de habitación, área y nombre del tipo de habitación */
         search?: string;
         /** @description Filtro por estado activo (array) */
         isActive?: string;
@@ -7212,7 +7225,7 @@ export interface operations {
         page?: number;
         /** @description Cantidad de elementos por página */
         pageSize?: number;
-        /** @description Término de búsqueda en nombre y descripción del tipo de habitación */
+        /** @description Término de búsqueda en nombre, descripción y precio del tipo de habitación (búsqueda flexible con OR) */
         search?: string;
         /** @description Filtro por estado activo (array) */
         isActive?: string;
@@ -7713,7 +7726,7 @@ export interface operations {
         page?: number;
         /** @description Number of items per page */
         pageSize?: number;
-        /** @description Search term for customer name, email, phone, document, department, province, country, payment code, or observations */
+        /** @description Search term for customer name, email, phone, document, department, province, country, payment code, observations, room number, room type (suite), or products (flexible OR search) */
         search?: string;
         /** @description Filter by payment status (array) */
         status?: string;
@@ -8315,7 +8328,7 @@ export interface operations {
         page?: number;
         /** @description Number of items per page */
         pageSize?: number;
-        /** @description Search term for movements details and products */
+        /** @description Search term for movements details, products, code, description, and document number (flexible OR search) */
         search?: string;
         /** @description Filter by warehouse type */
         warehouseType?: "COMMERCIAL" | "INTERNAL_USE" | "DEPOSIT";
@@ -9832,6 +9845,51 @@ export interface operations {
       };
     };
   };
+  CustomersController_toggleBlacklist_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ToggleBlacklistDto"];
+      };
+    };
+    responses: {
+      /** @description Customer blacklist status updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   CustomersController_deactivate_v1: {
     parameters: {
       query?: never;
@@ -11130,64 +11188,6 @@ export interface operations {
         content: {
           "application/json": string;
         };
-      };
-    };
-  };
-  ImportController_importExcel: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** @description Archivo Excel con datos de importación */
-    requestBody: {
-      content: {
-        "multipart/form-data": components["schemas"];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ImportController_cleanupImportedData: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Limpieza completada exitosamente */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            success?: boolean;
-            message?: string;
-            deletedCounts?: {
-              payments?: number;
-              reservations?: number;
-              customers?: number;
-              auditLogs?: number;
-            };
-          };
-        };
-      };
-      /** @description Error en la limpieza */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
       };
     };
   };

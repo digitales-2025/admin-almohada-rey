@@ -19,8 +19,9 @@ import "@reduxjs/toolkit";
 
 export type ComboBoxItemType<V> = {
   value: string;
-  label: string;
+  label: string | React.ReactNode;
   entity?: V;
+  keywords?: string[];
 };
 
 export type RTKUseQueryHookResult<T, E> = {
@@ -34,7 +35,7 @@ export type RTKUseQueryHookResult<T, E> = {
 
 type ComboboxProps<T> = {
   value?: string;
-  label?: string;
+  label?: string | React.ReactNode;
   onSelect: (value: string, label?: string, entity?: T) => void;
   items: ComboBoxItemType<T>[];
   queryState: RTKUseQueryHookResult<T[], Error>;
@@ -82,6 +83,7 @@ export function SearchCombobox<T = unknown>({
   notFoundAction, // Nuevo prop utilizado
 }: ComboboxProps<T>) {
   const [open, setOpenState] = React.useState(false);
+  const [searchValue, setSearchValue] = React.useState("");
   const defaultError = new Error("Algo salió mal");
   const { isError, isLoading, isLoadingError, error, data, refetch } = queryState;
   const warningsMessages = useMemo(
@@ -96,6 +98,35 @@ export function SearchCombobox<T = unknown>({
 
   const more = total ? total - items.length : 0;
 
+  // Filtrar items localmente basado en el valor de búsqueda
+  // Solo aplicar filtrado local si NO hay búsqueda remota (onSearchChange)
+  const filteredItems = useMemo(() => {
+    // Si hay búsqueda remota, NO filtrar localmente (dejar que el servidor filtre)
+    if (onSearchChange) {
+      return items;
+    }
+
+    // Solo filtrar localmente si NO hay búsqueda remota
+    if (!searchValue.trim()) {
+      return items;
+    }
+
+    const searchLower = searchValue.toLowerCase().trim();
+    return items.filter((item) => {
+      // Si tiene keywords, buscar en ellos
+      if (item.keywords && item.keywords.length > 0) {
+        return item.keywords.some((keyword) => keyword.toLowerCase().includes(searchLower));
+      }
+      // Si el label es un string, buscar en él
+      if (typeof item.label === "string") {
+        return item.label.toLowerCase().includes(searchLower);
+      }
+      // Si no, buscar en el value
+      return item.value.toLowerCase().includes(searchLower);
+    });
+  }, [items, searchValue, onSearchChange]);
+
+  // Para búsqueda remota, usar debounce exactamente como antes
   const handleOnSearchChange = useDebouncedCallback((value: string) => {
     if (regexInput) {
       // Only call onSearchChange if the value matches the regex pattern or is empty
@@ -107,10 +138,21 @@ export function SearchCombobox<T = unknown>({
     }
   }, 300) as (value: string) => void;
 
+  // Handler para búsqueda local: actualiza inmediatamente (sin debounce)
+  const handleOnSearchChangeImmediate = (value: string) => {
+    // Actualizar el valor de búsqueda local inmediatamente para filtrado local
+    setSearchValue(value);
+  };
+
   function setOpen(isOpen: boolean) {
     setOpenState(isOpen);
-    // Solo resetear la búsqueda cuando se cierra el popover, pero sin causar re-renderizados
-    if (!isOpen) {
+    // Resetear la búsqueda cuando se abre o cierra el popover
+    if (isOpen) {
+      // Resetear el valor de búsqueda cuando se abre el popover
+      setSearchValue("");
+    } else {
+      // Resetear el valor de búsqueda cuando se cierra el popover
+      setSearchValue("");
       // Usar setTimeout para evitar el bucle infinito
       setTimeout(() => {
         handleOnSearchChange("None");
@@ -128,7 +170,9 @@ export function SearchCombobox<T = unknown>({
           className={cn("justify-between w-full truncate", className)}
           disabled={disabled}
         >
-          <span className="truncate flex items-center capitalize">{label ?? selectItemMsg}</span>
+          <span className="truncate flex items-center capitalize">
+            {typeof label === "string" ? label : (label ?? selectItemMsg)}
+          </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -138,9 +182,16 @@ export function SearchCombobox<T = unknown>({
         align={align}
       >
         <Command shouldFilter={false}>
-          <CommandInput placeholder={searchPlaceholder} onValueChange={handleOnSearchChange} />
+          <CommandInput
+            placeholder={searchPlaceholder}
+            value={onSearchChange ? undefined : searchValue}
+            onValueChange={onSearchChange ? handleOnSearchChange : handleOnSearchChangeImmediate}
+          />
           <CommandList>
             {/* <CommandEmpty>{noResultsMsg}</CommandEmpty> */}
+            {!isLoading && !isError && filteredItems.length === 0 && items.length > 0 && (
+              <CommandEmpty>{noResultsMsg}</CommandEmpty>
+            )}
             {!isLoading && !isError && items.length === 0 && <CommandEmpty>{noResultsMsg}</CommandEmpty>}
             {isLoading && <CommandEmpty>{warningsMessages.loading}</CommandEmpty>}
             {isError && <CommandEmpty>{error?.message}</CommandEmpty>}
@@ -158,6 +209,11 @@ export function SearchCombobox<T = unknown>({
             {isLoadingError && (
               <CommandGroup>
                 <SmallErrorMessage error={error ? error : defaultError} reset={refetch}></SmallErrorMessage>
+              </CommandGroup>
+            )}
+            {!isLoading && !isError && filteredItems.length === 0 && items.length > 0 && (
+              <CommandGroup>
+                <NotFoundSearchResults>{notFoundAction}</NotFoundSearchResults>
               </CommandGroup>
             )}
             {!isLoading && !isError && items.length === 0 && (
@@ -180,21 +236,22 @@ export function SearchCombobox<T = unknown>({
                     {unselectMsg}
                   </CommandItem>
                 )}
-                {items.map((item) => {
+                {filteredItems.map((item) => {
                   const isSelected = value === item.value || selected.includes(item.value);
                   return (
                     <CommandItem
                       key={item.value}
                       value={item.value}
-                      keywords={[item.label]}
+                      keywords={item.keywords ?? (typeof item.label === "string" ? [item.label] : [])}
                       onSelect={(value) => {
-                        onSelect(value, item.label, item?.entity);
+                        const labelText = typeof item.label === "string" ? item.label : item.value;
+                        onSelect(value, labelText, item?.entity);
                         setOpen(false);
                       }}
                       className="capitalize"
                       disabled={isSelected}
                     >
-                      {item.label}
+                      {typeof item.label === "string" ? item.label : item.label}
                       <Check className={cn("ml-auto h-4 w-4", isSelected ? "opacity-100" : "opacity-0")} />
                     </CommandItem>
                   );

@@ -2,7 +2,18 @@
 
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { Ban, CheckCircle, ChevronDown, ChevronRight, Clock, Ellipsis, History, RotateCcw, Trash } from "lucide-react";
+import {
+  Ban,
+  CheckCircle,
+  ChevronDown,
+  ChevronRight,
+  Clock,
+  Ellipsis,
+  History,
+  RotateCcw,
+  ShieldAlert,
+  Trash,
+} from "lucide-react";
 import * as RPNInput from "react-phone-number-input";
 import flags from "react-phone-number-input/flags";
 
@@ -23,6 +34,7 @@ import { CustomerDocumentTypeLabels, CustomerMaritalStatusLabels } from "../../_
 import { ManagePastReservationsDialog } from "../manage-past-reservations/ManagePastReservationsDialog";
 import { DeleteCustomersDialog } from "../state-management/DeleteCustomersDialog";
 import { ReactivateCustomersDialog } from "../state-management/ReactivateCustomersDialog";
+import { ToggleBlacklistDialog } from "../state-management/ToggleBlacklistDialog";
 import { UpdateCustomerSheet } from "../update/UpdateCustomersSheet";
 
 /**
@@ -316,8 +328,9 @@ export const customersColumns = (
       const [showReactivateDialog, setShowReactivateDialog] = useState(false);
       const [showEditDialog, setShowEditDialog] = useState(false);
       const [showManagePastReservationsDialog, setShowManagePastReservationsDialog] = useState(false);
+      const [showToggleBlacklistDialog, setShowToggleBlacklistDialog] = useState(false);
 
-      const { isActive } = row.original;
+      const { isActive, isBlacklist } = row.original;
       return (
         <div>
           <div>
@@ -355,6 +368,16 @@ export const customersColumns = (
                 }}
               />
             )}
+            {showToggleBlacklistDialog && (
+              <ToggleBlacklistDialog
+                open={showToggleBlacklistDialog}
+                onOpenChange={setShowToggleBlacklistDialog}
+                customer={row?.original}
+                onSuccess={() => {
+                  row.toggleSelected(false);
+                }}
+              />
+            )}
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -385,6 +408,17 @@ export const customersColumns = (
                 Reservas pasadas
                 <DropdownMenuShortcut>
                   <Clock className="size-4" aria-hidden="true" />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onSelect={() => setShowToggleBlacklistDialog(true)}
+                disabled={!isActive}
+                className="group"
+              >
+                {isBlacklist ? "Remover de Lista Negra" : "Agregar a Lista Negra"}
+                <DropdownMenuShortcut>
+                  <ShieldAlert className="size-4" aria-hidden="true" />
                 </DropdownMenuShortcut>
               </DropdownMenuItem>
               {isSuperAdmin && (

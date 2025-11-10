@@ -210,6 +210,20 @@ export const customersApi = createApi({
         credentials: "include",
       }),
     }),
+
+    // Cambiar estado de blacklist de un cliente
+    toggleBlacklist: build.mutation<
+      Customer,
+      { id: string; isBlacklist: boolean; blacklistReason?: string; blacklistDate?: string }
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/customers/${id}/blacklist`,
+        method: "PATCH",
+        body,
+        credentials: "include",
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: "Customer", id }, "Customer"],
+    }),
   }),
 });
 
@@ -226,4 +240,5 @@ export const {
   useImportCustomersMutation,
   useLazyDownloadCustomerTemplateQuery,
   useGetCustomerDataByDniQuery,
+  useToggleBlacklistMutation,
 } = customersApi;

@@ -36,7 +36,7 @@ export default function TodayTabsContentDashboard({
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-7 md:col-span-4">
           <CardHeader className="pb-2">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
               <div>
                 <CardTitle className="text-xl">Check-ins de Hoy</CardTitle>
                 <CardDescription>Huéspedes que llegarán hoy</CardDescription>
