@@ -19,9 +19,7 @@ export const useCustomerBlacklist = () => {
     const promise = runAndHandleError(() => toggleBlacklist(input).unwrap());
 
     toast.promise(promise, {
-      loading: input.isBlacklist
-        ? "Agregando cliente a la lista negra..."
-        : "Removiendo cliente de la lista negra...",
+      loading: input.isBlacklist ? "Agregando cliente a la lista negra..." : "Removiendo cliente de la lista negra...",
       success: input.isBlacklist
         ? "Cliente agregado a la lista negra correctamente"
         : "Cliente removido de la lista negra correctamente",
@@ -37,4 +35,3 @@ export const useCustomerBlacklist = () => {
     isLoadingToggleBlacklist,
   };
 };
-

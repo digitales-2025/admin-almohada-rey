@@ -1,8 +1,8 @@
 "use client";
 
 import type React from "react";
-import { format, parse } from "date-fns";
 import { useEffect } from "react";
+import { format, parse } from "date-fns";
 import { AlertTriangle, Ban, CheckCircle } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 
@@ -29,7 +29,7 @@ export default function ToggleBlacklistForm({
   customer,
 }: ToggleBlacklistFormProps) {
   const isBlacklist = form.watch("isBlacklist");
-  
+
   // Datos del blacklist actual si existe
   const hasBlacklistData = isCurrentlyBlacklisted && customer.blacklistReason && customer.blacklistDate;
 
@@ -183,9 +183,7 @@ export default function ToggleBlacklistForm({
               <div className="flex items-start gap-3">
                 <CheckCircle className="size-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                    Remover de Lista Negra
-                  </p>
+                  <p className="text-sm font-medium text-blue-900 dark:text-blue-100">Remover de Lista Negra</p>
                   <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
                     Al remover el cliente de la lista negra, se eliminarán automáticamente la razón y la fecha
                     asociadas.
@@ -229,9 +227,7 @@ export default function ToggleBlacklistForm({
 
                   {(customer.blacklistedById || customer.blacklistedBy) && (
                     <div>
-                      <p className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
-                        Agregado por:
-                      </p>
+                      <p className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Agregado por:</p>
                       <p className="text-sm text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 p-3 rounded-md border border-slate-200 dark:border-slate-700">
                         {customer.blacklistedBy
                           ? `${customer.blacklistedBy.name} (${customer.blacklistedBy.email})`
@@ -250,4 +246,3 @@ export default function ToggleBlacklistForm({
     </Form>
   );
 }
-
