@@ -72,7 +72,7 @@ export default function UpcomingReservations({ weekReservations }: UpcomingReser
             <CardTitle className="flex items-center gap-2">Próximas Reservas</CardTitle>
             <CardDescription>Reservas para los próximos 7 días</CardDescription>
           </div>
-          <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="flex flex-col sm:flex-row items-center space-x-2 gap-2">
             <Badge
               className={`${reservationStatusConfig.CONFIRMED.backgroundColorIntense} hover:${reservationStatusConfig.CONFIRMED.backgroundColorIntense} ${reservationStatusConfig.CONFIRMED.borderColor} text-white text-center`}
             >

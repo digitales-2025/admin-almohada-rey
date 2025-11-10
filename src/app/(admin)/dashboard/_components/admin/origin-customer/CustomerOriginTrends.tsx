@@ -28,7 +28,7 @@ export function CustomerOriginTrends({ monthlyCustomerOrigin, className }: Custo
         <CardDescription>Evolución mensual de huéspedes por origen</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center justify-center gap-6 mb-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-4">
           <div className="flex items-center gap-2">
             <div className="h-3 w-8 rounded-full bg-emerald-500"></div>
             <span className="text-sm font-medium flex items-center gap-1">
@@ -43,7 +43,7 @@ export function CustomerOriginTrends({ monthlyCustomerOrigin, className }: Custo
           </div>
         </div>
 
-        <div className="h-[300px] w-full">
+        <div className="h-full sm:h-[300px] w-full">
           <ChartContainer
             config={{
               nacionales: {
