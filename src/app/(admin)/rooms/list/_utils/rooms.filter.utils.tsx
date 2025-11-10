@@ -1,5 +1,8 @@
-import { CheckCircle2, XCircle } from "lucide-react";
+import * as React from "react";
+import { CheckCircle2, Users, XCircle } from "lucide-react";
 
+import { DetailedRoom } from "@/app/(admin)/reservation/_schemas/reservation.schemas";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { FloorTypeLabels, getRoomTypeKey, RoomStatusLabels, RoomTypeLabels } from "./rooms.utils";
 
@@ -89,3 +92,113 @@ export const RoomTypeOption = ({ label, className }: RoomTypeOptionProps) => {
     </div>
   );
 };
+
+/**
+ * Capitaliza la primera letra de un string
+ */
+function capitalize(str: string): string {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
+/**
+ * Genera un string o ReactNode simple para el label del botón del combobox de habitaciones
+ * @param room - La habitación a mostrar
+ * @returns String o ReactNode con el label formateado
+ */
+export function createRoomComboboxLabelString(room: DetailedRoom): string {
+  const roomNumber = room?.number ?? 0;
+  const roomType = room?.RoomTypes?.name ?? "Sin tipo";
+  const roomPrice = room?.RoomTypes?.price ?? 0;
+  const roomCapacity = room?.RoomTypes?.guests ?? 0;
+
+  // Capitalizar el tipo de habitación (usar el nombre original)
+  const roomTypeLabel = capitalize(roomType);
+
+  return `${roomNumber} - ${roomTypeLabel} (${roomCapacity} huéspedes) - ${roomPrice.toLocaleString("es-PE", {
+    style: "currency",
+    currency: "PEN",
+  })}`;
+}
+
+/**
+ * Genera un componente React para el label de una habitación en un combobox
+ * Diseño innovador y moderno que respeta el UX/UI del sistema
+ * @param room - La habitación a mostrar
+ * @returns Componente React con el label formateado
+ */
+export function createRoomComboboxLabel(room: DetailedRoom): React.ReactNode {
+  const roomNumber = room?.number ?? 0;
+  const roomType = room?.RoomTypes?.name ?? "Sin tipo";
+  const roomPrice = room?.RoomTypes?.price ?? 0;
+  const roomCapacity = room?.RoomTypes?.guests ?? 0;
+  const roomStatus = room?.status;
+
+  // Solo normalizar para obtener el icono
+  const typeKey = getRoomTypeKey(roomType);
+  const roomTypeConfig = RoomTypeLabels[typeKey];
+  const RoomTypeIcon = roomTypeConfig?.icon || XCircle;
+
+  // Usar el nombre original capitalizado para el label
+  const roomTypeLabel = capitalize(roomType);
+
+  // Obtener configuración del estado de la habitación
+  const statusConfig = roomStatus ? RoomStatusLabels[roomStatus] : null;
+  const StatusIcon = statusConfig?.icon || XCircle;
+  const statusLabel = statusConfig?.label || "Sin estado";
+
+  return (
+    <div className="flex items-start gap-3 w-full min-w-0 py-0.5">
+      {/* Icono del tipo de habitación - elemento visual destacado */}
+      <div
+        className={cn(
+          "flex items-center justify-center w-9 h-9 rounded-full border-2 flex-shrink-0",
+          roomTypeConfig?.className || "border-muted"
+        )}
+      >
+        <RoomTypeIcon className="h-4 w-4" />
+      </div>
+
+      {/* Contenido principal */}
+      <div className="flex flex-col gap-1 flex-1 min-w-0">
+        {/* Primera fila: Número y tipo de habitación */}
+        <div className="flex items-center gap-2 w-full min-w-0">
+          <span className="text-sm text-foreground truncate flex-1 min-w-0 font-medium">
+            Habitación {roomNumber} - {roomTypeLabel}
+          </span>
+        </div>
+
+        {/* Segunda fila: Capacidad, precio y estado */}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            <Users className="h-3 w-3 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground whitespace-nowrap">{roomCapacity}</span>
+          </div>
+          <span className="text-xs text-muted-foreground">•</span>
+          <span className="text-xs text-foreground font-medium whitespace-nowrap">
+            {roomPrice.toLocaleString("es-PE", {
+              style: "currency",
+              currency: "PEN",
+            })}
+          </span>
+          {statusConfig && (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">•</span>
+              <Badge
+                variant="outline"
+                size="sm"
+                className={cn(
+                  "inline-flex items-center gap-1 px-2 py-0.5 rounded-md border-0 flex-shrink-0",
+                  statusConfig.className
+                )}
+              >
+                <StatusIcon className="h-3 w-3 flex-shrink-0" />
+                <span className="text-xs font-medium leading-none">{statusLabel}</span>
+              </Badge>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

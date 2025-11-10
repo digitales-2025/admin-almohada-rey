@@ -71,8 +71,8 @@ export function GuestsDetailsDialog({
 }) {
   const DIALOG_MESSAGES = {
     button: "Mostrar Acompañantes",
-    title: "Detalles de venta de productos",
-    description: `Aquí puedes ver el detalle de la venta de productos.`,
+    title: "Detalles de Acompañantes",
+    description: `Aquí puedes ver el detalle de los acompañantes.`,
     cancel: "Cerrar",
   } as const;
   const [open, setOpen] = useState(false);

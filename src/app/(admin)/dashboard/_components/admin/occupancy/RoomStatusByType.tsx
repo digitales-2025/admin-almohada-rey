@@ -86,7 +86,7 @@ export function RoomStatusByType({ roomOccupancy }: RoomStatusByTypeProps) {
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
             {statusStats.map((stat) => {
               const config = getRoomStatusConfig(stat.status);
               const StatusIcon = StatusIcons[stat.status] || StatusIcons[RoomStatus.AVAILABLE];
@@ -118,7 +118,7 @@ export function RoomStatusByType({ roomOccupancy }: RoomStatusByTypeProps) {
           <CardTitle className="text-lg">Tipos de Habitación</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-row flex-wrap w-full gap-3">
+          <div className="flex flex-row flex-wrap w-full gap-3 items-center justify-center">
             {roomTypes.map((type) => {
               const typeKey = getRoomTypeKey(type);
               const typeConfig = RoomTypeLabels[typeKey] || RoomTypeLabels.default;
@@ -161,7 +161,7 @@ export function RoomStatusByType({ roomOccupancy }: RoomStatusByTypeProps) {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {currentRooms.map((room) => {
               const config = getRoomStatusConfig(room.status);
               const StatusIcon = StatusIcons[room.status] || StatusIcons[RoomStatus.AVAILABLE];
