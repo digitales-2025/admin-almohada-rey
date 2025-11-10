@@ -465,33 +465,30 @@ export const reservationColumns = (
                 </DropdownMenuItem>
               )}
 
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem
+                onSelect={() => setShowToggleBlacklistDialog(true)}
+                disabled={!row.original.customer?.isActive}
+                className="group"
+              >
+                {row.original.customer?.isBlacklist ? "Remover de Lista Negra" : "Agregar a Lista Negra"}
+                <DropdownMenuShortcut>
+                  <ShieldAlert className="size-4" aria-hidden="true" />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
               {isSuperAdmin && (
-                <>
-                  <DropdownMenuSeparator />
-
-                  <DropdownMenuItem
-                    onSelect={() => setShowToggleBlacklistDialog(true)}
-                    disabled={!row.original.customer?.isActive}
-                    className="group"
-                  >
-                    {row.original.customer?.isBlacklist ? "Remover de Lista Negra" : "Agregar a Lista Negra"}
-                    <DropdownMenuShortcut>
-                      <ShieldAlert className="size-4" aria-hidden="true" />
-                    </DropdownMenuShortcut>
-                  </DropdownMenuItem>
-
-                  <DropdownMenuItem
-                    onSelect={() => setShowDeactivateDialog(true)}
-                    /* Habilitado si: está activo y se puede desactivar, O si hay un pago pendiente de eliminar */
-                    disabled={!(isActive && canDeactivate) && !isPendingDeletePayment}
-                    variant="destructive"
-                  >
-                    Archivar
-                    <DropdownMenuShortcut>
-                      <Trash className="size-4 text-destructive" aria-hidden="true" />
-                    </DropdownMenuShortcut>
-                  </DropdownMenuItem>
-                </>
+                <DropdownMenuItem
+                  onSelect={() => setShowDeactivateDialog(true)}
+                  /* Habilitado si: está activo y se puede desactivar, O si hay un pago pendiente de eliminar */
+                  disabled={!(isActive && canDeactivate) && !isPendingDeletePayment}
+                  variant="destructive"
+                >
+                  Archivar
+                  <DropdownMenuShortcut>
+                    <Trash className="size-4 text-destructive" aria-hidden="true" />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
               )}
             </DropdownMenuContent>
           </DropdownMenu>
