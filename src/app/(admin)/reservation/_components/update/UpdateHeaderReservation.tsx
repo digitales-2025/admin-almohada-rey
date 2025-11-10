@@ -1,21 +1,17 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
 import { CustomFormDescription } from "@/components/form/CustomFormDescription";
-import { Button } from "@/components/ui/button";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
 import { socketService } from "@/services/socketService";
 import { SelectOption } from "@/types/form/select-option";
 import { DetailedReservation, DetailedRoom, UpdateReservationInput } from "../../_schemas/reservation.schemas";
 import { UPDATE_FORMSTATICS } from "../../_statics/forms";
 import { documentTypeStatusConfig } from "../../_types/document-type.enum.config";
+import { SearchRoomCombobox } from "../search/SearchRoomCombobox";
 
 interface UpdateHeaderReservationProps {
   form: UseFormReturn<UpdateReservationInput>;
@@ -201,62 +197,18 @@ export default function UpdateHeaderReservation({
           <FormItem className="w-full">
             <FormLabel>{UPDATE_FORMSTATICS.roomId.label}</FormLabel>
             <FormControl>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      className={cn(
-                        "w-full justify-between capitalize truncate",
-                        !field.value && "text-muted-foreground"
-                      )}
-                      disabled={filteredRoomOptions.length === 0}
-                    >
-                      {field.value
-                        ? filteredRoomOptions.find((room) => room.value === field.value)?.label
-                        : UPDATE_FORMSTATICS.roomId.placeholder}
-                      <ChevronsUpDown className="opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
-                  <Command>
-                    <CommandInput placeholder={UPDATE_FORMSTATICS.roomId.placeholder} className="h-9" />
-                    <CommandList>
-                      {filteredRoomOptions.length === 0 ? (
-                        <CommandEmpty>No hay habitaciones disponibles</CommandEmpty>
-                      ) : (
-                        <CommandGroup>
-                          {filteredRoomOptions.map((room) => {
-                            // Determinar si esta es la habitación original de la reserva
-                            const isOriginalRoom = room.value === reservation.roomId;
-
-                            return (
-                              <CommandItem
-                                value={room.value}
-                                key={room.value}
-                                onSelect={() => {
-                                  form.setValue("roomId", room.value);
-                                  const detailedRoom = availableRooms?.find((r) => r.id === room.value);
-                                  onRoomSelected(detailedRoom);
-                                }}
-                                className={cn(isOriginalRoom && "font-medium")}
-                              >
-                                {isOriginalRoom ? "🔄 " : ""}
-                                {room.label}
-                                <Check
-                                  className={cn("ml-auto", room.value === field.value ? "opacity-100" : "opacity-0")}
-                                />
-                              </CommandItem>
-                            );
-                          })}
-                        </CommandGroup>
-                      )}
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
+              <SearchRoomCombobox
+                rooms={availableRooms ?? []}
+                unavailableRoomIds={unavailableRoomIds}
+                alwaysAvailableRoomIds={[reservation.roomId]} // Siempre incluir la habitación original
+                defaultValue={field.value}
+                className="max-w-none"
+                disabled={filteredRoomOptions.length === 0}
+                onValueChange={(value, entity) => {
+                  form.setValue("roomId", value);
+                  onRoomSelected(entity);
+                }}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>

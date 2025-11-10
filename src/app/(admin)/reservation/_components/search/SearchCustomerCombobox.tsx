@@ -4,10 +4,13 @@ import { useCallback, useState } from "react";
 
 import { useCustomers } from "@/app/(admin)/customers/_hooks/use-customers";
 import { ApiCustomer } from "@/app/(admin)/customers/_types/customer";
+import {
+  createCustomerComboboxLabel,
+  createCustomerComboboxLabelString,
+} from "@/app/(admin)/customers/_utils/customers.filter.utils";
 // import { useProducts } from "@/app/(admin)/(catalog)/product/products/_hooks/useProduct";
 import { RTKUseQueryHookResult, SearchCombobox } from "@/components/form/RemoteSearchCombobox";
 import { cn } from "@/lib/utils";
-import { documentTypeStatusConfig } from "../../_types/document-type.enum.config";
 import { CreateCustomersReservationsSheet } from "../create-customers/CreateCustomersReservationsSheet";
 
 type SearchOrderComoBoxProps = {
@@ -19,7 +22,7 @@ type SearchOrderComoBoxProps = {
 
 type ComboboxItem<T> = {
   value: string;
-  label: string;
+  label: string | React.ReactNode;
   entity: T;
 };
 
@@ -31,7 +34,7 @@ export function SearchCustomerCombobox({
 }: SearchOrderComoBoxProps) {
   const DefaultSearchValue = "None"; //IMPORTANT: This value is used to SEND a request to the backend when the search input is empty
   const [value, setValue] = useState(defaultValue);
-  const [label, setLabel] = useState("Buscar Cliente por Nro. de Documento");
+  const [label, setLabel] = useState<string | React.ReactNode>("Buscar Cliente por Nro. de Documento");
   // const [entity, setEntity] = useState<T | null>(null);
   const [search, setSearch] = useState(DefaultSearchValue);
 
@@ -40,14 +43,9 @@ export function SearchCustomerCombobox({
   const { data, isLoading, isError, error, refetch } = searchQuery;
 
   const mapToComboboxItem = useCallback((customer: ApiCustomer): ComboboxItem<ApiCustomer> => {
-    const documenTypeTranlation = customer?.documentType
-      ? documentTypeStatusConfig[customer.documentType].name
-      : "Sin tipo";
-    const documentString = `${documenTypeTranlation ?? "Sin tipo"}: ${customer?.documentNumber ?? "Sin documento"}`;
-    const label = `${customer?.name ?? "Sin nombre"} - ${documentString}`;
     return {
       value: customer.documentNumber ?? "None",
-      label: label,
+      label: createCustomerComboboxLabel(customer),
       entity: customer,
     };
   }, []);
@@ -78,8 +76,15 @@ export function SearchCustomerCombobox({
       value={value}
       label={label}
       onSelect={(value, label, entity) => {
-        setValue(value ?? DefaultSearchValue); //antes estaba ''
-        setLabel(label ?? DefaultSearchValue); //antes estaba ''
+        setValue(value ?? DefaultSearchValue);
+        // Si el entity es un ApiCustomer, generar un string o ReactNode para el botón
+        const labelToSet: string | React.ReactNode =
+          entity && typeof entity === "object" && "documentNumber" in entity
+            ? createCustomerComboboxLabelString(entity as ApiCustomer)
+            : typeof label === "string"
+              ? label
+              : DefaultSearchValue;
+        setLabel(labelToSet);
         onValueChange(value, entity);
       }}
       onSearchChange={(val) => setSearch(val === "" ? DefaultSearchValue : val)} // set search to "None" if empty string
