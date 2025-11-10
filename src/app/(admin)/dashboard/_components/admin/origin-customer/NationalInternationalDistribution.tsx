@@ -40,7 +40,7 @@ export default function NationalInternationalDistribution({
           </CardHeader>
           <CardContent>
             <div className="flex flex-col space-y-8">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex flex-col items-center justify-center p-6 rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950/40 dark:to-emerald-900/30">
                   <Building2 className="h-8 w-8 text-emerald-600 dark:text-emerald-400 mb-2" />
                   <h3 className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{nationalPercentage}%</h3>

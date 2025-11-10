@@ -23,7 +23,7 @@ export default function RoomsTabsContentDashboard({
 
       <Card>
         <CardHeader className="pb-2">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
             <div>
               <CardTitle className="text-xl">Habitaciones Disponibles</CardTitle>
               <CardDescription>Habitaciones listas para check-in</CardDescription>

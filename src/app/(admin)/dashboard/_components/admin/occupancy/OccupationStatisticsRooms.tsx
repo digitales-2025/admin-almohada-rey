@@ -162,7 +162,7 @@ export default function OccupationStatisticsRooms({ occupancyStatisticsPercentag
         </div>
 
         {/* Leyenda del gráfico */}
-        <div className="grid grid-cols-2 gap-2 p-4 border-t border-b">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-4 border-t border-b">
           {sortedStats.map((stat) => {
             const typeKey = getRoomTypeKey(stat.type);
             const typeConfig = RoomTypeLabels[typeKey] || RoomTypeLabels.default;

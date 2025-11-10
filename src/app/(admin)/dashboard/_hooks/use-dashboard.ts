@@ -29,13 +29,18 @@ interface UseDashboardProps {
 export const useDashboard = (options: UseDashboardProps = {}) => {
   const { year = new Date().getFullYear(), activeTab, mode = "admin" } = options;
 
-  // ===== QUERIES PARA ADMIN =====
+  // ===== VARIABLES DE CONTROL =====
   const shouldLoadAdminData = mode === "admin";
+  const shouldLoadReceptionistData = mode === "receptionist";
   const shouldLoadSummary = shouldLoadAdminData && (activeTab === "resumen" || !activeTab);
   const shouldLoadOccupancy = shouldLoadAdminData && (activeTab === "ocupacion" || !activeTab);
   const shouldLoadReservations = shouldLoadAdminData && (activeTab === "reservas" || !activeTab);
   const shouldLoadFinance = shouldLoadAdminData && (activeTab === "finanzas" || !activeTab);
   const shouldLoadOrigin = shouldLoadAdminData && (activeTab === "procedencia" || !activeTab);
+  const shouldLoadToday = shouldLoadReceptionistData && (activeTab === "hoy" || !activeTab);
+  const shouldLoadRooms = shouldLoadReceptionistData && (activeTab === "habitaciones" || !activeTab);
+  const shouldLoadWeekReservations = shouldLoadReceptionistData && (activeTab === "semana-reservas" || !activeTab);
+  const shouldLoadAmenities = shouldLoadReceptionistData && (activeTab === "amenidades" || !activeTab);
 
   // Estadísticas anuales (resumen)
   const {
@@ -57,13 +62,14 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
     refetchOnMountOrArgChange: true,
   });
 
-  // Mapa de ocupación de habitaciones (resumen, ocupación)
+  // Mapa de ocupación de habitaciones (resumen, ocupación, habitaciones en receptionist)
+  const shouldLoadRoomOccupancyForReceptionist = shouldLoadReceptionistData && shouldLoadRooms;
   const {
     data: roomOccupancy,
     isLoading: isLoadingRoomOccupancy,
     refetch: refetchRoomOccupancy,
   } = useGetRoomOccupancyQuery(undefined, {
-    skip: !shouldLoadSummary && !shouldLoadOccupancy,
+    skip: !shouldLoadSummary && !shouldLoadOccupancy && !shouldLoadRoomOccupancyForReceptionist,
     refetchOnMountOrArgChange: true,
   });
 
@@ -158,12 +164,6 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
   });
 
   // ===== QUERIES PARA RECEPCIONISTA =====
-  const shouldLoadReceptionistData = mode === "receptionist";
-  const shouldLoadToday = shouldLoadReceptionistData && (activeTab === "hoy" || !activeTab);
-  const shouldLoadRooms = shouldLoadReceptionistData && (activeTab === "habitaciones" || !activeTab);
-  const shouldLoadWeekReservations = shouldLoadReceptionistData && (activeTab === "semana-reservas" || !activeTab);
-  const shouldLoadAmenities = shouldLoadReceptionistData && (activeTab === "amenidades" || !activeTab);
-
   // Estadísticas de recepcionista para hoy (hoy)
   const {
     data: todayRecepcionistStatistics,
@@ -263,7 +263,7 @@ export const useDashboard = (options: UseDashboardProps = {}) => {
       isLoadingTop5TodayCheckOut ||
       isLoadingTop5PriorityPendingAmenities);
 
-  const isLoadingRooms = shouldLoadRooms && isLoadingTodayAvailableRooms;
+  const isLoadingRooms = shouldLoadRooms && (isLoadingTodayAvailableRooms || isLoadingRoomOccupancy);
 
   const isLoadingWeekReservationsData = shouldLoadWeekReservations && isLoadingWeekReservations;
 

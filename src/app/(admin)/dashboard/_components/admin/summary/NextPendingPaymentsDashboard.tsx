@@ -22,7 +22,7 @@ export function NextPendingPaymentsDashboard({ nextPendingPayments }: NextPendin
     return (
       <Card className="col-span-3 md:col-span-1">
         <CardHeader className="pb-2">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
             <div>
               <CardTitle className="text-xl">Pagos Pendientes</CardTitle>
               <CardDescription>No hay pagos pendientes este mes</CardDescription>
@@ -65,7 +65,7 @@ export function NextPendingPaymentsDashboard({ nextPendingPayments }: NextPendin
   return (
     <Card className="col-span-3 md:col-span-1">
       <CardHeader className="pb-2">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
           <div>
             <CardTitle className="text-xl">Pagos Pendientes</CardTitle>
             <CardDescription>

@@ -48,7 +48,7 @@ export function AvailableRooms({ todayAvailableRooms = [] }: AvailableRoomsProps
           const StatusIcon = statusInfo.icon;
 
           return (
-            <div key={room.id} className="flex items-center justify-between border-b pb-4">
+            <div key={room.id} className="flex flex-col sm:flex-row items-center justify-between border-b pb-4 gap-2">
               <div className="flex items-center space-x-4">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
                   <RoomTypeIcon className={`h-5 w-5 ${roomTypeInfo.className}`} />
@@ -56,14 +56,14 @@ export function AvailableRooms({ todayAvailableRooms = [] }: AvailableRoomsProps
                 <div>
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-medium">Habitación {room.number}</p>
-                    <Badge variant="outline" className={`text-xs ${roomTypeInfo.className}`}>
-                      {roomTypeInfo.label}
-                    </Badge>
                   </div>
                   <p className="text-xs text-muted-foreground">{formatPrice(room.price)} por noche</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-col sm:flex-row items-center space-x-2 gap-2">
+                <Badge variant="outline" className={`text-xs ${roomTypeInfo.className}`}>
+                  {roomTypeInfo.label}
+                </Badge>
                 <Badge variant="outline" className={statusInfo.className}>
                   <StatusIcon className="h-3 w-3 mr-1" />
                   {statusInfo.label}

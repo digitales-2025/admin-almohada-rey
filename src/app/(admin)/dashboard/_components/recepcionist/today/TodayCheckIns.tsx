@@ -52,7 +52,7 @@ export function TodayCheckIns({ top5TodayCheckIn = [] }: TodayCheckInsProps) {
         </div>
       ) : (
         top5TodayCheckIn.map((checkIn) => (
-          <div key={checkIn.id} className="flex items-center justify-between border-b pb-4">
+          <div key={checkIn.id} className="flex flex-col sm:flex-row items-center justify-between border-b pb-4 gap-2">
             <div className="flex items-center space-x-4">
               <Avatar>
                 <AvatarFallback>{getInitials(checkIn.customerName)}</AvatarFallback>

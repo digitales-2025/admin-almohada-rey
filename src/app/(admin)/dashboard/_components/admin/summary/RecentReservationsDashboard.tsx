@@ -88,7 +88,7 @@ export function RecentReservationsDashboard({ recentReservations }: RecentReserv
   return (
     <Card className="col-span-3 md:col-span-2">
       <CardHeader className="pb-2">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
           <div>
             <CardTitle className="text-xl">Reservas Recientes</CardTitle>
             <CardDescription>
@@ -109,7 +109,10 @@ export function RecentReservationsDashboard({ recentReservations }: RecentReserv
             const initials = getInitials(reservation.customerName);
 
             return (
-              <div key={reservation.id} className="flex items-center justify-between border-b pb-4">
+              <div
+                key={reservation.id}
+                className="flex flex-col sm:flex-row items-center justify-between border-b pb-4 gap-2"
+              >
                 <div className="flex items-center space-x-4">
                   <Avatar>
                     <AvatarFallback>{initials}</AvatarFallback>
