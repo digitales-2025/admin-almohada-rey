@@ -3,9 +3,11 @@
 import React, { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns-tz";
-import { CalendarCog, CalendarX2, CreditCard, Ellipsis, Pencil, Trash } from "lucide-react";
+import { CalendarCog, CalendarX2, CreditCard, Ellipsis, Pencil, ShieldAlert, Trash } from "lucide-react";
 import { toast } from "sonner";
 
+import { ToggleBlacklistDialog } from "@/app/(admin)/customers/_components/state-management/ToggleBlacklistDialog";
+import type { Customer } from "@/app/(admin)/customers/_types/customer";
 import { DataTableColumnHeader } from "@/components/datatable/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -267,6 +269,7 @@ export const reservationColumns = (
       const [showDetailDialog, setShowDetailDialog] = useState(false);
       const [showExtensionDialog, setShowExtensionDialog] = useState(false);
       const [showDeleteLateCheckoutDialog, setShowDeleteLateCheckoutDialog] = useState(false);
+      const [showToggleBlacklistDialog, setShowToggleBlacklistDialog] = useState(false);
       const { status, isPendingDeletePayment, isActive, appliedLateCheckOut } = row.original;
 
       const confirmConfig = DIALOG_DICTIONARY["CONFIRMED"];
@@ -359,6 +362,17 @@ export const reservationColumns = (
                 open={showDeleteLateCheckoutDialog}
                 onOpenChange={setShowDeleteLateCheckoutDialog}
                 id={row?.original.id}
+              />
+            )}
+
+            {showToggleBlacklistDialog && row.original.customer && (
+              <ToggleBlacklistDialog
+                open={showToggleBlacklistDialog}
+                onOpenChange={setShowToggleBlacklistDialog}
+                customer={row.original.customer as Customer}
+                onSuccess={() => {
+                  row.toggleSelected(false);
+                }}
               />
             )}
           </div>
@@ -454,6 +468,17 @@ export const reservationColumns = (
               {isSuperAdmin && (
                 <>
                   <DropdownMenuSeparator />
+
+                  <DropdownMenuItem
+                    onSelect={() => setShowToggleBlacklistDialog(true)}
+                    disabled={!row.original.customer?.isActive}
+                    className="group"
+                  >
+                    {row.original.customer?.isBlacklist ? "Remover de Lista Negra" : "Agregar a Lista Negra"}
+                    <DropdownMenuShortcut>
+                      <ShieldAlert className="size-4" aria-hidden="true" />
+                    </DropdownMenuShortcut>
+                  </DropdownMenuItem>
 
                   <DropdownMenuItem
                     onSelect={() => setShowDeactivateDialog(true)}
