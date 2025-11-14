@@ -11,7 +11,7 @@ export const editServiceSchema = z.object({
     .min(1, "La descripción es requerida")
     .min(10, "La descripción debe tener al menos 10 caracteres")
     .max(500, "La descripción no puede exceder 500 caracteres"),
-  price: z.number().min(0.01, "El precio debe ser mayor a 0").max(999999.99, "El precio no puede exceder 999,999.99"),
+  price: z.number().min(0, "El precio no puede ser negativo").max(999999.99, "El precio no puede exceder 999,999.99"),
 });
 
 export type EditServiceSchema = z.infer<typeof editServiceSchema>;

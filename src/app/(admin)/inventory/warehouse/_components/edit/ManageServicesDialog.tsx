@@ -117,7 +117,7 @@ export function ManageServicesDialog() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-2 p-2 hover:bg-primary/10"
+                              className="opacity-60 group-hover:opacity-100 transition-opacity duration-200 ml-2 p-2 hover:bg-primary/10 flex-shrink-0"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleEdit(service);
@@ -217,7 +217,7 @@ export function ManageServicesDialog() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-2 p-2 hover:bg-primary/10"
+                          className="opacity-60 group-hover:opacity-100 transition-opacity duration-200 ml-2 p-2 hover:bg-primary/10 flex-shrink-0"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleEdit(service);
