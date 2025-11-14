@@ -40,6 +40,15 @@ export default function ManageServicesForm({
     },
   });
 
+  // Actualizar el formulario cuando cambie el servicio o el modo de edición
+  useEffect(() => {
+    form.reset({
+      name: service.name || "",
+      description: service.description || "",
+      price: service.price ?? 0,
+    });
+  }, [service.id, service.name, service.description, service.price, isEditing]);
+
   const handleCancel = () => {
     form.reset({
       name: service.name,
@@ -142,12 +151,15 @@ export default function ManageServicesForm({
                           <InputWithIcon
                             Icon={Banknote}
                             type="number"
-                            min={0.01}
+                            min={0}
                             step={0.01}
                             placeholder="0.00"
                             {...field}
-                            onChange={(e) => field.onChange(e.target.valueAsNumber || 0)}
-                            value={field.value ?? ""}
+                            onChange={(e) => {
+                              const value = e.target.valueAsNumber;
+                              field.onChange(isNaN(value) ? 0 : value);
+                            }}
+                            value={field.value !== undefined && field.value !== null ? field.value : ""}
                           />
                         </FormControl>
                         <FormMessage />
