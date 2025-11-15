@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronLeft, ChevronRight, RefreshCcw } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -51,6 +51,8 @@ export function CreatePaymentDialog({ open, setOpen, reservation }: CreatePaymen
     initialPagination: { page: 1, pageSize: 10 },
   });
   const [step, setStep] = useState(1);
+  const [isNavigating, setIsNavigating] = useState(false);
+  const isProcessingRef = useRef(false);
 
   const nights = calculateStayNights(reservation.checkInDate, reservation.checkOutDate);
 
@@ -105,69 +107,83 @@ export function CreatePaymentDialog({ open, setOpen, reservation }: CreatePaymen
   }, [watchExtraServices, form.getValues("subtotal")]);
 
   const onSubmit = async (values: CreatePaymentSchema) => {
-    // Calcular el monto total de la reserva (habitación)
-    // El amount debe ser el total de TODAS las noches CON el descuento aplicado
-    const totalNights = nights; // Total de noches de la reserva
-    const roomAmountWithoutDiscount = values.unitPrice * totalNights; // Monto sin descuento
-    const discount = values.discount || 0;
-    const roomAmount = roomAmountWithoutDiscount - discount; // Monto con descuento aplicado
+    // Prevenir múltiples ejecuciones simultáneas
+    if (isProcessingRef.current || isCreatePending) {
+      return;
+    }
 
-    // Calcular el monto total de los servicios extra
-    const extraServicesAmount = values.extraServices.reduce((sum, service) => sum + service.subtotal, 0);
+    isProcessingRef.current = true;
 
-    // Monto total que incluye habitación + servicios extra
-    const totalReservationAmount = roomAmount + extraServicesAmount;
+    try {
+      // Calcular el monto total de la reserva (habitación)
+      // El amount debe ser el total de TODAS las noches CON el descuento aplicado
+      const totalNights = nights; // Total de noches de la reserva
+      const roomAmountWithoutDiscount = values.unitPrice * totalNights; // Monto sin descuento
+      const discount = values.discount || 0;
+      const roomAmount = roomAmountWithoutDiscount - discount; // Monto con descuento aplicado
 
-    // Determinar si el método de pago es PENDING_PAYMENT
-    const isPendingPayment = values.method === PaymentDetailMethod.PENDING_PAYMENT;
+      // Calcular el monto total de los servicios extra
+      const extraServicesAmount = values.extraServices.reduce((sum, service) => sum + service.subtotal, 0);
 
-    // Procesar los detalles de servicios
-    const serviceDetails = values.extraServices.map((service) => ({
-      paymentDate: values.paymentDate,
-      description: `Servicio: ${service.name}`,
-      type: PaymentDetailType.EXTRA_SERVICE,
-      method: values.method,
-      serviceId: service.id,
-      quantity: service.quantity,
-      unitPrice: service.unitPrice,
-      // Si es pago pendiente, el subtotal es 0
-      subtotal: isPendingPayment ? 0 : service.subtotal,
-    }));
+      // Monto total que incluye habitación + servicios extra
+      const totalReservationAmount = roomAmount + extraServicesAmount;
 
-    // Detalle de pago para la habitación
-    const roomDetail = {
-      paymentDate: values.paymentDate,
-      description: values.description || "Pago por habitación",
-      type: PaymentDetailType.ROOM_RESERVATION,
-      method: values.method,
-      roomId: values.roomId,
-      days: values.days,
-      unitPrice: values.unitPrice,
-      // Si es pago pendiente, el subtotal es 0
-      subtotal: isPendingPayment ? 0 : values.subtotal,
-      // Incluir descuento si existe
-      ...(values.discount && values.discount > 0 && { discount: values.discount }),
-    };
+      // Determinar si el método de pago es PENDING_PAYMENT
+      const isPendingPayment = values.method === PaymentDetailMethod.PENDING_PAYMENT;
 
-    // Transformar datos al formato esperado por la API
-    const transformedPaymentData = {
-      // El amount siempre incluye el monto total (habitación + servicios), independientemente del método de pago
-      amount: totalReservationAmount,
-      // Si es pago pendiente, el amountPaid es 0
-      amountPaid: isPendingPayment ? 0 : values.totalAmount,
-      reservationId: reservation.id,
-      observations: values.observations || undefined,
-      paymentDetail: [
-        // Detalles de pago para la habitación
-        roomDetail,
-        // Detalles de pago para servicios extra
-        ...serviceDetails,
-      ],
-    };
+      // Procesar los detalles de servicios
+      const serviceDetails = values.extraServices.map((service) => ({
+        paymentDate: values.paymentDate,
+        description: `Servicio: ${service.name}`,
+        type: PaymentDetailType.EXTRA_SERVICE,
+        method: values.method,
+        serviceId: service.id,
+        quantity: service.quantity,
+        unitPrice: service.unitPrice,
+        // Si es pago pendiente, el subtotal es 0
+        subtotal: isPendingPayment ? 0 : service.subtotal,
+      }));
 
-    startCreateTransition(() => {
-      onCreatePayment(transformedPaymentData);
-    });
+      // Detalle de pago para la habitación
+      const roomDetail = {
+        paymentDate: values.paymentDate,
+        description: values.description || "Pago por habitación",
+        type: PaymentDetailType.ROOM_RESERVATION,
+        method: values.method,
+        roomId: values.roomId,
+        days: values.days,
+        unitPrice: values.unitPrice,
+        // Si es pago pendiente, el subtotal es 0
+        subtotal: isPendingPayment ? 0 : values.subtotal,
+        // Incluir descuento si existe
+        ...(values.discount && values.discount > 0 && { discount: values.discount }),
+      };
+
+      // Transformar datos al formato esperado por la API
+      const transformedPaymentData = {
+        // El amount siempre incluye el monto total (habitación + servicios), independientemente del método de pago
+        amount: totalReservationAmount,
+        // Si es pago pendiente, el amountPaid es 0
+        amountPaid: isPendingPayment ? 0 : values.totalAmount,
+        reservationId: reservation.id,
+        observations: values.observations || undefined,
+        paymentDetail: [
+          // Detalles de pago para la habitación
+          roomDetail,
+          // Detalles de pago para servicios extra
+          ...serviceDetails,
+        ],
+      };
+
+      startCreateTransition(() => {
+        onCreatePayment(transformedPaymentData);
+      });
+    } finally {
+      // Resetear el flag después de un breve delay para permitir que la transición se complete
+      setTimeout(() => {
+        isProcessingRef.current = false;
+      }, 1000);
+    }
   };
 
   useEffect(() => {
@@ -177,40 +193,104 @@ export function CreatePaymentDialog({ open, setOpen, reservation }: CreatePaymen
       // Reset form and step
       form.reset();
       setStep(1);
+      setIsNavigating(false);
+      isProcessingRef.current = false;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccessCreatePayment]);
 
-  const nextStep = async () => {
-    if (step === 1) {
-      const isValid = await form.trigger(["paymentDate", "description", "roomId", "days", "unitPrice"]);
-      if (isValid) setStep(2);
-    } else if (step === 2) {
-      const method = form.getValues("method");
-      if (method) {
-        setStep(3);
-      } else {
-        form.setError("method", {
-          type: "required",
-          message: "Debes seleccionar un método de pago",
-        });
+  // Resetear estados cuando el diálogo se cierra
+  useEffect(() => {
+    if (!open) {
+      setIsNavigating(false);
+      isProcessingRef.current = false;
+      // Resetear el formulario y el paso solo si no fue por éxito
+      if (!isSuccessCreatePayment) {
+        form.reset();
+        setStep(1);
       }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  const nextStep = async () => {
+    // Prevenir múltiples clics simultáneos
+    if (isNavigating || isCreatePending || isProcessingRef.current) {
+      return;
+    }
+
+    setIsNavigating(true);
+
+    try {
+      if (step === 1) {
+        const isValid = await form.trigger(["paymentDate", "description", "roomId", "days", "unitPrice"]);
+        if (isValid) {
+          setStep(2);
+        }
+      } else if (step === 2) {
+        const method = form.getValues("method");
+        if (method) {
+          setStep(3);
+        } else {
+          form.setError("method", {
+            type: "required",
+            message: "Debes seleccionar un método de pago",
+          });
+        }
+      }
+    } finally {
+      // Resetear el estado después de un breve delay
+      setTimeout(() => {
+        setIsNavigating(false);
+      }, 300);
     }
   };
 
   const prevStep = () => {
-    if (step > 1) setStep(step - 1);
+    // Prevenir múltiples clics simultáneos
+    if (isNavigating || isCreatePending || isProcessingRef.current || step <= 1) {
+      return;
+    }
+
+    setIsNavigating(true);
+    setStep(step - 1);
+
+    // Resetear el estado después de un breve delay
+    setTimeout(() => {
+      setIsNavigating(false);
+    }, 300);
   };
 
   // Componente común para los botones de navegación
+  const isButtonDisabled = isNavigating || isCreatePending || isProcessingRef.current;
+
   const NavigationButtons = () => (
     <div className="flex justify-between pt-4 border-t mt-6 w-full">
       {step > 1 ? (
-        <Button type="button" variant="outline" onClick={prevStep} className="gap-1">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            prevStep();
+          }}
+          disabled={isButtonDisabled}
+          className="gap-1"
+        >
           <ChevronLeft className="h-4 w-4" /> Atras
         </Button>
       ) : (
-        <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setOpen(false);
+          }}
+          disabled={isButtonDisabled}
+        >
           Cancelar
         </Button>
       )}
@@ -219,15 +299,34 @@ export function CreatePaymentDialog({ open, setOpen, reservation }: CreatePaymen
         <Button
           type="button"
           onClick={(e) => {
-            e.preventDefault(); // Prevenir cualquier comportamiento por defecto
+            e.preventDefault();
+            e.stopPropagation();
             nextStep();
           }}
+          disabled={isButtonDisabled}
           className="gap-1"
         >
-          Continuar <ChevronRight className="h-4 w-4" />
+          {isNavigating ? (
+            <>
+              <RefreshCcw className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+              Procesando...
+            </>
+          ) : (
+            <>
+              Continuar <ChevronRight className="h-4 w-4" />
+            </>
+          )}
         </Button>
       ) : (
-        <Button disabled={isCreatePending}>
+        <Button
+          type="submit"
+          disabled={isButtonDisabled}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit(onSubmit)();
+          }}
+        >
           {isCreatePending && <RefreshCcw className="mr-2 size-4 animate-spin" aria-hidden="true" />}
           Crear Pago
         </Button>
